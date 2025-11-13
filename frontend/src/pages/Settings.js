@@ -38,6 +38,11 @@ export const Settings = () => {
     toast.success('Grief stages configuration saved!');
   };
   
+  const saveAccidentFollowUp = () => {
+    localStorage.setItem('accident_followup', JSON.stringify(accidentFollowUp));
+    toast.success('Accident/Illness follow-up configuration saved!');
+  };
+  
   return (
     <div className="space-y-6">
       <div>
