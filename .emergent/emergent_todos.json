@@ -1,10 +1,26 @@
 [
   {
-    "content": "Update financial aid event form with scheduling UI",
-    "status": "completed"
+    "content": "Design comprehensive analytics with member demographics, care trends, financial insights",
+    "status": "in_progress"
   },
   {
-    "content": "Test financial aid scheduling system",
-    "status": "completed"
+    "content": "Add engagement analytics (at-risk trends, contact frequency)",
+    "status": "pending"
+  },
+  {
+    "content": "Add financial aid analytics (spending patterns, aid effectiveness)",
+    "status": "pending"
+  },
+  {
+    "content": "Add grief support analytics (completion rates, stage timings)",
+    "status": "pending"
+  },
+  {
+    "content": "Add predictive analytics (at-risk prediction, aid need forecasting)",
+    "status": "pending"
+  },
+  {
+    "content": "Create interactive charts with drill-down capability",
+    "status": "pending"
   }
 ]
