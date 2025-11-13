@@ -302,33 +302,158 @@ export const MemberDetail = () => {
                 )}
                 
                 {newEvent.event_type === 'financial_aid' && (
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200">
-                    <div className="space-y-2">
-                      <Label>Aid Type *</Label>
-                      <Select value={newEvent.aid_type} onValueChange={(v) => setNewEvent({...newEvent, aid_type: v})} required>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="education">{t('aid_types.education')}</SelectItem>
-                          <SelectItem value="medical">{t('aid_types.medical')}</SelectItem>
-                          <SelectItem value="emergency">{t('aid_types.emergency')}</SelectItem>
-                          <SelectItem value="housing">{t('aid_types.housing')}</SelectItem>
-                          <SelectItem value="food">{t('aid_types.food')}</SelectItem>
-                          <SelectItem value="funeral_costs">{t('aid_types.funeral_costs')}</SelectItem>
-                          <SelectItem value="other">{t('aid_types.other')}</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  <div className="space-y-4 p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200">
+                    <h4 className="font-semibold text-green-900 dark:text-green-100">Financial Aid Details</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Aid Type *</Label>
+                        <Select value={newEvent.aid_type} onValueChange={(v) => setNewEvent({...newEvent, aid_type: v})} required>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="education">{t('aid_types.education')}</SelectItem>
+                            <SelectItem value="medical">{t('aid_types.medical')}</SelectItem>
+                            <SelectItem value="emergency">{t('aid_types.emergency')}</SelectItem>
+                            <SelectItem value="housing">{t('aid_types.housing')}</SelectItem>
+                            <SelectItem value="food">{t('aid_types.food')}</SelectItem>
+                            <SelectItem value="funeral_costs">{t('aid_types.funeral_costs')}</SelectItem>
+                            <SelectItem value="other">{t('aid_types.other')}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Amount (Rp) *</Label>
+                        <Input
+                          type="number"
+                          value={newEvent.aid_amount}
+                          onChange={(e) => setNewEvent({...newEvent, aid_amount: e.target.value})}
+                          placeholder="1500000"
+                          required
+                        />
+                      </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Amount (Rp) *</Label>
-                      <Input
-                        type="number"
-                        value={newEvent.aid_amount}
-                        onChange={(e) => setNewEvent({...newEvent, aid_amount: e.target.value})}
-                        placeholder="1500000"
-                        required
-                      />
+                    
+                    {/* Financial Aid Scheduling */}
+                    <div className="space-y-4 border-t pt-4">
+                      <h5 className="font-semibold text-green-800 dark:text-green-200">📅 Aid Schedule</h5>
+                      <div>
+                        <Label>Frequency *</Label>
+                        <Select value={newEvent.schedule_frequency} onValueChange={(v) => setNewEvent({...newEvent, schedule_frequency: v})}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="one_time">One-time (today only)</SelectItem>
+                            <SelectItem value="weekly">Weekly (every week)</SelectItem>
+                            <SelectItem value="monthly">Monthly (every month)</SelectItem>
+                            <SelectItem value="annually">Annually (every year)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      {newEvent.schedule_frequency === 'weekly' && (
+                        <div className="grid grid-cols-3 gap-3 p-3 bg-blue-50 dark:bg-blue-950 rounded">
+                          <div>
+                            <Label className="text-xs">Start Date *</Label>
+                            <Input
+                              type="date"
+                              value={newEvent.schedule_start_date}
+                              onChange={(e) => setNewEvent({...newEvent, schedule_start_date: e.target.value})}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Day of Week *</Label>
+                            <Select value={newEvent.day_of_week} onValueChange={(v) => setNewEvent({...newEvent, day_of_week: v})}>
+                              <SelectTrigger><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="monday">Monday</SelectItem>
+                                <SelectItem value="tuesday">Tuesday</SelectItem>
+                                <SelectItem value="wednesday">Wednesday</SelectItem>
+                                <SelectItem value="thursday">Thursday</SelectItem>
+                                <SelectItem value="friday">Friday</SelectItem>
+                                <SelectItem value="saturday">Saturday</SelectItem>
+                                <SelectItem value="sunday">Sunday</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs">End Date (optional)</Label>
+                            <Input
+                              type="date"
+                              value={newEvent.schedule_end_date}
+                              onChange={(e) => setNewEvent({...newEvent, schedule_end_date: e.target.value})}
+                              placeholder="Leave empty for no end"
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {newEvent.schedule_frequency === 'monthly' && (
+                        <div className="grid grid-cols-3 gap-3 p-3 bg-purple-50 dark:bg-purple-950 rounded">
+                          <div>
+                            <Label className="text-xs">Start Month/Year *</Label>
+                            <Input
+                              type="month"
+                              value={newEvent.schedule_start_date.substring(0, 7)}
+                              onChange={(e) => setNewEvent({...newEvent, schedule_start_date: e.target.value + '-01'})}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Day of Month *</Label>
+                            <Input
+                              type="number"
+                              min="1"
+                              max="31"
+                              value={newEvent.day_of_month}
+                              onChange={(e) => setNewEvent({...newEvent, day_of_month: parseInt(e.target.value)})}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-xs">End Month/Year (optional)</Label>
+                            <Input
+                              type="month"
+                              value={newEvent.schedule_end_date ? newEvent.schedule_end_date.substring(0, 7) : ''}
+                              onChange={(e) => setNewEvent({...newEvent, schedule_end_date: e.target.value ? e.target.value + '-01' : ''})}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {newEvent.schedule_frequency === 'annually' && (
+                        <div className="grid grid-cols-2 gap-3 p-3 bg-orange-50 dark:bg-orange-950 rounded">
+                          <div>
+                            <Label className="text-xs">Month of Year *</Label>
+                            <Select value={newEvent.month_of_year.toString()} onValueChange={(v) => setNewEvent({...newEvent, month_of_year: parseInt(v)})}>
+                              <SelectTrigger><SelectValue /></SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="1">January</SelectItem>
+                                <SelectItem value="2">February</SelectItem>
+                                <SelectItem value="3">March</SelectItem>
+                                <SelectItem value="4">April</SelectItem>
+                                <SelectItem value="5">May</SelectItem>
+                                <SelectItem value="6">June</SelectItem>
+                                <SelectItem value="7">July</SelectItem>
+                                <SelectItem value="8">August</SelectItem>
+                                <SelectItem value="9">September</SelectItem>
+                                <SelectItem value="10">October</SelectItem>
+                                <SelectItem value="11">November</SelectItem>
+                                <SelectItem value="12">December</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label className="text-xs">End Year (optional)</Label>
+                            <Input
+                              type="number"
+                              min={new Date().getFullYear()}
+                              max={new Date().getFullYear() + 20}
+                              value={newEvent.schedule_end_date ? new Date(newEvent.schedule_end_date).getFullYear() : ''}
+                              onChange={(e) => setNewEvent({...newEvent, schedule_end_date: e.target.value ? `${e.target.value}-12-31` : ''})}
+                              placeholder="2030"
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
