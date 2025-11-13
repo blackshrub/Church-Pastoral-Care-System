@@ -66,15 +66,23 @@ export const Dashboard = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
+  const [birthdaysToday, setBirthdaysToday] = useState([]);
+  const [griefToday, setGriefToday] = useState([]);
+  const [griefDue, setGriefDue] = useState([]);
+  const [hospitalFollowUp, setHospitalFollowUp] = useState([]);
   const [atRiskMembers, setAtRiskMembers] = useState([]);
-  const [activeGrief, setActiveGrief] = useState([]);
-  const [recentActivity, setRecentActivity] = useState([]);
-  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [disconnectedMembers, setDisconnectedMembers] = useState([]);
+  const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
+  const [financialAidDue, setFinancialAidDue] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quickEventOpen, setQuickEventOpen] = useState(false);
   const [allMembers, setAllMembers] = useState([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState([]);
   const [memberSearch, setMemberSearch] = useState('');
+  const [engagementSettings, setEngagementSettings] = useState({
+    atRiskDays: 60,
+    inactiveDays: 90
+  });
   const [quickEvent, setQuickEvent] = useState({
     event_type: 'regular_contact',
     event_date: new Date().toISOString().split('T')[0],
