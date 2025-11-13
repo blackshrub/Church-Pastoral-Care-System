@@ -323,11 +323,16 @@ export const Reminders = () => {
                         <p className="font-semibold">{member.name}</p>
                         <p className="text-sm text-muted-foreground">{member.days_since_last_contact} days since contact</p>
                       </div>
-                      <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white" asChild>
-                        <a href={formatPhoneForWhatsApp(member.phone)} target="_blank" rel="noopener noreferrer">
-                          Contact
-                        </a>
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white" asChild>
+                          <a href={formatPhoneForWhatsApp(member.phone)} target="_blank" rel="noopener noreferrer">
+                            Contact
+                          </a>
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => markMemberContacted(member.id, member.name, user, loadReminders)}>
+                          Mark Contacted
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
