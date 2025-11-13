@@ -25,8 +25,17 @@ export const Reminders = () => {
   const [disconnectedMembers, setDisconnectedMembers] = useState([]);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [engagementSettings, setEngagementSettings] = useState({
+    atRiskDays: 60,
+    inactiveDays: 90
+  });
   
   useEffect(() => {
+    // Load engagement settings from localStorage (set in Settings page)
+    const savedSettings = localStorage.getItem('engagement_settings');
+    if (savedSettings) {
+      setEngagementSettings(JSON.parse(savedSettings));
+    }
     loadReminders();
   }, []);
   
