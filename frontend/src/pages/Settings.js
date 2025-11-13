@@ -20,6 +20,11 @@ export const Settings = () => {
     { stage: '6_months', days: 180, name: '6 Months After' },
     { stage: '1_year', days: 365, name: '1 Year After' },
   ]);
+  const [accidentFollowUp, setAccidentFollowUp] = useState([
+    { stage: 'first_followup', days: 3, name: 'First Follow-up' },
+    { stage: 'second_followup', days: 7, name: 'Second Follow-up' },
+    { stage: 'final_followup', days: 14, name: 'Final Follow-up' },
+  ]);
   
   const saveEngagementSettings = () => {
     // Would save to backend/database in production
