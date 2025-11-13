@@ -13,44 +13,26 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ.get('DB_NAME', 'pastoral_care_db')]
 
 async def import_campuses_and_data():
-    """Import campuses, members, and generate realistic pastoral care data"""
+    """Import members and generate realistic pastoral care data (assumes campus already exists)"""
     
     print("="*60)
     print("GKBJ DATA IMPORT & DUMMY DATA GENERATION")
     print("="*60)
     
-    # Step 1: Extract and create campuses
-    print("\n1. Extracting campuses from CSV...")
-    campuses_map = {}
-    campus_names_found = set()
+    # Step 1: Get GKBJ Taman Kencana campus (should already exist)
+    print("\n1. Finding GKBJ Taman Kencana campus...")
+    campus = await db.campuses.find_one({"campus_name": {"$regex": "GKBJ Taman Kencana", "$options": "i"}}, {"_id": 0})
     
-    with open('/app/backend/core_jemaat.csv', 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            baptist_place = row.get('baptist_place', '').strip()
-            if baptist_place and baptist_place not in campus_names_found:
-                campus_names_found.add(baptist_place)
+    if not campus:
+        print("ERROR: GKBJ Taman Kencana campus not found!")
+        return
     
-    # Create campuses
-    for campus_name in sorted(campus_names_found):
-        if campus_name:  # Skip empty
-            campus_id = str(uuid.uuid4())
-            campus_obj = {
-                "id": campus_id,
-                "campus_name": campus_name,
-                "location": None,
-                "is_active": True,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            }
-            await db.campuses.insert_one(campus_obj)
-            campuses_map[campus_name] = campus_id
-            print(f"  ✓ Created campus: {campus_name}")
+    campus_id = campus['id']
+    campus_name = campus['campus_name']
+    print(f"✓ Using campus: {campus_name} (ID: {campus_id})")
     
-    print(f"\n✅ Created {len(campuses_map)} campuses")
-    
-    # Step 2: Import members with family grouping
-    print("\n2. Importing 696 members with family grouping...")
+    # Step 2: Import members
+    print(f"\n2. Importing members to {campus_name}...")
     
     family_groups_map = {}  # kk_name -> {campus_id -> family_group_id}
     members_imported = 0
