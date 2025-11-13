@@ -1638,9 +1638,13 @@ async def create_default_admin():
             )
             await db.users.insert_one(default_admin.model_dump())
             logger.info("Default admin user created: admin@gkbj.church / admin123")
+        
+        # Start automated reminder scheduler
+        start_scheduler()
     except Exception as e:
-        logger.error(f"Error creating default admin: {str(e)}")
+        logger.error(f"Error in startup: {str(e)}")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
+    stop_scheduler()
     client.close()
