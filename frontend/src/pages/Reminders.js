@@ -150,23 +150,24 @@ export const Reminders = () => {
         photo_url: m.photo_url 
       });
       
-      // Filter birthdays for today with member names
+      // Filter birthdays for today with member names and photos
       const todayBirthdays = eventsRes.data.filter(e => 
         e.event_type === 'birthday' && e.event_date === today
-      ).map(e => ({...e, member_name: memberMap[e.member_id]?.name, member_phone: memberMap[e.member_id]?.phone}));
+      ).map(e => ({...e, member_name: memberMap[e.member_id]?.name, member_phone: memberMap[e.member_id]?.phone, member_photo_url: memberMap[e.member_id]?.photo_url}));
       
-      // Get upcoming birthdays with member names
+      // Get upcoming birthdays with member names and photos
       const upcoming = eventsRes.data.filter(e => 
         e.event_type === 'birthday' && 
         e.event_date > today && 
         e.event_date <= weekAhead
-      ).map(e => ({...e, member_name: memberMap[e.member_id]?.name, member_phone: memberMap[e.member_id]?.phone}));
+      ).map(e => ({...e, member_name: memberMap[e.member_id]?.name, member_phone: memberMap[e.member_id]?.phone, member_photo_url: memberMap[e.member_id]?.photo_url}));
       
       // Filter grief stages due today AND overdue (for follow-up tab)
       const griefToday = griefRes.data.filter(g => g.scheduled_date === today).map(g => ({
         ...g,
         member_name: memberMap[g.member_id]?.name,
-        member_phone: memberMap[g.member_id]?.phone
+        member_phone: memberMap[g.member_id]?.phone,
+        member_photo_url: memberMap[g.member_id]?.photo_url
       }));
       
       // Filter overdue grief stages for follow-up tab
@@ -176,7 +177,8 @@ export const Reminders = () => {
       }).map(g => ({
         ...g,
         member_name: memberMap[g.member_id]?.name,
-        member_phone: memberMap[g.member_id]?.phone
+        member_phone: memberMap[g.member_id]?.phone,
+        member_photo_url: memberMap[g.member_id]?.photo_url
       }));
       
       // Separate at-risk and disconnected based on Settings thresholds
