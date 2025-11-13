@@ -1,38 +1,18 @@
 [
   {
-    "content": "Show member fields in MemberDetail",
-    "status": "completed"
-  },
-  {
-    "content": "Add Calendar event details dialog",
-    "status": "completed"
-  },
-  {
-    "content": "Add grief stage customization to Settings",
-    "status": "completed"
-  },
-  {
-    "content": "Add engagement thresholds to Settings",
-    "status": "completed"
-  },
-  {
-    "content": "Fix Add User button contrast",
-    "status": "completed"
-  },
-  {
     "content": "Add three-dots menu to timeline",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add API sync scheduler with interval",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Add column visibility toggles to MembersList",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Final testing and verification",
-    "status": "pending"
+    "status": "completed"
   }
 ]
