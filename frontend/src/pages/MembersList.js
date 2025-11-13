@@ -381,7 +381,7 @@ export const MembersList = () => {
         </CardContent>
       </Card>
       
-      {/* Virtual Scrolled Members Table */}
+      {/* Members Table */}
       <Card className="border-border shadow-sm">
         {selectedMembers.length > 0 && (
           <div className="p-4 bg-amber-50 border-b flex items-center justify-between">
@@ -393,24 +393,61 @@ export const MembersList = () => {
           </div>
         )}
         <CardContent className="p-0">
-          <div className="p-4 border-b bg-muted/30">
-            <div className="flex items-center gap-4 font-semibold text-sm">
-              <input type="checkbox" checked={selectedMembers.length === filteredMembers.length && filteredMembers.length > 0} onChange={toggleSelectAll} className="w-4 h-4" />
-              <span className="flex-1">Member</span>
-              <span className="w-20">Age</span>
-              <span className="w-20">Gender</span>
-              <span className="w-32">Status</span>
-              <span className="w-24">Actions</span>
-            </div>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-12">
+                    <input type="checkbox" checked={selectedMembers.length === filteredMembers.length && filteredMembers.length > 0} onChange={toggleSelectAll} className="w-4 h-4" />
+                  </TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Age</TableHead>
+                  <TableHead>Gender</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredMembers.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                      {t('empty_states.no_members')}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredMembers.map((member) => (
+                    <TableRow key={member.id} className="hover:bg-muted/50 transition-colors">
+                      <TableCell>
+                        <input type="checkbox" checked={selectedMembers.includes(member.id)} onChange={() => toggleSelectMember(member.id)} className="w-4 h-4" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <MemberAvatar member={member} size="sm" />
+                          <span className="font-medium">{member.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{member.phone || '-'}</TableCell>
+                      <TableCell>{member.age || '-'}</TableCell>
+                      <TableCell>{member.gender || '-'}</TableCell>
+                      <TableCell>
+                        <EngagementBadge status={member.engagement_status} days={member.days_since_last_contact} />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex gap-1 justify-end">
+                          <Link to={`/members/${member.id}`}>
+                            <Button size="sm" variant="outline">{t('view')}</Button>
+                          </Link>
+                          <Button size="sm" variant="ghost" onClick={() => { setEditingMember(member); setEditModalOpen(true); }}>Edit</Button>
+                          <Button size="sm" variant="ghost" className="text-red-600" onClick={() => handleDeleteMember(member.id, member.name)}>Delete</Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
           </div>
-          <List
-            height={600}
-            itemCount={filteredMembers.length}
-            itemSize={80}
-            width="100%"
-          >
-            {MemberRow}
-          </List>
         </CardContent>
       </Card>
     </div>
