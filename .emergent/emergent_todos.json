@@ -1,38 +1,14 @@
 [
   {
     "content": "Install backend dependencies (Pillow for photo processing, python-multipart for file upload)",
+    "status": "completed"
+  },
+  {
+    "content": "Create comprehensive server.py with all models and endpoints",
     "status": "in_progress"
   },
   {
-    "content": "Create database models: Member, FamilyGroup, CareEvent, GriefSupport, NotificationLog",
-    "status": "pending"
-  },
-  {
-    "content": "Create utility functions: engagement calculator, grief timeline generator, photo upload handler",
-    "status": "pending"
-  },
-  {
-    "content": "Implement Member CRUD endpoints with family grouping support",
-    "status": "pending"
-  },
-  {
-    "content": "Implement CareEvent CRUD with auto-grief-timeline generation",
-    "status": "pending"
-  },
-  {
-    "content": "Implement GriefSupport endpoints for timeline management",
-    "status": "pending"
-  },
-  {
-    "content": "Implement Dashboard endpoints (stats, at-risk, active grief, hospital follow-up)",
-    "status": "pending"
-  },
-  {
-    "content": "Implement photo upload endpoint and storage",
-    "status": "pending"
-  },
-  {
-    "content": "Implement CSV/JSON import and CSV export endpoints",
+    "content": "Test backend endpoints with curl",
     "status": "pending"
   },
   {
