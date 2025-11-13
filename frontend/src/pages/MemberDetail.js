@@ -99,19 +99,55 @@ export const MemberDetail = () => {
   const handleAddCareEvent = async (e) => {
     e.preventDefault();
     try {
-      const eventData = {
-        member_id: id,
-        campus_id: member.campus_id,  // Use member's campus_id instead of 'auto'
-        ...newEvent,
-        aid_amount: newEvent.aid_amount ? parseFloat(newEvent.aid_amount) : null
-      };
-      
-      await axios.post(`${API}/care-events`, eventData);
-      
-      if (newEvent.event_type === 'grief_loss' && newEvent.mourning_service_date) {
-        toast.success(t('success_messages.grief_timeline_generated'));
+      if (newEvent.event_type === 'financial_aid') {
+        if (newEvent.schedule_frequency === 'one_time') {
+          // One-time aid: Create care event (aid has been given)
+          const eventData = {
+            member_id: id,
+            campus_id: member.campus_id,
+            event_type: 'financial_aid',
+            event_date: newEvent.payment_date || newEvent.event_date,
+            title: newEvent.title,
+            description: newEvent.description,
+            aid_type: newEvent.aid_type,
+            aid_amount: parseFloat(newEvent.aid_amount)
+          };
+          await axios.post(`${API}/care-events`, eventData);
+          toast.success('Financial aid recorded as given!');
+        } else {
+          // Scheduled aid: Create schedule (future payments)
+          const scheduleData = {
+            member_id: id,
+            campus_id: member.campus_id,
+            title: newEvent.title,
+            aid_type: newEvent.aid_type,
+            aid_amount: parseFloat(newEvent.aid_amount),
+            frequency: newEvent.schedule_frequency,
+            start_date: newEvent.schedule_start_date,
+            end_date: newEvent.schedule_end_date || null,
+            day_of_week: newEvent.day_of_week,
+            day_of_month: newEvent.day_of_month,
+            month_of_year: newEvent.month_of_year,
+            notes: newEvent.description
+          };
+          await axios.post(`${API}/financial-aid-schedules`, scheduleData);
+          toast.success('Financial aid schedule created!');
+        }
       } else {
-        toast.success(t('success_messages.care_event_created'));
+        // Other event types: Create normal care event
+        const eventData = {
+          member_id: id,
+          campus_id: member.campus_id,
+          ...newEvent,
+          aid_amount: newEvent.aid_amount ? parseFloat(newEvent.aid_amount) : null
+        };
+        await axios.post(`${API}/care-events`, eventData);
+        
+        if (newEvent.event_type === 'grief_loss' && newEvent.mourning_service_date) {
+          toast.success(t('success_messages.grief_timeline_generated'));
+        } else {
+          toast.success(t('success_messages.care_event_created'));
+        }
       }
       
       setEventModalOpen(false);
@@ -125,7 +161,14 @@ export const MemberDetail = () => {
         hospital_name: '',
         admission_date: '',
         aid_type: 'education',
-        aid_amount: ''
+        aid_amount: '',
+        schedule_frequency: 'one_time',
+        payment_date: new Date().toISOString().split('T')[0],
+        schedule_start_date: new Date().toISOString().split('T')[0],
+        schedule_end_date: '',
+        day_of_week: 'monday',
+        day_of_month: 1,
+        month_of_year: 1
       });
       loadMemberData();
     } catch (error) {
