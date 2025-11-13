@@ -5,6 +5,7 @@ import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import httpx
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -48,163 +49,239 @@ async def send_whatsapp(phone: str, message: str, log_context: dict):
         logger.error(f"WhatsApp send error: {str(e)}")
         return {"success": False, "error": str(e)}
 
-async def send_grief_stage_reminders():
-    """Send reminders for grief stages due today"""
+async def generate_daily_digest_for_campus(campus_id: str, campus_name: str):
+    """Generate daily digest for a specific campus"""
     try:
         today = date.today()
+        church_name = os.environ.get('CHURCH_NAME', 'Church')
         
-        # Find grief stages due today that haven't been completed or reminded
-        stages = await db.grief_support.find({
-            "scheduled_date": today.isoformat(),
-            "completed": False,
-            "reminder_sent": False
+        # 1. Birthdays today
+        birthdays_today = await db.care_events.find({
+            "campus_id": campus_id,
+            "event_type": "birthday",
+            "event_date": today.isoformat(),
+            "completed": False
         }, {"_id": 0}).to_list(100)
         
-        logger.info(f"Found {len(stages)} grief stages due for reminders today")
+        # Get member names for birthdays
+        birthday_members = []
+        for event in birthdays_today:
+            member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0})
+            if member:
+                birthday_members.append(f"  • {member['name']} - {member['phone']}")
         
-        for stage in stages:
+        # 2. Birthdays this week (next 7 days)
+        week_end = today + timedelta(days=7)
+        birthdays_week = await db.care_events.find({
+            "campus_id": campus_id,
+            "event_type": "birthday",
+            "event_date": {"$gte": (today + timedelta(days=1)).isoformat(), "$lte": week_end.isoformat()},
+            "completed": False
+        }, {"_id": 0}).to_list(100)
+        
+        birthday_week_members = []
+        for event in birthdays_week:
+            member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0})
+            if member:
+                event_date = datetime.fromisoformat(event['event_date']).date() if isinstance(event['event_date'], str) else event['event_date']
+                days_until = (event_date - today).days
+                birthday_week_members.append(f"  • {member['name']} ({days_until} hari lagi) - {member['phone']}")
+        
+        # 3. Grief stages due today
+        grief_due = await db.grief_support.find({
+            "campus_id": campus_id,
+            "scheduled_date": today.isoformat(),
+            "completed": False
+        }, {"_id": 0}).to_list(100)
+        
+        grief_members = []
+        for stage in grief_due:
             member = await db.members.find_one({"id": stage["member_id"]}, {"_id": 0})
-            if not member:
-                continue
-            
-            church_name = os.environ.get('CHURCH_NAME', 'Church')
-            stage_names = {
-                "1_week": "1 minggu / 1 week",
-                "2_weeks": "2 minggu / 2 weeks",
-                "1_month": "1 bulan / 1 month",
-                "3_months": "3 bulan / 3 months",
-                "6_months": "6 bulan / 6 months",
-                "1_year": "1 tahun / 1 year"
-            }
-            stage_name = stage_names.get(stage["stage"], stage["stage"])
-            
-            message = f"{church_name} - Dukungan Dukacita / Grief Support Check-in: Sudah {stage_name} sejak kehilangan Anda. Kami memikirkan dan mendoakan Anda. Hubungi kami jika Anda memerlukan dukungan. / It has been {stage_name} since your loss. We are thinking of you and praying for you. Please reach out if you need support."
-            
-            result = await send_whatsapp(
-                member['phone'],
-                message,
-                {
-                    "id": str(uuid.uuid4()),
-                    "grief_support_id": stage["id"],
-                    "member_id": stage["member_id"]
+            if member:
+                stage_names = {
+                    "1_week": "1 minggu",
+                    "2_weeks": "2 minggu", 
+                    "1_month": "1 bulan",
+                    "3_months": "3 bulan",
+                    "6_months": "6 bulan",
+                    "1_year": "1 tahun"
                 }
-            )
-            
-            if result['success']:
-                await db.grief_support.update_one(
-                    {"id": stage["id"]},
-                    {"$set": {"reminder_sent": True}}
-                )
-                logger.info(f"Grief reminder sent to {member['name']} for stage {stage['stage']}")
-    
-    except Exception as e:
-        logger.error(f"Error sending grief reminders: {str(e)}")
-
-async def send_birthday_reminders():
-    """Send birthday reminders (7, 3, 1 days before)"""
-    try:
-        today = date.today()
-        reminder_days = [7, 3, 1]
+                stage_name = stage_names.get(stage["stage"], stage["stage"])
+                grief_members.append(f"  • {member['name']} ({stage_name} setelah dukacita) - {member['phone']}")
         
-        for days_before in reminder_days:
-            target_date = today + timedelta(days=days_before)
-            
-            # Find birthday events on target date
-            events = await db.care_events.find({
-                "event_type": "birthday",
-                "event_date": target_date.isoformat(),
-                "completed": False
-            }, {"_id": 0}).to_list(100)
-            
-            for event in events:
-                # Check if we already sent reminder for this timeframe
-                log = await db.notification_logs.find_one({
-                    "care_event_id": event["id"],
-                    "message": {"$regex": f"{days_before} hari"}
-                })
-                
-                if log:
-                    continue  # Already sent
-                
-                member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0})
-                if not member:
-                    continue
-                
-                church_name = os.environ.get('CHURCH_NAME', 'Church')
-                message = f"{church_name} - Pengingat Ulang Tahun / Birthday Reminder: {days_before} hari lagi ulang tahun {member['name']} ({target_date.strftime('%d %B %Y')}). Jangan lupa untuk menghubungi! / {days_before} days until {member['name']}'s birthday. Don't forget to reach out!"
-                
-                await send_whatsapp(
-                    member['phone'],
-                    message,
-                    {
-                        "id": str(uuid.uuid4()),
-                        "care_event_id": event["id"],
-                        "member_id": event["member_id"]
-                    }
-                )
-        
-        logger.info(f"Birthday reminders check completed")
-    except Exception as e:
-        logger.error(f"Error sending birthday reminders: {str(e)}")
-
-async def send_hospital_followup_reminders():
-    """Send hospital discharge follow-up reminders (3, 7, 14 days after)"""
-    try:
-        today = date.today()
+        # 4. Hospital follow-ups due
         followup_days = [3, 7, 14]
-        
+        hospital_followups = []
         for days_after in followup_days:
             discharge_date = today - timedelta(days=days_after)
-            
-            # Find hospital events with discharge on that date, not completed
             events = await db.care_events.find({
+                "campus_id": campus_id,
                 "event_type": "hospital_visit",
                 "discharge_date": discharge_date.isoformat(),
                 "completed": False
             }, {"_id": 0}).to_list(100)
             
             for event in events:
-                # Check if we already sent this specific followup
-                log = await db.notification_logs.find_one({
-                    "care_event_id": event["id"],
-                    "message": {"$regex": f"{days_after} hari setelah"}
-                })
-                
-                if log:
-                    continue
-                
                 member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0})
-                if not member:
-                    continue
-                
-                church_name = os.environ.get('CHURCH_NAME', 'Church')
-                message = f"{church_name} - Tindak Lanjut Rumah Sakit / Hospital Follow-up: Sudah {days_after} hari setelah pulang dari {event.get('hospital_name', 'rumah sakit')}. Bagaimana kondisi Anda? Kami ingin tahu dan mendukung. / It has been {days_after} days since your discharge from {event.get('hospital_name', 'hospital')}. How are you doing? We want to know and support you."
-                
-                await send_whatsapp(
-                    member['phone'],
-                    message,
+                if member:
+                    hospital_followups.append(f"  • {member['name']} ({days_after} hari setelah pulang dari {event.get('hospital_name', 'RS')}) - {member['phone']}")
+        
+        # 5. Members at risk (30+ days no contact) - top 10
+        members = await db.members.find({"campus_id": campus_id}, {"_id": 0}).to_list(1000)
+        at_risk_list = []
+        for member in members:
+            last_contact = member.get('last_contact_date')
+            if last_contact:
+                if isinstance(last_contact, str):
+                    last_contact = datetime.fromisoformat(last_contact)
+                if last_contact.tzinfo is None:
+                    last_contact = last_contact.replace(tzinfo=timezone.utc)
+                days = (datetime.now(timezone.utc) - last_contact).days
+            else:
+                days = 999
+            
+            if days >= 30:
+                at_risk_list.append((member['name'], days, member['phone']))
+        
+        at_risk_list.sort(key=lambda x: x[1], reverse=True)
+        at_risk_top = at_risk_list[:10]
+        
+        # Build digest message
+        digest_parts = []
+        digest_parts.append(f"🏥 *{church_name} - {campus_name}*")
+        digest_parts.append(f"📋 *TUGAS PERAWATAN PASTORAL HARI INI*")
+        digest_parts.append(f"📅 {today.strftime('%d %B %Y')}")
+        digest_parts.append("")
+        
+        if birthday_members:
+            digest_parts.append(f"🎂 *ULANG TAHUN HARI INI ({len(birthday_members)}):*")
+            digest_parts.extend(birthday_members[:20])  # Max 20
+            digest_parts.append("")
+        
+        if birthday_week_members:
+            digest_parts.append(f"🎈 *ULANG TAHUN MINGGU INI ({len(birthday_week_members)}):*")
+            digest_parts.extend(birthday_week_members[:10])  # Max 10
+            digest_parts.append("")
+        
+        if grief_members:
+            digest_parts.append(f"💔 *DUKUNGAN DUKACITA HARI INI ({len(grief_members)}):*")
+            digest_parts.extend(grief_members)
+            digest_parts.append("")
+        
+        if hospital_followups:
+            digest_parts.append(f"🏥 *TINDAK LANJUT RUMAH SAKIT ({len(hospital_followups)}):*")
+            digest_parts.extend(hospital_followups)
+            digest_parts.append("")
+        
+        if at_risk_top:
+            digest_parts.append(f"⚠️ *JEMAAT BERISIKO - PERLU PERHATIAN ({len(at_risk_list)} total):*")
+            for name, days, phone in at_risk_top:
+                digest_parts.append(f"  • {name} ({days} hari) - {phone}")
+            digest_parts.append("")
+        
+        if len(digest_parts) <= 4:  # Only header, no tasks
+            digest_parts.append("✅ Tidak ada tugas mendesak hari ini!")
+            digest_parts.append("")
+        
+        digest_parts.append(f"💡 _Silakan hubungi jemaat secara personal via WhatsApp/telepon_")
+        digest_parts.append(f"🙏 _Tuhan memberkati pelayanan Anda_")
+        
+        digest_message = "\n".join(digest_parts)
+        
+        return {
+            "campus_id": campus_id,
+            "campus_name": campus_name,
+            "message": digest_message,
+            "stats": {
+                "birthdays_today": len(birthday_members),
+                "birthdays_week": len(birthday_week_members),
+                "grief_due": len(grief_members),
+                "hospital_followups": len(hospital_followups),
+                "at_risk": len(at_risk_list)
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error generating digest for campus {campus_name}: {str(e)}")
+        return None
+
+async def send_daily_digest_to_pastoral_team():
+    """Send daily digest to all pastoral team members per campus"""
+    try:
+        logger.info("="*60)
+        logger.info("SENDING DAILY DIGEST TO PASTORAL TEAM")
+        logger.info("="*60)
+        
+        # Get all active campuses
+        campuses = await db.campuses.find({"is_active": True}, {"_id": 0}).to_list(200)
+        logger.info(f"Found {len(campuses)} active campuses")
+        
+        total_sent = 0
+        total_failed = 0
+        
+        for campus in campuses:
+            campus_id = campus["id"]
+            campus_name = campus["campus_name"]
+            
+            # Generate digest for this campus
+            digest = await generate_daily_digest_for_campus(campus_id, campus_name)
+            
+            if not digest:
+                continue
+            
+            # Skip if no tasks
+            if digest["stats"]["birthdays_today"] == 0 and \
+               digest["stats"]["grief_due"] == 0 and \
+               digest["stats"]["hospital_followups"] == 0 and \
+               digest["stats"]["at_risk"] == 0:
+                logger.info(f"  Skipping {campus_name} - no urgent tasks")
+                continue
+            
+            # Get all pastoral team members for this campus
+            pastoral_team = await db.users.find({
+                "$or": [
+                    {"campus_id": campus_id, "role": {"$in": ["campus_admin", "pastor"]}},
+                    {"role": "full_admin"}  # Full admin gets digests from all campuses
+                ],
+                "is_active": True
+            }, {"_id": 0}).to_list(100)
+            
+            logger.info(f"  {campus_name}: {len(pastoral_team)} team members, {sum(digest['stats'].values())} tasks")
+            
+            # Send to each team member
+            for user in pastoral_team:
+                result = await send_whatsapp(
+                    user['phone'],
+                    digest['message'],
                     {
                         "id": str(uuid.uuid4()),
-                        "care_event_id": event["id"],
-                        "member_id": event["member_id"]
+                        "campus_id": campus_id,
+                        "pastoral_team_user_id": user['id']
                     }
                 )
+                
+                if result['success']:
+                    total_sent += 1
+                    logger.info(f"    ✓ Sent to {user['name']} ({user['phone']})")
+                else:
+                    total_failed += 1
+                    logger.error(f"    ✗ Failed to send to {user['name']}: {result.get('error')}")
         
-        logger.info("Hospital follow-up reminders check completed")
+        logger.info("="*60)
+        logger.info(f"Daily digest complete: {total_sent} sent, {total_failed} failed")
+        logger.info("="*60)
+        
     except Exception as e:
-        logger.error(f"Error sending hospital follow-up reminders: {str(e)}")
+        logger.error(f"Error sending daily digest: {str(e)}")
 
 async def daily_reminder_job():
-    """Main daily reminder job - runs all reminder types"""
-    logger.info("=" * 50)
-    logger.info("Starting daily automated reminders")
-    logger.info("=" * 50)
+    """Main daily reminder job - sends digest to pastoral team"""
+    logger.info("==" * 30)
+    logger.info("DAILY PASTORAL CARE DIGEST - Sending to Team")
+    logger.info("==" * 30)
     
-    await send_grief_stage_reminders()
-    await send_birthday_reminders()
-    await send_hospital_followup_reminders()
+    await send_daily_digest_to_pastoral_team()
     
-    logger.info("Daily automated reminders completed")
+    logger.info("Daily digest job completed")
 
 def start_scheduler():
     """Start the scheduler with daily job at 8 AM Jakarta time"""
@@ -221,7 +298,7 @@ def start_scheduler():
         )
         
         scheduler.start()
-        logger.info("Scheduler started - daily reminders will run at 8 AM Jakarta time")
+        logger.info("✅ Scheduler started - daily digest to pastoral team at 8 AM Jakarta time")
     except Exception as e:
         logger.error(f"Error starting scheduler: {str(e)}")
 
@@ -233,6 +310,3 @@ def stop_scheduler():
             logger.info("Scheduler stopped")
     except Exception as e:
         logger.error(f"Error stopping scheduler: {str(e)}")
-
-# Import uuid for log context
-import uuid
