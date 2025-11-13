@@ -733,27 +733,40 @@ async def delete_user(user_id: str, current_admin: dict = Depends(get_current_ad
 # ==================== MEMBER ENDPOINTS ====================
 
 @api_router.post("/members", response_model=Member)
-async def create_member(member: MemberCreate):
+async def create_member(member: MemberCreate, current_user: dict = Depends(get_current_user)):
     """Create a new member"""
     try:
+        # For campus-specific users, enforce their campus
+        campus_id = member.campus_id
+        if current_user.get("role") in [UserRole.CAMPUS_ADMIN, UserRole.PASTOR]:
+            campus_id = current_user["campus_id"]
+        
         # Handle family group
         family_group_id = member.family_group_id
         
         if member.family_group_name and not family_group_id:
             # Create new family group
-            family_group = FamilyGroup(group_name=member.family_group_name)
+            family_group = FamilyGroup(group_name=member.family_group_name, campus_id=campus_id)
             await db.family_groups.insert_one(family_group.model_dump())
             family_group_id = family_group.id
         
         member_obj = Member(
             name=member.name,
             phone=member.phone,
+            campus_id=campus_id,
             family_group_id=family_group_id,
             external_member_id=member.external_member_id,
-            notes=member.notes
+            notes=member.notes,
+            birth_date=member.birth_date,
+            email=member.email,
+            address=member.address
         )
         
-        await db.members.insert_one(member_obj.model_dump())
+        member_dict = member_obj.model_dump()
+        if member_dict.get('birth_date'):
+            member_dict['birth_date'] = member_dict['birth_date'].isoformat() if isinstance(member_dict['birth_date'], date) else member_dict['birth_date']
+        
+        await db.members.insert_one(member_dict)
         return member_obj
     except Exception as e:
         logger.error(f"Error creating member: {str(e)}")
@@ -763,11 +776,12 @@ async def create_member(member: MemberCreate):
 async def list_members(
     engagement_status: Optional[EngagementStatus] = None,
     family_group_id: Optional[str] = None,
-    search: Optional[str] = None
+    search: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
 ):
     """List all members with optional filters"""
     try:
-        query = {}
+        query = get_campus_filter(current_user)
         
         if engagement_status:
             query["engagement_status"] = engagement_status
@@ -781,7 +795,7 @@ async def list_members(
                 {"phone": {"$regex": search, "$options": "i"}}
             ]
         
-        members = await db.members.find(query, {"_id": 0}).to_list(1000)
+        members = await db.members.find(query, {"_id": 0}).to_list(2000)
         
         # Update engagement status for each member
         for member in members:
@@ -975,11 +989,17 @@ async def get_family_group(group_id: str):
 # ==================== CARE EVENT ENDPOINTS ====================
 
 @api_router.post("/care-events", response_model=CareEvent)
-async def create_care_event(event: CareEventCreate):
+async def create_care_event(event: CareEventCreate, current_user: dict = Depends(get_current_user)):
     """Create a new care event"""
     try:
+        # For campus-specific users, enforce their campus
+        campus_id = event.campus_id
+        if current_user.get("role") in [UserRole.CAMPUS_ADMIN, UserRole.PASTOR]:
+            campus_id = current_user["campus_id"]
+        
         care_event = CareEvent(
             member_id=event.member_id,
+            campus_id=campus_id,
             event_type=event.event_type,
             event_date=event.event_date,
             title=event.title,
@@ -1027,6 +1047,9 @@ async def create_care_event(event: CareEventCreate):
                 event.member_id
             )
             if timeline:
+                # Add campus_id to all timeline stages
+                for stage in timeline:
+                    stage['campus_id'] = campus_id
                 await db.grief_support.insert_many(timeline)
                 logger.info(f"Generated {len(timeline)} grief support stages for member {event.member_id}")
         
