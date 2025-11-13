@@ -358,11 +358,49 @@ export const MemberDetail = () => {
         </div>
       </div>
       
-      {/* Member Info */}
+      {/* Member Info Card */}
       <Card className="border-border">
         <CardContent className="p-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {member.age && (
+              <div>
+                <p className="text-xs text-muted-foreground">Age</p>
+                <p className="font-semibold">{member.age} years</p>
+              </div>
+            )}
+            {member.gender && (
+              <div>
+                <p className="text-xs text-muted-foreground">Gender</p>
+                <p className="font-semibold">{member.gender === 'M' ? 'Male' : member.gender === 'F' ? 'Female' : member.gender}</p>
+              </div>
+            )}
+            {member.membership_status && (
+              <div>
+                <p className="text-xs text-muted-foreground">Membership</p>
+                <p className="font-semibold">{member.membership_status}</p>
+              </div>
+            )}
+            {member.marital_status && (
+              <div>
+                <p className="text-xs text-muted-foreground">Marital Status</p>
+                <p className="font-semibold">{member.marital_status}</p>
+              </div>
+            )}
+            {member.category && (
+              <div>
+                <p className="text-xs text-muted-foreground">Category</p>
+                <p className="font-semibold">{member.category}</p>
+              </div>
+            )}
+            {member.blood_type && (
+              <div>
+                <p className="text-xs text-muted-foreground">Blood Type</p>
+                <p className="font-semibold">{member.blood_type}</p>
+              </div>
+            )}
+          </div>
           {member.notes && (
-            <p className="text-sm text-muted-foreground">{member.notes}</p>
+            <p className="text-sm text-muted-foreground mt-4">{member.notes}</p>
           )}
         </CardContent>
       </Card>
