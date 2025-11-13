@@ -166,9 +166,10 @@ export const ImportExport = () => {
       </div>
       
       <Tabs defaultValue="import">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="import"><Upload className="w-4 h-4 mr-2" />Import</TabsTrigger>
           <TabsTrigger value="export"><Download className="w-4 h-4 mr-2" />Export</TabsTrigger>
+          <TabsTrigger value="sync-status">🔄 API Sync Status</TabsTrigger>
         </TabsList>
         
         <TabsContent value="import" className="space-y-4">
