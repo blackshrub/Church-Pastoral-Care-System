@@ -1334,9 +1334,9 @@ class WhatsAppTestResponse(BaseModel):
     message: str
     details: Optional[dict] = None
 
-@api_router.post(\"/integrations/ping/whatsapp\", response_model=WhatsAppTestResponse)
+@api_router.post("/integrations/ping/whatsapp", response_model=WhatsAppTestResponse)
 async def test_whatsapp_integration(request: WhatsAppTestRequest):
-    \"\"\"Test WhatsApp gateway integration by sending a test message\"\"\"
+    """Test WhatsApp gateway integration by sending a test message"""
     try:
         result = await send_whatsapp_message(request.phone, request.message)
         
