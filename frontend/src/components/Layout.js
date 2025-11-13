@@ -22,7 +22,6 @@ export const Layout = ({ children }) => {
   const navigation = [
     { name: t('dashboard'), href: '/dashboard', icon: LayoutDashboard },
     { name: t('members'), href: '/members', icon: Users },
-    { name: t('grief_support'), href: '/dashboard', icon: Heart },
     { name: t('financial_aid'), href: '/financial-aid', icon: DollarSign },
     { name: t('analytics'), href: '/analytics', icon: BarChart3 },
     { name: t('integrations'), href: '/integrations', icon: Settings },
