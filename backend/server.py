@@ -176,10 +176,14 @@ class FamilyGroup(BaseModel):
 class MemberCreate(BaseModel):
     name: str
     phone: str
+    campus_id: str
     family_group_id: Optional[str] = None
     family_group_name: Optional[str] = None  # For creating new family group
     external_member_id: Optional[str] = None
     notes: Optional[str] = None
+    birth_date: Optional[date] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
 
 class MemberUpdate(BaseModel):
     name: Optional[str] = None
@@ -187,6 +191,9 @@ class MemberUpdate(BaseModel):
     family_group_id: Optional[str] = None
     external_member_id: Optional[str] = None
     notes: Optional[str] = None
+    birth_date: Optional[date] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
 
 class Member(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -194,6 +201,7 @@ class Member(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     phone: str
+    campus_id: str
     photo_url: Optional[str] = None
     family_group_id: Optional[str] = None
     last_contact_date: Optional[datetime] = None
@@ -201,6 +209,9 @@ class Member(BaseModel):
     days_since_last_contact: int = 0
     external_member_id: Optional[str] = None
     notes: Optional[str] = None
+    birth_date: Optional[date] = None
+    email: Optional[str] = None
+    address: Optional[str] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
