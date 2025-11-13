@@ -41,7 +41,17 @@ export const Dashboard = () => {
   
   useEffect(() => {
     loadDashboardData();
+    loadMembers();
   }, []);
+  
+  const loadMembers = async () => {
+    try {
+      const response = await axios.get(`${API}/members`);
+      setAllMembers(response.data);
+    } catch (error) {
+      console.error('Error loading members');
+    }
+  };
   
   const loadDashboardData = async () => {
     try {
@@ -63,6 +73,52 @@ export const Dashboard = () => {
       setLoading(false);
     }
   };
+  
+  const handleQuickEvent = async (e) => {
+    e.preventDefault();
+    if (selectedMemberIds.length === 0) {
+      toast.error('Select at least one member');
+      return;
+    }
+    
+    try {
+      let success = 0;
+      for (const memberId of selectedMemberIds) {
+        await axios.post(`${API}/care-events`, {
+          member_id: memberId,
+          campus_id: 'auto',
+          ...quickEvent,
+          aid_amount: quickEvent.aid_amount ? parseFloat(quickEvent.aid_amount) : null
+        });
+        success++;
+      }
+      toast.success(`Added care event for ${success} members!`);
+      setQuickEventOpen(false);
+      setSelectedMemberIds([]);
+      setMemberSearch('');
+      setQuickEvent({
+        event_type: 'regular_contact',
+        event_date: new Date().toISOString().split('T')[0],
+        title: '',
+        description: '',
+        aid_type: 'education',
+        aid_amount: ''
+      });
+      loadDashboardData();
+    } catch (error) {
+      toast.error('Failed to add events');
+    }
+  };
+  
+  const toggleMemberSelection = (memberId) => {
+    setSelectedMemberIds(prev => 
+      prev.includes(memberId) ? prev.filter(id => id !== memberId) : [...prev, memberId]
+    );
+  };
+  
+  const filteredMembers = allMembers.filter(m => 
+    m.name.toLowerCase().includes(memberSearch.toLowerCase())
+  );
   
   return (
     <div className="space-y-8 pb-12">
