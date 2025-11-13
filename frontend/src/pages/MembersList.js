@@ -166,7 +166,7 @@ export const MembersList = () => {
         
         <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-primary-500 hover:bg-primary-600" data-testid="open-add-member-modal">
+            <Button className="bg-teal-500 hover:bg-teal-600 text-white" data-testid="open-add-member-modal">
               <Plus className="w-4 h-4 mr-2" />
               {t('add_member')}
             </Button>
