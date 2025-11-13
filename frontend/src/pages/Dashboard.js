@@ -4,8 +4,13 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Users, Heart, AlertTriangle, DollarSign, Plus, UserPlus, Bell, Calendar } from 'lucide-react';
+import { Users, Heart, AlertTriangle, DollarSign, Plus, UserPlus, Bell, Calendar, Zap } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
