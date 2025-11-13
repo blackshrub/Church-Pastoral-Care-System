@@ -1,14 +1,14 @@
 [
   {
     "content": "Create Admin Dashboard page with Campus Management and User Management",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add Admin menu item (only visible to full_admin)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test admin features end-to-end",
-    "status": "pending"
+    "status": "completed"
   }
 ]
