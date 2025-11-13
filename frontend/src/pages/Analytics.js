@@ -39,12 +39,13 @@ export const Analytics = () => {
   const loadAnalytics = async () => {
     try {
       setLoading(true);
-      const [membersRes, eventsRes, griefRes, aidSummaryRes, scheduleRes] = await Promise.all([
+      const [membersRes, eventsRes, griefRes, aidSummaryRes, scheduleRes, trendsRes] = await Promise.all([
         axios.get(`${API}/members`),
         axios.get(`${API}/care-events`),
         axios.get(`${API}/analytics/grief-completion-rate`),
         axios.get(`${API}/financial-aid/summary`),
-        axios.get(`${API}/financial-aid-schedules`)
+        axios.get(`${API}/financial-aid-schedules`),
+        axios.get(`${API}/analytics/demographic-trends`)
       ]);
       
       const members = membersRes.data;
