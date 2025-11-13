@@ -1,15 +1,11 @@
 [
   {
-    "content": "Get user's email service preference and credentials",
+    "content": "Set up backend dependencies and environment variables for WhatsApp/Email integration",
     "status": "completed"
   },
   {
-    "content": "Set up backend dependencies and environment variables for WhatsApp/Email integration",
-    "status": "in_progress"
-  },
-  {
     "content": "Create integration test endpoints: /api/integrations/ping/whatsapp and /api/integrations/ping/email",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Build minimal React test screen with buttons to trigger integration tests",
