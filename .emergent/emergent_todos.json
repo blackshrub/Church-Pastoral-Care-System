@@ -1,23 +1,19 @@
 [
   {
-    "content": "Move photos to uploads folder and create import script to match CSV photo column",
+    "content": "Debug care event frontend save error (backend works)",
     "status": "completed"
   },
   {
-    "content": "Debug care event frontend save error (backend works)",
-    "status": "in_progress"
-  },
-  {
     "content": "Merge hospital_visit into accident_illness everywhere",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Remove redundant dates (use only event_date)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Add Accident/Illness support config to Settings (3, 7, 14 days)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Add photo thumbnails to all reminders",
