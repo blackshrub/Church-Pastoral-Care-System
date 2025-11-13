@@ -280,10 +280,35 @@ export const Dashboard = () => {
         </Card>
       </div>
       
+      {/* Quick Actions */}
+      <div>
+        <h2 className="text-2xl font-playfair font-bold mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Dialog open={quickEventOpen} onOpenChange={setQuickEventOpen}>
+            <DialogTrigger asChild>
+              <Button className="w-full h-14 bg-teal-500 hover:bg-teal-600 text-white text-base font-semibold">
+                <Plus className="w-5 h-5 mr-2" />Add New Care Event
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Quick Care Event (Multi-Member)</DialogTitle>
+              </DialogHeader>
+              <p className="text-sm text-muted-foreground">Add same event to multiple members at once</p>
+            </DialogContent>
+          </Dialog>
+          <Link to="/members">
+            <Button className="w-full h-14 bg-amber-500 hover:bg-amber-600 text-white text-base font-semibold">
+              <Users className="w-5 h-5 mr-2" />View All Members
+            </Button>
+          </Link>
+        </div>
+      </div>
+      
       {/* Task Management */}
       <div>
-        <h1 className="text-3xl font-playfair font-bold">Today's Tasks & Reminders</h1>
-        <p className="text-muted-foreground mt-1">{birthdaysToday.length + griefToday.length + financialAidDue.length + atRiskMembers.length + disconnectedMembers.length} tasks need your attention</p>
+        <h2 className="text-2xl font-playfair font-bold mb-4">Today's Tasks & Reminders</h2>
+        <p className="text-muted-foreground mb-4">{birthdaysToday.length + griefToday.length + financialAidDue.length + atRiskMembers.length + disconnectedMembers.length} tasks need your attention</p>
       </div>
       
       <Tabs defaultValue="today" className="w-full">
