@@ -22,6 +22,7 @@ export const Reminders = () => {
   const [griefDue, setGriefDue] = useState([]);
   const [hospitalFollowUp, setHospitalFollowUp] = useState([]);
   const [atRiskMembers, setAtRiskMembers] = useState([]);
+  const [disconnectedMembers, setDisconnectedMembers] = useState([]);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [loading, setLoading] = useState(true);
   
