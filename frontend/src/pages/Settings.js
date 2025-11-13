@@ -9,6 +9,28 @@ import { Settings as SettingsIcon, Bell, Heart, Zap } from 'lucide-react';
 
 export const Settings = () => {
   const { user } = useAuth();
+  const [atRiskDays, setAtRiskDays] = useState(60);
+  const [inactiveDays, setInactiveDays] = useState(90);
+  const [griefStages, setGriefStages] = useState([
+    { stage: '1_week', days: 7, name: '1 Week After' },
+    { stage: '2_weeks', days: 14, name: '2 Weeks After' },
+    { stage: '1_month', days: 30, name: '1 Month After' },
+    { stage: '3_months', days: 90, name: '3 Months After' },
+    { stage: '6_months', days: 180, name: '6 Months After' },
+    { stage: '1_year', days: 365, name: '1 Year After' },
+  ]);
+  
+  const saveEngagementSettings = () => {
+    // Would save to backend/database in production
+    localStorage.setItem('engagement_settings', JSON.stringify({ atRiskDays, inactiveDays }));
+    toast.success('Engagement thresholds saved!');
+  };
+  
+  const saveGriefStages = () => {
+    // Would save to backend/database in production
+    localStorage.setItem('grief_stages', JSON.stringify(griefStages));
+    toast.success('Grief stages configuration saved!');
+  };
   
   return (
     <div className="space-y-6">
