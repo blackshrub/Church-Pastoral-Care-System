@@ -392,6 +392,8 @@ export const Reminders = () => {
             </CardContent>
           </Card>
         </TabsContent>
+        
+        <TabsContent value="disconnected" className="space-y-4">
           <Card className="card-border-left-red">
             <CardHeader>
               <CardTitle>Members Disconnected ({engagementSettings.inactiveDays}+ days no contact)</CardTitle>
