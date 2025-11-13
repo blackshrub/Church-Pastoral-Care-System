@@ -62,7 +62,23 @@ export const Layout = ({ children }) => {
           </div>
           
           <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground mr-2">
+              <UserCircle className="w-4 h-4" />
+              <span>{user?.name}</span>
+              <span className="text-xs px-2 py-0.5 bg-primary-100 text-primary-700 rounded">{user?.role}</span>
+            </div>
             <LanguageToggle />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
+              data-testid="logout-button"
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
           </div>
         </div>
         
