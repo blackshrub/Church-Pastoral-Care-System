@@ -34,33 +34,46 @@ export const Reminders = () => {
       const today = new Date().toISOString().split('T')[0];
       const weekAhead = new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
       
-      const [eventsRes, griefRes, hospitalRes, atRiskRes] = await Promise.all([
+      const [eventsRes, griefRes, hospitalRes, atRiskRes, membersRes] = await Promise.all([
         axios.get(`${API}/care-events`),
         axios.get(`${API}/grief-support?completed=false`),
         axios.get(`${API}/care-events/hospital/due-followup`),
-        axios.get(`${API}/members/at-risk`)
+        axios.get(`${API}/members/at-risk`),
+        axios.get(`${API}/members`)
       ]);
       
-      // Filter birthdays for today
+      // Get member names for events
+      const memberMap = {};
+      membersRes.data.forEach(m => memberMap[m.id] = m.name);
+      
+      // Filter birthdays for today with member names
       const todayBirthdays = eventsRes.data.filter(e => 
         e.event_type === 'birthday' && e.event_date === today
-      );
+      ).map(e => ({...e, member_name: memberMap[e.member_id]}));
       
-      // Get upcoming birthdays (next 7 days)
+      // Get upcoming birthdays with member names
       const upcoming = eventsRes.data.filter(e => 
         e.event_type === 'birthday' && 
         e.event_date > today && 
         e.event_date <= weekAhead
-      );
+      ).map(e => ({...e, member_name: memberMap[e.member_id]}));
       
-      // Filter grief stages due today
-      const griefToday = griefRes.data.filter(g => g.scheduled_date === today);
+      // Filter grief stages due today with member names
+      const griefToday = griefRes.data.filter(g => g.scheduled_date === today).map(g => ({
+        ...g,
+        member_name: memberMap[g.member_id]
+      }));
+      
+      // Separate at-risk (30-59 days) and disconnected (60+ days)
+      const atRisk = atRiskRes.data.filter(m => m.days_since_last_contact >= 30 && m.days_since_last_contact < 60);
+      const disconnected = atRiskRes.data.filter(m => m.days_since_last_contact >= 60);
       
       setBirthdaysToday(todayBirthdays);
       setUpcomingBirthdays(upcoming);
       setGriefDue(griefToday);
-      setHospitalFollowUp(hospitalRes.data);
-      setAtRiskMembers(atRiskRes.data.slice(0, 20));
+      setHospitalFollowUp(hospitalRes.data.map(h => ({...h, member_name: memberMap[h.member_id]})));
+      setAtRiskMembers(atRisk);
+      setDisconnectedMembers(disconnected);
     } catch (error) {
       console.error('Error loading reminders');
     } finally {
