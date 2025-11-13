@@ -146,8 +146,23 @@ async def get_current_admin(current_user: dict = Depends(get_current_user)):
 
 # ==================== MODELS ====================
 
+class CampusCreate(BaseModel):
+    campus_name: str
+    location: Optional[str] = None
+
+class Campus(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    campus_name: str
+    location: Optional[str] = None
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class FamilyGroupCreate(BaseModel):
     group_name: str
+    campus_id: str
 
 class FamilyGroup(BaseModel):
     model_config = ConfigDict(extra="ignore")
