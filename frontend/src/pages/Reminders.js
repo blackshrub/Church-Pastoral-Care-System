@@ -34,7 +34,7 @@ const MemberNameWithAvatar = ({ member, memberId }) => {
   return (
     <Link to={`/members/${memberId}`} className="flex items-center gap-3 hover:text-teal-700">
       <Avatar className="w-10 h-10">
-        {photoUrl && <AvatarImage src={photoUrl} alt={member.name} />}
+        {photoUrl && <AvatarImage src={photoUrl} alt={member.name} className="object-cover" />}
         <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-xs">
           {getInitials(member.name)}
         </AvatarFallback>
