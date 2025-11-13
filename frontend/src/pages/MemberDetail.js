@@ -418,7 +418,7 @@ export const MemberDetail = () => {
                             Rp {event.aid_amount.toLocaleString('id-ID')}
                           </p>
                         )}
-                        <div className="mt-2">
+                        <div className="mt-2 flex gap-2">
                           <Button
                             size="sm"
                             variant="outline"
@@ -427,6 +427,14 @@ export const MemberDetail = () => {
                           >
                             <Send className="w-3 h-3 mr-1" />
                             {t('send_reminder')}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-red-600 hover:text-red-700"
+                            onClick={() => handleDeleteEvent(event.id)}
+                          >
+                            Delete
                           </Button>
                         </div>
                       </div>
