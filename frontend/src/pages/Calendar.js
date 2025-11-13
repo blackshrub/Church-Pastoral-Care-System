@@ -13,6 +13,9 @@ const API = `${BACKEND_URL}/api`;
 export const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDateEvents, setSelectedDateEvents] = useState([]);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   
   useEffect(() => {
     loadEvents();
