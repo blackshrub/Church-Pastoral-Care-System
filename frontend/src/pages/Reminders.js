@@ -319,9 +319,9 @@ export const Reminders = () => {
                 <div className="space-y-2">
                   {disconnectedMembers.slice(0, 15).map(member => (
                     <div key={member.id} className="p-3 bg-red-50 rounded flex justify-between items-center">
-                      <div>
-                        <p className="font-semibold">{member.name}</p>
-                        <p className="text-sm text-muted-foreground">{member.days_since_last_contact} days since contact</p>
+                      <div className="flex-1">
+                        <MemberNameWithAvatar member={member} memberId={member.id} />
+                        <p className="text-sm text-muted-foreground ml-13">{member.days_since_last_contact} days since contact</p>
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" className="bg-red-500 hover:bg-red-600 text-white" asChild>
