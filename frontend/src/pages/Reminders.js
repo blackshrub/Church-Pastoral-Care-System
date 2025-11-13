@@ -16,6 +16,17 @@ const formatDate = (dateStr) => {
   } catch { return dateStr; }
 };
 
+const formatPhoneForWhatsApp = (phone) => {
+  if (!phone) return '#';
+  let formatted = phone;
+  if (formatted.startsWith('0')) {
+    formatted = '62' + formatted.substring(1);
+  } else if (formatted.startsWith('+')) {
+    formatted = formatted.substring(1);
+  }
+  return `https://wa.me/${formatted}`;
+};
+
 export const Reminders = () => {
   const { user } = useAuth();
   const [birthdaysToday, setBirthdaysToday] = useState([]);
