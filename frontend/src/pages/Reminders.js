@@ -99,10 +99,10 @@ export const Reminders = () => {
             <Calendar className="w-4 h-4 mr-2" />Today ({birthdaysToday.length + griefDue.length})
           </TabsTrigger>
           <TabsTrigger value="followup">
-            <Hospital className="w-4 h-4 mr-2" />Follow-up ({hospitalFollowUp.length})
+            <Hospital className="w-4 h-4 mr-2" />Follow-up ({hospitalFollowUp.length + griefDue.length})
           </TabsTrigger>
           <TabsTrigger value="at-risk">
-            <AlertTriangle className="w-4 h-4 mr-2" />At Risk ({atRiskMembers.length})
+            <AlertTriangle className="w-4 h-4 mr-2" />At Risk ({atRiskMembers.length + disconnectedMembers.length})
           </TabsTrigger>
           <TabsTrigger value="upcoming">
             <Heart className="w-4 h-4 mr-2" />Upcoming ({upcomingBirthdays.length})
