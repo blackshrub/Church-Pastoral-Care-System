@@ -37,6 +37,8 @@ export const ImportExport = () => {
   const [importing, setImporting] = useState(false);
   const [csvFile, setCsvFile] = useState(null);
   const [jsonData, setJsonData] = useState('');
+  const [editingSyncId, setEditingSyncId] = useState(null);
+  const [editSyncOpen, setEditSyncOpen] = useState(false);
   
   useEffect(() => {
     loadCampuses();
