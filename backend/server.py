@@ -419,7 +419,35 @@ def calculate_engagement_status(last_contact: Optional[datetime]) -> tuple[Engag
     else:
         return EngagementStatus.INACTIVE, days_since
 
-def generate_grief_timeline(mourning_date: date, care_event_id: str, member_id: str) -> List[Dict[str, Any]]:
+def generate_accident_followup_timeline(event_date: date, care_event_id: str, member_id: str, campus_id: str) -> List[Dict[str, Any]]:
+    """Generate 3-stage accident/illness follow-up timeline"""
+    # Get settings from localStorage or use defaults
+    stages = [
+        ("first_followup", 3),
+        ("second_followup", 7),
+        ("final_followup", 14),
+    ]
+    
+    timeline = []
+    for stage, days_offset in stages:
+        scheduled_date = event_date + timedelta(days=days_offset)
+        followup_stage = {
+            "id": str(uuid.uuid4()),
+            "care_event_id": care_event_id,
+            "member_id": member_id,
+            "campus_id": campus_id,
+            "stage": stage,
+            "scheduled_date": scheduled_date.isoformat(),
+            "completed": False,
+            "completed_at": None,
+            "notes": None,
+            "reminder_sent": False,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        timeline.append(followup_stage)
+    
+    return timeline
     """Generate 6-stage grief support timeline"""
     stages = [
         (GriefStage.ONE_WEEK, 7),
