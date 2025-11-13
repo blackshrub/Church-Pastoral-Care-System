@@ -234,11 +234,16 @@ export const Reminders = () => {
                             <p className="font-semibold">{stage.member_name}</p>
                             <p className="text-sm text-muted-foreground">{stage.stage.replace('_', ' ')} stage</p>
                           </div>
-                          <Button size="sm" className="bg-pink-500 hover:bg-pink-600 text-white" asChild>
-                            <a href={formatPhoneForWhatsApp(stage.member_phone)} target="_blank" rel="noopener noreferrer">
-                              Contact
-                            </a>
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button size="sm" className="bg-pink-500 hover:bg-pink-600 text-white" asChild>
+                              <a href={formatPhoneForWhatsApp(stage.member_phone)} target="_blank" rel="noopener noreferrer">
+                                Contact
+                              </a>
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => markGriefStageComplete(stage.id, loadReminders)}>
+                              Mark Complete
+                            </Button>
+                          </div>
                         </div>
                       ))}
                     </div>
