@@ -1,59 +1,19 @@
 [
   {
-    "content": "Phase 3: Create User model and JWT auth backend endpoints",
+    "content": "Phase 4: Install APScheduler and create scheduler service",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Create login/logout UI and protected routes",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 3: Add user management screens (admin only)",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 3: Implement role-based access control",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 3: Test authentication flow end-to-end",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 4: Install APScheduler and create scheduler service",
-    "status": "in_progress"
-  },
-  {
     "content": "Phase 4: Create automated reminder functions (grief, birthday, hospital)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Phase 4: Create message templates (ID/EN) for all reminder types",
-    "status": "pending"
+    "status": "completed"
   },
   {
-    "content": "Phase 4: Add dashboard widget for reminder status",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 4: Test automated reminders",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 5: Create calendar view component",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 5: Implement bulk WhatsApp messaging",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 5: Add advanced analytics (weekly/monthly reports)",
-    "status": "pending"
-  },
-  {
-    "content": "Phase 5: Optimize for mobile/responsive design",
-    "status": "pending"
+    "content": "Phase 3 & 5: Build comprehensive frontend (Login, User Management, Calendar, Bulk Messaging, Advanced Analytics)",
+    "status": "in_progress"
   },
   {
     "content": "Run final comprehensive testing",
