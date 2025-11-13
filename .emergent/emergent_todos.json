@@ -1,10 +1,66 @@
 [
   {
-    "content": "Phase 3 & 5: Build comprehensive frontend (Login, User Management, Calendar, Bulk Messaging, Advanced Analytics)",
-    "status": "completed"
+    "content": "CRITICAL CHANGE: Redesign notification system - send reminders to PASTORAL TEAM instead of members",
+    "status": "in_progress"
   },
   {
-    "content": "Run final comprehensive testing",
-    "status": "completed"
+    "content": "Add Campus model and multi-campus support to all models",
+    "status": "pending"
+  },
+  {
+    "content": "Update User model with campus_id and full_admin role",
+    "status": "pending"
+  },
+  {
+    "content": "Add campus selection to login form",
+    "status": "pending"
+  },
+  {
+    "content": "Create data import script for core_jemaat.csv (696 members)",
+    "status": "pending"
+  },
+  {
+    "content": "Generate realistic dummy pastoral care data (grief, hospital, aid events)",
+    "status": "pending"
+  },
+  {
+    "content": "Create Admin Dashboard UI (user management, campus management)",
+    "status": "pending"
+  },
+  {
+    "content": "Create Calendar View page with month/week/day views",
+    "status": "pending"
+  },
+  {
+    "content": "Create Bulk Messaging interface for pastoral team",
+    "status": "pending"
+  },
+  {
+    "content": "Create Advanced Analytics page (weekly/monthly reports, trends)",
+    "status": "pending"
+  },
+  {
+    "content": "Create Daily Digest feature - send task list to pastoral team",
+    "status": "pending"
+  },
+  {
+    "content": "Update all reminder functions to send to pastoral team, not members",
+    "status": "pending"
+  },
+  {
+    "content": "Add pastoral team member assignment feature",
+    "status": "pending"
+  },
+  {
+    "content": "Test multi-campus isolation and full admin access",
+    "status": "pending"
+  },
+  {
+    "content": "Test daily digest and pastoral team notifications",
+    "status": "pending"
+  },
+  {
+    "content": "Run final comprehensive testing on all new features",
+    "status": "pending"
   }
 ]
