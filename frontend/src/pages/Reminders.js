@@ -333,6 +333,12 @@ export const Reminders = () => {
                         <p className="text-sm text-muted-foreground ml-13">
                           {schedule.frequency} - Rp {schedule.aid_amount?.toLocaleString('id-ID')} ({schedule.aid_type})
                         </p>
+                        <p className="text-xs ml-13">
+                          <span className={schedule.days_overdue > 0 ? 'text-red-600 font-medium' : 'text-green-600'}>
+                            {schedule.days_overdue > 0 ? `Overdue ${schedule.days_overdue} days` : 'Due today'} - 
+                            Scheduled: {formatDate(schedule.next_occurrence)}
+                          </span>
+                        </p>
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white" asChild>
@@ -350,7 +356,7 @@ export const Reminders = () => {
                                   member_id: schedule.member_id,
                                   campus_id: schedule.campus_id,
                                   event_type: 'financial_aid',
-                                  event_date: new Date().toISOString().split('T')[0],
+                                  event_date: schedule.next_occurrence,
                                   title: `${schedule.title} - Scheduled Aid`,
                                   aid_type: schedule.aid_type,
                                   aid_amount: schedule.aid_amount,
