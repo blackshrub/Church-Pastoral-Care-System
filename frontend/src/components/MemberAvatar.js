@@ -20,7 +20,7 @@ export const MemberAvatar = ({ member, size = 'md' }) => {
     return name.substring(0, 2);
   };
   
-  const photoUrl = member.photo_url ? `${BACKEND_URL}${member.photo_url}` : null;
+  const photoUrl = member.photo_url ? `${BACKEND_URL}/api${member.photo_url}` : null;
   
   return (
     <Avatar className={sizeClasses[size]} data-testid="member-avatar">
