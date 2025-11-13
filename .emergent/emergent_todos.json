@@ -1,19 +1,15 @@
 [
   {
-    "content": "Install backend dependencies (Pillow for photo processing, python-multipart for file upload)",
+    "content": "Create comprehensive server.py with all models and endpoints",
     "status": "completed"
   },
   {
-    "content": "Create comprehensive server.py with all models and endpoints",
-    "status": "in_progress"
-  },
-  {
     "content": "Test backend endpoints with curl",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Install frontend dependencies (react-i18next, date-fns, recharts)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Set up design tokens and Google Fonts in index.css",
