@@ -156,13 +156,14 @@ export const Dashboard = () => {
       const today = new Date().toISOString().split('T')[0];
       const weekAhead = new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
       
-      const [eventsRes, griefRes, hospitalRes, atRiskRes, membersRes, aidDueRes] = await Promise.all([
+      const [eventsRes, griefRes, hospitalRes, atRiskRes, membersRes, aidDueRes, suggestionsRes] = await Promise.all([
         axios.get(`${API}/care-events`),
         axios.get(`${API}/grief-support?completed=false`),
         axios.get(`${API}/care-events/hospital/due-followup`),
         axios.get(`${API}/members/at-risk`),
         axios.get(`${API}/members`),
-        axios.get(`${API}/financial-aid-schedules/due-today`)
+        axios.get(`${API}/financial-aid-schedules/due-today`),
+        axios.get(`${API}/suggestions/follow-up`)
       ]);
       
       // Get member names, phones, and photos for events
