@@ -273,8 +273,11 @@ export const Dashboard = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="birthday">🎂 Birthday</SelectItem>
+                        <SelectItem value="childbirth">👶 Childbirth</SelectItem>
                         <SelectItem value="financial_aid">💰 Financial Aid</SelectItem>
                         <SelectItem value="grief_loss">💔 Grief/Loss</SelectItem>
+                        <SelectItem value="new_house">🏠 New House</SelectItem>
+                        <SelectItem value="accident_illness">🚑 Accident/Illness</SelectItem>
                         <SelectItem value="hospital_visit">🏥 Hospital Visit</SelectItem>
                         <SelectItem value="regular_contact">📞 Regular Contact</SelectItem>
                       </SelectContent>
