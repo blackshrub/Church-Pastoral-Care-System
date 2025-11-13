@@ -92,7 +92,7 @@ export const Layout = ({ children }) => {
       
       {/* Desktop Navigation */}
       <div className="container px-4 md:px-6 mt-6">
-        <nav className="hidden md:flex items-center gap-2 mb-6">
+        <nav className="hidden md:flex items-center gap-2 mb-6 flex-wrap">
           {navigation.map((item) => {
             const Icon = item.icon;
             return (
@@ -100,7 +100,7 @@ export const Layout = ({ children }) => {
                 <Button
                   variant={isActive(item.href) ? 'default' : 'ghost'}
                   size="sm"
-                  className={isActive(item.href) ? 'bg-primary-500 text-white' : ''}
+                  className={isActive(item.href) ? 'bg-primary-500 hover:bg-primary-600 text-white' : 'hover:bg-muted'}
                   data-testid={`nav-${item.href}`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
