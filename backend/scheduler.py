@@ -149,7 +149,7 @@ async def generate_daily_digest_for_campus(campus_id: str, campus_name: str):
         # Build digest message
         digest_parts = []
         digest_parts.append(f"🏥 *{church_name} - {campus_name}*")
-        digest_parts.append(f"📋 *TUGAS PERAWATAN PASTORAL HARI INI*")
+        digest_parts.append("📋 *TUGAS PERAWATAN PASTORAL HARI INI*")
         digest_parts.append(f"📅 {today.strftime('%d %B %Y')}")
         digest_parts.append("")
         
@@ -183,8 +183,8 @@ async def generate_daily_digest_for_campus(campus_id: str, campus_name: str):
             digest_parts.append("✅ Tidak ada tugas mendesak hari ini!")
             digest_parts.append("")
         
-        digest_parts.append(f"💡 _Silakan hubungi jemaat secara personal via WhatsApp/telepon_")
-        digest_parts.append(f"🙏 _Tuhan memberkati pelayanan Anda_")
+        digest_parts.append("💡 _Silakan hubungi jemaat secara personal via WhatsApp/telepon_")
+        digest_parts.append("🙏 _Tuhan memberkati pelayanan Anda_")
         
         digest_message = "\n".join(digest_parts)
         
