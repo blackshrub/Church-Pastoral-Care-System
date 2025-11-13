@@ -114,7 +114,7 @@ export const AdminDashboard = () => {
   
   // Only full admin can access
   if (user?.role !== 'full_admin') {
-    return <Navigate to=\"/dashboard\" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
   
   if (loading) {
