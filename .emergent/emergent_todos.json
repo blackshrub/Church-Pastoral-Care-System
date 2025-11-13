@@ -1,22 +1,34 @@
 [
   {
-    "content": "Add Auto-Suggestions backend endpoint (intelligent follow-up recommendations)",
-    "status": "completed"
+    "content": "Add database indexes for performance (member_id, campus_id, event_date)",
+    "status": "in_progress"
   },
   {
-    "content": "Add Demographic Trend Analysis backend endpoint",
-    "status": "completed"
+    "content": "Implement API pagination for large datasets",
+    "status": "pending"
   },
   {
-    "content": "Add Auto-Suggestions widget to Dashboard",
-    "status": "completed"
+    "content": "Add image optimization for member photos",
+    "status": "pending"
   },
   {
-    "content": "Add Demographic Trends to Analytics page",
-    "status": "completed"
+    "content": "Implement lazy loading for React routes",
+    "status": "pending"
   },
   {
-    "content": "Test AI-powered pastoral recommendations",
-    "status": "completed"
+    "content": "Add debounced search to MembersList",
+    "status": "pending"
+  },
+  {
+    "content": "Add React memoization to expensive components",
+    "status": "pending"
+  },
+  {
+    "content": "Implement virtual scrolling for large member lists",
+    "status": "pending"
+  },
+  {
+    "content": "Test performance improvements",
+    "status": "pending"
   }
 ]
