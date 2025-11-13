@@ -732,6 +732,204 @@ export const Dashboard = () => {
           </TabsContent>
           
           {/* All other tabs... (continuing in next message due to length) */}
+          
+          {/* Follow-up Tab */}
+          <TabsContent value="followup" className="space-y-4">
+            {/* Accident/Illness Follow-ups */}
+            {hospitalFollowUp.length > 0 && (
+              <Card className="card-border-left-blue">
+                <CardHeader><CardTitle>Accident/Illness Follow-ups</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {hospitalFollowUp.map(event => (
+                      <div key={event.id} className="p-3 bg-blue-50 rounded flex justify-between items-center">
+                        <div className="flex-1">
+                          <MemberNameWithAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} memberId={event.member_id} />
+                          <p className="text-sm text-muted-foreground ml-13">{event.followup_reason}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white" asChild>
+                            <a href={formatPhoneForWhatsApp(event.member_phone)} target="_blank" rel="noopener noreferrer">Contact</a>
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={async () => {
+                            try {
+                              await axios.post(`${API}/care-events/${event.id}/complete`);
+                              toast.success('Follow-up completed!');
+                              loadDashboardData();
+                            } catch (error) { toast.error('Failed'); }
+                          }}>Mark Complete</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
+            {/* Grief Support Follow-ups */}
+            {griefDue.length > 0 && (
+              <Card className="card-border-left-purple">
+                <CardHeader><CardTitle>Grief Support Follow-ups</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {griefDue.map(stage => (
+                      <div key={stage.id} className="p-3 bg-purple-50 rounded flex justify-between items-center">
+                        <div className="flex-1">
+                          <MemberNameWithAvatar member={{name: stage.member_name, photo_url: stage.member_photo_url}} memberId={stage.member_id} />
+                          <p className="text-sm text-muted-foreground ml-13">{stage.stage.replace('_', ' ')} after mourning</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" className="bg-purple-500 hover:bg-purple-600 text-white" asChild>
+                            <a href={formatPhoneForWhatsApp(stage.member_phone)} target="_blank" rel="noopener noreferrer">Contact</a>
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => markGriefStageComplete(stage.id)}>Mark Complete</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            
+            {hospitalFollowUp.length === 0 && griefDue.length === 0 && (
+              <Card><CardContent className="p-6 text-center">No follow-ups needed today</CardContent></Card>
+            )}
+          </TabsContent>
+          
+          {/* Financial Aid Tab */}
+          <TabsContent value="financial" className="space-y-4">
+            <Card className="card-border-left-green">
+              <CardHeader><CardTitle>Financial Aid Due Today</CardTitle></CardHeader>
+              <CardContent>
+                {financialAidDue.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-6">No financial aid scheduled for today</p>
+                ) : (
+                  <div className="space-y-2">
+                    {financialAidDue.map(schedule => (
+                      <div key={schedule.id} className="p-3 bg-green-50 rounded flex justify-between items-center">
+                        <div className="flex-1">
+                          <MemberNameWithAvatar member={{name: schedule.member_name, photo_url: schedule.member_photo_url}} memberId={schedule.member_id} />
+                          <p className="text-sm text-muted-foreground ml-13">{schedule.frequency} - Rp {schedule.aid_amount?.toLocaleString('id-ID')} ({schedule.aid_type})</p>
+                          <p className="text-xs ml-13">
+                            <span className={schedule.days_overdue > 0 ? 'text-red-600 font-medium' : 'text-green-600'}>
+                              {schedule.days_overdue > 0 ? `Overdue ${schedule.days_overdue} days` : 'Due today'} - Scheduled: {formatDate(schedule.next_occurrence)}
+                            </span>
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white" asChild>
+                            <a href={formatPhoneForWhatsApp(schedule.member_phone)} target="_blank" rel="noopener noreferrer">Contact</a>
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={async () => {
+                            if (window.confirm(`Mark aid as distributed to ${schedule.member_name}?`)) {
+                              try {
+                                await axios.post(`${API}/financial-aid-schedules/${schedule.id}/mark-distributed`);
+                                toast.success('Payment distributed! Schedule advanced.');
+                                loadDashboardData();
+                              } catch (error) { toast.error('Failed'); }
+                            }
+                          }}>Mark Distributed</Button>
+                          <Button size="sm" variant="ghost" className="text-red-600" onClick={async () => {
+                            if (window.confirm(`Stop aid schedule for ${schedule.member_name}?`)) {
+                              try {
+                                await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
+                                toast.success('Schedule stopped');
+                                loadDashboardData();
+                              } catch (error) { toast.error('Failed'); }
+                            }
+                          }}>Stop</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Disconnected Tab */}
+          <TabsContent value="disconnected" className="space-y-4">
+            <Card className="card-border-left-red">
+              <CardHeader><CardTitle>Members Disconnected ({engagementSettings.inactiveDays}+ days no contact)</CardTitle></CardHeader>
+              <CardContent>
+                {disconnectedMembers.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">No disconnected members</p>
+                ) : (
+                  <div className="space-y-2">
+                    {disconnectedMembers.slice(0, 15).map(member => (
+                      <div key={member.id} className="p-3 bg-red-50 rounded flex justify-between items-center">
+                        <div className="flex-1">
+                          <MemberNameWithAvatar member={member} memberId={member.id} />
+                          <p className="text-sm text-muted-foreground ml-13">{member.days_since_last_contact} days since contact</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" className="bg-red-500 hover:bg-red-600 text-white" asChild>
+                            <a href={formatPhoneForWhatsApp(member.phone)} target="_blank" rel="noopener noreferrer">Contact</a>
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => markMemberContacted(member.id, member.name)}>Mark Contacted</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* At-Risk Tab */}
+          <TabsContent value="at-risk" className="space-y-4">
+            <Card className="card-border-left-amber">
+              <CardHeader><CardTitle>Members at Risk ({engagementSettings.atRiskDays}-{engagementSettings.inactiveDays-1} days no contact)</CardTitle></CardHeader>
+              <CardContent>
+                {atRiskMembers.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">No members at risk</p>
+                ) : (
+                  <div className="space-y-2">
+                    {atRiskMembers.map(member => (
+                      <div key={member.id} className="p-3 bg-amber-50 rounded flex justify-between items-center">
+                        <div className="flex-1">
+                          <MemberNameWithAvatar member={member} memberId={member.id} />
+                          <p className="text-sm text-muted-foreground ml-13">{member.days_since_last_contact} days since contact</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white" asChild>
+                            <a href={formatPhoneForWhatsApp(member.phone)} target="_blank" rel="noopener noreferrer">Contact</a>
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => markMemberContacted(member.id, member.name)}>Mark Contacted</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Upcoming Tab */}
+          <TabsContent value="upcoming" className="space-y-4">
+            <Card className="card-border-left-purple">
+              <CardHeader><CardTitle>Upcoming Birthdays (Next 7 Days)</CardTitle></CardHeader>
+              <CardContent>
+                {upcomingBirthdays.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-6">No birthdays coming up</p>
+                ) : (
+                  <div className="space-y-2">
+                    {upcomingBirthdays.map(event => (
+                      <div key={event.id} className="p-3 bg-purple-50 rounded flex justify-between items-center">
+                        <div className="flex-1">
+                          <MemberNameWithAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} memberId={event.member_id} />
+                          <p className="text-sm text-muted-foreground ml-13">{formatDate(event.event_date)}</p>
+                        </div>
+                        <span className="text-xs px-2 py-1 bg-purple-100 text-purple-600 rounded">
+                          {Math.ceil((new Date(event.event_date) - new Date()) / (1000 * 60 * 60 * 24))} days
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
         {/* Recent Interactions */}
