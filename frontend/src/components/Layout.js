@@ -49,6 +49,7 @@ export const Layout = ({ children }) => {
                   <Link key={item.name} to={item.href}>
                     <Button
                       variant="ghost"
+                      size="sm"
                       className={isActive(item.href) 
                         ? 'text-teal-700 bg-teal-50 font-semibold' 
                         : 'text-gray-600 hover:text-teal-700 hover:bg-teal-50'
@@ -60,17 +61,6 @@ export const Layout = ({ children }) => {
                   </Link>
                 );
               })}
-              {user?.role === 'full_admin' && (
-                <Link to="/admin">
-                  <Button
-                    variant="ghost"
-                    className={isActive('/admin') ? 'text-teal-700 bg-teal-50 font-semibold' : 'text-gray-600 hover:text-teal-700 hover:bg-teal-50'}
-                  >
-                    <Shield className="w-4 h-4 mr-2" />
-                    Admin
-                  </Button>
-                </Link>
-              )}
             </nav>
             
             {/* Right Side */}
