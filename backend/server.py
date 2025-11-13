@@ -890,7 +890,7 @@ async def create_member(member: MemberCreate, current_user: dict = Depends(get_c
 @api_router.get("/members", response_model=List[Member])
 async def list_members(
     page: int = Query(1, ge=1),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(50, ge=1, le=1000),
     engagement_status: Optional[EngagementStatus] = None,
     family_group_id: Optional[str] = None,
     search: Optional[str] = None,
