@@ -834,23 +834,31 @@ async def get_hospital_followup_due():
 
 @api_router.get("/grief-support", response_model=List[GriefSupport])
 async def list_grief_support(completed: Optional[bool] = None):
-    \"\"\"List all grief support stages\"\"\"
+    """List all grief support stages"""
     try:
         query = {}
         if completed is not None:
-            query[\"completed\"] = completed
+            query["completed"] = completed
         
-        stages = await db.grief_support.find(query, {\"_id\": 0}).sort(\"scheduled_date\", 1).to_list(1000)
+        stages = await db.grief_support.find(query, {"_id": 0}).sort("scheduled_date", 1).to_list(1000)
         return stages
     except Exception as e:
-        logger.error(f\"Error listing grief support: {str(e)}\")
+        logger.error(f"Error listing grief support: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get(\"/grief-support/member/{member_id}\", response_model=List[GriefSupport])
+@api_router.get("/grief-support/member/{member_id}", response_model=List[GriefSupport])
 async def get_member_grief_timeline(member_id: str):
-    \"\"\"Get grief timeline for specific member\"\"\"
+    """Get grief timeline for specific member"""
     try:
-        timeline = await db.grief_support.find(\n            {\"member_id\": member_id},\n            {\"_id\": 0}\n        ).sort(\"scheduled_date\", 1).to_list(100)\n        \n        return timeline\n    except Exception as e:\n        logger.error(f\"Error getting member grief timeline: {str(e)}\")\n        raise HTTPException(status_code=500, detail=str(e))
+        timeline = await db.grief_support.find(
+            {"member_id": member_id},
+            {"_id": 0}
+        ).sort("scheduled_date", 1).to_list(100)
+        
+        return timeline
+    except Exception as e:
+        logger.error(f"Error getting member grief timeline: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post(\"/grief-support/{stage_id}/complete\")\nasync def complete_grief_stage(stage_id: str, notes: Optional[str] = None):\n    \"\"\"Mark grief stage as completed with notes\"\"\"\n    try:\n        update_data = {\n            \"completed\": True,\n            \"completed_at\": datetime.now(timezone.utc).isoformat(),\n            \"updated_at\": datetime.now(timezone.utc).isoformat()\n        }\n        \n        if notes:\n            update_data[\"notes\"] = notes\n        \n        result = await db.grief_support.update_one(\n            {\"id\": stage_id},\n            {\"$set\": update_data}\n        )\n        \n        if result.matched_count == 0:\n            raise HTTPException(status_code=404, detail=\"Grief stage not found\")\n        \n        # Update member's last contact date\n        stage = await db.grief_support.find_one({\"id\": stage_id}, {\"_id\": 0})\n        if stage:\n            await db.members.update_one(\n                {\"id\": stage[\"member_id\"]},\n                {\"$set\": {\"last_contact_date\": datetime.now(timezone.utc).isoformat()}}\n            )\n        \n        return {\"success\": True, \"message\": \"Grief stage marked as completed\"}\n    except HTTPException:\n        raise\n    except Exception as e:\n        logger.error(f\"Error completing grief stage: {str(e)}\")\n        raise HTTPException(status_code=500, detail=str(e))
 
