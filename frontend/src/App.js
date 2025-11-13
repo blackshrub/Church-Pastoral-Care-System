@@ -50,7 +50,7 @@ function AppRoutes() {
       <Route path="/analytics" element={<ProtectedRoute><Layout><Analytics /></Layout></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute><Layout><AdminDashboard /></Layout></ProtectedRoute>} />
       <Route path="/import-export" element={<ProtectedRoute><Layout><ImportExport /></Layout></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute><Layout><SettingsPage /></Layout></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
       <Route path="/whatsapp-logs" element={<ProtectedRoute><Layout><WhatsAppLogs /></Layout></ProtectedRoute>} />
       <Route path="/calendar" element={<ProtectedRoute><Layout><Calendar /></Layout></ProtectedRoute>} />
       <Route path="/messaging" element={<ProtectedRoute><Layout><BulkMessaging /></Layout></ProtectedRoute>} />
