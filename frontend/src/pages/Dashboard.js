@@ -702,6 +702,55 @@ export const Dashboard = () => {
         </div>
       </div>
       
+      {/* AI-Powered Suggestions */}
+      {suggestions.length > 0 && (
+        <Card className="card-border-left-purple shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-xl font-playfair flex items-center gap-2">
+              🤖 AI Pastoral Recommendations ({suggestions.length})
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">Intelligent follow-up suggestions based on member patterns</p>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {suggestions.slice(0, 8).map((suggestion) => (
+                <div key={`${suggestion.member_id}-${suggestion.suggestion}`} className={`p-3 rounded-lg border ${
+                  suggestion.priority === 'high' ? 'bg-red-50 border-red-200' :
+                  suggestion.priority === 'medium' ? 'bg-amber-50 border-amber-200' :
+                  'bg-blue-50 border-blue-200'
+                }`}>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <MemberNameWithAvatar 
+                          member={{name: suggestion.member_name, photo_url: suggestion.member_photo_url}} 
+                          memberId={suggestion.member_id} 
+                        />
+                        <span className={`text-xs px-2 py-1 rounded font-medium ${
+                          suggestion.priority === 'high' ? 'bg-red-100 text-red-700' :
+                          suggestion.priority === 'medium' ? 'bg-amber-100 text-amber-700' :
+                          'bg-blue-100 text-blue-700'
+                        }`}>
+                          {suggestion.priority.toUpperCase()} PRIORITY
+                        </span>
+                      </div>
+                      <p className="font-semibold text-sm ml-13">{suggestion.suggestion}</p>
+                      <p className="text-xs text-muted-foreground ml-13">{suggestion.reason}</p>
+                      <p className="text-xs text-green-700 ml-13 mt-1">💡 {suggestion.recommended_action}</p>
+                    </div>
+                    <Button size="sm" className="bg-purple-500 hover:bg-purple-600 text-white" asChild>
+                      <a href={formatPhoneForWhatsApp(suggestion.member_phone)} target="_blank" rel="noopener noreferrer">
+                        Contact
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
       {/* Task Management */}
       <div>
         <h2 className="text-2xl font-playfair font-bold mb-4">Today's Tasks & Reminders</h2>
