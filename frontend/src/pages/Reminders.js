@@ -29,7 +29,7 @@ const MemberNameWithAvatar = ({ member, memberId }) => {
     return name.substring(0, 2);
   };
 
-  const photoUrl = member?.photo_url ? `${BACKEND_URL}${member.photo_url}` : null;
+  const photoUrl = member?.photo_url ? `${BACKEND_URL}/api${member.photo_url}` : null;
 
   return (
     <Link to={`/members/${memberId}`} className="flex items-center gap-3 hover:text-teal-700">
