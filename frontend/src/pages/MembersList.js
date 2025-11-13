@@ -39,6 +39,18 @@ export const MembersList = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [selectedMembers, setSelectedMembers] = useState([]);
+  const [visibleColumns, setVisibleColumns] = useState({
+    phone: true,
+    age: true,
+    gender: true,
+    membership: true,
+    marital: false,
+    category: false,
+    blood_type: false,
+    family: true,
+    last_contact: true,
+    engagement: true
+  });
   
   const [newMember, setNewMember] = useState({
     name: '',
