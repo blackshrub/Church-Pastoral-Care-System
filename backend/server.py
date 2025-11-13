@@ -54,8 +54,7 @@ class EventType(str, Enum):
     CHILDBIRTH = "childbirth"
     GRIEF_LOSS = "grief_loss"
     NEW_HOUSE = "new_house"
-    ACCIDENT_ILLNESS = "accident_illness"
-    HOSPITAL_VISIT = "hospital_visit"
+    ACCIDENT_ILLNESS = "accident_illness"  # Merged hospital_visit into this
     FINANCIAL_AID = "financial_aid"
     REGULAR_CONTACT = "regular_contact"
 
