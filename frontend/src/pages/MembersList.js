@@ -69,7 +69,15 @@ export const MembersList = () => {
   const loadMembers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/members`);
+      const response = await axios.get(`${API}/members?limit=1000`); // Get all members
+      setMembers(response.data);
+    } catch (error) {
+      toast.error(t('error_messages.failed_to_save'));
+      console.error('Error loading members:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
       setMembers(response.data);
     } catch (error) {
       toast.error(t('error_messages.failed_to_save'));
