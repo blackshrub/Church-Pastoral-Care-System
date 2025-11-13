@@ -38,6 +38,7 @@ export const MemberDetail = () => {
   const [careEvents, setCareEvents] = useState([]);
   const [griefTimeline, setGriefTimeline] = useState([]);
   const [accidentTimeline, setAccidentTimeline] = useState([]);
+  const [aidSchedules, setAidSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
