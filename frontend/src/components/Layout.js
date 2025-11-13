@@ -100,7 +100,7 @@ export const Layout = ({ children }) => {
                   variant={isActive(item.href) ? 'default' : 'ghost'}
                   size="sm"
                   className={isActive(item.href) 
-                    ? 'bg-primary-600 hover:bg-primary-700 text-white font-medium' 
+                    ? 'bg-primary-100 text-primary-700 font-semibold hover:bg-primary-200 border border-primary-300' 
                     : 'text-foreground hover:bg-muted hover:text-foreground'
                   }
                   data-testid={`nav-${item.href}`}
