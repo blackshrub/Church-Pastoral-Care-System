@@ -1,15 +1,11 @@
 [
   {
-    "content": "Install frontend dependencies (react-i18next, date-fns, recharts)",
+    "content": "Build complete frontend with all screens using bulk_file_writer",
     "status": "completed"
   },
   {
-    "content": "Build complete frontend with all screens using bulk_file_writer",
-    "status": "in_progress"
-  },
-  {
     "content": "Test grief support flow end-to-end",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Test hospital care flow with visitation logs",
