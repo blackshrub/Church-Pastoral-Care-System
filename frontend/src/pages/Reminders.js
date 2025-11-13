@@ -386,9 +386,9 @@ export const Reminders = () => {
                 <div className="space-y-2">
                   {hospitalFollowUp.map(event => (
                     <div key={event.id} className="p-3 bg-blue-50 rounded flex justify-between items-center">
-                      <div>
-                        <p className="font-semibold">{event.member_name}</p>
-                        <p className="text-sm text-muted-foreground">{event.followup_reason}</p>
+                      <div className="flex-1">
+                        <MemberNameWithAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} memberId={event.member_id} />
+                        <p className="text-sm text-muted-foreground ml-13">{event.followup_reason}</p>
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white" asChild>
