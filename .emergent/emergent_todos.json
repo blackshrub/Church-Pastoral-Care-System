@@ -1,18 +1,18 @@
 [
   {
     "content": "Move photos to uploads folder and create import script to match CSV photo column",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Debug care event frontend save error (backend works)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Merge hospital_visit into accident_illness everywhere",
     "status": "pending"
   },
   {
-    "content": "Remove redundant dates (discharge_date, admission_date, mourning_service_date)",
+    "content": "Remove redundant dates (use only event_date)",
     "status": "pending"
   },
   {
