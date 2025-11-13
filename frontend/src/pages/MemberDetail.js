@@ -751,35 +751,105 @@ export const MemberDetail = () => {
         <TabsContent value="aid">
           <Card>
             <CardContent className="p-6">
-              {careEvents.filter(e => e.event_type === 'financial_aid').length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">No financial aid recorded.</p>
-              ) : (
-                <div className="space-y-3">
-                  {careEvents.filter(e => e.event_type === 'financial_aid').map(event => (
-                    <div key={event.id} className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-semibold text-foreground">{t(`aid_types.${event.aid_type}`)}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {formatDate(event.event_date, 'dd MMM yyyy')}
+              {/* Past Financial Aid (One-time aid given) */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-foreground">Past Financial Aid Given</h4>
+                {careEvents.filter(e => e.event_type === 'financial_aid').length === 0 ? (
+                  <p className="text-sm text-muted-foreground py-4">No financial aid recorded.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {careEvents.filter(e => e.event_type === 'financial_aid').map(event => (
+                      <div key={event.id} className="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold text-foreground">{t(`aid_types.${event.aid_type}`)}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {formatDate(event.event_date, 'dd MMM yyyy')}
+                            </p>
+                            {event.aid_notes && (
+                              <p className="text-sm text-muted-foreground mt-1">{event.aid_notes}</p>
+                            )}
+                          </div>
+                          <p className="text-lg font-bold text-green-700">
+                            Rp {event.aid_amount?.toLocaleString('id-ID')}
                           </p>
-                          {event.aid_notes && (
-                            <p className="text-sm text-muted-foreground mt-1">{event.aid_notes}</p>
-                          )}
                         </div>
-                        <p className="text-lg font-bold text-green-700">
-                          Rp {event.aid_amount?.toLocaleString('id-ID')}
-                        </p>
                       </div>
-                    </div>
-                  ))}
-                  <div className="pt-4 border-t">
-                    <p className="text-right font-semibold text-foreground">
-                      Total: Rp {careEvents.filter(e => e.event_type === 'financial_aid').reduce((sum, e) => sum + (e.aid_amount || 0), 0).toLocaleString('id-ID')}
-                    </p>
+                    ))}
                   </div>
+                )}
+                
+                {/* Scheduled Financial Aid (Future payments) */}
+                <div className="border-t pt-4">
+                  <h4 className="font-semibold text-foreground">Upcoming Scheduled Payments</h4>
+                  {aidSchedules.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-4">No scheduled aid.</p>
+                  ) : (
+                    <div className="space-y-3 mt-3">
+                      {aidSchedules.slice(0, 5).map(schedule => (
+                        <div key={schedule.id} className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <p className="font-semibold text-foreground">{schedule.title}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {schedule.frequency} - Next: {formatDate(schedule.next_occurrence, 'dd MMM yyyy')}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                {schedule.aid_type} - Rp {schedule.aid_amount?.toLocaleString('id-ID')}
+                              </p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline" onClick={async () => {
+                                if (window.confirm('Mark this scheduled payment as distributed?')) {
+                                  try {
+                                    // Create care event for this payment
+                                    await axios.post(`${API}/care-events`, {
+                                      member_id: id,
+                                      campus_id: member.campus_id,
+                                      event_type: 'financial_aid',
+                                      event_date: schedule.next_occurrence,
+                                      title: schedule.title,
+                                      aid_type: schedule.aid_type,
+                                      aid_amount: schedule.aid_amount,
+                                      aid_notes: `From schedule: ${schedule.frequency}`
+                                    });
+                                    toast.success('Payment marked as distributed!');
+                                    loadMemberData();
+                                  } catch (error) {
+                                    toast.error('Failed to mark payment');
+                                  }
+                                }
+                              }}>
+                                Mark Distributed
+                              </Button>
+                              <Button size="sm" variant="ghost" className="text-red-600" onClick={async () => {
+                                if (window.confirm('Stop this aid schedule?')) {
+                                  try {
+                                    await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
+                                    toast.success('Schedule stopped');
+                                    loadMemberData();
+                                  } catch (error) {
+                                    toast.error('Failed to stop schedule');
+                                  }
+                                }
+                              }}>
+                                Stop Schedule
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+                
+                {/* Total Summary */}
+                <div className="pt-4 border-t">
+                  <p className="text-right font-semibold text-foreground">
+                    Total Given: Rp {careEvents.filter(e => e.event_type === 'financial_aid').reduce((sum, e) => sum + (e.aid_amount || 0), 0).toLocaleString('id-ID')}
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
