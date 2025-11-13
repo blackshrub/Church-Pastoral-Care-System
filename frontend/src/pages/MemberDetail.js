@@ -217,7 +217,6 @@ export const MemberDetail = () => {
                         <SelectItem value="grief_loss">💔 {t('event_types.grief_loss')}</SelectItem>
                         <SelectItem value="new_house">🏠 {t('event_types.new_house')}</SelectItem>
                         <SelectItem value="accident_illness">🚑 {t('event_types.accident_illness')}</SelectItem>
-                        <SelectItem value="hospital_visit">🏥 {t('event_types.hospital_visit')}</SelectItem>
                         <SelectItem value="financial_aid">💰 {t('event_types.financial_aid')}</SelectItem>
                         <SelectItem value="regular_contact">📞 {t('event_types.regular_contact')}</SelectItem>
                       </SelectContent>
