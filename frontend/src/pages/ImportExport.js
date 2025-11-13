@@ -332,6 +332,42 @@ export const ImportExport = () => {
             </CardContent>
           </Card>
         </TabsContent>
+        
+        <TabsContent value="sync-status" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Active API Sync Jobs</CardTitle>
+              <CardDescription>Monitor continuous synchronization status</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {activeSyncs.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No active sync jobs</p>
+              ) : (
+                <div className="space-y-3">
+                  {activeSyncs.map(sync => (
+                    <div key={sync.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${sync.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        <div>
+                          <p className="font-semibold">{sync.name}</p>
+                          <p className="text-sm text-muted-foreground">{sync.campus_name}</p>
+                          <p className="text-xs text-muted-foreground">Every {sync.interval} minutes</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-green-600">✅ Synced</p>
+                        <p className="text-xs text-muted-foreground">Last: {sync.last_sync.toLocaleTimeString()}</p>
+                        <Button size="sm" variant="outline" className="mt-2">
+                          Stop Sync
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
