@@ -159,7 +159,7 @@ export const AdminDashboard = () => {
                 <CardTitle>Manage Users</CardTitle>
                 <Dialog open={userModalOpen} onOpenChange={setUserModalOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-primary-500"><Plus className="w-4 h-4 mr-2" />Add User</Button>
+                    <Button className="bg-teal-500 hover:bg-teal-600 text-white"><Plus className="w-4 h-4 mr-2" />Add User</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader><DialogTitle>Add User</DialogTitle></DialogHeader>
@@ -190,7 +190,7 @@ export const AdminDashboard = () => {
                       )}
                       <div className="flex gap-2 justify-end">
                         <Button type="button" variant="outline" onClick={() => setUserModalOpen(false)}>Cancel</Button>
-                        <Button type="submit" className="bg-primary-500">Create</Button>
+                        <Button type="submit" className="bg-teal-500 hover:bg-teal-600 text-white">Create</Button>
                       </div>
                     </form>
                   </DialogContent>
