@@ -200,7 +200,42 @@ export const Dashboard = () => {
     }
   };
   
-  const handleQuickEvent = async (e) => {
+  const markBirthdayComplete = async (eventId) => {
+    try {
+      await axios.post(`${API}/care-events/${eventId}/complete`);
+      toast.success('Birthday task completed!');
+      loadDashboardData();
+    } catch (error) {
+      toast.error('Failed to complete');
+    }
+  };
+  
+  const markGriefStageComplete = async (stageId) => {
+    try {
+      await axios.post(`${API}/grief-support/${stageId}/complete`);
+      toast.success('Grief stage completed!');
+      loadDashboardData();
+    } catch (error) {
+      toast.error('Failed to complete');
+    }
+  };
+  
+  const markMemberContacted = async (memberId, memberName) => {
+    try {
+      await axios.post(`${API}/care-events`, {
+        member_id: memberId,
+        campus_id: user?.campus_id || '2b3f9094-eef4-4af4-a3ff-730ef4adeb8a',
+        event_type: 'regular_contact',
+        event_date: new Date().toISOString().split('T')[0],
+        title: `Contact with ${memberName}`,
+        description: 'Contacted via Dashboard'
+      });
+      toast.success(`${memberName} marked as contacted! Status updated to Active.`);
+      loadDashboardData();
+    } catch (error) {
+      toast.error('Failed to mark as contacted');
+    }
+  };
     e.preventDefault();
     if (selectedMemberIds.length === 0) {
       toast.error('Select at least one member');
