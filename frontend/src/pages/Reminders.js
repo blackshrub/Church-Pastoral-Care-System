@@ -80,8 +80,18 @@ export const Reminders = () => {
         e.event_date <= weekAhead
       ).map(e => ({...e, member_name: memberMap[e.member_id]?.name, member_phone: memberMap[e.member_id]?.phone}));
       
-      // Filter grief stages due today with member names
+      // Filter grief stages due today AND overdue (for follow-up tab)
       const griefToday = griefRes.data.filter(g => g.scheduled_date === today).map(g => ({
+        ...g,
+        member_name: memberMap[g.member_id]?.name,
+        member_phone: memberMap[g.member_id]?.phone
+      }));
+      
+      // Filter overdue grief stages for follow-up tab
+      const griefOverdue = griefRes.data.filter(g => {
+        const schedDate = new Date(g.scheduled_date);
+        return schedDate <= new Date() && !g.completed;
+      }).map(g => ({
         ...g,
         member_name: memberMap[g.member_id]?.name,
         member_phone: memberMap[g.member_id]?.phone
