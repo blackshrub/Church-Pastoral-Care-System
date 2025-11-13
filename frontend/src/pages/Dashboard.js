@@ -9,8 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
-import { Users, Heart, AlertTriangle, DollarSign, Plus, UserPlus, Bell, Calendar, Zap } from 'lucide-react';
+import { Users, Heart, AlertTriangle, DollarSign, Plus, UserPlus, Bell, Calendar, Zap, Hospital } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -18,8 +20,46 @@ const API = `${BACKEND_URL}/api`;
 
 const formatDate = (dateStr) => {
   try {
-    return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
   } catch { return dateStr; }
+};
+
+const formatPhoneForWhatsApp = (phone) => {
+  if (!phone) return '#';
+  let formatted = phone;
+  if (formatted.startsWith('0')) {
+    formatted = '62' + formatted.substring(1);
+  } else if (formatted.startsWith('+')) {
+    formatted = formatted.substring(1);
+  }
+  return `https://wa.me/${formatted}`;
+};
+
+const MemberNameWithAvatar = ({ member, memberId }) => {
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return parts[0][0] + parts[parts.length - 1][0];
+    }
+    return name.substring(0, 2);
+  };
+
+  const photoUrl = member?.photo_url ? `${BACKEND_URL}/api${member.photo_url}` : null;
+
+  return (
+    <Link to={`/members/${memberId}`} className="flex items-center gap-3 hover:text-teal-700">
+      <Avatar className="w-10 h-10">
+        {photoUrl && <AvatarImage src={photoUrl} alt={member.name} className="object-cover" />}
+        <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-xs">
+          {getInitials(member.name)}
+        </AvatarFallback>
+      </Avatar>
+      <div>
+        <p className="font-semibold hover:underline">{member.name}</p>
+      </div>
+    </Link>
+  );
 };
 
 export const Dashboard = () => {
