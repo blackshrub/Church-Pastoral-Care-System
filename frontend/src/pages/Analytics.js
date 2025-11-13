@@ -177,17 +177,89 @@ export const Analytics = () => {
     return <div className="space-y-6"><Skeleton className="h-96 w-full" /></div>;
   }
   
-  const chartData = eventsByType.map(item => ({
-    name: t(`event_types.${item.type}`),
-    count: item.count
-  }));
-  
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-manrope font-bold text-foreground">{t('analytics')}</h1>
-        <p className="text-muted-foreground mt-1">Pastoral care insights and trends</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-playfair font-bold text-foreground">Advanced Analytics</h1>
+          <p className="text-muted-foreground mt-1">Comprehensive pastoral care insights and trends</p>
+        </div>
+        <Select value={timeRange} onValueChange={setTimeRange}>
+          <SelectTrigger className="w-48">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Time</SelectItem>
+            <SelectItem value="year">This Year</SelectItem>
+            <SelectItem value="6months">Last 6 Months</SelectItem>
+            <SelectItem value="3months">Last 3 Months</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+      
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="card-border-left-teal">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Members</p>
+                <p className="text-3xl font-bold">{memberStats?.total || 0}</p>
+                <p className="text-xs text-muted-foreground">{memberStats?.withPhotos || 0} with photos</p>
+              </div>
+              <Users className="w-8 h-8 text-teal-600" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="card-border-left-amber">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Financial Aid</p>
+                <p className="text-2xl font-bold">Rp {financialData?.totalAid?.toLocaleString('id-ID') || 0}</p>
+                <p className="text-xs text-muted-foreground">{financialData?.schedules || 0} active schedules</p>
+              </div>
+              <DollarSign className="w-8 h-8 text-amber-600" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="card-border-left-pink">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Grief Support</p>
+                <p className="text-3xl font-bold">{griefData?.completion_rate || 0}%</p>
+                <p className="text-xs text-muted-foreground">completion rate</p>
+              </div>
+              <Heart className="w-8 h-8 text-pink-600" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="card-border-left-purple">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Avg Member Age</p>
+                <p className="text-3xl font-bold">{memberStats?.avgAge || 0}</p>
+                <p className="text-xs text-muted-foreground">years old</p>
+              </div>
+              <Target className="w-8 h-8 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <Tabs defaultValue="demographics" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="demographics"><Users className="w-4 h-4 mr-2" />Demographics</TabsTrigger>
+          <TabsTrigger value="engagement"><TrendingUp className="w-4 h-4 mr-2" />Engagement</TabsTrigger>
+          <TabsTrigger value="financial"><DollarSign className="w-4 h-4 mr-2" />Financial</TabsTrigger>
+          <TabsTrigger value="care"><Heart className="w-4 h-4 mr-2" />Care Events</TabsTrigger>
+          <TabsTrigger value="predictive"><Target className="w-4 h-4 mr-2" />Predictive</TabsTrigger>
+        </TabsList>
       
       {/* Grief Completion Stats */}
       {griefCompletion && griefCompletion.total_stages > 0 && (
