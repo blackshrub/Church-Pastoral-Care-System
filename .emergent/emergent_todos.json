@@ -1,66 +1,78 @@
 [
   {
-    "content": "CRITICAL CHANGE: Redesign notification system - send reminders to PASTORAL TEAM instead of members",
+    "content": "Update all backend models with campus_id (CareEvent, GriefSupport, NotificationLog)",
     "status": "in_progress"
   },
   {
-    "content": "Add Campus model and multi-campus support to all models",
+    "content": "Add campus filtering to all existing endpoints",
     "status": "pending"
   },
   {
-    "content": "Update User model with campus_id and full_admin role",
+    "content": "Create Campus CRUD endpoints",
     "status": "pending"
   },
   {
-    "content": "Add campus selection to login form",
+    "content": "Update auth endpoints for campus selection at login",
     "status": "pending"
   },
   {
-    "content": "Create data import script for core_jemaat.csv (696 members)",
+    "content": "Redesign scheduler to send to PASTORAL TEAM, not members",
     "status": "pending"
   },
   {
-    "content": "Generate realistic dummy pastoral care data (grief, hospital, aid events)",
+    "content": "Create daily digest aggregation function",
     "status": "pending"
   },
   {
-    "content": "Create Admin Dashboard UI (user management, campus management)",
+    "content": "Download and parse core_jemaat.csv",
     "status": "pending"
   },
   {
-    "content": "Create Calendar View page with month/week/day views",
+    "content": "Create campus import script (extract from baptist_place)",
     "status": "pending"
   },
   {
-    "content": "Create Bulk Messaging interface for pastoral team",
+    "content": "Create member import script with family grouping",
     "status": "pending"
   },
   {
-    "content": "Create Advanced Analytics page (weekly/monthly reports, trends)",
+    "content": "Generate realistic dummy pastoral care data",
     "status": "pending"
   },
   {
-    "content": "Create Daily Digest feature - send task list to pastoral team",
+    "content": "Update frontend Auth to handle campus selection",
     "status": "pending"
   },
   {
-    "content": "Update all reminder functions to send to pastoral team, not members",
+    "content": "Create Admin Dashboard page (user + campus management)",
     "status": "pending"
   },
   {
-    "content": "Add pastoral team member assignment feature",
+    "content": "Create Calendar View page (month/week/day)",
     "status": "pending"
   },
   {
-    "content": "Test multi-campus isolation and full admin access",
+    "content": "Create Bulk Messaging page",
     "status": "pending"
   },
   {
-    "content": "Test daily digest and pastoral team notifications",
+    "content": "Create Advanced Analytics page",
     "status": "pending"
   },
   {
-    "content": "Run final comprehensive testing on all new features",
+    "content": "Create Daily Digest UI",
+    "status": "pending"
+  },
+  {
+    "content": "Test multi-campus isolation",
+    "status": "pending"
+  },
+  {
+    "content": "Test notification redesign (to team)",
+    "status": "pending"
+  },
+  {
+    "content": "Run final comprehensive testing",
     "status": "pending"
   }
 ]
