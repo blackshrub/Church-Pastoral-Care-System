@@ -100,7 +100,10 @@ export const Layout = ({ children }) => {
                 <Button
                   variant={isActive(item.href) ? 'default' : 'ghost'}
                   size="sm"
-                  className={isActive(item.href) ? 'bg-primary-500 hover:bg-primary-600 text-white' : 'hover:bg-muted'}
+                  className={isActive(item.href) 
+                    ? 'bg-primary-600 hover:bg-primary-700 text-white font-medium' 
+                    : 'text-foreground hover:bg-muted hover:text-foreground'
+                  }
                   data-testid={`nav-${item.href}`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
