@@ -181,10 +181,9 @@ async def generate_daily_digest_for_campus(campus_id: str, campus_name: str):
             digest_parts.extend(hospital_followups)
             digest_parts.append("")
         
-        if at_risk_top:
+        if at_risk_formatted:
             digest_parts.append(f"⚠️ *JEMAAT BERISIKO - PERLU PERHATIAN ({len(at_risk_list)} total):*")
-            for name, days, phone in at_risk_top:
-                digest_parts.append(f"  • {name} ({days} hari) - {phone}")
+            digest_parts.extend(at_risk_formatted)
             digest_parts.append("")
         
         if len(digest_parts) <= 4:  # Only header, no tasks
