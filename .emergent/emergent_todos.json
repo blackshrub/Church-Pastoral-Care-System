@@ -1,22 +1,6 @@
 [
   {
-    "content": "Fix dropdown/select styling - force light background with dark text",
-    "status": "completed"
-  },
-  {
-    "content": "Fix navigation routing - Dashboard and Grief Support going to same page",
-    "status": "completed"
-  },
-  {
-    "content": "Fix active menu state - change to dark text on light background",
-    "status": "completed"
-  },
-  {
-    "content": "Disable dark mode completely - force light mode only",
-    "status": "completed"
-  },
-  {
     "content": "Test all fixes with screenshots",
-    "status": "in_progress"
+    "status": "completed"
   }
 ]
