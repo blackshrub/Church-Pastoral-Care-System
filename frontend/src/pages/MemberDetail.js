@@ -89,6 +89,7 @@ export const MemberDetail = () => {
     try {
       const eventData = {
         member_id: id,
+        campus_id: 'auto',
         ...newEvent,
         aid_amount: newEvent.aid_amount ? parseFloat(newEvent.aid_amount) : null
       };
@@ -117,7 +118,17 @@ export const MemberDetail = () => {
       loadMemberData();
     } catch (error) {
       toast.error(t('error_messages.failed_to_save'));
-      console.error('Error adding care event:', error);
+    }
+  };
+  
+  const handleDeleteEvent = async (eventId) => {
+    if (!window.confirm('Delete this care event?')) return;
+    try {
+      await axios.delete(`${API}/care-events/${eventId}`);
+      toast.success('Event deleted');
+      loadMemberData();
+    } catch (error) {
+      toast.error('Failed to delete');
     }
   };
   
