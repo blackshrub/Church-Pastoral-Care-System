@@ -37,6 +37,7 @@ export const MemberDetail = () => {
   const [member, setMember] = useState(null);
   const [careEvents, setCareEvents] = useState([]);
   const [griefTimeline, setGriefTimeline] = useState([]);
+  const [accidentTimeline, setAccidentTimeline] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
