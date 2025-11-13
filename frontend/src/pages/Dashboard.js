@@ -120,6 +120,7 @@ export const Dashboard = () => {
   const [disconnectedMembers, setDisconnectedMembers] = useState([]);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [financialAidDue, setFinancialAidDue] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quickEventOpen, setQuickEventOpen] = useState(false);
   const [allMembers, setAllMembers] = useState([]);
