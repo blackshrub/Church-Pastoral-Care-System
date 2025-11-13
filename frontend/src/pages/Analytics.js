@@ -170,17 +170,48 @@ export const Analytics = () => {
           <h1 className="text-3xl font-playfair font-bold text-foreground">Advanced Analytics</h1>
           <p className="text-muted-foreground mt-1">Comprehensive pastoral care insights and trends</p>
         </div>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-48">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Time</SelectItem>
-            <SelectItem value="year">This Year</SelectItem>
-            <SelectItem value="6months">Last 6 Months</SelectItem>
-            <SelectItem value="3months">Last 3 Months</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-4">
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-48">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="year">This Year</SelectItem>
+              <SelectItem value="6months">Last 6 Months</SelectItem>
+              <SelectItem value="3months">Last 3 Months</SelectItem>
+              <SelectItem value="custom">Custom Date Range</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {timeRange === 'custom' && (
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={customStartDate}
+                onChange={(e) => setCustomStartDate(e.target.value)}
+                className="px-3 py-2 border rounded text-sm"
+                placeholder="Start date"
+              />
+              <span className="text-muted-foreground">to</span>
+              <input
+                type="date"
+                value={customEndDate}
+                onChange={(e) => setCustomEndDate(e.target.value)}
+                className="px-3 py-2 border rounded text-sm"
+                placeholder="End date"
+              />
+              <Button 
+                size="sm" 
+                className="bg-teal-500 hover:bg-teal-600 text-white"
+                onClick={() => loadAnalytics()}
+                disabled={!customStartDate || !customEndDate}
+              >
+                Apply
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Overview Cards */}
