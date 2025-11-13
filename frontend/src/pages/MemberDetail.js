@@ -382,19 +382,32 @@ export const MemberDetail = () => {
                     
                     {/* Financial Aid Scheduling */}
                     <div className="space-y-4 border-t pt-4">
-                      <h5 className="font-semibold text-green-800 dark:text-green-200">📅 Aid Schedule</h5>
+                      <h5 className="font-semibold text-green-800 dark:text-green-200">📅 Payment Type</h5>
                       <div>
                         <Label>Frequency *</Label>
                         <Select value={newEvent.schedule_frequency} onValueChange={(v) => setNewEvent({...newEvent, schedule_frequency: v})}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="one_time">One-time (today only)</SelectItem>
-                            <SelectItem value="weekly">Weekly (every week)</SelectItem>
-                            <SelectItem value="monthly">Monthly (every month)</SelectItem>
-                            <SelectItem value="annually">Annually (every year)</SelectItem>
+                            <SelectItem value="one_time">One-time Payment (already given)</SelectItem>
+                            <SelectItem value="weekly">Weekly Schedule (future payments)</SelectItem>
+                            <SelectItem value="monthly">Monthly Schedule (future payments)</SelectItem>
+                            <SelectItem value="annually">Annual Schedule (future payments)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
+                      
+                      {newEvent.schedule_frequency === 'one_time' && (
+                        <div>
+                          <Label>Payment Date *</Label>
+                          <Input
+                            type="date"
+                            value={newEvent.payment_date}
+                            onChange={(e) => setNewEvent({...newEvent, payment_date: e.target.value})}
+                            required
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">Date when aid was given</p>
+                        </div>
+                      )}
                       
                       {newEvent.schedule_frequency === 'weekly' && (
                         <div className="grid grid-cols-3 gap-3 p-3 bg-blue-50 dark:bg-blue-950 rounded">
@@ -428,7 +441,6 @@ export const MemberDetail = () => {
                               type="date"
                               value={newEvent.schedule_end_date}
                               onChange={(e) => setNewEvent({...newEvent, schedule_end_date: e.target.value})}
-                              placeholder="Leave empty for no end"
                             />
                           </div>
                         </div>
@@ -452,7 +464,7 @@ export const MemberDetail = () => {
                               min="1"
                               max="31"
                               value={newEvent.day_of_month}
-                              onChange={(e) => setNewEvent({...newEvent, day_of_month: parseInt(e.target.value)})}
+                              onChange={(e) => setNewEvent({...newEvent, day_of_month: parseInt(e.target.value) || 1})}
                               required
                             />
                           </div>
