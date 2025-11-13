@@ -136,14 +136,14 @@ export const Settings = () => {
                 <p className="text-xs text-muted-foreground">Default: 60 days. Members with no contact for this many days will show as "At Risk"</p>
               </div>
               <div className="space-y-2">
-                <Label>Inactive Threshold (days since last contact)</Label>
+                <Label>Disconnected Threshold (days since last contact)</Label>
                 <Input
                   type="number"
                   value={inactiveDays}
                   onChange={(e) => setInactiveDays(parseInt(e.target.value))}
                   min="1"
                 />
-                <p className="text-xs text-muted-foreground">Default: 90 days. Members with no contact for this many days will show as "Inactive"</p>
+                <p className="text-xs text-muted-foreground">Default: 90 days. Members with no contact for this many days will show as "Disconnected"</p>
               </div>
               <Button onClick={saveEngagementSettings} className="bg-teal-500 hover:bg-teal-600 text-white">
                 Save Engagement Thresholds
