@@ -1637,6 +1637,20 @@ async def stop_aid_schedule(schedule_id: str, current_user: dict = Depends(get_c
         logger.error(f"Error stopping aid schedule: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/financial-aid-schedules/member/{member_id}")
+async def get_member_aid_schedules(member_id: str, current_user: dict = Depends(get_current_user)):
+    """Get financial aid schedules for specific member"""
+    try:
+        schedules = await db.financial_aid_schedules.find(
+            {"member_id": member_id, "is_active": True},
+            {"_id": 0}
+        ).sort("next_occurrence", 1).to_list(10)
+        
+        return schedules
+    except Exception as e:
+        logger.error(f"Error getting member aid schedules: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/financial-aid-schedules/due-today")
 async def get_aid_due_today(current_user: dict = Depends(get_current_user)):
     """Get financial aid schedules due today"""
