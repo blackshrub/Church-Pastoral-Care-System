@@ -163,12 +163,7 @@ async def generate_daily_digest_for_campus(campus_id: str, campus_name: str):
         
         if birthday_members:
             digest_parts.append(f"🎂 *ULANG TAHUN HARI INI ({len(birthday_members)}):*")
-            digest_parts.extend(birthday_members[:20])  # Max 20
-            digest_parts.append("")
-        
-        if birthday_week_members:
-            digest_parts.append(f"🎈 *ULANG TAHUN MINGGU INI ({len(birthday_week_members)}):*")
-            digest_parts.extend(birthday_week_members[:10])  # Max 10
+            digest_parts.extend(birthday_members[:20])
             digest_parts.append("")
         
         if grief_members:
