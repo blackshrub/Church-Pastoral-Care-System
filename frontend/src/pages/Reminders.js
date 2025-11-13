@@ -276,9 +276,9 @@ export const Reminders = () => {
                     <div className="space-y-2">
                       {griefToday.map(stage => (
                         <div key={stage.id} className="p-3 bg-pink-50 rounded flex justify-between items-center">
-                          <div>
-                            <p className="font-semibold">{stage.member_name}</p>
-                            <p className="text-sm text-muted-foreground">{stage.stage.replace('_', ' ')} stage</p>
+                          <div className="flex-1">
+                            <MemberNameWithAvatar member={{name: stage.member_name, photo_url: stage.member_photo_url}} memberId={stage.member_id} />
+                            <p className="text-sm text-muted-foreground ml-13">{stage.stage.replace('_', ' ')} stage</p>
                           </div>
                           <div className="flex gap-2">
                             <Button size="sm" className="bg-pink-500 hover:bg-pink-600 text-white" asChild>
