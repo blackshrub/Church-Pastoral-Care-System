@@ -16,6 +16,7 @@ import { Settings as SettingsPage } from '@/pages/Settings';
 import { WhatsAppLogs } from '@/pages/WhatsAppLogs';
 import { Calendar } from '@/pages/Calendar';
 import { BulkMessaging } from '@/pages/BulkMessaging';
+import { Reminders } from '@/pages/Reminders';
 import { IntegrationTest } from '@/components/IntegrationTest';
 import { Layout } from '@/components/Layout';
 
