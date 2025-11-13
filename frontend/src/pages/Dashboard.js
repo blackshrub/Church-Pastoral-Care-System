@@ -93,9 +93,10 @@ export const Dashboard = () => {
     try {
       let success = 0;
       for (const memberId of selectedMemberIds) {
+        const member = allMembers.find(m => m.id === memberId);
         await axios.post(`${API}/care-events`, {
           member_id: memberId,
-          campus_id: 'auto',
+          campus_id: member.campus_id,  // Use member's campus_id
           ...quickEvent,
           aid_amount: quickEvent.aid_amount ? parseFloat(quickEvent.aid_amount) : null
         });
