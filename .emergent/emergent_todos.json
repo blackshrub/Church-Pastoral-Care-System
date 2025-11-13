@@ -1,10 +1,6 @@
 [
   {
-    "content": "Build all remaining frontend pages in one bulk operation",
-    "status": "completed"
-  },
-  {
     "content": "Test complete multi-campus system with login and dashboard",
-    "status": "in_progress"
+    "status": "completed"
   }
 ]
