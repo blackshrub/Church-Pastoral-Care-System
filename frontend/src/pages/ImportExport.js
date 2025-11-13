@@ -482,7 +482,90 @@ export const ImportExport = () => {
                     ))}
                   </div>
                 </div>
-                <Button type="submit" disabled={!apiUrl || importing} className="bg-teal-500 hover:bg-teal-600 text-white">
+                <Button type="button" disabled={!apiUrl || importing} className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleApiTest}>
+                  {importing ? 'Testing...' : 'Test API Connection'}
+                </Button>
+                
+                {showApiPreview && apiValidation && (
+                  <div className="space-y-4 p-4 border rounded bg-blue-50">
+                    <h4 className="font-semibold">🔗 API Connection Results</h4>
+                    
+                    {apiValidation.success ? (
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm font-medium">Connection Status:</p>
+                            <p className="text-sm text-green-600">✅ Successfully connected</p>
+                            <p className="text-sm text-muted-foreground">{apiValidation.total} members found</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium">Field Mapping:</p>
+                            {apiValidation.mappingErrors.length === 0 ? (
+                              <p className="text-sm text-green-600">✅ All required fields mapped correctly</p>
+                            ) : (
+                              <div className="text-sm text-red-600">
+                                {apiValidation.mappingErrors.map((error, i) => (
+                                  <p key={i}>❌ {error}</p>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {apiValidation.qualityIssues.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium text-orange-600">⚠️ Data Quality Issues:</p>
+                            <div className="text-xs text-orange-600 max-h-20 overflow-y-auto">
+                              {apiValidation.qualityIssues.map((issue, i) => (
+                                <p key={i}>• {issue}</p>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <div className="max-h-48 overflow-auto border rounded bg-white p-2">
+                          <p className="text-xs font-medium mb-2">Sample Data (first 5 rows):</p>
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr>
+                                {Object.entries(fieldMapping).map(([ourField, theirField]) => (
+                                  <th key={ourField} className="border p-1 text-left">
+                                    {ourField} ({theirField}) {apiValidation.mappingValid[ourField] ? '✅' : '❌'}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {apiPreview.slice(0, 5).map((row, i) => (
+                                <tr key={i}>
+                                  {Object.values(fieldMapping).map((theirField, j) => (
+                                    <td key={j} className="border p-1">{row[theirField] || '-'}</td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                        
+                        {apiValidation.mappingErrors.length === 0 ? (
+                          <Button onClick={handleApiSyncConfirm} className="bg-teal-500 hover:bg-teal-600 text-white">
+                            ✅ Confirm API Sync Setup ({apiValidation.total} members, every {syncInterval} min)
+                          </Button>
+                        ) : (
+                          <p className="text-red-600 text-sm">Fix field mapping errors before proceeding</p>
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-red-600">
+                        <p className="font-medium">❌ Connection Failed</p>
+                        <p className="text-sm">{apiValidation.error}</p>
+                        <p className="text-xs mt-2">Please check URL, API key, and network connection</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <Button type="submit" disabled={!apiUrl || importing || showApiPreview} className="bg-teal-500 hover:bg-teal-600 text-white">
                   <FileJson className="w-4 h-4 mr-2" />
                   {importing ? 'Syncing...' : 'Create Sync Job'}
                 </Button>
