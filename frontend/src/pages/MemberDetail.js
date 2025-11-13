@@ -18,6 +18,15 @@ import { EngagementBadge } from '@/components/EngagementBadge';
 import { EventTypeBadge } from '@/components/EventTypeBadge';
 import { format } from 'date-fns';
 
+// Safe date formatter
+const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
+  try {
+    return format(new Date(dateStr), formatStr);
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
@@ -159,7 +168,7 @@ export const MemberDetail = () => {
               <EngagementBadge status={member.engagement_status} days={member.days_since_last_contact} />
               {member.last_contact_date && (
                 <span className="text-sm text-muted-foreground">
-                  {t('last_contact')}: {format(new Date(member.last_contact_date), 'dd MMM yyyy')}
+                  {t('last_contact')}: {formatDate(member.last_contact_date, 'dd MMM yyyy')}
                 </span>
               )}
             </div>
@@ -379,7 +388,7 @@ export const MemberDetail = () => {
                         <div className="flex items-center gap-2 mb-1">
                           <EventTypeBadge type={event.event_type} />
                           <span className="text-xs text-muted-foreground">
-                            {format(new Date(event.event_date), 'dd MMM yyyy')}
+                            {formatDate(event.event_date, 'dd MMM yyyy')}
                           </span>
                           {event.completed && (
                             <CheckCircle2 className="w-4 h-4 text-green-600" />
@@ -442,7 +451,7 @@ export const MemberDetail = () => {
                             {t(`grief_stages.${stage.stage}`)}
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            {format(new Date(stage.scheduled_date), 'dd MMM yyyy')}
+                            {formatDate(stage.scheduled_date, 'dd MMM yyyy')}
                           </p>
                           {stage.notes && (
                             <p className="text-sm text-muted-foreground mt-2 italic">
@@ -462,7 +471,7 @@ export const MemberDetail = () => {
                           )}
                           {stage.completed && (
                             <p className="text-xs text-green-600 mt-2">
-                              Completed: {format(new Date(stage.completed_at), 'dd MMM yyyy')}
+                              Completed: {formatDate(stage.completed_at, 'dd MMM yyyy')}
                             </p>
                           )}
                         </div>
@@ -487,11 +496,11 @@ export const MemberDetail = () => {
                     <div>
                       <h4 className="font-semibold">{event.hospital_name}</h4>
                       <p className="text-sm text-muted-foreground">
-                        Admitted: {event.admission_date && format(new Date(event.admission_date), 'dd MMM yyyy')}
+                        Admitted: {event.admission_date && formatDate(event.admission_date, 'dd MMM yyyy')}
                       </p>
                       {event.discharge_date && (
                         <p className="text-sm text-muted-foreground">
-                          Discharged: {format(new Date(event.discharge_date), 'dd MMM yyyy')}
+                          Discharged: {formatDate(event.discharge_date, 'dd MMM yyyy')}
                         </p>
                       )}
                     </div>
@@ -500,7 +509,7 @@ export const MemberDetail = () => {
                         <h5 className="text-sm font-medium">Visitation Log:</h5>
                         {event.visitation_log.map((log, idx) => (
                           <div key={idx} className="text-sm bg-muted/30 p-3 rounded">
-                            <p className="font-medium">{log.visitor_name} - {format(new Date(log.visit_date), 'dd MMM yyyy')}</p>
+                            <p className="font-medium">{log.visitor_name} - {formatDate(log.visit_date, 'dd MMM yyyy')}</p>
                             <p className="text-muted-foreground">{log.notes}</p>
                             {log.prayer_offered && <p className="text-xs text-primary-600 mt-1">✓ Prayer offered</p>}
                           </div>
@@ -528,7 +537,7 @@ export const MemberDetail = () => {
                         <div>
                           <p className="font-semibold text-foreground">{t(`aid_types.${event.aid_type}`)}</p>
                           <p className="text-sm text-muted-foreground">
-                            {format(new Date(event.event_date), 'dd MMM yyyy')}
+                            {formatDate(event.event_date, 'dd MMM yyyy')}
                           </p>
                           {event.aid_notes && (
                             <p className="text-sm text-muted-foreground mt-1">{event.aid_notes}</p>
