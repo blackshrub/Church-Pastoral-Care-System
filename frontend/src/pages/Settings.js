@@ -51,9 +51,10 @@ export const Settings = () => {
       </div>
       
       <Tabs defaultValue="automation">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="automation"><Bell className="w-4 h-4 mr-2" />Automation</TabsTrigger>
           <TabsTrigger value="grief"><Heart className="w-4 h-4 mr-2" />Grief Support</TabsTrigger>
+          <TabsTrigger value="accident"><Zap className="w-4 h-4 mr-2" />Accident/Illness</TabsTrigger>
           <TabsTrigger value="engagement"><Users className="w-4 h-4 mr-2" />Engagement</TabsTrigger>
           <TabsTrigger value="system"><SettingsIcon className="w-4 h-4 mr-2" />System</TabsTrigger>
         </TabsList>
