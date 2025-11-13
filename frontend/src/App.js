@@ -52,6 +52,7 @@ function AppRoutes() {
       <Route path="/whatsapp-logs" element={<ProtectedRoute><Layout><WhatsAppLogs /></Layout></ProtectedRoute>} />
       <Route path="/calendar" element={<ProtectedRoute><Layout><Calendar /></Layout></ProtectedRoute>} />
       <Route path="/messaging" element={<ProtectedRoute><Layout><BulkMessaging /></Layout></ProtectedRoute>} />
+      <Route path="/reminders" element={<ProtectedRoute><Layout><Reminders /></Layout></ProtectedRoute>} />
       <Route path="/integrations" element={<ProtectedRoute><Layout><IntegrationTest /></Layout></ProtectedRoute>} />
     </Routes>
   );
