@@ -161,7 +161,7 @@ export const Dashboard = () => {
         axios.get(`${API}/grief-support?completed=false`),
         axios.get(`${API}/care-events/hospital/due-followup`),
         axios.get(`${API}/members/at-risk`),
-        axios.get(`${API}/members`),
+        axios.get(`${API}/members?limit=1000`), // Get all members for mapping
         axios.get(`${API}/financial-aid-schedules/due-today`),
         axios.get(`${API}/suggestions/follow-up`)
       ]);
