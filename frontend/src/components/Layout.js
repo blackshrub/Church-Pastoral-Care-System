@@ -62,10 +62,19 @@ export const Layout = ({ children }) => {
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground mr-2">
-              <UserCircle className="w-4 h-4" />
-              <span>{user?.name}</span>
-              <span className="text-xs px-2 py-0.5 bg-primary-100 text-primary-700 rounded">{user?.role}</span>
+            <div className="hidden md:flex items-center gap-3 text-sm mr-2">
+              {user?.campus_name && (
+                <span className="px-3 py-1 bg-accent-500/10 text-accent-700 rounded-full font-medium">
+                  📍 {user.campus_name}
+                </span>
+              )}
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <UserCircle className="w-4 h-4" />
+                <span>{user?.name}</span>
+                <span className="text-xs px-2 py-0.5 bg-primary-100 text-primary-700 rounded font-medium">
+                  {user?.role === 'full_admin' ? 'Full Admin' : (user?.role === 'campus_admin' ? 'Campus Admin' : 'Pastor')}
+                </span>
+              </div>
             </div>
             <LanguageToggle />
             <Button
