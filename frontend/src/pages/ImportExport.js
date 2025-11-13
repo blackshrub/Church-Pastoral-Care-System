@@ -39,6 +39,9 @@ export const ImportExport = () => {
   const [importing, setImporting] = useState(false);
   const [csvFile, setCsvFile] = useState(null);
   const [jsonData, setJsonData] = useState('');
+  const [csvPreview, setCsvPreview] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [validationResults, setValidationResults] = useState(null);
   const [editingSyncId, setEditingSyncId] = useState(null);
   const [editSyncOpen, setEditSyncOpen] = useState(false);
   
