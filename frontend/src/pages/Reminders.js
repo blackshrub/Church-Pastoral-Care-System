@@ -108,7 +108,7 @@ export const Reminders = () => {
       
       setBirthdaysToday(todayBirthdays);
       setUpcomingBirthdays(upcoming);
-      setGriefDue(griefToday);
+      setGriefDue(griefOverdue);  // Use overdue for follow-up tab
       setHospitalFollowUp(hospitalRes.data.map(h => ({...h, member_name: memberMap[h.member_id]?.name, member_phone: memberMap[h.member_id]?.phone})));
       setAtRiskMembers(atRisk);
       setDisconnectedMembers(disconnected);
