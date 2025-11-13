@@ -19,6 +19,8 @@ import {
 
 export const Layout = ({ children }) => {
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
