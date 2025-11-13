@@ -1,10 +1,6 @@
 [
   {
-    "content": "Build minimal React test screen with buttons to trigger integration tests",
-    "status": "completed"
-  },
-  {
     "content": "Test WhatsApp integration end-to-end and document response shape",
-    "status": "in_progress"
+    "status": "completed"
   }
 ]
