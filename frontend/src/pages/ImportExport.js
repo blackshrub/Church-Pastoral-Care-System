@@ -171,21 +171,92 @@ export const ImportExport = () => {
     }
   };
   
-  const handleApiSync = async (e) => {
-    e.preventDefault();
-    if (!apiUrl) return;
+  const handleApiTest = async () => {
+    if (!apiUrl) {
+      toast.error('Enter API URL first');
+      return;
+    }
+    
+    try {
+      setImporting(true);
+      // Test API connection and get preview data
+      const headers = apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {};
+      const response = await axios.get(apiUrl, { headers, timeout: 10000 });
+      const data = Array.isArray(response.data) ? response.data : [response.data];
+      
+      if (data.length === 0) {
+        toast.error('API returned no data');
+        return;
+      }
+      
+      // Validate field mapping
+      const sample = data[0];
+      const mappingValid = {};
+      const mappingErrors = [];
+      
+      Object.entries(fieldMapping).forEach(([ourField, theirField]) => {
+        const hasField = sample.hasOwnProperty(theirField);
+        mappingValid[ourField] = hasField;
+        if (!hasField && ['name', 'phone'].includes(ourField)) {
+          mappingErrors.push(`Required field "${theirField}" not found in API response`);
+        }
+      });
+      
+      // Check data quality
+      const qualityIssues = [];
+      data.slice(0, 10).forEach((item, i) => {
+        const name = item[fieldMapping.name];
+        const phone = item[fieldMapping.phone];
+        
+        if (!name) qualityIssues.push(`Row ${i+1}: Missing name`);
+        if (!phone) qualityIssues.push(`Row ${i+1}: Missing phone`);
+        if (phone && !phone.match(/^(\+?62|0)[0-9]{8,13}$/)) {
+          qualityIssues.push(`Row ${i+1}: Invalid phone format (${phone})`);
+        }
+      });
+      
+      setApiPreview(data.slice(0, 10));
+      setApiValidation({
+        success: true,
+        total: data.length,
+        mappingValid,
+        mappingErrors,
+        qualityIssues: qualityIssues.slice(0, 10) // Show first 10 issues
+      });
+      setShowApiPreview(true);
+      toast.success('API connection successful!');
+      
+    } catch (error) {
+      setApiValidation({
+        success: false,
+        error: error.response?.data?.message || error.message || 'API connection failed'
+      });
+      setShowApiPreview(true);
+      toast.error('API connection failed');
+    } finally {
+      setImporting(false);
+    }
+  };
+  
+  const handleApiSyncConfirm = async () => {
+    if (!window.confirm(`Create API sync job?\n\nThis will sync ${apiValidation.total} members every ${syncInterval} minutes from ${selectedCampusId ? campuses.find(c => c.id === selectedCampusId)?.campus_name : 'selected campus'}.`)) {
+      return;
+    }
     
     try {
       setImporting(true);
       const response = await axios.post(`${API}/sync/members/from-api`, null, {
         params: { api_url: apiUrl, api_key: apiKey || undefined }
       });
-      toast.success(`Synced ${response.data.synced_count} members from API!`);
+      toast.success(`API sync created! ${response.data.synced_count} members synced.`);
       if (response.data.errors.length > 0) {
         toast.warning(`${response.data.errors.length} errors occurred`);
       }
       setApiUrl('');
       setApiKey('');
+      setShowApiPreview(false);
+      setApiPreview(null);
+      loadActiveSyncs();
     } catch (error) {
       toast.error('API sync failed');
     } finally {
