@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +17,33 @@ const formatDate = (dateStr) => {
   try {
     return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
   } catch { return dateStr; }
+};
+
+const MemberNameWithAvatar = ({ member, memberId }) => {
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return parts[0][0] + parts[parts.length - 1][0];
+    }
+    return name.substring(0, 2);
+  };
+
+  const photoUrl = member?.photo_url ? `${BACKEND_URL}${member.photo_url}` : null;
+
+  return (
+    <Link to={`/members/${memberId}`} className="flex items-center gap-3 hover:text-teal-700">
+      <Avatar className="w-10 h-10">
+        {photoUrl && <AvatarImage src={photoUrl} alt={member.name} />}
+        <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-xs">
+          {getInitials(member.name)}
+        </AvatarFallback>
+      </Avatar>
+      <div>
+        <p className="font-semibold hover:underline">{member.name}</p>
+      </div>
+    </Link>
+  );
 };
 
 const formatPhoneForWhatsApp = (phone) => {
