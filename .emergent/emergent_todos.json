@@ -1,15 +1,11 @@
 [
   {
-    "content": "Get integration playbook for WhatsApp gateway (http://dermapack.net:3001) and email service",
+    "content": "Get user's email service preference and credentials",
     "status": "completed"
   },
   {
-    "content": "Get user's email service preference and credentials",
-    "status": "in_progress"
-  },
-  {
     "content": "Set up backend dependencies and environment variables for WhatsApp/Email integration",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create integration test endpoints: /api/integrations/ping/whatsapp and /api/integrations/ping/email",
