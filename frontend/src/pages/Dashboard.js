@@ -205,49 +205,63 @@ export const Dashboard = () => {
       {/* Quick Actions */}
       <div>
         <h2 className="text-2xl font-playfair font-bold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Link to="/members">
-            <Button className="w-full h-14 bg-teal-500 hover:bg-teal-600 text-white text-base font-semibold">
-              <Plus className="w-5 h-5 mr-2" />Add New Member
-            </Button>
-          </Link>
-          <Link to="/members">
-            <Button className="w-full h-14 bg-amber-500 hover:bg-amber-600 text-white text-base font-semibold">
-              <Users className="w-5 h-5 mr-2" />View All Members
-            </Button>
-          </Link>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Dialog open={quickEventOpen} onOpenChange={setQuickEventOpen}>
             <DialogTrigger asChild>
-              <Button className="w-full h-14 bg-pink-500 hover:bg-pink-600 text-white text-base font-semibold">
-                <Zap className="w-5 h-5 mr-2" />Quick Care Event
+              <Button className="w-full h-14 bg-teal-500 hover:bg-teal-600 text-white text-base font-semibold">
+                <Plus className="w-5 h-5 mr-2" />Add New Care Event
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Quick Care Event (Multi-Member)</DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleQuickEvent} className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Search and Select Members *</Label>
+              <form onSubmit={handleQuickEvent} className="space-y-6">
+                {/* Member Selection with Better UX */}
+                <div className="space-y-3">
+                  <Label>Select Members *</Label>
                   <Input
                     value={memberSearch}
                     onChange={(e) => setMemberSearch(e.target.value)}
-                    placeholder="Type to search members..."
+                    placeholder="Type member name to search..."
                   />
-                  <div className="max-h-48 overflow-y-auto border rounded p-2 space-y-1">
-                    {filteredMembers.slice(0, 20).map(member => (
-                      <div key={member.id} className="flex items-center gap-2">
-                        <Checkbox
-                          checked={selectedMemberIds.includes(member.id)}
-                          onCheckedChange={() => toggleMemberSelection(member.id)}
-                        />
-                        <span className="text-sm">{member.name} ({member.phone})</span>
+                  
+                  {/* Selected Members Display */}
+                  {selectedMemberIds.length > 0 && (
+                    <div className="p-3 bg-teal-50 rounded border">
+                      <p className="font-semibold text-sm mb-2">Selected Members ({selectedMemberIds.length}):</p>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedMemberIds.map(id => {
+                          const member = allMembers.find(m => m.id === id);
+                          return member ? (
+                            <span key={id} className="bg-teal-100 text-teal-800 px-2 py-1 rounded text-xs flex items-center gap-1">
+                              {member.name}
+                              <button type="button" onClick={() => toggleMemberSelection(id)} className="ml-1 text-teal-600 hover:text-teal-800">×</button>
+                            </span>
+                          ) : null;
+                        })}
                       </div>
-                    ))}
-                  </div>
-                  <p className="text-sm text-muted-foreground">{selectedMemberIds.length} members selected</p>
+                    </div>
+                  )}
+                  
+                  {/* Member Search Results */}
+                  {memberSearch && (
+                    <div className="max-h-48 overflow-y-auto border rounded p-2 space-y-1">
+                      {filteredMembers.slice(0, 15).map(member => (
+                        <div key={member.id} className="flex items-center gap-2 p-1 hover:bg-muted rounded">
+                          <Checkbox
+                            checked={selectedMemberIds.includes(member.id)}
+                            onCheckedChange={() => toggleMemberSelection(member.id)}
+                          />
+                          <span className="text-sm">{member.name}</span>
+                          <span className="text-xs text-muted-foreground">({member.phone})</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 
+                {/* Event Details */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Event Type *</Label>
@@ -272,41 +286,97 @@ export const Dashboard = () => {
                 
                 <div>
                   <Label>Title *</Label>
-                  <Input value={quickEvent.title} onChange={(e) => setQuickEvent({...quickEvent, title: e.target.value})} placeholder="e.g., Financial assistance" required />
+                  <Input value={quickEvent.title} onChange={(e) => setQuickEvent({...quickEvent, title: e.target.value})} placeholder="e.g., Financial assistance for 15 families" required />
                 </div>
                 
+                <div>
+                  <Label>Description</Label>
+                  <Input value={quickEvent.description} onChange={(e) => setQuickEvent({...quickEvent, description: e.target.value})} placeholder="Additional details..." />
+                </div>
+                
+                {/* Conditional Fields Based on Event Type */}
                 {quickEvent.event_type === 'financial_aid' && (
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-green-50 rounded">
-                    <div>
-                      <Label>Aid Type *</Label>
-                      <Select value={quickEvent.aid_type} onValueChange={(v) => setQuickEvent({...quickEvent, aid_type: v})}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="education">Education</SelectItem>
-                          <SelectItem value="medical">Medical</SelectItem>
-                          <SelectItem value="emergency">Emergency</SelectItem>
-                          <SelectItem value="housing">Housing</SelectItem>
-                          <SelectItem value="food">Food</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  <div className="space-y-4 p-4 bg-green-50 rounded border border-green-200">
+                    <h4 className="font-semibold text-green-900">Financial Aid Details</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Aid Type *</Label>
+                        <Select value={quickEvent.aid_type} onValueChange={(v) => setQuickEvent({...quickEvent, aid_type: v})}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="education">Education Support</SelectItem>
+                            <SelectItem value="medical">Medical Bills</SelectItem>
+                            <SelectItem value="emergency">Emergency Relief</SelectItem>
+                            <SelectItem value="housing">Housing Assistance</SelectItem>
+                            <SelectItem value="food">Food Support</SelectItem>
+                            <SelectItem value="funeral_costs">Funeral Costs</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Amount per Member (Rp) *</Label>
+                        <Input type="number" value={quickEvent.aid_amount} onChange={(e) => setQuickEvent({...quickEvent, aid_amount: e.target.value})} placeholder="1500000" required />
+                      </div>
                     </div>
-                    <div>
-                      <Label>Amount (Rp) *</Label>
-                      <Input type="number" value={quickEvent.aid_amount} onChange={(e) => setQuickEvent({...quickEvent, aid_amount: e.target.value})} required />
+                    <p className="text-sm text-green-700">
+                      Total: Rp {((quickEvent.aid_amount || 0) * selectedMemberIds.length).toLocaleString('id-ID')} for {selectedMemberIds.length} members
+                    </p>
+                  </div>
+                )}
+                
+                {quickEvent.event_type === 'grief_loss' && (
+                  <div className="space-y-4 p-4 bg-purple-50 rounded border border-purple-200">
+                    <h4 className="font-semibold text-purple-900">⭐ Grief Support (Auto-generates 6-stage timeline)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Relationship to Deceased *</Label>
+                        <Select value={quickEvent.grief_relationship || ''} onValueChange={(v) => setQuickEvent({...quickEvent, grief_relationship: v})}>
+                          <SelectTrigger><SelectValue placeholder="Select relationship" /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="spouse">Spouse</SelectItem>
+                            <SelectItem value="parent">Parent</SelectItem>
+                            <SelectItem value="child">Child</SelectItem>
+                            <SelectItem value="sibling">Sibling</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>Mourning Service Date *</Label>
+                        <Input type="date" value={quickEvent.mourning_service_date || ''} onChange={(e) => setQuickEvent({...quickEvent, mourning_service_date: e.target.value})} required />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {quickEvent.event_type === 'hospital_visit' && (
+                  <div className="space-y-4 p-4 bg-blue-50 rounded border border-blue-200">
+                    <h4 className="font-semibold text-blue-900">Hospital Visit Details</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label>Hospital Name</Label>
+                        <Input value={quickEvent.hospital_name || ''} onChange={(e) => setQuickEvent({...quickEvent, hospital_name: e.target.value})} placeholder="RSU Jakarta" />
+                      </div>
+                      <div>
+                        <Label>Admission Date</Label>
+                        <Input type="date" value={quickEvent.admission_date || ''} onChange={(e) => setQuickEvent({...quickEvent, admission_date: e.target.value})} />
+                      </div>
                     </div>
                   </div>
                 )}
                 
                 <div className="flex gap-2 justify-end">
                   <Button type="button" variant="outline" onClick={() => setQuickEventOpen(false)}>Cancel</Button>
-                  <Button type="submit" className="bg-teal-500 hover:bg-teal-600 text-white">Save for {selectedMemberIds.length} Members</Button>
+                  <Button type="submit" className="bg-teal-500 hover:bg-teal-600 text-white" disabled={selectedMemberIds.length === 0}>
+                    Save for {selectedMemberIds.length} Member{selectedMemberIds.length !== 1 ? 's' : ''}
+                  </Button>
                 </div>
               </form>
             </DialogContent>
           </Dialog>
-          <Link to="/members">
-            <Button className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white text-base font-semibold">
-              <Bell className="w-5 h-5 mr-2" />View Reminders
+          <Link to="/whatsapp-logs">
+            <Button className="w-full h-14 bg-amber-500 hover:bg-amber-600 text-white text-base font-semibold">
+              <Bell className="w-5 h-5 mr-2" />View WhatsApp Logs
             </Button>
           </Link>
         </div>
