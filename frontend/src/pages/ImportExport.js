@@ -168,6 +168,44 @@ export const ImportExport = () => {
               </form>
             </CardContent>
           </Card>
+          
+          <Card className="card-border-left-teal">
+            <CardHeader>
+              <CardTitle>API Sync (Continuous)</CardTitle>
+              <CardDescription>Connect to external church management system for continuous sync</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleApiSync} className="space-y-4">
+                <div>
+                  <Label>External API URL *</Label>
+                  <Input
+                    value={apiUrl}
+                    onChange={(e) => setApiUrl(e.target.value)}
+                    placeholder="https://your-church-system.com/api/members"
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">API endpoint that returns member data JSON</p>
+                </div>
+                <div>
+                  <Label>API Key (optional)</Label>
+                  <Input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="Bearer token if required"
+                  />
+                </div>
+                <Button type="submit" disabled={!apiUrl || importing} className="bg-teal-500 hover:bg-teal-600">
+                  <FileJson className="w-4 h-4 mr-2" />
+                  {importing ? 'Syncing...' : 'Sync from API'}
+                </Button>
+                <div className="p-3 bg-blue-50 rounded text-sm">
+                  <p className="font-medium">💡 How it works:</p>
+                  <p className="text-muted-foreground mt-1">System will fetch members from your external API and sync to this database. Existing members (matched by external_member_id) will be updated, new ones will be created.</p>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
         </TabsContent>
         
         <TabsContent value="export" className="space-y-4">
