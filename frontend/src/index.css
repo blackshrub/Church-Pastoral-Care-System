@@ -100,31 +100,53 @@
 
 /* Force better contrast for dialogs and modals */
 [role="dialog"],
+[data-radix-dialog-content],
+.fixed.inset-0 + div[role="dialog"] {
+  background-color: hsl(0, 0%, 100%) !important;
+  color: hsl(0, 0%, 10%) !important;
+}
+
+/* Force light background for dialog content */
 [data-radix-dialog-content] {
-  @apply bg-card text-card-foreground;
+  background: white !important;
 }
 
-/* Improve form label visibility */
-label {
-  @apply text-foreground font-medium;
+/* Improve form label visibility - force dark text */
+[role="dialog"] label,
+[data-radix-dialog-content] label {
+  color: hsl(0, 0%, 15%) !important;
+  font-weight: 500 !important;
 }
 
-/* Improve input visibility and contrast */
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="date"],
-input[type="number"],
-textarea,
-select {
-  @apply bg-card text-foreground border-border;
+/* Improve input visibility and contrast - force light background */
+[role="dialog"] input[type="text"],
+[role="dialog"] input[type="email"],
+[role="dialog"] input[type="tel"],
+[role="dialog"] input[type="date"],
+[role="dialog"] input[type="number"],
+[role="dialog"] textarea,
+[role="dialog"] select,
+[data-radix-dialog-content] input,
+[data-radix-dialog-content] textarea,
+[data-radix-dialog-content] select {
+  background-color: hsl(0, 0%, 100%) !important;
+  color: hsl(0, 0%, 10%) !important;
+  border-color: hsl(0, 0%, 85%) !important;
 }
 
-input[type="text"]::placeholder,
-input[type="email"]::placeholder,
-input[type="tel"]::placeholder,
-textarea::placeholder {
-  @apply text-muted-foreground opacity-60;
+[role="dialog"] input::placeholder,
+[role="dialog"] textarea::placeholder,
+[data-radix-dialog-content] input::placeholder,
+[data-radix-dialog-content] textarea::placeholder {
+  color: hsl(0, 0%, 60%) !important;
+  opacity: 1 !important;
+}
+
+/* Dialog title */
+[role="dialog"] h2,
+[data-radix-dialog-content] h2,
+[data-radix-dialog-title] {
+  color: hsl(0, 0%, 10%) !important;
 }
 
 /* Ensure dialog overlay has proper backdrop */
