@@ -13,6 +13,15 @@ import { EventTypeBadge } from '@/components/EventTypeBadge';
 import { EngagementBadge } from '@/components/EngagementBadge';
 import { format } from 'date-fns';
 
+// Safe date formatter
+const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
+  try {
+    return format(new Date(dateStr), formatStr);
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
@@ -241,7 +250,7 @@ export const Dashboard = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <EventTypeBadge type={event.event_type} />
                         <span className="text-xs text-muted-foreground">
-                          {format(new Date(event.event_date), 'dd MMM yyyy')}
+                          {formatDate(event.event_date, 'dd MMM yyyy')}
                         </span>
                       </div>
                       <p className="text-sm font-medium text-foreground">{event.title}</p>
@@ -270,7 +279,7 @@ export const Dashboard = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <EventTypeBadge type={event.event_type} />
                         <span className="text-xs text-muted-foreground">
-                          {format(new Date(event.created_at), 'dd MMM, HH:mm')}
+                          {formatDate(event.created_at, 'dd MMM, HH:mm')}
                         </span>
                       </div>
                       <p className="text-sm font-medium text-foreground">{event.title}</p>
