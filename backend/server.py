@@ -297,15 +297,12 @@ class CareEvent(BaseModel):
     completed: bool = False
     completed_at: Optional[datetime] = None
     
-    # Grief support fields
+    # Grief support fields (only relationship, use event_date as mourning date)
     grief_relationship: Optional[str] = None
-    mourning_service_date: Optional[date] = None
     grief_stage: Optional[GriefStage] = None
     
-    # Hospital visit fields
+    # Accident/illness fields (merged from hospital, only hospital_name, use event_date as admission)
     hospital_name: Optional[str] = None
-    admission_date: Optional[date] = None
-    discharge_date: Optional[date] = None
     visitation_log: List[Dict[str, Any]] = Field(default_factory=list)
     
     # Financial aid fields
