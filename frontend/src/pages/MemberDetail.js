@@ -465,8 +465,9 @@ export const MemberDetail = () => {
                               type="number"
                               min="1"
                               max="31"
-                              value={newEvent.day_of_month}
+                              value={newEvent.day_of_month || ''}
                               onChange={(e) => setNewEvent({...newEvent, day_of_month: parseInt(e.target.value) || 1})}
+                              placeholder="13"
                               required
                             />
                           </div>
