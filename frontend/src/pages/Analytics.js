@@ -121,7 +121,7 @@ export const Analytics = () => {
       setEventsByType(Object.entries(eventTypeCount).map(([type, count]) => ({ 
         name: type.replace('_', ' ').toUpperCase(), 
         value: count,
-        percentage: Math.round(count / events.length * 100)
+        percentage: totalNonBirthdayEvents > 0 ? Math.round(count / totalNonBirthdayEvents * 100) : 0
       })));
       
       setDemographicData({
