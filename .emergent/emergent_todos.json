@@ -1,18 +1,34 @@
 [
   {
-    "content": "Quick care event form with all event types and clear search",
-    "status": "completed"
+    "content": "Debug care event frontend save issues",
+    "status": "in_progress"
   },
   {
-    "content": "API sync with interval, campus, full field mapping",
-    "status": "completed"
+    "content": "Merge Hospital Visit into Accident/Illness everywhere",
+    "status": "pending"
   },
   {
-    "content": "API sync status list with green/red lights",
-    "status": "completed"
+    "content": "Remove redundant dates (use only event_date)",
+    "status": "pending"
   },
   {
-    "content": "Final comprehensive testing and verification",
-    "status": "completed"
+    "content": "Add Accident/Illness support config (3, 7, 14 days)",
+    "status": "pending"
+  },
+  {
+    "content": "Download and extract profile photos from zip",
+    "status": "pending"
+  },
+  {
+    "content": "Import photos and match with CSV photo column",
+    "status": "pending"
+  },
+  {
+    "content": "Add photo thumbnails to reminders page",
+    "status": "pending"
+  },
+  {
+    "content": "Add photo_url to API sync field mapping",
+    "status": "pending"
   }
 ]
