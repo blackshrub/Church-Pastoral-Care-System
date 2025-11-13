@@ -560,20 +560,34 @@ async def register_user(user_data: UserCreate, current_admin: dict = Depends(get
         if existing:
             raise HTTPException(status_code=400, detail="Email already registered")
         
+        # Validate campus_id for non-full-admin users
+        if user_data.role != UserRole.FULL_ADMIN and not user_data.campus_id:
+            raise HTTPException(status_code=400, detail="campus_id required for campus admin and pastor roles")
+        
         user = User(
             email=user_data.email,
             name=user_data.name,
             role=user_data.role,
+            campus_id=user_data.campus_id,
+            phone=user_data.phone,
             hashed_password=get_password_hash(user_data.password)
         )
         
         await db.users.insert_one(user.model_dump())
+        
+        campus_name = None
+        if user.campus_id:
+            campus = await db.campuses.find_one({"id": user.campus_id}, {"_id": 0})
+            campus_name = campus["campus_name"] if campus else None
         
         return UserResponse(
             id=user.id,
             email=user.email,
             name=user.name,
             role=user.role,
+            campus_id=user.campus_id,
+            campus_name=campus_name,
+            phone=user.phone,
             is_active=user.is_active,
             created_at=user.created_at
         )
@@ -606,7 +620,20 @@ async def login(user_data: UserLogin):
                 detail="User account is disabled"
             )
         
+        # For campus-specific users, validate campus_id
+        if user.get("role") in [UserRole.CAMPUS_ADMIN, UserRole.PASTOR]:
+            if user_data.campus_id and user["campus_id"] != user_data.campus_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="You don't have access to this campus"
+                )
+        
         access_token = create_access_token(data={"sub": user["id"]})
+        
+        campus_name = None
+        if user.get("campus_id"):
+            campus = await db.campuses.find_one({"id": user["campus_id"]}, {"_id": 0})
+            campus_name = campus["campus_name"] if campus else None
         
         return TokenResponse(
             access_token=access_token,
@@ -616,6 +643,9 @@ async def login(user_data: UserLogin):
                 email=user["email"],
                 name=user["name"],
                 role=user["role"],
+                campus_id=user.get("campus_id"),
+                campus_name=campus_name,
+                phone=user["phone"],
                 is_active=user.get("is_active", True),
                 created_at=user["created_at"]
             )
@@ -629,11 +659,19 @@ async def login(user_data: UserLogin):
 @api_router.get("/auth/me", response_model=UserResponse)
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     """Get current logged-in user info"""
+    campus_name = None
+    if current_user.get("campus_id"):
+        campus = await db.campuses.find_one({"id": current_user["campus_id"]}, {"_id": 0})
+        campus_name = campus["campus_name"] if campus else None
+    
     return UserResponse(
         id=current_user["id"],
         email=current_user["email"],
         name=current_user["name"],
         role=current_user["role"],
+        campus_id=current_user.get("campus_id"),
+        campus_name=campus_name,
+        phone=current_user["phone"],
         is_active=current_user.get("is_active", True),
         created_at=current_user["created_at"]
     )
@@ -642,15 +680,33 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
 async def list_users(current_admin: dict = Depends(get_current_admin)):
     """List all users (admin only)"""
     try:
-        users = await db.users.find({}, {"_id": 0}).to_list(100)
-        return [UserResponse(
-            id=u["id"],
-            email=u["email"],
-            name=u["name"],
-            role=u["role"],
-            is_active=u.get("is_active", True),
-            created_at=u["created_at"]
-        ) for u in users]
+        query = {}
+        # Campus admins only see users in their campus
+        if current_admin.get("role") == UserRole.CAMPUS_ADMIN:
+            query["campus_id"] = current_admin["campus_id"]
+        
+        users = await db.users.find(query, {"_id": 0}).to_list(100)
+        
+        result = []
+        for u in users:
+            campus_name = None
+            if u.get("campus_id"):
+                campus = await db.campuses.find_one({"id": u["campus_id"]}, {"_id": 0})
+                campus_name = campus["campus_name"] if campus else None
+            
+            result.append(UserResponse(
+                id=u["id"],
+                email=u["email"],
+                name=u["name"],
+                role=u["role"],
+                campus_id=u.get("campus_id"),
+                campus_name=campus_name,
+                phone=u["phone"],
+                is_active=u.get("is_active", True),
+                created_at=u["created_at"]
+            ))
+        
+        return result
     except Exception as e:
         logger.error(f"Error listing users: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
