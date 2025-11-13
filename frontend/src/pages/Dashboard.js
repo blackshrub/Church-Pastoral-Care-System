@@ -26,6 +26,18 @@ export const Dashboard = () => {
   const [recentActivity, setRecentActivity] = useState([]);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [quickEventOpen, setQuickEventOpen] = useState(false);
+  const [allMembers, setAllMembers] = useState([]);
+  const [selectedMemberIds, setSelectedMemberIds] = useState([]);
+  const [memberSearch, setMemberSearch] = useState('');
+  const [quickEvent, setQuickEvent] = useState({
+    event_type: 'regular_contact',
+    event_date: new Date().toISOString().split('T')[0],
+    title: '',
+    description: '',
+    aid_type: 'education',
+    aid_amount: ''
+  });
   
   useEffect(() => {
     loadDashboardData();
