@@ -1,19 +1,19 @@
 [
   {
     "content": "Add CSV preview with field mapping validation before import",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add API connection test and preview before sync setup",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Add data quality checks (phone validation, duplicate detection)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Add confirmation dialogs for all import operations",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test enterprise validation features",
