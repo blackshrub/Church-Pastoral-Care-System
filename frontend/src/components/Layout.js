@@ -4,7 +4,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { LanguageToggle } from './LanguageToggle';
 import { Button } from '@/components/ui/button';
-import { Church, LayoutDashboard, Users, DollarSign, BarChart3, Settings, Upload, Cog, LogOut, Shield, MessageSquare } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Church, LayoutDashboard, Users, DollarSign, BarChart3, Settings, Upload, Cog, LogOut, Shield, MessageSquare, Calendar as CalIcon, Bell, ChevronDown } from 'lucide-react';
 
 export const Layout = ({ children }) => {
   const { t } = useTranslation();
@@ -12,18 +13,15 @@ export const Layout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const navigation = [
+  const mainNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Members', href: '/members', icon: Users },
     { name: 'Financial Aid', href: '/financial-aid', icon: DollarSign },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-    { name: 'Import/Export', href: '/import-export', icon: Upload },
-    { name: 'Settings', href: '/settings', icon: Cog },
+    { name: 'Calendar', href: '/calendar', icon: CalIcon },
+    { name: 'Messaging', href: '/messaging', icon: MessageSquare },
+    { name: 'WhatsApp Logs', href: '/whatsapp-logs', icon: Bell },
   ];
-  
-  if (user?.role === 'full_admin') {
-    navigation.splice(5, 0, { name: 'Admin', href: '/admin', icon: Shield });
-  }
   
   const isActive = (href) => location.pathname === href || (href === '/dashboard' && location.pathname === '/');
   
