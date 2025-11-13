@@ -83,41 +83,70 @@ export const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle>Grief Support Timeline Configuration</CardTitle>
-              <CardDescription>6-stage grief support schedule</CardDescription>
+              <CardDescription>Customize the 6-stage grief support schedule</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded">
-                  <span className="font-medium">Stage 1: Initial Support</span>
-                  <span className="text-muted-foreground">1 week after mourning</span>
+              {griefStages.map((stage, index) => (
+                <div key={stage.stage} className="flex items-center gap-4 p-3 bg-muted/30 rounded">
+                  <span className="font-medium w-32">{stage.name}</span>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={stage.days}
+                      onChange={(e) => {
+                        const updated = [...griefStages];
+                        updated[index].days = parseInt(e.target.value);
+                        setGriefStages(updated);
+                      }}
+                      className="w-20"
+                    />
+                    <span className="text-sm text-muted-foreground">days after mourning</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded">
-                  <span className="font-medium">Stage 2: Early Follow-up</span>
-                  <span className="text-muted-foreground">2 weeks after mourning</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded">
-                  <span className="font-medium">Stage 3: One Month Check</span>
-                  <span className="text-muted-foreground">1 month after mourning</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded">
-                  <span className="font-medium">Stage 4: Deep Grief Period</span>
-                  <span className="text-muted-foreground">3 months after mourning</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded">
-                  <span className="font-medium">Stage 5: Extended Support</span>
-                  <span className="text-muted-foreground">6 months after mourning</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-muted/30 rounded">
-                  <span className="font-medium">Stage 6: Anniversary</span>
-                  <span className="text-muted-foreground">1 year after mourning</span>
-                </div>
-              </div>
+              ))}
+              <Button onClick={saveGriefStages} className="bg-teal-500 hover:bg-teal-600 text-white">
+                Save Grief Stages Configuration
+              </Button>
               <div className="p-4 bg-purple-50 rounded-lg mt-4">
-                <p className="text-sm font-medium">💜 Configuration Note:</p>
+                <p className="text-sm font-medium">💜 Note:</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Grief stages are automatically generated when a grief/loss event is created with mourning service date. The 6-stage timeline is currently fixed. Future versions can allow custom stage configuration.
+                  Changes will apply to NEW grief events. Existing timelines remain unchanged.
                 </p>
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="engagement">
+          <Card>
+            <CardHeader>
+              <CardTitle>Engagement Status Thresholds</CardTitle>
+              <CardDescription>Configure when members are marked at-risk or inactive</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>At Risk Threshold (days since last contact)</Label>
+                <Input
+                  type="number"
+                  value={atRiskDays}
+                  onChange={(e) => setAtRiskDays(parseInt(e.target.value))}
+                  min="1"
+                />
+                <p className="text-xs text-muted-foreground">Default: 60 days. Members with no contact for this many days will show as "At Risk"</p>
+              </div>
+              <div className="space-y-2">
+                <Label>Inactive Threshold (days since last contact)</Label>
+                <Input
+                  type="number"
+                  value={inactiveDays}
+                  onChange={(e) => setInactiveDays(parseInt(e.target.value))}
+                  min="1"
+                />
+                <p className="text-xs text-muted-foreground">Default: 90 days. Members with no contact for this many days will show as "Inactive"</p>
+              </div>
+              <Button onClick={saveEngagementSettings} className="bg-teal-500 hover:bg-teal-600 text-white">
+                Save Engagement Thresholds
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
