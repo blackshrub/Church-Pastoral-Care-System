@@ -14,17 +14,58 @@ const API = `${BACKEND_URL}/api`;
 
 export const ImportExport = () => {
   const { user } = useAuth();
-  const [csvFile, setCsvFile] = useState(null);
-  const [jsonData, setJsonData] = useState('');
   const [apiUrl, setApiUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
+  const [syncInterval, setSyncInterval] = useState(60);
+  const [selectedCampusId, setSelectedCampusId] = useState('');
+  const [campuses, setCampuses] = useState([]);
   const [fieldMapping, setFieldMapping] = useState({
     name: 'name',
     phone: 'phone',
     email: 'email',
-    external_id: 'id'
+    external_id: 'id',
+    birth_date: 'birth_date',
+    category: 'category',
+    gender: 'gender',
+    blood_type: 'blood_type',
+    marital_status: 'marital_status',
+    membership_status: 'membership_status',
+    address: 'address'
   });
+  const [activeSyncs, setActiveSyncs] = useState([]);
   const [importing, setImporting] = useState(false);
+  
+  useEffect(() => {
+    loadCampuses();
+    loadActiveSyncs();
+  }, []);
+  
+  const loadCampuses = async () => {
+    try {
+      const response = await axios.get(`${API}/campuses`);
+      setCampuses(response.data);
+      if (response.data.length > 0) {
+        setSelectedCampusId(response.data[0].id);
+      }
+    } catch (error) {
+      console.error('Error loading campuses');
+    }
+  };
+  
+  const loadActiveSyncs = async () => {
+    // Mock data for now - would load from backend in production
+    setActiveSyncs([
+      {
+        id: '1',
+        name: 'Main Church System',
+        url: 'https://church-system.com/api/members',
+        interval: 60,
+        last_sync: new Date(),
+        status: 'active',
+        campus_name: 'GKBJ Taman Kencana'
+      }
+    ]);
+  };
   
   const handleCsvImport = async (e) => {
     e.preventDefault();
