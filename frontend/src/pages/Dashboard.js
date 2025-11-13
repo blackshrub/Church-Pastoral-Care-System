@@ -43,7 +43,14 @@ export const Dashboard = () => {
     aid_type: 'education',
     aid_amount: '',
     grief_relationship: '',
-    hospital_name: ''
+    hospital_name: '',
+    // Financial aid scheduling
+    schedule_frequency: 'one_time',
+    schedule_start_date: new Date().toISOString().split('T')[0],
+    schedule_end_date: '',
+    day_of_week: 'monday',
+    day_of_month: 1,
+    month_of_year: 1
   });
   
   useEffect(() => {
