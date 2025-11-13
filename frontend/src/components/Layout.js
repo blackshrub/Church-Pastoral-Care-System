@@ -20,8 +20,6 @@ export const Layout = ({ children }) => {
     { name: 'Financial Aid', href: '/financial-aid', icon: DollarSign },
     { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Calendar', href: '/calendar', icon: CalIcon },
-    { name: 'Messaging', href: '/messaging', icon: MessageSquare },
-    { name: 'WhatsApp Logs', href: '/whatsapp-logs', icon: Bell },
   ];
   
   const isActive = (href) => location.pathname === href || (href === '/dashboard' && location.pathname === '/');
