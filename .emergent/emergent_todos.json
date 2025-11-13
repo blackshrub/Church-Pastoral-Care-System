@@ -1,18 +1,18 @@
 [
   {
     "content": "Add accident follow-up timeline display to MemberDetail (3 stages like grief)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Update MemberDetail to load accident timeline data",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Restart backend and test accident event creation generates 3 stages",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Final system verification",
-    "status": "pending"
+    "status": "completed"
   }
 ]
