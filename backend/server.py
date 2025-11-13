@@ -1623,8 +1623,8 @@ async def get_reminder_stats():
         
         # Count notifications sent today
         logs = await db.notification_logs.find({
-            \"created_at\": {\"$gte\": today_start.isoformat()}
-        }, {\"_id\": 0}).to_list(1000)
+            "created_at": {"$gte": today_start.isoformat()}
+        }, {"_id": 0}).to_list(1000)
         
         sent_count = sum(1 for log in logs if log.get('status') == 'sent')
         failed_count = sum(1 for log in logs if log.get('status') == 'failed')
@@ -1632,26 +1632,26 @@ async def get_reminder_stats():
         # Count pending grief stages due today
         today = date.today()
         grief_due = await db.grief_support.count_documents({
-            \"scheduled_date\": today.isoformat(),
-            \"completed\": False
+            "scheduled_date": today.isoformat(),
+            "completed": False
         })
         
         # Count birthdays in next 7 days
         future_date = today + timedelta(days=7)
         birthdays_upcoming = await db.care_events.count_documents({
-            \"event_type\": \"birthday\",
-            \"event_date\": {\"$gte\": today.isoformat(), \"$lte\": future_date.isoformat()},
-            \"completed\": False
+            "event_type": "birthday",
+            "event_date": {"$gte": today.isoformat(), "$lte": future_date.isoformat()},
+            "completed": False
         })
         
         return {
-            \"reminders_sent_today\": sent_count,
-            \"reminders_failed_today\": failed_count,
-            \"grief_stages_due_today\": grief_due,
-            \"birthdays_next_7_days\": birthdays_upcoming
+            "reminders_sent_today": sent_count,
+            "reminders_failed_today": failed_count,
+            "grief_stages_due_today": grief_due,
+            "birthdays_next_7_days": birthdays_upcoming
         }
     except Exception as e:
-        logger.error(f\"Error getting reminder stats: {str(e)}\")
+        logger.error(f"Error getting reminder stats: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # ==================== STATIC FILES ====================
