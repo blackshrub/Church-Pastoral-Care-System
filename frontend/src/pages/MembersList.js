@@ -364,18 +364,19 @@ export const MembersList = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-12">
-                    <input
-                      type="checkbox"
-                      checked={selectedMembers.length === filteredMembers.length && filteredMembers.length > 0}
-                      onChange={toggleSelectAll}
-                      className="w-4 h-4"
-                    />
+                    <input type="checkbox" checked={selectedMembers.length === filteredMembers.length && filteredMembers.length > 0} onChange={toggleSelectAll} className="w-4 h-4" />
                   </TableHead>
-                  <TableHead>Member</TableHead>
-                  <TableHead>Phone</TableHead>
-                  <TableHead>Family Group</TableHead>
-                  <TableHead>{t('last_contact')}</TableHead>
-                  <TableHead>{t('engagement_status')}</TableHead>
+                  <TableHead>Name</TableHead>
+                  {visibleColumns.phone && <TableHead>Phone</TableHead>}
+                  {visibleColumns.age && <TableHead>Age</TableHead>}
+                  {visibleColumns.gender && <TableHead>Gender</TableHead>}
+                  {visibleColumns.membership && <TableHead>Membership</TableHead>}
+                  {visibleColumns.marital && <TableHead>Marital</TableHead>}
+                  {visibleColumns.category && <TableHead>Category</TableHead>}
+                  {visibleColumns.blood_type && <TableHead>Blood</TableHead>}
+                  {visibleColumns.family && <TableHead>Family</TableHead>}
+                  {visibleColumns.last_contact && <TableHead>Last Contact</TableHead>}
+                  {visibleColumns.engagement && <TableHead>Status</TableHead>}
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
