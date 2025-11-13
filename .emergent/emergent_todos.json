@@ -1,22 +1,22 @@
 [
   {
     "content": "Add Auto-Suggestions backend endpoint (intelligent follow-up recommendations)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add Demographic Trend Analysis backend endpoint",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Add Auto-Suggestions widget to Dashboard",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Add Demographic Trends to Analytics page",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test AI-powered pastoral recommendations",
-    "status": "pending"
+    "status": "completed"
   }
 ]
