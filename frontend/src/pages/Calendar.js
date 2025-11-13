@@ -88,14 +88,18 @@ export const Calendar = () => {
             {days.map((day) => {
               const dayEvents = events.filter(e => e.event_date === day.toISOString().split('T')[0]);
               return (
-                <div key={day.toISOString()} className="border rounded-lg p-2 min-h-[80px] hover:bg-muted/50">
+                <div 
+                  key={day.toISOString()} 
+                  className={`border rounded-lg p-2 min-h-[80px] transition-all ${dayEvents.length > 0 ? 'hover:bg-teal-50 cursor-pointer hover:shadow-md' : 'hover:bg-muted/50'}`}
+                  onClick={() => handleDateClick(day, dayEvents)}
+                >
                   <div className="text-sm font-semibold mb-1">{day.getDate()}</div>
                   {dayEvents.slice(0, 2).map(e => (
                     <div key={e.id} className="text-xs bg-teal-100 text-teal-700 rounded px-1 mb-1 truncate">
-                      {e.event_type}
+                      {e.event_type.replace('_', ' ')}
                     </div>
                   ))}
-                  {dayEvents.length > 2 && <div className="text-xs text-muted-foreground">+{dayEvents.length - 2}</div>}
+                  {dayEvents.length > 2 && <div className="text-xs text-muted-foreground font-semibold">+{dayEvents.length - 2} more</div>}
                 </div>
               );
             })}
