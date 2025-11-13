@@ -233,16 +233,18 @@ export const MemberDetail = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Event Date *</Label>
-                    <Input
-                      type="date"
-                      value={newEvent.event_date}
-                      onChange={(e) => setNewEvent({...newEvent, event_date: e.target.value})}
-                      required
-                      data-testid="event-date-input"
-                    />
-                  </div>
+                  {newEvent.event_type !== 'financial_aid' && (
+                    <div className="space-y-2">
+                      <Label>Event Date *</Label>
+                      <Input
+                        type="date"
+                        value={newEvent.event_date}
+                        onChange={(e) => setNewEvent({...newEvent, event_date: e.target.value})}
+                        required
+                        data-testid="event-date-input"
+                      />
+                    </div>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
