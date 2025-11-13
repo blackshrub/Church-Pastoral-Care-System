@@ -294,6 +294,7 @@ class GriefSupport(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     care_event_id: str
     member_id: str
+    campus_id: str
     stage: GriefStage
     scheduled_date: date
     completed: bool = False
@@ -309,7 +310,9 @@ class NotificationLog(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     care_event_id: Optional[str] = None
     grief_support_id: Optional[str] = None
-    member_id: str
+    member_id: Optional[str] = None
+    campus_id: Optional[str] = None
+    pastoral_team_user_id: Optional[str] = None  # If sent to pastoral team
     channel: NotificationChannel
     recipient: str
     message: str
