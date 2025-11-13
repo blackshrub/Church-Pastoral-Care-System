@@ -102,6 +102,11 @@ export const Dashboard = () => {
   });
   
   useEffect(() => {
+    // Load engagement settings from localStorage (set in Settings page)
+    const savedSettings = localStorage.getItem('engagement_settings');
+    if (savedSettings) {
+      setEngagementSettings(JSON.parse(savedSettings));
+    }
     loadDashboardData();
     loadMembers();
   }, []);
@@ -117,18 +122,77 @@ export const Dashboard = () => {
   
   const loadDashboardData = async () => {
     try {
-      const [statsRes, atRiskRes, griefRes, recentRes, upcomingRes] = await Promise.all([
+      const today = new Date().toISOString().split('T')[0];
+      const weekAhead = new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0];
+      
+      const [statsRes, eventsRes, griefRes, hospitalRes, atRiskRes, membersRes, aidDueRes] = await Promise.all([
         axios.get(`${API}/dashboard/stats`),
+        axios.get(`${API}/care-events`),
+        axios.get(`${API}/grief-support?completed=false`),
+        axios.get(`${API}/care-events/hospital/due-followup`),
         axios.get(`${API}/members/at-risk`),
-        axios.get(`${API}/dashboard/grief-active`),
-        axios.get(`${API}/dashboard/recent-activity?limit=8`),
-        axios.get(`${API}/dashboard/upcoming?days=7`)
+        axios.get(`${API}/members`),
+        axios.get(`${API}/financial-aid-schedules/due-today`)
       ]);
+      
       setStats(statsRes.data);
-      setAtRiskMembers(atRiskRes.data.slice(0, 10));
-      setActiveGrief(griefRes.data.slice(0, 5));
-      setRecentActivity(recentRes.data);
-      setUpcomingEvents(upcomingRes.data.slice(0, 8));
+      
+      // Get member names, phones, and photos for events
+      const memberMap = {};
+      membersRes.data.forEach(m => memberMap[m.id] = { 
+        name: m.name, 
+        phone: m.phone, 
+        photo_url: m.photo_url 
+      });
+      
+      // Filter birthdays for today with member names and photos
+      const todayBirthdays = eventsRes.data.filter(e => 
+        e.event_type === 'birthday' && e.event_date === today
+      ).map(e => ({...e, member_name: memberMap[e.member_id]?.name, member_phone: memberMap[e.member_id]?.phone, member_photo_url: memberMap[e.member_id]?.photo_url}));
+      
+      // Get upcoming birthdays with member names and photos
+      const upcoming = eventsRes.data.filter(e => 
+        e.event_type === 'birthday' && 
+        e.event_date > today && 
+        e.event_date <= weekAhead
+      ).map(e => ({...e, member_name: memberMap[e.member_id]?.name, member_phone: memberMap[e.member_id]?.phone, member_photo_url: memberMap[e.member_id]?.photo_url}));
+      
+      // Filter grief stages due today AND overdue (for follow-up tab)
+      const griefToday = griefRes.data.filter(g => g.scheduled_date === today).map(g => ({
+        ...g,
+        member_name: memberMap[g.member_id]?.name,
+        member_phone: memberMap[g.member_id]?.phone,
+        member_photo_url: memberMap[g.member_id]?.photo_url
+      }));
+      
+      // Filter overdue grief stages for follow-up tab
+      const griefOverdue = griefRes.data.filter(g => {
+        const schedDate = new Date(g.scheduled_date);
+        return schedDate <= new Date() && !g.completed;
+      }).map(g => ({
+        ...g,
+        member_name: memberMap[g.member_id]?.name,
+        member_phone: memberMap[g.member_id]?.phone,
+        member_photo_url: memberMap[g.member_id]?.photo_url
+      }));
+      
+      // Separate at-risk and disconnected based on Settings thresholds
+      const atRisk = atRiskRes.data.filter(m => 
+        m.days_since_last_contact >= engagementSettings.atRiskDays && 
+        m.days_since_last_contact < engagementSettings.inactiveDays
+      );
+      const disconnected = atRiskRes.data.filter(m => 
+        m.days_since_last_contact >= engagementSettings.inactiveDays
+      );
+      
+      setBirthdaysToday(todayBirthdays);
+      setUpcomingBirthdays(upcoming);
+      setGriefToday(griefToday);
+      setGriefDue(griefOverdue);
+      setHospitalFollowUp(hospitalRes.data.map(h => ({...h, member_name: memberMap[h.member_id]?.name, member_phone: memberMap[h.member_id]?.phone, member_photo_url: memberMap[h.member_id]?.photo_url})));
+      setFinancialAidDue(aidDueRes.data);
+      setAtRiskMembers(atRisk);
+      setDisconnectedMembers(disconnected);
     } catch (error) {
       toast.error('Failed to load');
     } finally {
