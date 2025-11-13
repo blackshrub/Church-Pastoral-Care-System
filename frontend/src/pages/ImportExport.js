@@ -42,6 +42,9 @@ export const ImportExport = () => {
   const [csvPreview, setCsvPreview] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [validationResults, setValidationResults] = useState(null);
+  const [apiPreview, setApiPreview] = useState(null);
+  const [showApiPreview, setShowApiPreview] = useState(false);
+  const [apiValidation, setApiValidation] = useState(null);
   const [editingSyncId, setEditingSyncId] = useState(null);
   const [editSyncOpen, setEditSyncOpen] = useState(false);
   
