@@ -1629,6 +1629,81 @@ async def get_grief_completion_rate():
         logger.error(f"Error getting grief completion rate: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ==================== API SYNC ENDPOINTS ====================
+
+@api_router.post("/sync/members/from-api")
+async def sync_members_from_external_api(
+    api_url: str,
+    api_key: Optional[str] = None,
+    current_admin: dict = Depends(get_current_admin)
+):
+    """Continuously sync members from external API"""
+    try:
+        headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.get(api_url, headers=headers)
+            external_members = response.json()
+        
+        synced_count = 0
+        errors = []
+        
+        for ext_member in external_members:
+            try:
+                # Check if member exists by external_member_id
+                existing = await db.members.find_one(
+                    {"external_member_id": ext_member.get('id')},
+                    {"_id": 0}
+                )
+                
+                if existing:
+                    # Update existing member
+                    await db.members.update_one(
+                        {"id": existing["id"]},
+                        {"$set": {
+                            "name": ext_member.get('name'),
+                            "phone": ext_member.get('phone'),
+                            "email": ext_member.get('email'),
+                            "updated_at": datetime.now(timezone.utc).isoformat()
+                        }}
+                    )
+                else:
+                    # Create new member
+                    member = Member(
+                        name=ext_member.get('name'),
+                        phone=ext_member.get('phone'),
+                        campus_id=ext_member.get('campus_id', current_admin.get('campus_id')),
+                        external_member_id=ext_member.get('id'),
+                        email=ext_member.get('email')
+                    )
+                    member_dict = member.model_dump()
+                    if member_dict.get('birth_date'):
+                        member_dict['birth_date'] = member_dict['birth_date'].isoformat()
+                    await db.members.insert_one(member_dict)
+                
+                synced_count += 1
+            except Exception as e:
+                errors.append(f"Error syncing {ext_member.get('name')}: {str(e)}")
+        
+        return {
+            "success": True,
+            "synced_count": synced_count,
+            "total_received": len(external_members),
+            "errors": errors
+        }
+    except Exception as e:
+        logger.error(f"API sync error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/sync/members/webhook")
+async def member_sync_webhook(current_admin: dict = Depends(get_current_admin)):
+    """Webhook URL for external system to push member updates"""
+    return {
+        "webhook_url": f"{os.environ.get('BACKEND_URL', 'http://localhost:8001')}/api/sync/members/from-api",
+        "method": "POST",
+        "description": "External system can POST member data here for continuous sync"
+    }
+
 # ==================== IMPORT/EXPORT ENDPOINTS ====================
 
 @api_router.post("/import/members/csv")
