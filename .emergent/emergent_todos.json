@@ -1,26 +1,22 @@
 [
   {
-    "content": "Build complete frontend with all screens using bulk_file_writer",
+    "content": "Test grief support flow end-to-end",
     "status": "completed"
   },
   {
-    "content": "Test grief support flow end-to-end",
-    "status": "in_progress"
-  },
-  {
     "content": "Test hospital care flow with visitation logs",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test financial aid tracking and analytics",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test multi-language switching throughout app",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Run automated testing agent and fix bugs",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
