@@ -294,8 +294,9 @@ export const Analytics = () => {
       </div>
       
       <Tabs defaultValue="demographics" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="demographics"><Users className="w-4 h-4 mr-2" />Demographics</TabsTrigger>
+          <TabsTrigger value="trends"><TrendingUp className="w-4 h-4 mr-2" />Trends</TabsTrigger>
           <TabsTrigger value="engagement"><TrendingUp className="w-4 h-4 mr-2" />Engagement</TabsTrigger>
           <TabsTrigger value="financial"><DollarSign className="w-4 h-4 mr-2" />Financial</TabsTrigger>
           <TabsTrigger value="care"><Heart className="w-4 h-4 mr-2" />Care Events</TabsTrigger>
