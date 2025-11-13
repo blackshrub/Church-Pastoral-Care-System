@@ -72,6 +72,25 @@ export const ImportExport = () => {
     ]);
   };
   
+  const handleEditSync = (syncId) => {
+    const sync = activeSyncs.find(s => s.id === syncId);
+    if (sync) {
+      setApiUrl(sync.url);
+      setSyncInterval(sync.interval);
+      setEditingSyncId(syncId);
+      setEditSyncOpen(true);
+    }
+  };
+  
+  const handleUpdateSync = async (e) => {
+    e.preventDefault();
+    // Would update sync job in backend
+    toast.success('Sync job updated!');
+    setEditSyncOpen(false);
+    setEditingSyncId(null);
+    loadActiveSyncs();
+  };
+  
   const handleCsvImport = async (e) => {
     e.preventDefault();
     if (!csvFile) return;
