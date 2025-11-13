@@ -14,6 +14,8 @@ import { AdminDashboard } from '@/pages/AdminDashboard';
 import { ImportExport } from '@/pages/ImportExport';
 import { Settings as SettingsPage } from '@/pages/Settings';
 import { WhatsAppLogs } from '@/pages/WhatsAppLogs';
+import { Calendar } from '@/pages/Calendar';
+import { BulkMessaging } from '@/pages/BulkMessaging';
 import { IntegrationTest } from '@/components/IntegrationTest';
 import { Layout } from '@/components/Layout';
 
@@ -47,6 +49,8 @@ function AppRoutes() {
       <Route path="/import-export" element={<ProtectedRoute><Layout><ImportExport /></Layout></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Layout><SettingsPage /></Layout></ProtectedRoute>} />
       <Route path="/whatsapp-logs" element={<ProtectedRoute><Layout><WhatsAppLogs /></Layout></ProtectedRoute>} />
+      <Route path="/calendar" element={<ProtectedRoute><Layout><Calendar /></Layout></ProtectedRoute>} />
+      <Route path="/messaging" element={<ProtectedRoute><Layout><BulkMessaging /></Layout></ProtectedRoute>} />
       <Route path="/integrations" element={<ProtectedRoute><Layout><IntegrationTest /></Layout></ProtectedRoute>} />
     </Routes>
   );
