@@ -121,6 +121,20 @@ export const Dashboard = () => {
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [financialAidDue, setFinancialAidDue] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [quickEventOpen, setQuickEventOpen] = useState(false);
+  const [allMembers, setAllMembers] = useState([]);
+  const [selectedMemberIds, setSelectedMemberIds] = useState([]);
+  const [memberSearch, setMemberSearch] = useState('');
+  const [quickEvent, setQuickEvent] = useState({
+    event_type: 'regular_contact',
+    event_date: new Date().toISOString().split('T')[0],
+    title: '',
+    description: '',
+    aid_type: 'education',
+    aid_amount: '',
+    grief_relationship: '',
+    hospital_name: ''
+  });
   const [engagementSettings, setEngagementSettings] = useState({
     atRiskDays: 60,
     inactiveDays: 90
