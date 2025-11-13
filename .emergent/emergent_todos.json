@@ -1,14 +1,10 @@
 [
   {
-    "content": "Create integration test endpoints: /api/integrations/ping/whatsapp and /api/integrations/ping/email",
+    "content": "Build minimal React test screen with buttons to trigger integration tests",
     "status": "completed"
   },
   {
-    "content": "Build minimal React test screen with buttons to trigger integration tests",
-    "status": "in_progress"
-  },
-  {
     "content": "Test WhatsApp integration end-to-end and document response shape",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
