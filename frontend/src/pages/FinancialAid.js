@@ -7,6 +7,15 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recha
 import { DollarSign } from 'lucide-react';
 import { format } from 'date-fns';
 
+// Safe date formatter
+const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
+  try {
+    return format(new Date(dateStr), formatStr);
+  } catch (e) {
+    return dateStr;
+  }
+};
+
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
@@ -145,7 +154,7 @@ export const FinancialAid = () => {
                       <div>
                         <p className="font-medium text-sm">{t(`aid_types.${event.aid_type}`)}</p>
                         <p className="text-xs text-muted-foreground">
-                          {format(new Date(event.event_date), 'dd MMM yyyy')}
+                          {formatDate(event.event_date, 'dd MMM yyyy')}
                         </p>
                       </div>
                       <p className="font-semibold text-green-700">
