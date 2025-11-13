@@ -32,6 +32,7 @@ export const Reminders = () => {
   const { user } = useAuth();
   const [birthdaysToday, setBirthdaysToday] = useState([]);
   const [griefDue, setGriefDue] = useState([]);
+  const [griefToday, setGriefToday] = useState([]);
   const [hospitalFollowUp, setHospitalFollowUp] = useState([]);
   const [atRiskMembers, setAtRiskMembers] = useState([]);
   const [disconnectedMembers, setDisconnectedMembers] = useState([]);
