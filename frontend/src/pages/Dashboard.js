@@ -443,14 +443,17 @@ export const Dashboard = () => {
                 </div>
                 
                 <div>
-                  <Label>Title *</Label>
-                  <Input value={quickEvent.title} onChange={(e) => setQuickEvent({...quickEvent, title: e.target.value})} placeholder="e.g., Financial assistance" required />
-                </div>
-                
-                <div>
                   <Label>Description</Label>
                   <Input value={quickEvent.description} onChange={(e) => setQuickEvent({...quickEvent, description: e.target.value})} placeholder="Additional details..." />
                 </div>
+                
+                {/* Title only for Financial Aid */}
+                {quickEvent.event_type === 'financial_aid' && (
+                  <div>
+                    <Label>Aid Name/Title *</Label>
+                    <Input value={quickEvent.title} onChange={(e) => setQuickEvent({...quickEvent, title: e.target.value})} placeholder="e.g., Monthly Education Support" required />
+                  </div>
+                )}
                 
                 {/* Conditional Fields */}
                 {quickEvent.event_type === 'grief_loss' && (
