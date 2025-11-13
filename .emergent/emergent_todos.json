@@ -1,7 +1,7 @@
 [
   {
     "content": "Install backend dependencies (Pillow for photo processing, python-multipart for file upload)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create database models: Member, FamilyGroup, CareEvent, GriefSupport, NotificationLog",
