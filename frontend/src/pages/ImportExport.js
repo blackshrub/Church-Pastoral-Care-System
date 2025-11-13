@@ -32,7 +32,8 @@ export const ImportExport = () => {
     blood_type: 'blood_type',
     marital_status: 'marital_status',
     membership_status: 'membership_status',
-    address: 'address'
+    address: 'address',
+    photo_url: 'photo_url'
   });
   const [activeSyncs, setActiveSyncs] = useState([]);
   const [importing, setImporting] = useState(false);
