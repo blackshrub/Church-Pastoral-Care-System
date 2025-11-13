@@ -1811,6 +1811,31 @@ async def test_email_integration():
         "pending_provider": True
     }
 
+# ==================== NOTIFICATION LOGS ENDPOINTS ====================
+
+@api_router.get("/notification-logs")
+async def get_notification_logs(
+    limit: int = Query(100, le=500),
+    status: Optional[NotificationStatus] = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get notification logs with filtering"""
+    try:
+        query = get_campus_filter(current_user)
+        
+        if status:
+            query["status"] = status
+        
+        logs = await db.notification_logs.find(
+            query,
+            {"_id": 0}
+        ).sort("created_at", -1).limit(limit).to_list(limit)
+        
+        return logs
+    except Exception as e:
+        logger.error(f"Error getting notification logs: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ==================== AUTOMATED REMINDERS ENDPOINTS ====================
 
 @api_router.post("/reminders/run-now")
