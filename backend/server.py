@@ -38,10 +38,116 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# Integration Test Models
+class WhatsAppTestRequest(BaseModel):
+    phone: str
+    message: str
+
+class WhatsAppTestResponse(BaseModel):
+    success: bool
+    message: str
+    details: Optional[dict] = None
+
+class EmailTestResponse(BaseModel):
+    success: bool
+    message: str
+    pending_provider: bool = False
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
     return {"message": "Hello World"}
+
+# Integration Test Endpoints
+@api_router.post("/integrations/ping/whatsapp", response_model=WhatsAppTestResponse)
+async def test_whatsapp_integration(request: WhatsAppTestRequest):
+    """Test WhatsApp gateway integration by sending a test message"""
+    try:
+        whatsapp_url = os.environ.get('WHATSAPP_GATEWAY_URL')
+        church_name = os.environ.get('CHURCH_NAME', 'Church')
+        
+        if not whatsapp_url:
+            raise HTTPException(status_code=500, detail="WhatsApp gateway URL not configured")
+        
+        # Format phone number (ensure it's in the correct format)
+        phone_formatted = request.phone
+        if not phone_formatted.endswith('@s.whatsapp.net'):
+            phone_formatted = f"{request.phone}@s.whatsapp.net"
+        
+        # Prepare the message payload according to the API documentation
+        payload = {
+            "phone": phone_formatted,
+            "message": request.message
+        }
+        
+        logger.info(f"Sending WhatsApp test message to {phone_formatted}")
+        
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                f"{whatsapp_url}/send/message",
+                json=payload
+            )
+            
+            response_data = response.json()
+            logger.info(f"WhatsApp API Response: {response_data}")
+            
+            # Check if the API returned success
+            if response.status_code == 200 and response_data.get('code') == 'SUCCESS':
+                return WhatsAppTestResponse(
+                    success=True,
+                    message=f"✅ WhatsApp message sent successfully to {request.phone}!",
+                    details={
+                        "message_id": response_data.get('results', {}).get('message_id'),
+                        "status": response_data.get('results', {}).get('status'),
+                        "phone": phone_formatted
+                    }
+                )
+            else:
+                error_msg = response_data.get('message', 'Unknown error')
+                return WhatsAppTestResponse(
+                    success=False,
+                    message=f"❌ Failed to send WhatsApp message: {error_msg}",
+                    details=response_data
+                )
+                
+    except httpx.TimeoutException:
+        logger.error("WhatsApp gateway timeout")
+        return WhatsAppTestResponse(
+            success=False,
+            message="❌ WhatsApp gateway timeout. Please check if the gateway is running.",
+            details={"error": "timeout"}
+        )
+    except Exception as e:
+        logger.error(f"WhatsApp integration error: {str(e)}")
+        return WhatsAppTestResponse(
+            success=False,
+            message=f"❌ Error: {str(e)}",
+            details={"error": str(e)}
+        )
+
+@api_router.get("/integrations/ping/email", response_model=EmailTestResponse)
+async def test_email_integration():
+    """Email integration test - currently pending provider configuration"""
+    return EmailTestResponse(
+        success=False,
+        message="📧 Email integration pending provider configuration. Currently WhatsApp-only mode.",
+        pending_provider=True
+    )
+
+@api_router.get("/integrations/logs")
+async def get_integration_logs():
+    """Get recent integration test logs"""
+    # For now, return a simple placeholder
+    # In full implementation, this would query a logs collection
+    return {
+        "logs": [
+            {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "type": "info",
+                "message": "Integration endpoints ready. Use POST /api/integrations/ping/whatsapp to test."
+            }
+        ]
+    }
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
