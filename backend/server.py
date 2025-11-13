@@ -90,6 +90,21 @@ class UserRole(str, Enum):
     CAMPUS_ADMIN = "campus_admin"  # Can manage their campus only
     PASTOR = "pastor"  # Regular pastoral care staff
 
+class ScheduleFrequency(str, Enum):
+    ONE_TIME = "one_time"
+    WEEKLY = "weekly"
+    MONTHLY = "monthly"
+    ANNUALLY = "annually"
+
+class WeekDay(str, Enum):
+    MONDAY = "monday"
+    TUESDAY = "tuesday"
+    WEDNESDAY = "wednesday"
+    THURSDAY = "thursday"
+    FRIDAY = "friday"
+    SATURDAY = "saturday"
+    SUNDAY = "sunday"
+
 # ==================== AUTH CONFIGURATION ====================
 
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
