@@ -47,7 +47,30 @@ export const Analytics = () => {
       ]);
       
       const members = membersRes.data;
-      const events = eventsRes.data;
+      let events = eventsRes.data;
+      
+      // Apply date filtering based on timeRange
+      if (timeRange !== 'all') {
+        const now = new Date();
+        let cutoffDate;
+        
+        if (timeRange === 'year') {
+          cutoffDate = new Date(now.getFullYear(), 0, 1);
+        } else if (timeRange === '6months') {
+          cutoffDate = new Date(now.setMonth(now.getMonth() - 6));
+        } else if (timeRange === '3months') {
+          cutoffDate = new Date(now.setMonth(now.getMonth() - 3));
+        } else if (timeRange === 'custom' && customStartDate && customEndDate) {
+          events = events.filter(e => {
+            const eventDate = new Date(e.event_date);
+            return eventDate >= new Date(customStartDate) && eventDate <= new Date(customEndDate);
+          });
+        }
+        
+        if (timeRange !== 'custom') {
+          events = events.filter(e => new Date(e.event_date) >= cutoffDate);
+        }
+      }
       
       // Member Demographics
       const ageGroups = { 'Child (0-12)': 0, 'Teen (13-17)': 0, 'Youth (18-30)': 0, 'Adult (31-60)': 0, 'Senior (60+)': 0 };
