@@ -1692,24 +1692,30 @@ async def get_member_aid_schedules(member_id: str, current_user: dict = Depends(
 
 @api_router.get("/financial-aid-schedules/due-today")
 async def get_aid_due_today(current_user: dict = Depends(get_current_user)):
-    """Get financial aid schedules due today"""
+    """Get financial aid schedules due today and overdue"""
     try:
         today = date.today().isoformat()
         query = get_campus_filter(current_user)
         query.update({
-            "next_occurrence": today,
+            "next_occurrence": {"$lte": today},  # Today and overdue
             "is_active": True
         })
         
         schedules = await db.financial_aid_schedules.find(query, {"_id": 0}).to_list(100)
         
-        # Add member info
+        # Add member info and calculate overdue days
         for schedule in schedules:
             member = await db.members.find_one({"id": schedule["member_id"]}, {"_id": 0, "name": 1, "phone": 1, "photo_url": 1})
             if member:
                 schedule["member_name"] = member["name"]
                 schedule["member_phone"] = member["phone"]
                 schedule["member_photo_url"] = member.get("photo_url")
+                
+                # Calculate how many days overdue
+                next_date = date.fromisoformat(schedule["next_occurrence"])
+                days_overdue = (date.today() - next_date).days
+                schedule["days_overdue"] = max(0, days_overdue)
+                schedule["status"] = "overdue" if days_overdue > 0 else "due_today"
         
         return schedules
     except Exception as e:
