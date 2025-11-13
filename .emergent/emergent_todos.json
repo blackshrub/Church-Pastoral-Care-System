@@ -1,14 +1,42 @@
 [
   {
-    "content": "Create Admin Dashboard page with Campus Management and User Management",
-    "status": "completed"
+    "content": "Add edit/delete functionality for Members (individual + bulk)",
+    "status": "in_progress"
   },
   {
-    "content": "Add Admin menu item (only visible to full_admin)",
-    "status": "completed"
+    "content": "Add edit/delete functionality for Campuses",
+    "status": "pending"
   },
   {
-    "content": "Test admin features end-to-end",
-    "status": "completed"
+    "content": "Add edit/delete functionality for Care Events",
+    "status": "pending"
+  },
+  {
+    "content": "Create Import/Export page (CSV upload, API sync, bulk export)",
+    "status": "pending"
+  },
+  {
+    "content": "Create Settings/Configuration page (WhatsApp, grief stages, automation)",
+    "status": "pending"
+  },
+  {
+    "content": "Add bulk selection checkboxes for members, events, grief stages",
+    "status": "pending"
+  },
+  {
+    "content": "Create Calendar View page (month/week/day with events)",
+    "status": "pending"
+  },
+  {
+    "content": "Create Bulk Messaging page (send to selected pastoral team)",
+    "status": "pending"
+  },
+  {
+    "content": "Enhance Analytics page (weekly/monthly reports, trends)",
+    "status": "pending"
+  },
+  {
+    "content": "Test all new features comprehensively",
+    "status": "pending"
   }
 ]
