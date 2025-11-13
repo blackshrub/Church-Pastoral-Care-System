@@ -331,6 +331,22 @@ class GriefSupport(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+class AccidentFollowup(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    care_event_id: str
+    member_id: str
+    campus_id: str
+    stage: str  # "first_followup", "second_followup", "final_followup"
+    scheduled_date: date
+    completed: bool = False
+    completed_at: Optional[datetime] = None
+    notes: Optional[str] = None
+    reminder_sent: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 class NotificationLog(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
