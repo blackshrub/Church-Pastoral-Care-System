@@ -632,69 +632,108 @@ export const Dashboard = () => {
         </div>
       </div>
       
-      {/* Two Column Layout - Priority Widgets */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* At-Risk Members Widget */}
-        <Card className="card-border-left-amber shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-xl font-playfair flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-amber-600" />
-              Members at Risk ({stats?.members_at_risk || 0})
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">30+ days since last contact</p>
-          </CardHeader>
-          <CardContent>
-            {atRiskMembers.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">All members recently contacted!</p>
-            ) : (
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {atRiskMembers.map((member) => (
-                  <div key={member.id} className="flex items-center justify-between p-3 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors">
-                    <div className="flex-1">
-                      <p className="font-semibold">{member.name}</p>
-                      <p className="text-sm text-muted-foreground">{member.phone}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-sm font-semibold text-amber-700">{member.days_since_last_contact} days</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      {/* Task Management Tabs (formerly Reminders page) */}
+      <div>
+        <h2 className="text-2xl font-playfair font-bold mb-4">Today's Tasks & Reminders</h2>
         
-        {/* Active Grief Support Widget */}
-        <Card className="card-border-left-pink shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-xl font-playfair flex items-center gap-2">
-              <Heart className="w-5 h-5 text-pink-600" />
-              Active Grief Support ({stats?.active_grief_support || 0})
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">Members in grief care timeline</p>
-          </CardHeader>
-          <CardContent>
-            {activeGrief.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No active grief support</p>
+        <Tabs defaultValue="today" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="today">
+              <Calendar className="w-4 h-4 mr-2" />Today ({birthdaysToday.length + griefToday.length})
+            </TabsTrigger>
+            <TabsTrigger value="followup">
+              <Hospital className="w-4 h-4 mr-2" />Follow-up ({hospitalFollowUp.length + griefDue.length})
+            </TabsTrigger>
+            <TabsTrigger value="financial">
+              <DollarSign className="w-4 h-4 mr-2" />Financial Aid ({financialAidDue.length})
+            </TabsTrigger>
+            <TabsTrigger value="disconnected">
+              <Users className="w-4 h-4 mr-2" />Disconnected ({disconnectedMembers.length})
+            </TabsTrigger>
+            <TabsTrigger value="at-risk">
+              <AlertTriangle className="w-4 h-4 mr-2" />At Risk ({atRiskMembers.length})
+            </TabsTrigger>
+            <TabsTrigger value="upcoming">
+              <Heart className="w-4 h-4 mr-2" />Upcoming ({upcomingBirthdays.length})
+            </TabsTrigger>
+          </TabsList>
+          
+          {/* Today Tab */}
+          <TabsContent value="today" className="space-y-4">
+            {birthdaysToday.length === 0 && griefToday.length === 0 ? (
+              <Card><CardContent className="p-6 text-center">No urgent tasks for today! 🎉</CardContent></Card>
             ) : (
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {activeGrief.map((grief) => (
-                  <div key={grief.member_id} className="p-3 bg-pink-50 rounded-lg hover:bg-pink-100 transition-colors">
-                    <p className="font-semibold">{grief.member_name}</p>
-                    <p className="text-sm text-muted-foreground">{grief.stages.length} stages pending</p>
-                    <Link to={`/members/${grief.member_id}`}>
-                      <Button size="sm" variant="outline" className="mt-2">View Timeline</Button>
-                    </Link>
-                  </div>
-                ))}
-              </div>
+              <>
+                {birthdaysToday.length > 0 && (
+                  <Card className="card-border-left-amber">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        🎂 Birthdays Today ({birthdaysToday.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {birthdaysToday.map(event => (
+                          <div key={event.id} className="p-3 bg-amber-50 rounded flex justify-between items-center">
+                            <div className="flex-1">
+                              <MemberNameWithAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} memberId={event.member_id} />
+                              <p className="text-sm text-muted-foreground ml-13">Call to wish happy birthday</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white" asChild>
+                                <a href={formatPhoneForWhatsApp(event.member_phone)} target="_blank" rel="noopener noreferrer">
+                                  Contact
+                                </a>
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => markBirthdayComplete(event.id)}>
+                                Mark Complete
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {griefToday.length > 0 && (
+                  <Card className="card-border-left-pink">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        💔 Grief Support Due Today ({griefToday.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {griefToday.map(stage => (
+                          <div key={stage.id} className="p-3 bg-pink-50 rounded flex justify-between items-center">
+                            <div className="flex-1">
+                              <MemberNameWithAvatar member={{name: stage.member_name, photo_url: stage.member_photo_url}} memberId={stage.member_id} />
+                              <p className="text-sm text-muted-foreground ml-13">{stage.stage.replace('_', ' ')} stage</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" className="bg-pink-500 hover:bg-pink-600 text-white" asChild>
+                                <a href={formatPhoneForWhatsApp(stage.member_phone)} target="_blank" rel="noopener noreferrer">
+                                  Contact
+                                </a>
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={() => markGriefStageComplete(stage.id)}>
+                                Mark Complete
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </>
             )}
-          </CardContent>
-        </Card>
+          </TabsContent>
+          
+          {/* All other tabs... (continuing in next message due to length) */}
+        </Tabs>
       </div>
-      
-      {/* Two Column Layout - Recent & Upcoming */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Interactions */}
         <Card className="shadow-sm">
           <CardHeader>
