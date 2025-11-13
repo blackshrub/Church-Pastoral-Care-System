@@ -1,0 +1,270 @@
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
+import { Plus, Search } from 'lucide-react';
+import { MemberAvatar } from '@/components/MemberAvatar';
+import { EngagementBadge } from '@/components/EngagementBadge';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+export const MembersList = () => {
+  const { t } = useTranslation();
+  const [members, setMembers] = useState([]);
+  const [familyGroups, setFamilyGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  
+  const [newMember, setNewMember] = useState({
+    name: '',
+    phone: '',
+    family_group_name: '',
+    notes: ''
+  });
+  
+  useEffect(() => {
+    loadMembers();
+    loadFamilyGroups();
+  }, []);
+  
+  const loadMembers = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API}/members`);
+      setMembers(response.data);
+    } catch (error) {
+      toast.error(t('error_messages.failed_to_save'));
+      console.error('Error loading members:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const loadFamilyGroups = async () => {
+    try {
+      const response = await axios.get(`${API}/family-groups`);
+      setFamilyGroups(response.data);
+    } catch (error) {
+      console.error('Error loading family groups:', error);
+    }
+  };
+  
+  const handleAddMember = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API}/members`, newMember);
+      toast.success(t('success_messages.member_created'));
+      setAddModalOpen(false);
+      setNewMember({ name: '', phone: '', family_group_name: '', notes: '' });
+      loadMembers();
+      loadFamilyGroups();
+    } catch (error) {
+      toast.error(t('error_messages.failed_to_save'));
+      console.error('Error adding member:', error);
+    }
+  };
+  
+  const filteredMembers = members.filter(member => {
+    const matchesSearch = member.name.toLowerCase().includes(search.toLowerCase()) ||
+                         member.phone.includes(search);
+    const matchesStatus = filterStatus === 'all' || member.engagement_status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
+  
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-manrope font-bold text-foreground">{t('members')}</h1>
+          <p className="text-muted-foreground mt-1">{members.length} total members</p>
+        </div>
+        
+        <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-primary-500 hover:bg-primary-600" data-testid="open-add-member-modal">
+              <Plus className="w-4 h-4 mr-2" />
+              {t('add_member')}
+            </Button>
+          </DialogTrigger>
+          <DialogContent data-testid="add-member-modal">
+            <DialogHeader>
+              <DialogTitle>{t('add_member')}</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddMember} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">{t('member_name')} *</Label>
+                <Input
+                  id="name"
+                  value={newMember.name}
+                  onChange={(e) => setNewMember({...newMember, name: e.target.value})}
+                  required
+                  data-testid="member-name-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">{t('phone_number')} *</Label>
+                <Input
+                  id="phone"
+                  value={newMember.phone}
+                  onChange={(e) => setNewMember({...newMember, phone: e.target.value})}
+                  placeholder="628123456789"
+                  required
+                  data-testid="member-phone-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="family_group">{t('family_group')}</Label>
+                <Input
+                  id="family_group"
+                  value={newMember.family_group_name}
+                  onChange={(e) => setNewMember({...newMember, family_group_name: e.target.value})}
+                  placeholder="Enter new family group name"
+                  data-testid="family-group-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="notes">{t('notes')}</Label>
+                <Input
+                  id="notes"
+                  value={newMember.notes}
+                  onChange={(e) => setNewMember({...newMember, notes: e.target.value})}
+                  data-testid="member-notes-input"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button type="button" variant="outline" onClick={() => setAddModalOpen(false)}>
+                  {t('cancel')}
+                </Button>
+                <Button type="submit" className="bg-primary-500 hover:bg-primary-600" data-testid="save-member-button">
+                  {t('save')}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      {/* Filters */}
+      <Card className="border-border">
+        <CardContent className="p-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={t('search')}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10"
+                  data-testid="search-members-input"
+                />
+              </div>
+            </div>
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
+              <SelectTrigger className="w-full md:w-48" data-testid="filter-status-select">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="active">{t('active')}</SelectItem>
+                <SelectItem value="at_risk">{t('at_risk')}</SelectItem>
+                <SelectItem value="inactive">{t('inactive')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+      
+      {/* Members Table */}
+      <Card className="border-border shadow-sm">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Member</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Family Group</TableHead>
+                <TableHead>{t('last_contact')}</TableHead>
+                <TableHead>{t('engagement_status')}</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredMembers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                    {t('empty_states.no_members')}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredMembers.map((member) => (
+                  <TableRow key={member.id} className="hover:bg-muted/50 transition-colors" data-testid={`member-row-${member.id}`}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <MemberAvatar member={member} size="sm" />
+                        <span className="font-medium">{member.name}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>{member.phone}</TableCell>
+                    <TableCell>
+                      {member.family_group_id && (
+                        <span className="text-sm text-muted-foreground">
+                          {familyGroups.find(g => g.id === member.family_group_id)?.group_name || 'Family'}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {member.last_contact_date ? (
+                        <span className="text-sm">
+                          {format(new Date(member.last_contact_date), 'dd MMM yyyy')}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">{t('never_contacted')}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <EngagementBadge 
+                        status={member.engagement_status} 
+                        days={member.days_since_last_contact} 
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Link to={`/members/${member.id}`}>
+                        <Button size="sm" variant="outline" data-testid={`view-member-${member.id}`}>
+                          {t('view')}
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default MembersList;
