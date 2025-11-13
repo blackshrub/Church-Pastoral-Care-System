@@ -41,7 +41,11 @@ export const Dashboard = () => {
     title: '',
     description: '',
     aid_type: 'education',
-    aid_amount: ''
+    aid_amount: '',
+    grief_relationship: '',
+    mourning_service_date: '',
+    hospital_name: '',
+    admission_date: ''
   });
   
   useEffect(() => {
@@ -107,7 +111,11 @@ export const Dashboard = () => {
         title: '',
         description: '',
         aid_type: 'education',
-        aid_amount: ''
+        aid_amount: '',
+        grief_relationship: '',
+        mourning_service_date: '',
+        hospital_name: '',
+        admission_date: ''
       });
       loadDashboardData();
     } catch (error) {
