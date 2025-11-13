@@ -155,6 +155,15 @@ export const MembersList = () => {
     }
   };
   
+  const filteredMembers = useMemo(() => {
+    return members.filter(member => {
+      const matchesSearch = member.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+                           member.phone.includes(debouncedSearch);
+      const matchesStatus = filterStatus === 'all' || member.engagement_status === filterStatus;
+      return matchesSearch && matchesStatus;
+    });
+  }, [members, debouncedSearch, filterStatus]);
+  
   // Memoized row component for virtual scrolling
   const MemberRow = React.memo(({ index, style }) => {
     const member = filteredMembers[index];
@@ -188,13 +197,6 @@ export const MembersList = () => {
       </div>
     );
   });
-    return members.filter(member => {
-      const matchesSearch = member.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-                           member.phone.includes(debouncedSearch);
-      const matchesStatus = filterStatus === 'all' || member.engagement_status === filterStatus;
-      return matchesSearch && matchesStatus;
-    });
-  }, [members, debouncedSearch, filterStatus]);
   
   if (loading) {
     return (
