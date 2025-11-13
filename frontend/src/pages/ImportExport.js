@@ -408,7 +408,7 @@ export const ImportExport = () => {
               <CardDescription>Connect to external church management system for continuous sync</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleApiSync} className="space-y-4">
+              <form onSubmit={(e) => { e.preventDefault(); handleApiTest(); }} className="space-y-4">
                 <div>
                   <Label>External API URL *</Label>
                   <Input
