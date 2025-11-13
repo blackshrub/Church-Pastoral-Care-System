@@ -1,15 +1,11 @@
 [
   {
-    "content": "Set up backend dependencies and environment variables for WhatsApp/Email integration",
+    "content": "Create integration test endpoints: /api/integrations/ping/whatsapp and /api/integrations/ping/email",
     "status": "completed"
   },
   {
-    "content": "Create integration test endpoints: /api/integrations/ping/whatsapp and /api/integrations/ping/email",
-    "status": "in_progress"
-  },
-  {
     "content": "Build minimal React test screen with buttons to trigger integration tests",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Test WhatsApp integration end-to-end and document response shape",
