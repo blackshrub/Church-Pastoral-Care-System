@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { format } from 'date-fns';
+
+// Safe date formatter
+const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
+  try {
+    return format(new Date(dateStr), formatStr);
+  } catch (e) {
+    return dateStr;
+  }
+};
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -237,7 +247,7 @@ export const MembersList = () => {
                     <TableCell>
                       {member.last_contact_date ? (
                         <span className="text-sm">
-                          {format(new Date(member.last_contact_date), 'dd MMM yyyy')}
+                          {formatDate(member.last_contact_date, 'dd MMM yyyy')}
                         </span>
                       ) : (
                         <span className="text-sm text-muted-foreground">{t('never_contacted')}</span>
