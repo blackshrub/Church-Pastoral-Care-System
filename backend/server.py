@@ -137,12 +137,29 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     return user
 
 async def get_current_admin(current_user: dict = Depends(get_current_user)):
-    if current_user.get("role") != UserRole.ADMIN:
+    if current_user.get("role") not in [UserRole.FULL_ADMIN, UserRole.CAMPUS_ADMIN]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin privileges required"
         )
     return current_user
+
+async def get_full_admin(current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != UserRole.FULL_ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Full admin privileges required"
+        )
+    return current_user
+
+def get_campus_filter(current_user: dict):
+    """Get campus filter for queries based on user role"""
+    if current_user.get("role") == UserRole.FULL_ADMIN:
+        return {}  # Full admin sees all campuses
+    elif current_user.get("campus_id"):
+        return {"campus_id": current_user["campus_id"]}  # Campus-specific user
+    else:
+        return {"campus_id": None}  # Fallback
 
 # ==================== MODELS ====================
 
