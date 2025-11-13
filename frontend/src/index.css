@@ -6,15 +6,15 @@
 
 @layer base {
   :root {
-    /* Teal Primary */
+    /* Teal Primary - matches reference */
     --primary: 174 94% 39%;
     --primary-foreground: 0 0% 100%;
     
-    /* Amber Secondary */
-    --secondary: 45 93% 47%;
+    /* Amber Secondary - matches reference */
+    --secondary: 38 92% 50%;
     --secondary-foreground: 0 0% 100%;
     
-    /* Backgrounds */
+    /* Backgrounds - clean white */
     --background: 0 0% 100%;
     --foreground: 0 0% 10%;
     --card: 0 0% 100%;
@@ -26,19 +26,19 @@
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
     
-    /* Accent */
+    /* Accent - Teal */
     --accent: 174 94% 39%;
     --accent-foreground: 0 0% 100%;
     
-    /* Destructive */
-    --destructive: 0 72% 51%;
+    /* Destructive - Pink/Red for reminders */
+    --destructive: 346 84% 61%;
     --destructive-foreground: 0 0% 100%;
     
     /* Border */
     --border: 0 0% 90%;
     --input: 0 0% 90%;
     --ring: 174 94% 39%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 }
 
@@ -57,47 +57,34 @@
   }
 }
 
-/* Force light mode only */
+/* Force light mode */
 * {
   color-scheme: light only !important;
 }
 
-/* Dialog and modal styling */
+/* Dialog styling */
 [role="dialog"],
 [data-radix-dialog-content] {
   background-color: white !important;
   color: hsl(0, 0%, 10%) !important;
 }
 
-[role="dialog"] label,
 label {
   color: hsl(0, 0%, 15%) !important;
   font-weight: 500 !important;
 }
 
-/* Form inputs */
-input,
-textarea,
-select {
+input, textarea, select {
   background-color: white !important;
   color: hsl(0, 0%, 10%) !important;
   border: 1px solid hsl(0, 0%, 85%) !important;
 }
 
-input::placeholder,
-textarea::placeholder {
+input::placeholder, textarea::placeholder {
   color: hsl(0, 0%, 60%) !important;
 }
 
-/* Dropdown/Select styling */
-[role="combobox"],
-[data-radix-select-trigger],
-[data-radix-select-content],
-[data-radix-select-item] {
-  background-color: white !important;
-  color: hsl(0, 0%, 10%) !important;
-}
-
+/* Dropdown styling */
 [data-radix-select-item][data-highlighted] {
   background-color: hsl(174, 94%, 95%) !important;
 }
@@ -107,21 +94,34 @@ textarea::placeholder {
   font-weight: 600 !important;
 }
 
-[data-radix-dialog-overlay] {
-  background-color: rgba(0, 0, 0, 0.7) !important;
+/* Card with left border (like reference) */
+.card-border-left-teal {
+  border-left: 4px solid hsl(174, 94%, 39%);
 }
 
-/* Card hover animation */
-.card-hover {
+.card-border-left-amber {
+  border-left: 4px solid hsl(38, 92%, 50%);
+}
+
+.card-border-left-pink {
+  border-left: 4px solid hsl(346, 84%, 61%);
+}
+
+.card-border-left-purple {
+  border-left: 4px solid hsl(271, 91%, 65%);
+}
+
+/* Card hover effect */
+.card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card-hover:hover {
+.card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(20, 184, 166, 0.1);
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.15);
 }
 
-/* Mobile table fix */
+/* Mobile fixes */
 @media (max-width: 768px) {
   .table-container {
     overflow-x: auto;
@@ -132,7 +132,6 @@ textarea::placeholder {
     min-width: 600px;
   }
   
-  /* Fix timeline on mobile */
   .timeline-item {
     margin-left: 1rem !important;
     padding-left: 1.5rem !important;
