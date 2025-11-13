@@ -353,9 +353,9 @@ export const Reminders = () => {
                 <div className="space-y-2">
                   {atRiskMembers.map(member => (
                     <div key={member.id} className="p-3 bg-amber-50 rounded flex justify-between items-center">
-                      <div>
-                        <p className="font-semibold">{member.name}</p>
-                        <p className="text-sm text-muted-foreground">{member.days_since_last_contact} days since contact</p>
+                      <div className="flex-1">
+                        <MemberNameWithAvatar member={member} memberId={member.id} />
+                        <p className="text-sm text-muted-foreground ml-13">{member.days_since_last_contact} days since contact</p>
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white" asChild>
