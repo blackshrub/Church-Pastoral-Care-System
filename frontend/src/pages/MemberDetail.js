@@ -193,7 +193,7 @@ export const MemberDetail = () => {
           
           <Dialog open={eventModalOpen} onOpenChange={setEventModalOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-primary-500 hover:bg-primary-600" data-testid="add-care-event-button">
+              <Button className="bg-teal-500 hover:bg-teal-600 text-white" data-testid="add-care-event-button">
                 <Plus className="w-4 h-4 mr-2" />
                 {t('add_care_event')}
               </Button>
@@ -348,7 +348,7 @@ export const MemberDetail = () => {
                   <Button type="button" variant="outline" onClick={() => setEventModalOpen(false)}>
                     {t('cancel')}
                   </Button>
-                  <Button type="submit" className="bg-primary-500 hover:bg-primary-600" data-testid="save-care-event-button">
+                  <Button type="submit" className="bg-teal-500 hover:bg-teal-600 text-white" data-testid="save-care-event-button">
                     {t('save')}
                   </Button>
                 </div>
