@@ -1851,19 +1851,21 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def create_default_admin():
-    """Create default admin user if none exists"""
+    """Create default full admin user if none exists"""
     try:
-        admin_count = await db.users.count_documents({"role": UserRole.ADMIN})
+        admin_count = await db.users.count_documents({"role": UserRole.FULL_ADMIN})
         if admin_count == 0:
             default_admin = User(
                 email="admin@gkbj.church",
-                name="Admin GKBJ",
-                role=UserRole.ADMIN,
+                name="Full Administrator",
+                role=UserRole.FULL_ADMIN,
+                campus_id=None,  # Full admin has access to all campuses
+                phone="6281290080025",  # Admin's phone for receiving system alerts
                 hashed_password=get_password_hash("admin123"),
                 is_active=True
             )
             await db.users.insert_one(default_admin.model_dump())
-            logger.info("Default admin user created: admin@gkbj.church / admin123")
+            logger.info("Default full admin user created: admin@gkbj.church / admin123")
         
         # Start automated reminder scheduler
         start_scheduler()
