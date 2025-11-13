@@ -223,6 +223,7 @@ class VisitationLogEntry(BaseModel):
 
 class CareEventCreate(BaseModel):
     member_id: str
+    campus_id: str
     event_type: EventType
     event_date: date
     title: str
