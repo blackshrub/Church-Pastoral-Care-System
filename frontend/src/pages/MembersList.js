@@ -44,9 +44,9 @@ export const MembersList = () => {
     age: true,
     gender: true,
     membership: true,
-    marital: false,
-    category: false,
-    blood_type: false,
+    marital: true,
+    category: true,
+    blood_type: true,
     family: true,
     last_contact: true,
     engagement: true
