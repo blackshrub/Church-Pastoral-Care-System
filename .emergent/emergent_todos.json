@@ -1,7 +1,7 @@
 [
   {
     "content": "Phase 3: Create User model and JWT auth backend endpoints",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Phase 3: Create login/logout UI and protected routes",
@@ -21,7 +21,7 @@
   },
   {
     "content": "Phase 4: Install APScheduler and create scheduler service",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Phase 4: Create automated reminder functions (grief, birthday, hospital)",
