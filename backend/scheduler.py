@@ -63,12 +63,13 @@ async def generate_daily_digest_for_campus(campus_id: str, campus_name: str):
             "completed": False
         }, {"_id": 0}).to_list(100)
         
-        # Get member names for birthdays
+        # Get member names for birthdays with wa.me links
         birthday_members = []
         for event in birthdays_today:
             member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0})
             if member:
-                birthday_members.append(f"  • {member['name']} - {member['phone']}")
+                phone_clean = member['phone'].replace('@s.whatsapp.net', '')
+                birthday_members.append(f"  • {member['name']}\n    📱 wa.me/{phone_clean}")
         
         # 2. Birthdays this week (next 7 days)
         week_end = today + timedelta(days=7)
