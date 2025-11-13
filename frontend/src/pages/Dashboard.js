@@ -268,7 +268,7 @@ export const Dashboard = () => {
         grief_relationship: '',
         hospital_name: ''
       });
-      loadDashboardData();
+      loadReminders();
     } catch (error) {
       toast.error('Failed to add events');
     }
