@@ -1173,6 +1173,26 @@ export const Dashboard = () => {
                         }}>
                           Mark Complete
                         </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="ghost">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={async () => {
+                              try {
+                                await axios.post(`${API}/accident-followup/${followup.id}/ignore`);
+                                toast.success('Accident follow-up ignored');
+                                loadReminders();
+                              } catch (error) {
+                                toast.error('Failed to ignore');
+                              }
+                            }}>
+                              Ignore
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   ))}
