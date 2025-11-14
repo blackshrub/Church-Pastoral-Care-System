@@ -10,14 +10,14 @@ from datetime import datetime, timezone
 def calculate_engagement_status(last_contact):
     """Calculate engagement status"""
     if not last_contact:
-        return "inactive", 999
+        return "disconnected", 999
     
     # Handle string dates
     if isinstance(last_contact, str):
         try:
             last_contact = datetime.fromisoformat(last_contact)
         except:
-            return "inactive", 999
+            return "disconnected", 999
     
     # Make timezone-aware if needed
     if last_contact.tzinfo is None:
@@ -30,8 +30,6 @@ def calculate_engagement_status(last_contact):
         return "active", days_since
     elif days_since < 60:
         return "at_risk", days_since
-    elif days_since < 90:
-        return "inactive", days_since
     else:
         return "disconnected", days_since
 
