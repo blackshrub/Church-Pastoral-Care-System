@@ -1,18 +1,18 @@
 [
   {
-    "content": "Fix birthday completion endpoint (POST instead of PATCH)",
-    "status": "completed"
+    "content": "Create backend endpoint for pre-calculated daily reminders",
+    "status": "in_progress"
   },
   {
-    "content": "Add timezone configuration to Campus model and database",
-    "status": "completed"
+    "content": "Add daily cache refresh job to scheduler",
+    "status": "pending"
   },
   {
-    "content": "Add comprehensive international timezone selector UI in Settings page",
-    "status": "completed"
+    "content": "Update Dashboard to use cached reminders endpoint",
+    "status": "pending"
   },
   {
-    "content": "Create comprehensive API documentation for mobile app",
-    "status": "completed"
+    "content": "Test Dashboard load speed improvement",
+    "status": "pending"
   }
 ]
