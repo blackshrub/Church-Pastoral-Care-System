@@ -1338,6 +1338,12 @@ async def list_care_events(
                 )
                 if member:
                     event["member_name"] = member.get("name")
+                else:
+                    # Extract name from title if member not found
+                    # Title format: "Bantuan Keuangan - MEMBER_NAME" or similar
+                    title = event.get("title", "")
+                    if " - " in title:
+                        event["member_name"] = title.split(" - ", 1)[1].strip()
         
         return events
     except Exception as e:
