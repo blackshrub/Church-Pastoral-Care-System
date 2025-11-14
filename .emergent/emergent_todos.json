@@ -1,10 +1,6 @@
 [
   {
-    "content": "Fix missing profile photos in Financial Aid Recipients dialog",
-    "status": "completed"
-  },
-  {
-    "content": "Test and verify photos display correctly across all pages",
+    "content": "Fix LazyImage full-screen teal loading state when scrolling fast",
     "status": "completed"
   }
 ]
