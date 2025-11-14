@@ -1322,9 +1322,16 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                 })
         
         # Today's grief stages (not overdue, exactly today)
+        grief_today = []
         for stage in grief_stages:
             sched_date = datetime.strptime(stage["scheduled_date"], '%Y-%m-%d').date()
+            days_overdue = (today - sched_date).days
+            
+            # Apply writeoff threshold
+            grief_writeoff = writeoff_settings.get("grief_support", 14)
+            
             if sched_date == today:
+                # Due today
                 today_tasks.append({
                     "type": "grief_support",
                     "date": stage["scheduled_date"],
@@ -1335,6 +1342,16 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                     "details": f"{stage['stage'].replace('_', ' ')} stage",
                     "data": stage
                 })
+            elif sched_date < today:
+                # Overdue - check writeoff threshold
+                if grief_writeoff == 0 or days_overdue <= grief_writeoff:
+                    grief_today.append({
+                        **stage,
+                        "member_name": member_map.get(stage["member_id"], {}).get("name"),
+                        "member_phone": member_map.get(stage["member_id"], {}).get("phone"),
+                        "member_photo_url": member_map.get(stage["member_id"], {}).get("photo_url"),
+                        "days_overdue": days_overdue
+                    })
             elif tomorrow <= sched_date <= week_ahead:
                 upcoming_tasks.append({
                     "type": "grief_support",
