@@ -17,7 +17,7 @@ import { ArrowLeft, Plus, Send, CheckCircle2, Calendar, Heart, Hospital, DollarS
 import { MemberAvatar } from '@/components/MemberAvatar';
 import { EngagementBadge } from '@/components/EngagementBadge';
 import { EventTypeBadge } from '@/components/EventTypeBadge';
-import { format } from 'date-fns';
+import { format } from 'date-fns/format';
 
 // Safe date formatter
 const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
