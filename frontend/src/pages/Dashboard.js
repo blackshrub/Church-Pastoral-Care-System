@@ -822,7 +822,7 @@ export const Dashboard = () => {
               <Calendar className="w-4 h-4 mr-2" />Today ({birthdaysToday.length + griefToday.length})
             </TabsTrigger>
             <TabsTrigger value="followup" className="whitespace-nowrap">
-              <Hospital className="w-4 h-4 mr-2" />Follow-up ({hospitalFollowUp.length + griefDue.length})
+              <Hospital className="w-4 h-4 mr-2" />Follow-up ({hospitalFollowUp.length + griefDue.length + accidentFollowUp.length})
             </TabsTrigger>
             <TabsTrigger value="financial" className="whitespace-nowrap">
               <DollarSign className="w-4 h-4 mr-2" />Aid ({financialAidDue.length})
