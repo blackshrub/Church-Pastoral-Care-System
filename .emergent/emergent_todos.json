@@ -1,10 +1,10 @@
 [
   {
     "content": "Fix payment_date field not showing initially for one-time payments",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add missing Indonesian translations",
-    "status": "pending"
+    "status": "completed"
   }
 ]
