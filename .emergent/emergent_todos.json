@@ -1,18 +1,18 @@
 [
   {
-    "content": "Remove AI pastoral recommendation widget from Dashboard",
-    "status": "completed"
+    "content": "Add ignore button to financial aid schedules in Dashboard",
+    "status": "in_progress"
   },
   {
-    "content": "Update all Dashboard tab actions to use local state (no refresh)",
-    "status": "completed"
+    "content": "Exclude deleted/archived members from all calculations",
+    "status": "pending"
   },
   {
-    "content": "Update care event form submissions to use local state",
-    "status": "completed"
+    "content": "Update API sync to archive members not in source",
+    "status": "pending"
   },
   {
-    "content": "Test all actions maintain current tab and update locally",
-    "status": "completed"
+    "content": "Complete translation audit - Dashboard and MemberDetail pages",
+    "status": "pending"
   }
 ]
