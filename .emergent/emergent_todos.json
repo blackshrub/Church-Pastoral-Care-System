@@ -1,22 +1,18 @@
 [
   {
-    "content": "Add overdue_writeoff settings to backend model and database",
-    "status": "completed"
+    "content": "Fix Settings page wording about write-off vs ignore",
+    "status": "in_progress"
   },
   {
-    "content": "Add Overdue Write-off configuration UI in Settings page",
-    "status": "completed"
+    "content": "Add ignored flag to financial aid queries",
+    "status": "pending"
   },
   {
-    "content": "Update dashboard calculation to respect writeoff thresholds",
-    "status": "completed"
+    "content": "Update API documentation with all new features",
+    "status": "pending"
   },
   {
-    "content": "Create ignore/dismiss endpoint for care events",
-    "status": "completed"
-  },
-  {
-    "content": "Add three-dots menu with Ignore button to overdue cards",
+    "content": "Show ignored events in member profile with greyed out style",
     "status": "pending"
   }
 ]
