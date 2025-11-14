@@ -2576,6 +2576,33 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
         logger.error(f"Error marking aid distributed: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/financial-aid-schedules/{schedule_id}/ignore")
+async def ignore_financial_aid_schedule(schedule_id: str, user: dict = Depends(get_current_user)):
+    """Mark a financial aid schedule as ignored/dismissed"""
+    try:
+        schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0})
+        if not schedule:
+            raise HTTPException(status_code=404, detail="Financial aid schedule not found")
+        
+        await db.financial_aid_schedules.update_one(
+            {"id": schedule_id},
+            {"$set": {
+                "ignored": True,
+                "ignored_at": datetime.now(timezone.utc).isoformat(),
+                "ignored_by": user.get("id")
+            }}
+        )
+        
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(schedule["campus_id"])
+        
+        return {"success": True, "message": "Financial aid schedule ignored"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ==================== FINANCIAL AID ENDPOINTS ====================
 
 @api_router.post("/accident-followup/{stage_id}/ignore")
