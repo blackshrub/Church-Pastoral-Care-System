@@ -1004,7 +1004,8 @@ export const Dashboard = () => {
                           try {
                             await axios.post(`${API}/care-events/${event.id}/complete`);
                             toast.success('Birthday marked as completed!');
-                            loadReminders();
+                            // Update local state
+                            setOverdueBirthdays(prev => prev.filter(b => b.id !== event.id));
                           } catch (error) {
                             toast.error('Failed to mark as completed');
                           }
