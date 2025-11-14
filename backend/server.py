@@ -1188,7 +1188,7 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         
         # Financial aid due (today and overdue)
         aid_schedules = await db.financial_aid_schedules.find(
-            {"campus_id": campus_id, "is_active": True},
+            {"campus_id": campus_id, "is_active": True, "ignored": {"$ne": True}},
             {"_id": 0}
         ).to_list(None)
         
