@@ -178,6 +178,7 @@ export const Dashboard = () => {
       setGriefToday(data.grief_today || []);
       setGriefDue(data.grief_today || []); // Same as grief_today
       setAccidentFollowUp(data.accident_followup || []);
+      setHospitalFollowUp([]); // No longer used, kept for backward compatibility
       setAtRiskMembers(data.at_risk_members || []);
       setDisconnectedMembers(data.disconnected_members || []);
       setFinancialAidDue(data.financial_aid_due || []);
