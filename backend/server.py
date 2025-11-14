@@ -1533,6 +1533,9 @@ async def create_care_event(event: CareEventCreate, current_user: dict = Depends
                 await db.accident_followup.insert_many(timeline)
                 logger.info(f"Generated {len(timeline)} accident follow-up stages for member {event.member_id}")
         
+        # Invalidate dashboard cache after creating care event
+        await invalidate_dashboard_cache(campus_id)
+        
         return care_event
     except Exception as e:
         logger.error(f"Error creating care event: {str(e)}")
