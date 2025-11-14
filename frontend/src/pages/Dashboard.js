@@ -926,7 +926,7 @@ export const Dashboard = () => {
                             Contact
                           </a>
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => markMemberContacted(member.id, member.name, user, loadReminders)}>
+                        <Button size="sm" variant="outline" onClick={() => markMemberContacted(member.id, member.name, user, setAtRiskMembers, setDisconnectedMembers)}>
                           Mark Contacted
                         </Button>
                       </div>
@@ -960,7 +960,7 @@ export const Dashboard = () => {
                             Contact
                           </a>
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => markMemberContacted(member.id, member.name, user, loadReminders)}>
+                        <Button size="sm" variant="outline" onClick={() => markMemberContacted(member.id, member.name, user, setAtRiskMembers, setDisconnectedMembers)}>
                           Mark Contacted
                         </Button>
                       </div>
