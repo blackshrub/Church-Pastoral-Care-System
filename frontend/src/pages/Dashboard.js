@@ -1314,7 +1314,12 @@ export const Dashboard = () => {
               <CardContent>
                 <div className="space-y-3">
                   {upcomingTasks.map((task, index) => {
-                    const daysUntil = Math.ceil((new Date(task.date) - new Date()) / (1000 * 60 * 60 * 24));
+                    const taskDate = new Date(task.date);
+                    const todayDate = new Date();
+                    // Set both to midnight to get accurate day difference
+                    taskDate.setHours(0, 0, 0, 0);
+                    todayDate.setHours(0, 0, 0, 0);
+                    const daysUntil = Math.round((taskDate - todayDate) / (1000 * 60 * 60 * 24));
                     const typeConfig = {
                       birthday: { icon: '🎂', color: 'amber', label: 'Birthday' },
                       grief_support: { icon: '💔', color: 'pink', label: 'Grief Support' },
