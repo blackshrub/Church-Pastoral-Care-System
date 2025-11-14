@@ -987,7 +987,29 @@ async def get_dashboard_reminders(user: dict = Depends(get_current_user)):
     Optimized for fast loading - data refreshed daily
     """
     try:
-        campus_tz = await get_campus_timezone(user.get("campus_id"))
+        campus_id = user.get("campus_id")
+        
+        # For full admins without campus, use default campus or all campuses
+        if not campus_id:
+            # Get default campus
+            default_campus = await db.campuses.find_one({"is_active": True}, {"_id": 0, "id": 1, "timezone": 1})
+            if default_campus:
+                campus_id = default_campus["id"]
+            else:
+                # No campus found, return empty
+                return {
+                    "birthdays_today": [],
+                    "upcoming_birthdays": [],
+                    "grief_today": [],
+                    "accident_followup": [],
+                    "at_risk_members": [],
+                    "disconnected_members": [],
+                    "financial_aid_due": [],
+                    "ai_suggestions": [],
+                    "total_tasks": 0
+                }
+        
+        campus_tz = await get_campus_timezone(campus_id)
         today_date = get_date_in_timezone(campus_tz)
         
         # Check if we have cached data for today
