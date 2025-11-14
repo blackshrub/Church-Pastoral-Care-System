@@ -83,7 +83,7 @@ export const LoginPage = () => {
               ) : (
                 <Select value={campusId} onValueChange={setCampusId}>
                   <SelectTrigger data-testid="campus-select">
-                    <SelectValue placeholder="Select your campus (optional for full admin)" />
+                    <SelectValue placeholder="Select your campus" />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px] overflow-y-auto">
                     {campuses.map((campus) => (
