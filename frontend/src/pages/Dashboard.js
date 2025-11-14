@@ -682,8 +682,8 @@ export const Dashboard = () => {
             <div className="space-y-3 max-h-80 overflow-y-auto">
               {suggestions.slice(0, 8).map((suggestion) => (
                 <div key={`${suggestion.member_id}-${suggestion.suggestion}`} className={`p-3 rounded-lg border ${
-                  suggestion.priority === 'high' ? 'bg-red-50 border-red-200' :
-                  suggestion.priority === 'medium' ? 'bg-amber-50 border-amber-200' :
+                  (suggestion.priority || 'medium') === 'high' ? 'bg-red-50 border-red-200' :
+                  (suggestion.priority || 'medium') === 'medium' ? 'bg-amber-50 border-amber-200' :
                   'bg-blue-50 border-blue-200'
                 }`}>
                   <div className="flex items-start justify-between">
