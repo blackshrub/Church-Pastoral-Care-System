@@ -1,18 +1,18 @@
 [
   {
-    "content": "Fix Settings page wording about write-off vs ignore",
-    "status": "completed"
+    "content": "Fix ignored grief stages not showing greyed out styling",
+    "status": "in_progress"
   },
   {
-    "content": "Add ignored flag to financial aid queries",
-    "status": "completed"
+    "content": "Fix mark_complete button text (should be 'Mark Complete')",
+    "status": "pending"
   },
   {
-    "content": "Update API documentation with all new features",
-    "status": "completed"
+    "content": "Update grief UI to match accident/illness clean design",
+    "status": "pending"
   },
   {
-    "content": "Show ignored events in member profile with greyed out style",
-    "status": "completed"
+    "content": "Replace loadMemberData() with local state updates to avoid tab switching",
+    "status": "pending"
   }
 ]
