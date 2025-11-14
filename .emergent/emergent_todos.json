@@ -1,14 +1,14 @@
 [
   {
     "content": "Debug and fix pre-calculation logic for all dashboard tabs",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Fix grief support not showing in follow-up tab",
-    "status": "pending"
+    "status": "completed"
   },
   {
-    "content": "Verify all tab data accuracy",
-    "status": "pending"
+    "content": "Verify all tab data accuracy in UI",
+    "status": "in_progress"
   }
 ]
