@@ -1,14 +1,18 @@
 [
   {
-    "content": "Implement UTC+7 timezone handling universally (frontend & backend)",
+    "content": "Fix birthday completion endpoint (POST instead of PATCH)",
     "status": "completed"
   },
   {
-    "content": "Add birthday section to member profile timeline with Mark Complete button",
+    "content": "Add timezone configuration to Campus model and database",
     "status": "completed"
   },
   {
-    "content": "Test timezone consistency and birthday completion flow",
+    "content": "Add timezone selector UI in Settings page",
     "status": "in_progress"
+  },
+  {
+    "content": "Update time-related functions to respect campus timezone setting",
+    "status": "pending"
   }
 ]
