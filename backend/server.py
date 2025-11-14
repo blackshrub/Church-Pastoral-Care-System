@@ -1175,12 +1175,15 @@ async def create_care_event(event: CareEventCreate, current_user: dict = Depends
         
         await db.care_events.insert_one(event_dict)
         
-        # Update member's last contact date
+        # Update member's last contact date and engagement status
+        now = datetime.now(timezone.utc)
         await db.members.update_one(
             {"id": event.member_id},
             {"$set": {
-                "last_contact_date": datetime.now(timezone.utc).isoformat(),
-                "updated_at": datetime.now(timezone.utc).isoformat()
+                "last_contact_date": now.isoformat(),
+                "days_since_last_contact": 0,  # Reset to 0 for fresh contact
+                "engagement_status": "active",  # Set to active after contact
+                "updated_at": now.isoformat()
             }}
         )
         
