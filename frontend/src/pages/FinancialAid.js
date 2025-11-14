@@ -102,14 +102,58 @@ export const FinancialAid = () => {
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">Total Recipients</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-foreground">{summary?.total_count || 0}</p>
-          </CardContent>
-        </Card>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Card className="cursor-pointer hover:bg-accent/50 transition-colors" onClick={loadRecipients}>
+              <CardHeader>
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Total Recipients
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-foreground">{summary?.total_count || 0}</p>
+                <p className="text-xs text-muted-foreground mt-1">Click to view details</p>
+              </CardContent>
+            </Card>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Financial Aid Recipients</DialogTitle>
+            </DialogHeader>
+            {loadingRecipients ? (
+              <div className="space-y-2">
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+                <Skeleton className="h-12 w-full" />
+              </div>
+            ) : recipients.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">No recipients found.</p>
+            ) : (
+              <div className="space-y-2">
+                {recipients.map((recipient) => (
+                  <Link 
+                    key={recipient.member_id} 
+                    to={`/members/${recipient.member_id}`}
+                    className="block p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium text-sm">{recipient.member_name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {recipient.aid_count} aid event{recipient.aid_count !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                      <p className="font-semibold text-green-700">
+                        Rp {recipient.total_amount?.toLocaleString('id-ID')}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
         
         <Card>
           <CardHeader>
