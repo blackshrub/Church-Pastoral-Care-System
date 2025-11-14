@@ -61,6 +61,18 @@ export const FinancialAid = () => {
     }
   };
   
+  const loadRecipients = async () => {
+    try {
+      setLoadingRecipients(true);
+      const response = await axios.get(`${API}/financial-aid/recipients`);
+      setRecipients(response.data);
+    } catch (error) {
+      console.error('Error loading recipients:', error);
+    } finally {
+      setLoadingRecipients(false);
+    }
+  };
+  
   if (loading) {
     return <div className="space-y-6"><Skeleton className="h-96 w-full" /></div>;
   }
