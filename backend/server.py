@@ -1212,6 +1212,8 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
             try:
                 next_date = datetime.strptime(next_occurrence, '%Y-%m-%d').date()
                 
+                logger.info(f"Financial aid schedule: next_date={next_date}, today={today}, next_date==today: {next_date == today}")
+                
                 # Due TODAY - add to today_tasks
                 if next_date == today:
                     today_tasks.append({
