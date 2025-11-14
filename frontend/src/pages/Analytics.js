@@ -286,7 +286,7 @@ export const Analytics = () => {
               <div>
                 <p className="text-sm text-muted-foreground">{t('avg_member_age')}</p>
                 <p className="text-3xl font-bold">{memberStats?.avgAge || 0}</p>
-                <p className="text-xs text-muted-foreground">years old</p>
+                <p className="text-xs text-muted-foreground">{t('years_old')}</p>
               </div>
               <Target className="w-8 h-8 text-purple-600" />
             </div>
@@ -437,16 +437,16 @@ export const Analytics = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-green-50 rounded">
                     <p className="text-2xl font-bold text-green-700">Rp {financialData?.totalAid?.toLocaleString('id-ID') || 0}</p>
-                    <p className="text-sm text-muted-foreground">Total Distributed</p>
+                    <p className="text-sm text-muted-foreground">{t('total_distributed')}</p>
                   </div>
                   <div className="text-center p-4 bg-blue-50 rounded">
                     <p className="text-2xl font-bold text-blue-700">Rp {financialData?.scheduledAmount?.toLocaleString('id-ID') || 0}</p>
-                    <p className="text-sm text-muted-foreground">Total Scheduled</p>
+                    <p className="text-sm text-muted-foreground">{t('total_scheduled')}</p>
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <h4 className="font-semibold">Average Aid by Type</h4>
+                  <h4 className="font-semibold">{t('average_aid_by_type')}</h4>
                   {financialData.byType?.map(type => (
                     <div key={type.name} className="flex justify-between items-center p-2 bg-muted/30 rounded">
                       <span className="text-sm">{type.name}</span>
