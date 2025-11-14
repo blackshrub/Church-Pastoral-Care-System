@@ -110,10 +110,15 @@ export const MembersList = () => {
       
       if (filterStatus && filterStatus !== 'all') {
         // Only add engagement_status if it's a valid value
-        const validStatuses = ['active', 'at_risk', 'inactive'];
+        const validStatuses = ['active', 'at_risk', 'disconnected'];
         if (validStatuses.includes(filterStatus)) {
           params.append('engagement_status', filterStatus);
         }
+      }
+      
+      // Add archived filter
+      if (showArchived) {
+        params.append('show_archived', 'true');
       }
       
       const response = await axios.get(`${API}/members?${params.toString()}`);
