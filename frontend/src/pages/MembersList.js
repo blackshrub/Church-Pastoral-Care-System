@@ -84,8 +84,8 @@ export const MembersList = () => {
       params.append('page', page.toString());
       params.append('limit', pageSize.toString());
       
-      if (search && search.trim()) {
-        params.append('search', search.trim());
+      if (debouncedSearch && debouncedSearch.trim()) {
+        params.append('search', debouncedSearch.trim());
       }
       
       if (filterStatus && filterStatus !== 'all') {
