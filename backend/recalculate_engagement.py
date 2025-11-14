@@ -37,13 +37,24 @@ async def main():
     client = MongoClient('mongodb://localhost:27017')
     db = client['pastoral_care_db']
     
+    # Get engagement settings
+    settings_doc = db.settings.find_one({"key": "engagement_thresholds"})
+    if settings_doc and settings_doc.get("data"):
+        at_risk_days = settings_doc["data"].get("atRiskDays", 60)
+        disconnected_days = settings_doc["data"].get("disconnectedDays", 90)
+    else:
+        at_risk_days = 60
+        disconnected_days = 90
+    
+    print(f"Using thresholds: At-risk={at_risk_days} days, Disconnected={disconnected_days} days")
+    
     members = list(db.members.find({}, {"_id": 0, "id": 1, "name": 1, "last_contact_date": 1}))
     
     print(f"Recalculating engagement status for {len(members)} members...")
     
     updated = 0
     for member in members:
-        status, days = calculate_engagement_status(member.get("last_contact_date"))
+        status, days = calculate_engagement_status(member.get("last_contact_date"), at_risk_days, disconnected_days)
         
         db.members.update_one(
             {"id": member["id"]},
