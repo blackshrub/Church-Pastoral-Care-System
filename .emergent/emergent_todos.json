@@ -1,14 +1,14 @@
 [
   {
     "content": "Add cache invalidation after user actions (mark complete, add event)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add midnight cache refresh job (separate from 8 AM digest)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test cache invalidation and refresh timing",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
