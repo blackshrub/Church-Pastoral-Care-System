@@ -1,18 +1,22 @@
 [
   {
     "content": "Update login page to show campus selector for full admins",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Update login endpoint to accept selected campus_id",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Store selected campus in user token/session",
-    "status": "pending"
+    "status": "completed"
   },
   {
-    "content": "Test full admin login with campus selection",
+    "content": "Re-enable cached dashboard endpoint",
+    "status": "in_progress"
+  },
+  {
+    "content": "Test dashboard with caching and verify performance",
     "status": "pending"
   }
 ]
