@@ -250,20 +250,15 @@ export const FinancialAid = () => {
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         {event.member_id && event.member_name ? (
-                          <Link 
-                            to={`/members/${event.member_id}`}
-                            className="font-medium text-sm text-primary hover:underline"
-                          >
-                            {event.member_name}
-                          </Link>
+                          <MemberNameWithPhoto 
+                            member={{ name: event.member_name, photo_url: event.member_photo_url }} 
+                            memberId={event.member_id} 
+                          />
                         ) : (
                           <p className="font-medium text-sm text-muted-foreground">Unknown Member</p>
                         )}
-                        <p className="font-medium text-sm text-muted-foreground">
-                          {t(`aid_types.${event.aid_type}`)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDate(event.event_date, 'dd MMM yyyy')}
+                        <p className="text-xs text-muted-foreground mt-1 ml-11">
+                          {t(`aid_types.${event.aid_type}`)} - {formatDate(event.event_date, 'dd MMM yyyy')}
                         </p>
                       </div>
                       <p className="font-semibold text-green-700">
@@ -271,7 +266,7 @@ export const FinancialAid = () => {
                       </p>
                     </div>
                     {event.aid_notes && (
-                      <p className="text-xs text-muted-foreground mt-1">{event.aid_notes}</p>
+                      <p className="text-xs text-muted-foreground mt-1 ml-11">{event.aid_notes}</p>
                     )}
                   </div>
                 ))}
