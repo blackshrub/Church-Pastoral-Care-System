@@ -768,7 +768,7 @@ export const Dashboard = () => {
               {todayTasks.length > 0 && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Other Tasks Due Today ({todayTasks.length})</CardTitle>
+                    <CardTitle>{t('other_tasks_due_today')} ({todayTasks.length})</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -876,7 +876,7 @@ export const Dashboard = () => {
                             }
                           }}
                         >
-                          Mark Distributed
+                          {t('mark_distributed')}
                         </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -895,7 +895,7 @@ export const Dashboard = () => {
                                 toast.error('Failed to ignore');
                               }
                             }}>
-                              Ignore
+                            {t('ignore')}
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               className="text-red-600"
@@ -912,7 +912,7 @@ export const Dashboard = () => {
                                 }
                               }}
                             >
-                              Stop Schedule
+                            {t('stop_schedule')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -948,7 +948,7 @@ export const Dashboard = () => {
                           </a>
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => markMemberContacted(member.id, member.name, user, setAtRiskMembers, setDisconnectedMembers)}>
-                          Mark Contacted
+                          {t('mark_contacted')}
                         </Button>
                       </div>
                     </div>
@@ -982,7 +982,7 @@ export const Dashboard = () => {
                           </a>
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => markMemberContacted(member.id, member.name, user, setAtRiskMembers, setDisconnectedMembers)}>
-                          Mark Contacted
+                          {t('mark_contacted')}
                         </Button>
                       </div>
                     </div>
@@ -1005,8 +1005,8 @@ export const Dashboard = () => {
           ) : (
             <Card className="border-amber-200">
               <CardHeader>
-                <CardTitle>🎂 Overdue Birthdays ({overdueBirthdays.length})</CardTitle>
-                <CardDescription>Birthdays that passed but haven't been acknowledged yet</CardDescription>
+                <CardTitle>{t('overdue_birthdays')} ({overdueBirthdays.length})</CardTitle>
+                <CardDescription>{t('birthdays_passed_not_acknowledged')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -1056,7 +1056,7 @@ export const Dashboard = () => {
                                 toast.error('Failed to ignore');
                               }
                             }}>
-                              Ignore
+                            {t('ignore')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -1150,7 +1150,7 @@ export const Dashboard = () => {
                                 toast.error('Failed to ignore');
                               }
                             }}>
-                              Ignore
+                            {t('ignore')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -1202,7 +1202,7 @@ export const Dashboard = () => {
                                 toast.error('Failed to ignore');
                               }
                             }}>
-                              Ignore
+                            {t('ignore')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
