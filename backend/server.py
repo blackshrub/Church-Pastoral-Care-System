@@ -1138,9 +1138,9 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         # Get writeoff settings
         writeoff_settings = await get_writeoff_settings()
         
-        # Fetch only necessary data with projection
+        # Fetch only necessary data with projection (exclude archived)
         members = await db.members.find(
-            {"campus_id": campus_id},
+            {"campus_id": campus_id, "is_archived": {"$ne": True}},
             {"_id": 0, "id": 1, "name": 1, "phone": 1, "photo_url": 1, "birth_date": 1, 
              "engagement_status": 1, "days_since_last_contact": 1}
         ).to_list(None)
