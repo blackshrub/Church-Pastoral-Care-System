@@ -81,7 +81,48 @@ Enterprise pastoral care system for GKBJ ensuring no member is left behind throu
 - **Mobile-responsive** with horizontal scrolling tabs
 - **PWA capability** with home screen installation
 
-## 🚀 **Installation & Deployment**
+## 📱 **Mobile App Integration**
+
+### **Complete API Coverage**
+All frontend functionality accessible via REST API:
+
+```http
+# Configuration for mobile dropdowns
+GET /api/config/all
+→ Returns all dropdown values, settings, thresholds
+
+# Member management
+GET /api/members?page=1&limit=25&search=john
+POST /api/members
+PUT /api/members/{id}
+DELETE /api/members/{id}
+
+# AI recommendations  
+GET /api/suggestions/follow-up
+→ Smart pastoral recommendations with priority
+
+# Daily automation
+GET /api/dashboard/stats
+GET /api/dashboard/upcoming?days=7
+GET /api/members/at-risk
+
+# Financial aid scheduling
+POST /api/financial-aid-schedules
+GET /api/financial-aid-schedules/due-today
+POST /api/financial-aid-schedules/{id}/mark-distributed
+
+# Timeline systems
+GET /api/grief-support/member/{id}
+GET /api/accident-followup/member/{id}
+POST /api/grief-support/{id}/complete
+```
+
+### **Mobile Development Ready**
+- **No localStorage dependencies**: All data via API
+- **Configuration endpoints**: Dynamic dropdown population
+- **Real-time data**: Fresh information guaranteed
+- **Photo optimization**: Multi-size images for different screen densities
+- **Authentication**: JWT with role-based permissions
 
 ### **Prerequisites**
 - Python 3.11+
