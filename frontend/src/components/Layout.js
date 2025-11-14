@@ -75,7 +75,7 @@ export const Layout = ({ children }) => {
             <div className="flex items-center gap-3">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2 border-0 hover:bg-teal-50 hover:text-teal-700">
+                  <Button variant="ghost" size="sm" className="group gap-2 border-0 hover:bg-teal-50 hover:text-teal-700">
                     <div className="text-right hidden md:block">
                       <p className="text-sm font-semibold text-gray-700 group-hover:text-teal-700">{user?.name}</p>
                       <p className="text-xs text-muted-foreground group-hover:text-teal-600">
