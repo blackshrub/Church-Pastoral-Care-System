@@ -1290,13 +1290,17 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                 })
             elif this_year_birthday < today and not event.get("completed"):
                 # Overdue birthday (past but not completed)
-                overdue_birthdays.append({
-                    **event,
-                    "member_name": member["name"],
-                    "member_phone": member["phone"],
-                    "member_photo_url": member.get("photo_url"),
-                    "days_overdue": (today - this_year_birthday).days
-                })
+                days_overdue = (today - this_year_birthday).days
+                # Only include if within writeoff threshold (0 = never writeoff)
+                birthday_writeoff = writeoff_settings.get("birthday", 7)
+                if birthday_writeoff == 0 or days_overdue <= birthday_writeoff:
+                    overdue_birthdays.append({
+                        **event,
+                        "member_name": member["name"],
+                        "member_phone": member["phone"],
+                        "member_photo_url": member.get("photo_url"),
+                        "days_overdue": days_overdue
+                    })
             elif tomorrow <= this_year_birthday <= week_ahead:
                 # Upcoming birthday (1-7 days ahead)
                 days_until = (this_year_birthday - today).days
