@@ -152,14 +152,12 @@ export const MembersList = () => {
     }
   };
   
-  const filteredMembers = useMemo(() => {
-    return members.filter(member => {
-      const matchesSearch = member.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-                           member.phone.includes(debouncedSearch);
-      const matchesStatus = filterStatus === 'all' || member.engagement_status === filterStatus;
-      return matchesSearch && matchesStatus;
-    });
-  }, [members, debouncedSearch, filterStatus]);
+  const filteredMembers = members.filter(member => {
+    const matchesSearch = member.name.toLowerCase().includes(search.toLowerCase()) ||
+                         member.phone.includes(search);
+    const matchesStatus = filterStatus === 'all' || member.engagement_status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
   
   if (loading) {
     return (
