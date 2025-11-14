@@ -444,12 +444,12 @@ export const Dashboard = () => {
       
       {/* Quick Actions */}
       <div>
-        <h2 className="text-2xl font-playfair font-bold mb-4">Quick Actions</h2>
+        <h2 className="text-2xl font-playfair font-bold mb-4">{t('quick_actions')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Dialog open={quickEventOpen} onOpenChange={setQuickEventOpen}>
             <DialogTrigger asChild>
               <Button className="w-full h-14 bg-teal-500 hover:bg-teal-600 text-white text-base font-semibold">
-                <Plus className="w-5 h-5 mr-2" />Add New Care Event
+                <Plus className="w-5 h-5 mr-2" />{t('add_new_care_event')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
