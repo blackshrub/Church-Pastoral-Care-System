@@ -1,18 +1,18 @@
 [
   {
-    "content": "Remove Grief Support section from Today's tab (duplicate)",
-    "status": "completed"
+    "content": "Update backend to calculate upcoming tasks (7 days ahead) for all types",
+    "status": "in_progress"
   },
   {
-    "content": "Fix and verify Accident/Illness follow-up calculation logic",
-    "status": "completed"
+    "content": "Update Upcoming tab UI to show all upcoming task types",
+    "status": "pending"
   },
   {
-    "content": "Verify Financial Aid tab data accuracy",
-    "status": "completed"
+    "content": "Sort all upcoming tasks by date",
+    "status": "pending"
   },
   {
-    "content": "Sort Upcoming tab by date (nearest to furthest)",
-    "status": "completed"
+    "content": "Test Upcoming tab with comprehensive data",
+    "status": "pending"
   }
 ]
