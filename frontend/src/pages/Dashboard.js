@@ -694,8 +694,8 @@ export const Dashboard = () => {
                           memberId={suggestion.member_id} 
                         />
                         <span className={`text-xs px-2 py-1 rounded font-medium ${
-                          suggestion.priority === 'high' ? 'bg-red-100 text-red-700' :
-                          suggestion.priority === 'medium' ? 'bg-amber-100 text-amber-700' :
+                          (suggestion.priority || 'medium') === 'high' ? 'bg-red-100 text-red-700' :
+                          (suggestion.priority || 'medium') === 'medium' ? 'bg-amber-100 text-amber-700' :
                           'bg-blue-100 text-blue-700'
                         }`}>
                           {suggestion.priority?.toUpperCase() || 'MEDIUM'} PRIORITY
