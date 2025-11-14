@@ -1,18 +1,18 @@
 [
   {
     "content": "Create backend endpoint for pre-calculated daily reminders",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add daily cache refresh job to scheduler",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update Dashboard to use cached reminders endpoint",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test Dashboard load speed improvement",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
