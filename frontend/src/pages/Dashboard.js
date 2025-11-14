@@ -38,12 +38,20 @@ const MemberNameWithAvatar = ({ member, memberId }) => {
 
   return (
     <Link to={`/members/${memberId}`} className="flex items-center gap-3 hover:text-teal-700">
-      <Avatar className="w-10 h-10">
-        {photoUrl && <AvatarImage src={photoUrl} alt={member.name} className="object-cover" />}
-        <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold text-xs">
-          {getInitials(member.name)}
-        </AvatarFallback>
-      </Avatar>
+      <div className="w-10 h-10 rounded-full overflow-hidden bg-teal-100 flex items-center justify-center">
+        {photoUrl ? (
+          <LazyImage 
+            src={photoUrl} 
+            alt={member.name}
+            className="w-full h-full object-cover"
+            placeholderClassName="w-full h-full bg-teal-100 flex items-center justify-center text-teal-700 text-xs font-semibold"
+          />
+        ) : (
+          <span className="text-teal-700 font-semibold text-xs">
+            {getInitials(member.name)}
+          </span>
+        )}
+      </div>
       <div>
         <p className="font-semibold hover:underline">{member.name}</p>
       </div>
