@@ -151,6 +151,17 @@
   "recent_activity": "Aktivitas Terkini",
   
   "add_new_care_event": "Tambah Kejadian Perawatan Baru",
+  "view_all_members": "Lihat Semua Jemaat",
+  "ai_pastoral_recommendations": "Rekomendasi Pastoral AI",
+  "intelligent_followup": "Saran tindak lanjut cerdas berdasarkan pola jemaat",
+  "high_priority": "PRIORITAS TINGGI",
+  "urgent_reconnection_needed": "Perlu Koneksi Ulang Mendesak",
+  "no_contact_for": "Tidak ada kontak selama",
+  "days_risk": "hari - risiko terputus",
+  "personal_visit_or_call": "Kunjungan pribadi atau panggilan telepon",
+  "contact": "Hubungi",
+  "mark_completed": "Tandai Selesai",
+  
   "select_members": "Pilih Jemaat",
   "event_type": "Jenis Kejadian",
   "event_date": "Tanggal Kejadian",
