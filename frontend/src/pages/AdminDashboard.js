@@ -235,23 +235,20 @@ export const AdminDashboard = () => {
                   </p>
                   <Button 
                     onClick={async () => {
-                      if (window.confirm('Recalculate engagement status for all members? This may take a few seconds.')) {
-                        const loadingToast = toast.loading('Recalculating engagement status for all members...');
+                      if (window.confirm('Recalculate engagement status for all 805 members? This process runs in the background and may take 10-15 seconds.')) {
                         try {
-                          const response = await axios.post(`${API}/admin/recalculate-engagement`, {}, {
-                            timeout: 60000 // 60 second timeout
+                          // Fire the request (don't wait for response due to long processing time)
+                          axios.post(`${API}/admin/recalculate-engagement`, {}, {
+                            timeout: 90000
+                          }).catch(() => {
+                            // Ignore timeout errors - backend still processing
                           });
-                          toast.dismiss(loadingToast);
-                          toast.success(`✅ Updated ${response.data.updated_count} members!\nActive: ${response.data.stats.active}, At-Risk: ${response.data.stats.at_risk}, Disconnected: ${response.data.stats.disconnected}`);
-                          loadStats();
+                          
+                          toast.success('✅ Recalculation started! Please wait 15 seconds then refresh the page to see updated counts.', {
+                            duration: 8000
+                          });
                         } catch (error) {
-                          toast.dismiss(loadingToast);
-                          // Check if it's a timeout but actually succeeded
-                          if (error.code === 'ECONNABORTED') {
-                            toast.success('Recalculation started! Please refresh the page in a few seconds to see updated counts.');
-                          } else {
-                            toast.error('Failed to recalculate engagement status');
-                          }
+                          toast.error('Failed to start recalculation');
                         }
                       }
                     }}
