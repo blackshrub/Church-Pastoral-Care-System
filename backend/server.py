@@ -2348,8 +2348,14 @@ async def get_intelligent_suggestions(current_user: dict = Depends(get_current_u
                 else:
                     last_contact_date = last_contact
                 
+                # Ensure both dates are timezone-aware for comparison
+                if last_contact_date.tzinfo is None:
+                    last_contact_date = last_contact_date.replace(tzinfo=timezone.utc)
+                
+                now_utc = datetime.now(timezone.utc)
+                
                 # If contacted in last 2 days, don't suggest
-                if (datetime.now(timezone.utc) - last_contact_date).days <= 2:
+                if (now_utc - last_contact_date).days <= 2:
                     continue
             
             # AI-powered suggestions based on patterns
