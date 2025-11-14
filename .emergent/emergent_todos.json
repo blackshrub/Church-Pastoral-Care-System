@@ -1,38 +1,10 @@
 [
   {
-    "content": "Service Worker for offline app resources",
-    "status": "completed"
+    "content": "Fix missing profile photos in Financial Aid Recipients dialog",
+    "status": "in_progress"
   },
   {
-    "content": "PWA manifest for app-like experience",
-    "status": "completed"
-  },
-  {
-    "content": "IndexedDB for offline member data storage",
-    "status": "completed"
-  },
-  {
-    "content": "Offline form queue for care events",
-    "status": "completed"
-  },
-  {
-    "content": "Image lazy loading with placeholders",
-    "status": "completed"
-  },
-  {
-    "content": "Touch optimizations and gesture support",
-    "status": "completed"
-  },
-  {
-    "content": "Advanced caching strategy",
-    "status": "completed"
-  },
-  {
-    "content": "Push notification system",
-    "status": "completed"
-  },
-  {
-    "content": "Offline-first functionality",
-    "status": "completed"
+    "content": "Test and verify photos display correctly across all pages",
+    "status": "pending"
   }
 ]
