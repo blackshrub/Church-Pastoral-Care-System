@@ -1,14 +1,18 @@
 [
   {
-    "content": "Debug and fix pre-calculation logic for all dashboard tabs",
-    "status": "completed"
+    "content": "Remove Grief Support section from Today's tab (duplicate)",
+    "status": "in_progress"
   },
   {
-    "content": "Fix grief support not showing in follow-up tab",
-    "status": "completed"
+    "content": "Fix and verify Accident/Illness follow-up calculation logic",
+    "status": "pending"
   },
   {
-    "content": "Verify all tab data accuracy in UI",
-    "status": "completed"
+    "content": "Verify Financial Aid tab data accuracy",
+    "status": "pending"
+  },
+  {
+    "content": "Sort Upcoming tab by date (nearest to furthest)",
+    "status": "pending"
   }
 ]
