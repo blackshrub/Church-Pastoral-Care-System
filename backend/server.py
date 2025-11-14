@@ -1691,6 +1691,9 @@ async def complete_care_event(event_id: str):
             
             await db.care_events.insert_one(contact_event)
         
+        # Invalidate dashboard cache after completing event
+        await invalidate_dashboard_cache(event["campus_id"])
+        
         return {"success": True, "message": "Care event marked as completed"}
     except HTTPException:
         raise
