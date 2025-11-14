@@ -1278,8 +1278,8 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                     "member_phone": member["phone"],
                     "member_photo_url": member.get("photo_url")
                 })
-            elif this_year_birthday < today and not event.get("completed"):
-                # Overdue birthday (past but not completed)
+            elif this_year_birthday < today and not event.get("completed") and not event.get("ignored"):
+                # Overdue birthday (past but not completed and not ignored)
                 days_overdue = (today - this_year_birthday).days
                 # Only include if within writeoff threshold (0 = never writeoff)
                 birthday_writeoff = writeoff_settings.get("birthday", 7)
