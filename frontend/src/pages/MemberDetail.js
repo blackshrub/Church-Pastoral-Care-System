@@ -868,7 +868,7 @@ export const MemberDetail = () => {
                 careEvents.filter(e => e.event_type === 'accident_illness').map(event => (
                   <div key={event.id} className="space-y-4 mb-6 p-4 border rounded-lg">
                     <div>
-                      <h4 className="font-semibold">{event.title}</h4>
+                      <h4 className="font-semibold text-lg mb-1">🏥 {event.description || event.title || 'Accident/Illness Visit'}</h4>
                       <p className="text-sm text-muted-foreground">
                         Date: {formatDate(event.event_date, 'dd MMM yyyy')}
                       </p>
