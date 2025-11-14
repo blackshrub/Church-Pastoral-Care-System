@@ -12,6 +12,10 @@ from typing import List, Optional, Dict, Any
 from enum import Enum
 import uuid
 from datetime import datetime, timezone, timedelta, date
+from zoneinfo import ZoneInfo
+
+# Jakarta timezone (UTC+7)
+JAKARTA_TZ = ZoneInfo("Asia/Jakarta")
 import httpx
 from PIL import Image
 import io
