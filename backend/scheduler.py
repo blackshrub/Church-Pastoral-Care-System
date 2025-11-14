@@ -1,6 +1,7 @@
 import asyncio
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 import logging
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
@@ -8,6 +9,17 @@ import httpx
 import uuid
 
 logger = logging.getLogger(__name__)
+
+# Jakarta timezone
+JAKARTA_TZ = ZoneInfo("Asia/Jakarta")
+
+def now_jakarta():
+    """Get current datetime in Jakarta timezone"""
+    return datetime.now(JAKARTA_TZ)
+
+def today_jakarta():
+    """Get current date in Jakarta timezone"""
+    return now_jakarta().date()
 
 # MongoDB connection
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
