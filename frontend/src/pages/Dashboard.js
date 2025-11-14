@@ -121,6 +121,7 @@ const markMemberContacted = async (memberId, memberName, user, loadReminders) =>
 };
 
 export const Dashboard = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [birthdaysToday, setBirthdaysToday] = useState([]);
   const [griefDue, setGriefDue] = useState([]);
