@@ -67,32 +67,19 @@ Enterprise pastoral care system for GKBJ ensuring no member is left behind throu
 ## 🏗️ **Architecture**
 
 ### **Backend (FastAPI + MongoDB)**
-```
-backend/
-├── server.py              # Main API server (60+ endpoints)
-├── scheduler.py           # Daily digest automation
-├── create_indexes.py      # Database performance optimization
-├── import_data.py         # Data import utilities
-├── requirements.txt       # Python dependencies
-├── .env                   # Environment configuration
-└── uploads/               # Member photo storage (657 photos)
-```
+- **70+ REST endpoints** with comprehensive CRUD operations
+- **Database indexing** for optimized query performance
+- **JWT authentication** with role-based access control
+- **Automated scheduling** (APScheduler) for daily digest
+- **Configuration API** for mobile app integration
+- **Photo optimization** with multi-size serving
 
-### **Frontend (React + PWA)**
-```
-frontend/
-├── public/
-│   ├── manifest.json      # PWA configuration
-│   ├── sw.js             # Service Worker for offline functionality
-│   └── index.html        # PWA meta tags and service worker registration
-├── src/
-│   ├── pages/            # 11 main application pages
-│   ├── components/       # Reusable UI components
-│   ├── utils/            # Offline storage, push notifications, mobile optimization
-│   ├── locales/          # Indonesian/English translations
-│   └── App.js            # Main app with PWA initialization
-└── package.json          # Dependencies with PWA libraries
-```
+### **Frontend (React PWA)**
+- **Real-time updates** prioritized over caching
+- **Professional pagination** (25 items/page) for large datasets
+- **Lazy image loading** for optimal performance
+- **Mobile-responsive** with horizontal scrolling tabs
+- **PWA capability** with home screen installation
 
 ## 🚀 **Installation & Deployment**
 
