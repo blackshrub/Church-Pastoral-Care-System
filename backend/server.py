@@ -1140,6 +1140,7 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         logger.info(f"Calculating dashboard reminders for campus {campus_id}, date {today_date}")
         
         today = datetime.strptime(today_date, '%Y-%m-%d').date()
+        tomorrow = today + timedelta(days=1)
         week_ahead = today + timedelta(days=7)
         
         # Get writeoff settings
