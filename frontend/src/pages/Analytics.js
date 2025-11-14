@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, LineChart, Line, Area, AreaChart } from 'recharts';
+import { PieChart, BarChart, AreaChart } from '@/components/charts';
 import { TrendingUp, Users, DollarSign, Heart, Calendar, Target } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -312,61 +312,28 @@ export const Analytics = () => {
             <Card>
               <CardHeader><CardTitle>Age Distribution</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={demographicData.ageGroups}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="value" fill={COLORS.demographic[0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarChart data={demographicData.ageGroups || []} color={COLORS.demographic[0]} height={300} />
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader><CardTitle>Membership Status</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie data={demographicData.membership} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}>
-                      {demographicData.membership?.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS.demographic[index % COLORS.demographic.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <PieChart data={demographicData.membership || []} colors={COLORS.demographic} height={300} />
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader><CardTitle>Gender Distribution</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
-                    <Pie data={demographicData.gender} cx="50%" cy="50%" outerRadius={60} dataKey="value">
-                      {demographicData.gender?.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS.primary[index]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <PieChart data={demographicData.gender || []} colors={COLORS.primary} height={250} />
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader><CardTitle>Member Categories</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={demographicData.category}>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="value" fill={COLORS.primary[2]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarChart data={demographicData.category || []} color={COLORS.primary[2]} height={250} />
               </CardContent>
             </Card>
           </div>
@@ -378,31 +345,14 @@ export const Analytics = () => {
             <Card>
               <CardHeader><CardTitle>Population Analysis by Age Group</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={trendsData.age_groups}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="count" fill={COLORS.demographic[0]} name="Members" />
-                    <Bar dataKey="care_events" fill={COLORS.demographic[1]} name="Care Events" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarChart data={trendsData.age_groups || []} color={COLORS.demographic[0]} height={300} />
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader><CardTitle>Engagement by Membership Status</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={trendsData.membership_trends}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="status" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="avg_engagement" fill={COLORS.primary[2]} name="Engagement Score" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarChart data={trendsData.membership_trends || []} color={COLORS.primary[2]} height={300} />
               </CardContent>
             </Card>
           </div>
@@ -458,31 +408,14 @@ export const Analytics = () => {
             <Card>
               <CardHeader><CardTitle>Member Engagement Status</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie data={demographicData.engagement} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({name, value}) => `${name}: ${value}`}>
-                      <Cell fill="#059669" /> {/* Active - Green */}
-                      <Cell fill="#f59e0b" /> {/* At Risk - Amber */}
-                      <Cell fill="#ef4444" /> {/* Inactive - Red */}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
+                <PieChart data={demographicData.engagement || []} colors={['#059669', '#f59e0b', '#ef4444']} height={300} />
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader><CardTitle>Care Events by Month ({new Date().getFullYear()})</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={engagementData.trends}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Area type="monotone" dataKey="events" stroke={COLORS.primary[0]} fill={COLORS.primary[0]} fillOpacity={0.3} />
-                  </AreaChart>
-                </ResponsiveContainer>
+                <AreaChart data={engagementData.trends || []} dataKey="events" color={COLORS.primary[0]} height={300} />
               </CardContent>
             </Card>
           </div>
@@ -494,15 +427,7 @@ export const Analytics = () => {
             <Card>
               <CardHeader><CardTitle>Financial Aid by Type</CardTitle></CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={financialData.byType}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip formatter={(value) => `Rp ${value.toLocaleString('id-ID')}`} />
-                    <Bar dataKey="amount" fill={COLORS.financial[0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <BarChart data={financialData.byType || []} color={COLORS.financial[0]} height={300} formatValue={(value) => `Rp ${value.toLocaleString('id-ID')}`} />
               </CardContent>
             </Card>
             
@@ -539,16 +464,7 @@ export const Analytics = () => {
           <Card>
             <CardHeader><CardTitle>Care Events Distribution</CardTitle></CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <PieChart>
-                  <Pie data={eventsByType} cx="50%" cy="50%" outerRadius={120} dataKey="value" label={({name, percentage}) => `${name}: ${percentage}%`}>
-                    {eventsByType.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS.primary[index % COLORS.primary.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              <PieChart data={eventsByType} colors={COLORS.primary} height={400} />
             </CardContent>
           </Card>
         </TabsContent>
