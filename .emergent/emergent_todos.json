@@ -1,18 +1,18 @@
 [
   {
     "content": "Fix Settings page wording about write-off vs ignore",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add ignored flag to financial aid queries",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update API documentation with all new features",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Show ignored events in member profile with greyed out style",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
