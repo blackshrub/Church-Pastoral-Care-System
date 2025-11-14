@@ -64,7 +64,7 @@ async def send_whatsapp(phone: str, message: str, log_context: dict):
 async def generate_daily_digest_for_campus(campus_id: str, campus_name: str):
     """Generate daily digest for a specific campus"""
     try:
-        today = date.today()
+        today = today_jakarta()  # Use Jakarta timezone
         church_name = os.environ.get('CHURCH_NAME', 'Church')
         
         # 1. Birthdays today
