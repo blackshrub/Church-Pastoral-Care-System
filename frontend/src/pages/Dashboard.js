@@ -883,11 +883,11 @@ export const Dashboard = () => {
         <TabsContent value="financial" className="space-y-4">
           <Card className="card-border-left-green">
             <CardHeader>
-              <CardTitle>{t('financial_aid_due_today')}</CardTitle>
+              <CardTitle>{t('financial_aid_overdue')}</CardTitle>
             </CardHeader>
             <CardContent>
               {financialAidDue.length === 0 ? (
-                <p className="text-center text-muted-foreground py-6">No financial aid scheduled for today</p>
+                <p className="text-sm text-muted-foreground text-center py-8">{t('no_overdue_financial_aid')}</p>
               ) : (
                 <div className="space-y-2">
                   {financialAidDue.map(schedule => (
