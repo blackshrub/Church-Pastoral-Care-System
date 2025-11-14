@@ -9,14 +9,14 @@
   },
   {
     "content": "Update dashboard calculation to respect writeoff thresholds",
+    "status": "completed"
+  },
+  {
+    "content": "Create ignore/dismiss endpoint for care events",
     "status": "in_progress"
   },
   {
     "content": "Add three-dots menu with Ignore button to overdue cards",
-    "status": "pending"
-  },
-  {
-    "content": "Create ignore/dismiss endpoint for care events",
     "status": "pending"
   }
 ]
