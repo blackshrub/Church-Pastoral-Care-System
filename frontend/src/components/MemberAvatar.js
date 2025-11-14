@@ -1,5 +1,6 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import LazyImage from '@/components/LazyImage';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -24,10 +25,21 @@ export const MemberAvatar = ({ member, size = 'md' }) => {
   
   return (
     <Avatar className={sizeClasses[size]} data-testid="member-avatar">
-      {photoUrl && <AvatarImage src={photoUrl} alt={member.name} className="object-cover" />}
-      <AvatarFallback className="bg-primary-100 text-primary-700 font-semibold">
-        {getInitials(member.name)}
-      </AvatarFallback>
+      {photoUrl ? (
+        <LazyImage 
+          src={photoUrl} 
+          alt={member.name}
+          className="w-full h-full rounded-full object-cover"
+          placeholderClassName="w-full h-full rounded-full bg-teal-100 flex items-center justify-center"
+          onError={() => {
+            // Show initials fallback on error
+          }}
+        />
+      ) : (
+        <AvatarFallback className="bg-teal-100 text-teal-700 font-semibold">
+          {getInitials(member.name)}
+        </AvatarFallback>
+      )}
     </Avatar>
   );
 };
