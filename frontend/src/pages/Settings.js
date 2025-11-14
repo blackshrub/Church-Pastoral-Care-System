@@ -51,8 +51,34 @@ export const Settings = () => {
         const campusRes = await axios.get(`${API}/campuses/${user.campus_id}`);
         setCampusTimezone(campusRes.data.timezone || 'Asia/Jakarta');
       }
+      
+      // Load writeoff settings
+      const writeoffRes = await axios.get(`${API}/settings/overdue_writeoff`);
+      if (writeoffRes.data?.data) {
+        setWriteoffBirthday(writeoffRes.data.data.birthday || 7);
+        setWriteoffFinancialAid(writeoffRes.data.data.financial_aid || 0);
+        setWriteoffAccident(writeoffRes.data.data.accident_illness || 14);
+        setWriteoffGrief(writeoffRes.data.data.grief_support || 14);
+      }
     } catch (error) {
-      console.error('Error loading campus data');
+      console.error('Error loading settings');
+    }
+  };
+  
+  const saveWriteoffSettings = async () => {
+    try {
+      await axios.put(`${API}/settings/overdue_writeoff`, {
+        data: {
+          birthday: parseInt(writeoffBirthday),
+          financial_aid: parseInt(writeoffFinancialAid),
+          accident_illness: parseInt(writeoffAccident),
+          grief_support: parseInt(writeoffGrief)
+        }
+      });
+      toast.success('Overdue write-off settings saved!');
+    } catch (error) {
+      toast.error('Failed to save write-off settings');
+      console.error('Error saving writeoff settings:', error);
     }
   };
   
