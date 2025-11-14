@@ -680,8 +680,15 @@ export const MemberDetail = () => {
                 </p>
               ) : (
                 <div className="space-y-4">
-                  {careEvents.filter(e => e.event_type !== 'birthday').map((event) => (
-                    <div key={event.id} className="flex gap-4 pb-4 border-l-2 border-primary-200 pl-6 ml-3 relative timeline-item" data-testid={`care-event-${event.id}`}>
+                  {careEvents.filter(e => e.event_type !== 'birthday').map((event) => {
+                    const isIgnored = event.ignored === true;
+                    return (
+                    <div key={event.id} className={`flex gap-4 pb-4 border-l-2 border-primary-200 pl-6 ml-3 relative timeline-item ${isIgnored ? 'opacity-60' : ''}`} data-testid={`care-event-${event.id}`}>
+                      {isIgnored && (
+                        <div className="absolute top-0 right-0">
+                          <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
+                        </div>
+                      )}
                       <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-500 border-2 border-background"></div>
                       <div className="flex-1">
                         <div className="flex items-start justify-between">
