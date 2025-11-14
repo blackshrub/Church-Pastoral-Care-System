@@ -212,8 +212,20 @@ export const FinancialAid = () => {
                 {aidEvents.map((event) => (
                   <div key={event.id} className="p-3 bg-muted/30 rounded-lg">
                     <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium text-sm">{t(`aid_types.${event.aid_type}`)}</p>
+                      <div className="flex-1">
+                        {event.member_id && event.member_name ? (
+                          <Link 
+                            to={`/members/${event.member_id}`}
+                            className="font-medium text-sm text-primary hover:underline"
+                          >
+                            {event.member_name}
+                          </Link>
+                        ) : (
+                          <p className="font-medium text-sm text-muted-foreground">Unknown Member</p>
+                        )}
+                        <p className="font-medium text-sm text-muted-foreground">
+                          {t(`aid_types.${event.aid_type}`)}
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           {formatDate(event.event_date, 'dd MMM yyyy')}
                         </p>
