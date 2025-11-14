@@ -258,15 +258,56 @@ export const Settings = () => {
                     <SelectTrigger id="timezone">
                       <SelectValue placeholder="Select timezone" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-[300px]">
+                      {/* Asia Pacific */}
                       <SelectItem value="Asia/Jakarta">Asia/Jakarta (UTC+7) - Jakarta, Indonesia</SelectItem>
                       <SelectItem value="Asia/Singapore">Asia/Singapore (UTC+8) - Singapore</SelectItem>
-                      <SelectItem value="Asia/Kuala_Lumpur">Asia/Kuala_Lumpur (UTC+8) - Malaysia</SelectItem>
-                      <SelectItem value="Asia/Manila">Asia/Manila (UTC+8) - Philippines</SelectItem>
-                      <SelectItem value="Asia/Bangkok">Asia/Bangkok (UTC+7) - Thailand</SelectItem>
-                      <SelectItem value="Asia/Ho_Chi_Minh">Asia/Ho_Chi_Minh (UTC+7) - Vietnam</SelectItem>
+                      <SelectItem value="Asia/Kuala_Lumpur">Asia/Kuala_Lumpur (UTC+8) - Kuala Lumpur, Malaysia</SelectItem>
+                      <SelectItem value="Asia/Manila">Asia/Manila (UTC+8) - Manila, Philippines</SelectItem>
+                      <SelectItem value="Asia/Bangkok">Asia/Bangkok (UTC+7) - Bangkok, Thailand</SelectItem>
+                      <SelectItem value="Asia/Ho_Chi_Minh">Asia/Ho_Chi_Minh (UTC+7) - Ho Chi Minh, Vietnam</SelectItem>
+                      <SelectItem value="Asia/Seoul">Asia/Seoul (UTC+9) - Seoul, South Korea</SelectItem>
+                      <SelectItem value="Asia/Tokyo">Asia/Tokyo (UTC+9) - Tokyo, Japan</SelectItem>
+                      <SelectItem value="Asia/Hong_Kong">Asia/Hong_Kong (UTC+8) - Hong Kong</SelectItem>
+                      <SelectItem value="Asia/Shanghai">Asia/Shanghai (UTC+8) - Shanghai, China</SelectItem>
+                      <SelectItem value="Asia/Taipei">Asia/Taipei (UTC+8) - Taipei, Taiwan</SelectItem>
+                      <SelectItem value="Asia/Kolkata">Asia/Kolkata (UTC+5:30) - Mumbai, India</SelectItem>
+                      <SelectItem value="Asia/Dubai">Asia/Dubai (UTC+4) - Dubai, UAE</SelectItem>
+                      <SelectItem value="Asia/Riyadh">Asia/Riyadh (UTC+3) - Riyadh, Saudi Arabia</SelectItem>
+                      
+                      {/* Australia & Pacific */}
                       <SelectItem value="Australia/Sydney">Australia/Sydney (UTC+10/+11) - Sydney</SelectItem>
-                      <SelectItem value="Pacific/Auckland">Pacific/Auckland (UTC+12/+13) - New Zealand</SelectItem>
+                      <SelectItem value="Australia/Melbourne">Australia/Melbourne (UTC+10/+11) - Melbourne</SelectItem>
+                      <SelectItem value="Australia/Perth">Australia/Perth (UTC+8) - Perth</SelectItem>
+                      <SelectItem value="Pacific/Auckland">Pacific/Auckland (UTC+12/+13) - Auckland, NZ</SelectItem>
+                      <SelectItem value="Pacific/Fiji">Pacific/Fiji (UTC+12) - Fiji</SelectItem>
+                      
+                      {/* Americas */}
+                      <SelectItem value="America/New_York">America/New_York (UTC-5/-4) - New York, USA</SelectItem>
+                      <SelectItem value="America/Chicago">America/Chicago (UTC-6/-5) - Chicago, USA</SelectItem>
+                      <SelectItem value="America/Denver">America/Denver (UTC-7/-6) - Denver, USA</SelectItem>
+                      <SelectItem value="America/Los_Angeles">America/Los_Angeles (UTC-8/-7) - Los Angeles, USA</SelectItem>
+                      <SelectItem value="America/Toronto">America/Toronto (UTC-5/-4) - Toronto, Canada</SelectItem>
+                      <SelectItem value="America/Vancouver">America/Vancouver (UTC-8/-7) - Vancouver, Canada</SelectItem>
+                      <SelectItem value="America/Mexico_City">America/Mexico_City (UTC-6) - Mexico City</SelectItem>
+                      <SelectItem value="America/Sao_Paulo">America/Sao_Paulo (UTC-3) - São Paulo, Brazil</SelectItem>
+                      <SelectItem value="America/Buenos_Aires">America/Buenos_Aires (UTC-3) - Buenos Aires, Argentina</SelectItem>
+                      
+                      {/* Europe */}
+                      <SelectItem value="Europe/London">Europe/London (UTC+0/+1) - London, UK</SelectItem>
+                      <SelectItem value="Europe/Paris">Europe/Paris (UTC+1/+2) - Paris, France</SelectItem>
+                      <SelectItem value="Europe/Berlin">Europe/Berlin (UTC+1/+2) - Berlin, Germany</SelectItem>
+                      <SelectItem value="Europe/Rome">Europe/Rome (UTC+1/+2) - Rome, Italy</SelectItem>
+                      <SelectItem value="Europe/Madrid">Europe/Madrid (UTC+1/+2) - Madrid, Spain</SelectItem>
+                      <SelectItem value="Europe/Amsterdam">Europe/Amsterdam (UTC+1/+2) - Amsterdam, Netherlands</SelectItem>
+                      <SelectItem value="Europe/Moscow">Europe/Moscow (UTC+3) - Moscow, Russia</SelectItem>
+                      <SelectItem value="Europe/Istanbul">Europe/Istanbul (UTC+3) - Istanbul, Turkey</SelectItem>
+                      
+                      {/* Africa */}
+                      <SelectItem value="Africa/Cairo">Africa/Cairo (UTC+2) - Cairo, Egypt</SelectItem>
+                      <SelectItem value="Africa/Johannesburg">Africa/Johannesburg (UTC+2) - Johannesburg, South Africa</SelectItem>
+                      <SelectItem value="Africa/Lagos">Africa/Lagos (UTC+1) - Lagos, Nigeria</SelectItem>
+                      <SelectItem value="Africa/Nairobi">Africa/Nairobi (UTC+3) - Nairobi, Kenya</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-muted-foreground mt-2">
