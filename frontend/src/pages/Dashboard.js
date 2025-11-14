@@ -887,7 +887,8 @@ export const Dashboard = () => {
                               try {
                                 await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
                                 toast.success('Schedule stopped');
-                                loadReminders();
+                                // Update local state
+                                setFinancialAidDue(prev => prev.filter(s => s.id !== schedule.id));
                               } catch (error) {
                                 toast.error('Failed to stop schedule');
                               }
