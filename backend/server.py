@@ -1208,6 +1208,18 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                         "member_photo_url": member_map.get(followup["member_id"], {}).get("photo_url"),
                         "days_overdue": days_overdue
                     })
+            elif tomorrow <= sched_date <= week_ahead:
+                # UPCOMING (1-7 days ahead)
+                upcoming_tasks.append({
+                    "type": "accident_followup",
+                    "date": followup["scheduled_date"],
+                    "member_id": followup["member_id"],
+                    "member_name": member_map.get(followup["member_id"], {}).get("name"),
+                    "member_phone": member_map.get(followup["member_id"], {}).get("phone"),
+                    "member_photo_url": member_map.get(followup["member_id"], {}).get("photo_url"),
+                    "details": f"{followup['stage'].replace('_', ' ')}",
+                    "data": followup
+                })
         
         # At-risk and disconnected members
         at_risk = [m for m in members if m.get("engagement_status") == "at_risk"]
