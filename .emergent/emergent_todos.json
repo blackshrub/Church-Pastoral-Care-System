@@ -1,18 +1,10 @@
 [
   {
-    "content": "Add ignore button to financial aid schedules in Dashboard",
-    "status": "completed"
+    "content": "Move Stop Schedule to three-dots menu in MemberDetail Financial Aid",
+    "status": "in_progress"
   },
   {
-    "content": "Exclude deleted/archived members from all calculations",
-    "status": "completed"
-  },
-  {
-    "content": "Update API sync to archive members not in source",
-    "status": "completed"
-  },
-  {
-    "content": "Complete translation audit - Dashboard and MemberDetail pages",
-    "status": "completed"
+    "content": "Add archived members toggle filter in Members page",
+    "status": "pending"
   }
 ]
