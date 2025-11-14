@@ -94,7 +94,7 @@ export const LoginPage = () => {
                   </SelectContent>
                 </Select>
               )}
-              <p className="text-xs text-muted-foreground">Select campus (required for campus admin/pastor)</p>
+              <p className="text-xs text-muted-foreground">Select your campus (required for all users)</p>
             </div>
             
             <div className="space-y-2">
