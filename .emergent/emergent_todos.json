@@ -1,18 +1,14 @@
 [
   {
     "content": "Implement UTC+7 timezone handling universally (frontend & backend)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add birthday section to member profile timeline with Mark Complete button",
-    "status": "pending"
+    "status": "completed"
   },
   {
-    "content": "Test timezone consistency across all pages",
-    "status": "pending"
-  },
-  {
-    "content": "Test birthday completion flow in member profile",
-    "status": "pending"
+    "content": "Test timezone consistency and birthday completion flow",
+    "status": "in_progress"
   }
 ]
