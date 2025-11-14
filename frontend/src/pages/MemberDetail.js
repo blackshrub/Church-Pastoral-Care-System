@@ -755,114 +755,101 @@ export const MemberDetail = () => {
                   No grief/loss events recorded.
                 </p>
               ) : (
-                <div className="space-y-6">
-                  {careEvents.filter(e => e.event_type === 'grief_loss').map(event => {
-                    const isEventIgnored = event.ignored === true;
-                    const eventStages = griefTimeline.filter(s => s.care_event_id === event.id);
-                    
-                    return (
-                    <div key={event.id} className={`p-4 border rounded-lg ${isEventIgnored ? 'bg-gray-100 opacity-60 border-gray-300' : 'bg-card border-pink-200'}`}>
-                      {isEventIgnored && (
-                        <div className="absolute top-2 right-2">
-                          <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
-                        </div>
+                careEvents.filter(e => e.event_type === 'grief_loss').map(event => (
+                  <div key={event.id} className="space-y-4 mb-6 p-4 border border-pink-200 rounded-lg">
+                    <div>
+                      <h4 className="font-semibold">💔 {event.title || 'Grief/Loss Event'}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Date: {formatDate(event.event_date, 'dd MMM yyyy')}
+                      </p>
+                      {event.grief_relationship && (
+                        <p className="text-sm text-muted-foreground">
+                          Relationship: {event.grief_relationship}
+                        </p>
                       )}
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h4 className="font-playfair font-semibold text-lg mb-1">
-                            💔 {event.title || 'Grief/Loss Event'}
-                          </h4>
-                          <p className="text-sm text-muted-foreground">
-                            {formatDate(event.event_date, 'dd MMM yyyy')}
-                            {event.grief_relationship && ` • ${event.grief_relationship}`}
-                          </p>
-                          {event.description && (
-                            <p className="text-sm mt-2">{event.description}</p>
-                          )}
-                        </div>
-                      </div>
-                      
-                      {/* Grief Timeline Stages */}
-                      <div className="space-y-4 mt-4">
-                        <h5 className="text-sm font-semibold text-muted-foreground">Support Timeline ({eventStages.length} stages):</h5>
-                        {eventStages.map((stage, index) => {
+                      {event.description && (
+                        <p className="text-sm mt-2">{event.description}</p>
+                      )}
+                    </div>
+                    
+                    {/* Grief Timeline within each grief event */}
+                    <div className="mt-4">
+                      <h5 className="text-sm font-semibold mb-3">Support Timeline:</h5>
+                      <div className="space-y-3">
+                        {griefTimeline.filter(s => s.care_event_id === event.id).map((stage, index) => {
                           const isIgnored = stage.ignored === true;
                           return (
-                          <div key={stage.id} className={`relative ${isIgnored ? 'opacity-60' : ''}`}>
+                          <div key={stage.id} className={`flex items-center gap-3 p-2 bg-pink-50 rounded relative ${isIgnored ? 'opacity-60' : ''}`}>
                             {isIgnored && (
-                              <div className="absolute top-0 right-0 z-10">
-                                <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
+                              <div className="absolute top-1 right-1">
+                                <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
                               </div>
                             )}
-                            {index > 0 && <div className="absolute left-6 top-0 w-0.5 h-6 bg-primary-200 -mt-6"></div>}
-                            <div className="flex gap-4">
-                              <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                                stage.completed ? 'bg-green-500' : 'bg-primary-100'
-                              }`}>
-                                {stage.completed ? (
-                                  <CheckCircle2 className="w-6 h-6 text-white" />
-                                ) : (
-                                  <span className="text-sm font-bold text-primary-700">{index + 1}</span>
-                                )}
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="font-manrope font-semibold text-foreground">
-                                  {t(`grief_stages.${stage.stage}`)}
-                                </h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {formatDate(stage.scheduled_date, 'dd MMM yyyy')}
-                                </p>
-                                {stage.notes && (
-                                  <p className="text-sm text-muted-foreground mt-2 italic">
-                                    Notes: {stage.notes}
-                                  </p>
-                                )}
-                                {!stage.completed && !isIgnored && (
-                                  <div className="flex gap-2 mt-3">
-                                    <Button
-                                      size="sm"
-                                      onClick={() => completeGriefStage(stage.id)}
-                                      data-testid={`complete-grief-stage-${stage.id}`}
-                                    >
-                                      {t('mark_complete')}
-                                    </Button>
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button size="sm" variant="ghost">
-                                          <MoreVertical className="w-4 h-4" />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent align="end">
-                                        <DropdownMenuItem onClick={async () => {
-                                          try {
-                                            await axios.post(`${API}/grief-support/${stage.id}/ignore`);
-                                            toast.success('Grief stage ignored');
-                                            loadMemberData();
-                                          } catch (error) {
-                                            toast.error('Failed to ignore');
-                                          }
-                                        }}>
-                                          Ignore
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  </div>
-                                )}
-                                {stage.completed && (
-                                  <p className="text-xs text-green-600 mt-2">
-                                    Completed: {formatDate(stage.completed_at, 'dd MMM yyyy')}
-                                  </p>
-                                )}
-                              </div>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                              stage.completed ? 'bg-pink-500' : 'bg-pink-200'
+                            }`}>
+                              {stage.completed ? (
+                                <span className="text-white text-xs">✓</span>
+                              ) : (
+                                <span className="text-pink-700 text-xs font-bold">{index + 1}</span>
+                              )}
                             </div>
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">
+                                {t(`grief_stages.${stage.stage}`)}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {formatDate(stage.scheduled_date, 'dd MMM')}
+                              </p>
+                            </div>
+                            {!stage.completed && !isIgnored && (
+                              <div className="flex gap-1">
+                                <Button size="sm" variant="outline" onClick={async () => {
+                                  try {
+                                    await axios.post(`${API}/grief-support/${stage.id}/complete`);
+                                    toast.success(t('success_messages.stage_completed'));
+                                    // Update local state instead of full reload
+                                    setGriefTimeline(prev => prev.map(s => 
+                                      s.id === stage.id ? {...s, completed: true, completed_at: new Date().toISOString()} : s
+                                    ));
+                                  } catch (error) {
+                                    toast.error('Failed');
+                                  }
+                                }}>
+                                  Mark Complete
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button size="sm" variant="ghost">
+                                      <MoreVertical className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={async () => {
+                                      try {
+                                        await axios.post(`${API}/grief-support/${stage.id}/ignore`);
+                                        toast.success('Grief stage ignored');
+                                        // Update local state instead of full reload
+                                        setGriefTimeline(prev => prev.map(s => 
+                                          s.id === stage.id ? {...s, ignored: true} : s
+                                        ));
+                                      } catch (error) {
+                                        toast.error('Failed to ignore');
+                                      }
+                                    }}>
+                                      Ignore
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            )}
                           </div>
                           );
                         })}
                       </div>
                     </div>
-                    );
-                  })}
-                </div>
+                  </div>
+                ))
               )}
             </CardContent>
           </Card>
