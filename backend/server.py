@@ -1204,50 +1204,27 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         
         aid_due = []
         for schedule in aid_schedules:
-            # Calculate all due dates from start to today
-            start = datetime.strptime(schedule["start_date"], '%Y-%m-%d').date()
-            
-            # Skip if start date is in the future
-            if start > today:
+            # Use the pre-calculated next_occurrence field from schedule
+            next_occurrence = schedule.get("next_occurrence")
+            if not next_occurrence:
                 continue
             
-            # Check if any payment is due (including overdue)
-            if schedule["frequency"] == "weekly":
-                days_diff = (today - start).days
-                weeks_passed = days_diff // 7
-                if weeks_passed >= 0:
-                    # Calculate next due date
-                    next_due = start + timedelta(days=weeks_passed * 7)
-                    if next_due <= today:
-                        aid_due.append({
-                            **schedule,
-                            "next_due_date": next_due.isoformat(),
-                            "member_name": member_map.get(schedule["member_id"], {}).get("name"),
-                            "member_phone": member_map.get(schedule["member_id"], {}).get("phone"),
-                            "member_photo_url": member_map.get(schedule["member_id"], {}).get("photo_url")
-                        })
-            elif schedule["frequency"] == "monthly":
-                # Check if we've passed at least one monthly payment date
-                months_diff = (today.year - start.year) * 12 + (today.month - start.month)
-                if months_diff >= 0:
+            try:
+                next_date = datetime.strptime(next_occurrence, '%Y-%m-%d').date()
+                
+                # Check if payment is due (today or overdue)
+                if next_date <= today:
+                    days_overdue = (today - next_date).days
                     aid_due.append({
                         **schedule,
-                        "next_due_date": today.replace(day=start.day).isoformat() if today.day >= start.day else (today.replace(day=1) - timedelta(days=1)).replace(day=start.day).isoformat(),
+                        "next_due_date": next_occurrence,
+                        "days_overdue": days_overdue,
                         "member_name": member_map.get(schedule["member_id"], {}).get("name"),
                         "member_phone": member_map.get(schedule["member_id"], {}).get("phone"),
                         "member_photo_url": member_map.get(schedule["member_id"], {}).get("photo_url")
                     })
-            elif schedule["frequency"] == "annual":
-                # Check if at least one year has passed
-                years_diff = today.year - start.year
-                if years_diff >= 0:
-                    aid_due.append({
-                        **schedule,
-                        "next_due_date": start.replace(year=today.year).isoformat(),
-                        "member_name": member_map.get(schedule["member_id"], {}).get("name"),
-                        "member_phone": member_map.get(schedule["member_id"], {}).get("phone"),
-                        "member_photo_url": member_map.get(schedule["member_id"], {}).get("photo_url")
-                    })
+            except:
+                continue
         
         # AI suggestions (top 10 at-risk)
         suggestions_list = sorted(at_risk + disconnected, 
