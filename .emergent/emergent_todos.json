@@ -13,10 +13,10 @@
   },
   {
     "content": "Re-enable cached dashboard endpoint",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test dashboard with caching and verify performance",
-    "status": "pending"
+    "status": "completed"
   }
 ]
