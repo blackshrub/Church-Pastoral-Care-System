@@ -349,6 +349,18 @@ async def daily_reminder_job():
 def start_scheduler():
     """Start the scheduler with daily job at 8 AM Jakarta time"""
     try:
+        # Midnight job - Refresh dashboard cache when date changes
+        scheduler.add_job(
+            refresh_all_dashboard_caches,
+            'cron',
+            hour=0,
+            minute=0,
+            timezone='Asia/Jakarta',
+            id='midnight_cache_refresh',
+            name='Midnight Dashboard Cache Refresh',
+            replace_existing=True
+        )
+        
         # Run daily at 8 AM Jakarta time (Asia/Jakarta = UTC+7)
         scheduler.add_job(
             daily_reminder_job,
@@ -361,7 +373,9 @@ def start_scheduler():
         )
         
         scheduler.start()
-        logger.info("✅ Scheduler started - daily digest to pastoral team at 8 AM Jakarta time")
+        logger.info("✅ Scheduler started successfully")
+        logger.info("  - Midnight cache refresh: 00:00 Asia/Jakarta")
+        logger.info("  - Daily digest: 08:00 Asia/Jakarta")
     except Exception as e:
         logger.error(f"Error starting scheduler: {str(e)}")
 
