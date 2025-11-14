@@ -2762,6 +2762,140 @@ async def get_demographic_trends(current_user: dict = Depends(get_current_user))
         logger.error(f"Error analyzing demographic trends: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ==================== CONFIGURATION ENDPOINTS (For Mobile App) ====================
+
+@api_router.get("/config/aid-types")
+async def get_aid_types():
+    """Get all financial aid types"""
+    return [
+        {"value": "education", "label": "Education Support", "icon": "🎓"},
+        {"value": "medical", "label": "Medical Bills", "icon": "🏥"},
+        {"value": "emergency", "label": "Emergency Relief", "icon": "🚨"},
+        {"value": "housing", "label": "Housing Assistance", "icon": "🏠"},
+        {"value": "food", "label": "Food Support", "icon": "🍞"},
+        {"value": "funeral_costs", "label": "Funeral Costs", "icon": "⚱️"},
+        {"value": "other", "label": "Other", "icon": "📋"}
+    ]
+
+@api_router.get("/config/event-types")
+async def get_event_types():
+    """Get all care event types"""
+    return [
+        {"value": "birthday", "label": "Birthday", "icon": "🎂"},
+        {"value": "childbirth", "label": "Childbirth", "icon": "👶"},
+        {"value": "grief_loss", "label": "Grief/Loss", "icon": "💔"},
+        {"value": "new_house", "label": "New House", "icon": "🏠"},
+        {"value": "accident_illness", "label": "Accident/Illness", "icon": "🚑"},
+        {"value": "financial_aid", "label": "Financial Aid", "icon": "💰"},
+        {"value": "regular_contact", "label": "Regular Contact", "icon": "📞"}
+    ]
+
+@api_router.get("/config/relationship-types")
+async def get_relationship_types():
+    """Get grief relationship types"""
+    return [
+        {"value": "spouse", "label": "Spouse"},
+        {"value": "parent", "label": "Parent"},
+        {"value": "child", "label": "Child"},
+        {"value": "sibling", "label": "Sibling"},
+        {"value": "friend", "label": "Friend"},
+        {"value": "other", "label": "Other"}
+    ]
+
+@api_router.get("/config/user-roles")
+async def get_user_roles():
+    """Get user role types"""
+    return [
+        {"value": "full_admin", "label": "Full Administrator", "description": "Access all campuses"},
+        {"value": "campus_admin", "label": "Campus Administrator", "description": "Manage one campus"},
+        {"value": "pastor", "label": "Pastor", "description": "Pastoral care staff"}
+    ]
+
+@api_router.get("/config/engagement-statuses")
+async def get_engagement_statuses():
+    """Get engagement status types"""
+    return [
+        {"value": "active", "label": "Active", "color": "green", "description": "Recent contact"},
+        {"value": "at_risk", "label": "At Risk", "color": "amber", "description": "30-59 days no contact"},
+        {"value": "inactive", "label": "Inactive", "color": "red", "description": "60+ days no contact"}
+    ]
+
+@api_router.get("/config/weekdays")
+async def get_weekdays():
+    """Get weekday options"""
+    return [
+        {"value": "monday", "label": "Monday", "short": "Mon"},
+        {"value": "tuesday", "label": "Tuesday", "short": "Tue"},
+        {"value": "wednesday", "label": "Wednesday", "short": "Wed"},
+        {"value": "thursday", "label": "Thursday", "short": "Thu"},
+        {"value": "friday", "label": "Friday", "short": "Fri"},
+        {"value": "saturday", "label": "Saturday", "short": "Sat"},
+        {"value": "sunday", "label": "Sunday", "short": "Sun"}
+    ]
+
+@api_router.get("/config/months")
+async def get_months():
+    """Get month options"""
+    return [
+        {"value": 1, "label": "January", "short": "Jan"},
+        {"value": 2, "label": "February", "short": "Feb"},
+        {"value": 3, "label": "March", "short": "Mar"},
+        {"value": 4, "label": "April", "short": "Apr"},
+        {"value": 5, "label": "May", "short": "May"},
+        {"value": 6, "label": "June", "short": "Jun"},
+        {"value": 7, "label": "July", "short": "Jul"},
+        {"value": 8, "label": "August", "short": "Aug"},
+        {"value": 9, "label": "September", "short": "Sep"},
+        {"value": 10, "label": "October", "short": "Oct"},
+        {"value": 11, "label": "November", "short": "Nov"},
+        {"value": 12, "label": "December", "short": "Dec"}
+    ]
+
+@api_router.get("/config/frequency-types")
+async def get_frequency_types():
+    """Get financial aid frequency types"""
+    return [
+        {"value": "one_time", "label": "One-time Payment", "description": "Single payment (already given)"},
+        {"value": "weekly", "label": "Weekly Schedule", "description": "Future weekly payments"},
+        {"value": "monthly", "label": "Monthly Schedule", "description": "Future monthly payments"},
+        {"value": "annually", "label": "Annual Schedule", "description": "Future annual payments"}
+    ]
+
+@api_router.get("/config/membership-statuses")
+async def get_membership_statuses():
+    """Get membership status types"""
+    return [
+        {"value": "Member", "label": "Member", "active": True},
+        {"value": "Non Member", "label": "Non Member", "active": False},
+        {"value": "Visitor", "label": "Visitor", "active": False},
+        {"value": "Sympathizer", "label": "Sympathizer", "active": False},
+        {"value": "Member (Inactive)", "label": "Member (Inactive)", "active": False}
+    ]
+
+@api_router.get("/config/all")
+async def get_all_config():
+    """Get all configuration data for mobile app"""
+    try:
+        return {
+            "aid_types": await get_aid_types(),
+            "event_types": await get_event_types(),
+            "relationship_types": await get_relationship_types(),
+            "user_roles": await get_user_roles(),
+            "engagement_statuses": await get_engagement_statuses(),
+            "weekdays": await get_weekdays(),
+            "months": await get_months(),
+            "frequency_types": await get_frequency_types(),
+            "membership_statuses": await get_membership_statuses(),
+            "settings": {
+                "engagement": await get_engagement_settings(),
+                "grief_stages": await get_grief_stages(),
+                "accident_followup": await get_accident_followup()
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error getting all config: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ==================== SETTINGS CONFIGURATION ENDPOINTS ====================
 
 @api_router.get("/settings/engagement")
