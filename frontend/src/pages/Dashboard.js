@@ -694,25 +694,25 @@ export const Dashboard = () => {
         <div className="overflow-x-auto">
           <TabsList className="inline-flex w-max min-w-full">
             <TabsTrigger value="today" className="whitespace-nowrap">
-              <Bell className="w-4 h-4 mr-2" />Today ({birthdaysToday.length + todayTasks.length})
+              <Bell className="w-4 h-4 mr-2" />{t('today')} ({birthdaysToday.length + todayTasks.length})
             </TabsTrigger>
             <TabsTrigger value="birthday" className="whitespace-nowrap">
-              🎂 Birthdays ({overdueBirthdays.length})
+              🎂 {t('birthdays')} ({overdueBirthdays.length})
             </TabsTrigger>
             <TabsTrigger value="followup" className="whitespace-nowrap">
-              <Hospital className="w-4 h-4 mr-2" />Follow-up ({hospitalFollowUp.length + griefDue.length + accidentFollowUp.length})
+              <Hospital className="w-4 h-4 mr-2" />{t('followup')} ({griefDue.length + accidentFollowUp.length})
             </TabsTrigger>
             <TabsTrigger value="financial" className="whitespace-nowrap">
-              <DollarSign className="w-4 h-4 mr-2" />Aid ({financialAidDue.length})
+              <DollarSign className="w-4 h-4 mr-2" />{t('aid')} ({financialAidDue.length})
             </TabsTrigger>
             <TabsTrigger value="disconnected" className="whitespace-nowrap">
-              <Users className="w-4 h-4 mr-2" />Disconnected ({disconnectedMembers.length})
+              <Users className="w-4 h-4 mr-2" />{t('disconnected')} ({disconnectedMembers.length})
             </TabsTrigger>
             <TabsTrigger value="at-risk" className="whitespace-nowrap">
-              <AlertTriangle className="w-4 h-4 mr-2" />At Risk ({atRiskMembers.length})
+              <AlertTriangle className="w-4 h-4 mr-2" />{t('at_risk')} ({atRiskMembers.length})
             </TabsTrigger>
             <TabsTrigger value="upcoming" className="whitespace-nowrap">
-              <Heart className="w-4 h-4 mr-2" />Upcoming ({upcomingBirthdays.length})
+              <Heart className="w-4 h-4 mr-2" />{t('upcoming')} ({upcomingTasks.length})
             </TabsTrigger>
           </TabsList>
         </div>
