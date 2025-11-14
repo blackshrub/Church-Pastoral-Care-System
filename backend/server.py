@@ -270,6 +270,9 @@ class Member(BaseModel):
     last_contact_date: Optional[datetime] = None
     engagement_status: EngagementStatus = EngagementStatus.ACTIVE
     days_since_last_contact: int = 0
+    is_archived: bool = False
+    archived_at: Optional[datetime] = None
+    archived_reason: Optional[str] = None
     external_member_id: Optional[str] = None
     notes: Optional[str] = None
     birth_date: Optional[date] = None
