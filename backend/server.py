@@ -2061,7 +2061,7 @@ async def get_financial_aid_recipients():
         for data in recipients_data:
             member_id = data["_id"]
             if member_id:
-                member = await db.members.find_one({"member_id": member_id}, {"_id": 0, "name": 1, "photo_url": 1})
+                member = await db.members.find_one({"id": member_id}, {"_id": 0, "name": 1, "photo_url": 1})
                 member_name = "Unknown"
                 photo_url = None
                 
