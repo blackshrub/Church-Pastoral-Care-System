@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import LazyImage from '@/components/LazyImage';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
