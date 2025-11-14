@@ -860,8 +860,15 @@ export const MemberDetail = () => {
                     <div className="mt-4">
                       <h5 className="text-sm font-semibold mb-3">Follow-up Schedule:</h5>
                       <div className="space-y-3">
-                        {accidentTimeline.filter(t => t.care_event_id === event.id).map((stage, index) => (
-                          <div key={stage.id} className="flex items-center gap-3 p-2 bg-blue-50 rounded">
+                        {accidentTimeline.filter(t => t.care_event_id === event.id).map((stage, index) => {
+                          const isIgnored = stage.ignored === true;
+                          return (
+                          <div key={stage.id} className={`flex items-center gap-3 p-2 bg-blue-50 rounded relative ${isIgnored ? 'opacity-60' : ''}`}>
+                            {isIgnored && (
+                              <div className="absolute top-1 right-1">
+                                <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
+                              </div>
+                            )}
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                               stage.completed ? 'bg-blue-500' : 'bg-blue-200'
                             }`}>
@@ -880,21 +887,44 @@ export const MemberDetail = () => {
                                 {formatDate(stage.scheduled_date, 'dd MMM')}
                               </p>
                             </div>
-                            {!stage.completed && (
-                              <Button size="sm" variant="outline" onClick={async () => {
-                                try {
-                                  await axios.post(`${API}/accident-followup/${stage.id}/complete`);
-                                  toast.success('Follow-up completed');
-                                  loadMemberData();
-                                } catch (error) {
-                                  toast.error('Failed');
-                                }
-                              }}>
-                                Complete
-                              </Button>
+                            {!stage.completed && !isIgnored && (
+                              <div className="flex gap-1">
+                                <Button size="sm" variant="outline" onClick={async () => {
+                                  try {
+                                    await axios.post(`${API}/accident-followup/${stage.id}/complete`);
+                                    toast.success('Follow-up completed');
+                                    loadMemberData();
+                                  } catch (error) {
+                                    toast.error('Failed');
+                                  }
+                                }}>
+                                  Complete
+                                </Button>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button size="sm" variant="ghost">
+                                      <MoreVertical className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={async () => {
+                                      try {
+                                        await axios.post(`${API}/accident-followup/${stage.id}/ignore`);
+                                        toast.success('Follow-up ignored');
+                                        loadMemberData();
+                                      } catch (error) {
+                                        toast.error('Failed to ignore');
+                                      }
+                                    }}>
+                                      Ignore
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                             )}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                     
