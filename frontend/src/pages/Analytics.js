@@ -163,6 +163,7 @@ export const Analytics = () => {
         totalAid: totalFinancialAid,
         byType: Object.entries(financialByType).map(([type, data]) => ({ 
           name: type.replace('_', ' '),
+          value: data.total_amount,
           amount: data.total_amount,
           count: data.count,
           avg: avgAidByType[type]
@@ -178,6 +179,7 @@ export const Analytics = () => {
       setTrendsData({
         age_groups: Object.entries(ageGroups).map(([name, count]) => ({ 
           name, 
+          value: count,
           count,
           care_events: events.filter(e => {
             const member = members.find(m => m.id === e.member_id);
@@ -192,7 +194,9 @@ export const Analytics = () => {
           }).length
         })),
         membership_trends: Object.entries(membershipData).map(([status, count]) => ({ 
+          name: status,
           status, 
+          value: count,
           count,
           avg_engagement: members.filter(m => m.membership_status === status).reduce((sum, m) => {
             const daysSinceContact = m.days_since_contact || 0;
