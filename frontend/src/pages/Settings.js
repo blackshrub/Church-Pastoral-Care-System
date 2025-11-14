@@ -19,6 +19,10 @@ export const Settings = () => {
   const [inactiveDays, setInactiveDays] = useState(90);
   const [campusCount, setCampusCount] = useState(0);
   const [campusTimezone, setCampusTimezone] = useState('Asia/Jakarta');
+  const [writeoffBirthday, setWriteoffBirthday] = useState(7);
+  const [writeoffFinancialAid, setWriteoffFinancialAid] = useState(0);
+  const [writeoffAccident, setWriteoffAccident] = useState(14);
+  const [writeoffGrief, setWriteoffGrief] = useState(14);
   const [griefStages, setGriefStages] = useState([
     { stage: '1_week', days: 7, name: '1 Week After' },
     { stage: '2_weeks', days: 14, name: '2 Weeks After' },
