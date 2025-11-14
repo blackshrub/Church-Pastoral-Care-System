@@ -15,11 +15,11 @@ export const Layout = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const mainNavigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Members', href: '/members', icon: Users },
-    { name: 'Financial Aid', href: '/financial-aid', icon: DollarSign },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-    { name: 'Calendar', href: '/calendar', icon: CalIcon },
+    { name: t('dashboard'), href: '/dashboard', icon: LayoutDashboard },
+    { name: t('members'), href: '/members', icon: Users },
+    { name: t('financial_aid'), href: '/financial-aid', icon: DollarSign },
+    { name: t('analytics'), href: '/analytics', icon: BarChart3 },
+    { name: t('calendar'), href: '/calendar', icon: CalIcon },
   ];
   
   const isActive = (href) => location.pathname === href || (href === '/dashboard' && location.pathname === '/');
