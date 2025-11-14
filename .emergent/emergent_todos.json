@@ -1,18 +1,18 @@
 [
   {
     "content": "Fix ignored grief stages not showing greyed out styling",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Fix mark_complete button text (should be 'Mark Complete')",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update grief UI to match accident/illness clean design",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Replace loadMemberData() with local state updates to avoid tab switching",
-    "status": "pending"
+    "status": "completed"
   }
 ]
