@@ -777,10 +777,11 @@ export const Dashboard = () => {
         </div>
         
         <TabsContent value="today" className="space-y-4">
-          {birthdaysToday.length === 0 ? (
+          {birthdaysToday.length === 0 && todayTasks.length === 0 ? (
             <Card><CardContent className="p-6 text-center">No urgent tasks for today! 🎉</CardContent></Card>
           ) : (
             <>
+              {/* Birthdays Today */}
               {birthdaysToday.length > 0 && (
                 <Card className="card-border-left-amber">
                   <CardHeader>
@@ -817,6 +818,64 @@ export const Dashboard = () => {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {/* All Other Tasks Due Today */}
+              {todayTasks.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Other Tasks Due Today ({todayTasks.length})</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {todayTasks.map((task, index) => {
+                        const typeConfig = {
+                          grief_support: { icon: '💔', color: 'pink', label: 'Grief Support' },
+                          accident_followup: { icon: '🏥', color: 'blue', label: 'Accident Follow-up' },
+                          financial_aid: { icon: '💰', color: 'green', label: 'Financial Aid' }
+                        };
+                        const config = typeConfig[task.type] || { icon: '📋', color: 'gray', label: 'Task' };
+                        
+                        return (
+                          <div key={index} className={`p-4 bg-${config.color}-50 rounded-lg border border-${config.color}-200 flex justify-between items-center`}>
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="text-2xl">{config.icon}</div>
+                              <div className="flex-1">
+                                <MemberNameWithAvatar 
+                                  member={{name: task.member_name, photo_url: task.member_photo_url}} 
+                                  memberId={task.member_id} 
+                                />
+                                <p className="text-sm text-muted-foreground">{config.label}: {task.details}</p>
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" className={`bg-${config.color}-500 hover:bg-${config.color}-600 text-white`} asChild>
+                                <a href={formatPhoneForWhatsApp(task.member_phone)} target="_blank" rel="noopener noreferrer">
+                                  {t('contact')}
+                                </a>
+                              </Button>
+                              <Button size="sm" variant="outline" onClick={async () => {
+                                try {
+                                  if (task.type === 'grief_support') {
+                                    await markGriefStageComplete(task.data.id, loadReminders);
+                                  } else if (task.type === 'accident_followup') {
+                                    await axios.post(`${API}/accident-followup/${task.data.id}/complete`);
+                                    toast.success('Follow-up marked complete');
+                                    loadReminders();
+                                  }
+                                } catch (error) {
+                                  toast.error('Failed to mark as completed');
+                                }
+                              }}>
+                                {t('mark_completed')}
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </CardContent>
                 </Card>
