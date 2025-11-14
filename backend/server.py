@@ -2019,6 +2019,42 @@ async def get_financial_aid_summary(
         logger.error(f"Error getting financial aid summary: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/financial-aid/recipients")
+async def get_financial_aid_recipients():
+    """Get list of all financial aid recipients with totals"""
+    try:
+        # Aggregate financial aid by member
+        pipeline = [
+            {"$match": {"event_type": EventType.FINANCIAL_AID}},
+            {"$group": {
+                "_id": "$member_id",
+                "total_amount": {"$sum": "$aid_amount"},
+                "aid_count": {"$sum": 1}
+            }},
+            {"$sort": {"total_amount": -1}}
+        ]
+        
+        recipients_data = await db.care_events.aggregate(pipeline).to_list(1000)
+        
+        # Fetch member names
+        recipients = []
+        for data in recipients_data:
+            member_id = data["_id"]
+            if member_id:
+                member = await db.members.find_one({"member_id": member_id}, {"_id": 0, "name": 1})
+                recipients.append({
+                    "member_id": member_id,
+                    "member_name": member.get("name", "Unknown") if member else "Unknown",
+                    "total_amount": data["total_amount"],
+                    "aid_count": data["aid_count"]
+                })
+        
+        return recipients
+    except Exception as e:
+        logger.error(f"Error getting financial aid recipients: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.get("/financial-aid/member/{member_id}")
 async def get_member_financial_aid(member_id: str):
     """Get all financial aid given to a member"""
