@@ -1,18 +1,14 @@
 [
   {
-    "content": "Configure webpack-bundle-analyzer for build analysis",
-    "status": "completed"
+    "content": "Run bundle analyzer to identify optimization opportunities",
+    "status": "in_progress"
   },
   {
-    "content": "Implement production build optimizations",
-    "status": "completed"
+    "content": "Replace recharts with lightweight Chart.js",
+    "status": "pending"
   },
   {
-    "content": "Add compression and caching strategies",
-    "status": "completed"
-  },
-  {
-    "content": "Optimize image loading and reduce initial bundle",
-    "status": "completed"
+    "content": "Implement date-fns tree-shaking",
+    "status": "pending"
   }
 ]
