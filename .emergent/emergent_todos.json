@@ -1,14 +1,14 @@
 [
   {
     "content": "Update Financial Aid page to use translation keys",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Update Analytics page to use translation keys",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test translations on both pages",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
