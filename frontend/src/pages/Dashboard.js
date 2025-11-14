@@ -508,7 +508,6 @@ export const Dashboard = () => {
                     <Select value={quickEvent.event_type} onValueChange={(v) => setQuickEvent({...quickEvent, event_type: v})}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="birthday">🎂 Birthday</SelectItem>
                         <SelectItem value="childbirth">👶 Childbirth</SelectItem>
                         <SelectItem value="grief_loss">💔 Grief/Loss</SelectItem>
                         <SelectItem value="new_house">🏠 New House</SelectItem>
