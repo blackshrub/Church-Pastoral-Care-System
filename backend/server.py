@@ -3422,6 +3422,45 @@ async def update_engagement_settings(settings: dict, current_admin: dict = Depen
         logger.error(f"Error updating engagement settings: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/settings/overdue_writeoff")
+async def get_overdue_writeoff_settings(user: dict = Depends(get_current_user)):
+    """Get overdue write-off threshold settings"""
+    try:
+        settings = await db.settings.find_one({"key": "overdue_writeoff"}, {"_id": 0})
+        return settings if settings else {
+            "key": "overdue_writeoff", 
+            "data": {
+                "birthday": 7,
+                "financial_aid": 0,
+                "accident_illness": 14,
+                "grief_support": 14
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/settings/overdue_writeoff")
+async def update_overdue_writeoff_settings(settings_data: dict, user: dict = Depends(get_current_user)):
+    """Update overdue write-off threshold settings"""
+    try:
+        if user.get("role") not in [UserRole.FULL_ADMIN, UserRole.CAMPUS_ADMIN]:
+            raise HTTPException(status_code=403, detail="Only admins can update settings")
+        
+        await db.settings.update_one(
+            {"key": "overdue_writeoff"},
+            {"$set": {
+                "key": "overdue_writeoff",
+                "data": settings_data.get("data", {}),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
+        return {"success": True, "message": "Write-off settings updated"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/settings/grief-stages")
 async def get_grief_stages():
     """Get grief support stage configuration"""
