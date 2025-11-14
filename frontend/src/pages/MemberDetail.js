@@ -205,7 +205,7 @@ export const MemberDetail = () => {
   
   const handleCompleteBirthday = async (eventId) => {
     try {
-      await axios.patch(`${API}/care-events/${eventId}/complete`);
+      await axios.post(`${API}/care-events/${eventId}/complete`);
       toast.success('Birthday marked as completed!');
       loadMemberData();
     } catch (error) {
