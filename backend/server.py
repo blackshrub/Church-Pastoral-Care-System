@@ -2578,6 +2578,32 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
 
 # ==================== FINANCIAL AID ENDPOINTS ====================
 
+@api_router.post("/accident-followup/{stage_id}/ignore")
+async def ignore_accident_stage(stage_id: str, user: dict = Depends(get_current_user)):
+    """Mark an accident followup stage as ignored/dismissed"""
+    try:
+        stage = await db.accident_followup.find_one({"id": stage_id}, {"_id": 0})
+        if not stage:
+            raise HTTPException(status_code=404, detail="Accident followup not found")
+        
+        await db.accident_followup.update_one(
+            {"id": stage_id},
+            {"$set": {
+                "ignored": True,
+                "ignored_at": datetime.now(timezone.utc).isoformat(),
+                "ignored_by": user.get("id")
+            }}
+        )
+        
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(stage["campus_id"])
+        
+        return {"success": True, "message": "Accident followup ignored"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/financial-aid/summary")
 async def get_financial_aid_summary(
     start_date: Optional[str] = None,
