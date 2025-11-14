@@ -350,9 +350,10 @@ export const MembersList = () => {
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  {searchLoading && (
-                    <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-teal-500 animate-spin" />
+                  {searchLoading ? (
+                    <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-teal-500 animate-spin" />
+                  ) : (
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   )}
                   <Input
                     placeholder="Type name/phone (min 1 char) - Press Enter to search"
@@ -364,7 +365,7 @@ export const MembersList = () => {
                       }
                     }}
                     onKeyDown={handleSearchKeyDown}
-                    className="pl-10 pr-10"
+                    className="pl-10"
                     data-testid="search-members-input"
                   />
                 </div>
