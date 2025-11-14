@@ -40,8 +40,31 @@ export const Settings = () => {
     try {
       const response = await axios.get(`${API}/campuses`);
       setCampusCount(response.data.length);
+      
+      // Load timezone from user's campus
+      if (user?.campus_id) {
+        const campusRes = await axios.get(`${API}/campuses/${user.campus_id}`);
+        setCampusTimezone(campusRes.data.timezone || 'Asia/Jakarta');
+      }
     } catch (error) {
-      console.error('Error loading campus count');
+      console.error('Error loading campus data');
+    }
+  };
+  
+  const saveTimezoneSettings = async () => {
+    try {
+      if (!user?.campus_id) {
+        toast.error('No campus assigned to user');
+        return;
+      }
+      
+      await axios.put(`${API}/campuses/${user.campus_id}`, {
+        timezone: campusTimezone
+      });
+      toast.success('Timezone settings saved! All date/time operations will use this timezone.');
+    } catch (error) {
+      toast.error('Failed to save timezone settings');
+      console.error('Error saving timezone:', error);
     }
   };
   
