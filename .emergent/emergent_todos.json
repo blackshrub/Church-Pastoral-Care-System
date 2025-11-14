@@ -1,22 +1,14 @@
 [
   {
-    "content": "Update login page to show campus selector for full admins",
-    "status": "completed"
+    "content": "Debug and fix pre-calculation logic for all dashboard tabs",
+    "status": "in_progress"
   },
   {
-    "content": "Update login endpoint to accept selected campus_id",
-    "status": "completed"
+    "content": "Fix grief support not showing in follow-up tab",
+    "status": "pending"
   },
   {
-    "content": "Store selected campus in user token/session",
-    "status": "completed"
-  },
-  {
-    "content": "Re-enable cached dashboard endpoint",
-    "status": "completed"
-  },
-  {
-    "content": "Test dashboard with caching and verify performance",
-    "status": "completed"
+    "content": "Verify all tab data accuracy",
+    "status": "pending"
   }
 ]
