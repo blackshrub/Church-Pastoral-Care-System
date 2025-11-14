@@ -79,7 +79,7 @@ export const MembersList = () => {
   useEffect(() => {
     loadMembers(currentPage);
     loadFamilyGroups();
-  }, [currentPage, debouncedSearch, filterStatus]);
+  }, [currentPage, debouncedSearch, filterStatus, showArchived]);
 
   useEffect(() => {
     // Reset to page 1 when search/filter changes
