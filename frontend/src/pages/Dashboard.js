@@ -117,6 +117,7 @@ export const Dashboard = () => {
   const [griefDue, setGriefDue] = useState([]);
   const [griefToday, setGriefToday] = useState([]);
   const [hospitalFollowUp, setHospitalFollowUp] = useState([]);
+  const [accidentFollowUp, setAccidentFollowUp] = useState([]);
   const [atRiskMembers, setAtRiskMembers] = useState([]);
   const [disconnectedMembers, setDisconnectedMembers] = useState([]);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
