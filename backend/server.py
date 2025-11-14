@@ -1386,8 +1386,14 @@ async def delete_care_event(event_id: str):
 
 @api_router.post("/care-events/{event_id}/complete")
 async def complete_care_event(event_id: str):
-    """Mark care event as completed"""
+    """Mark care event as completed and update member engagement"""
     try:
+        # Get the care event first
+        event = await db.care_events.find_one({"id": event_id}, {"_id": 0})
+        if not event:
+            raise HTTPException(status_code=404, detail="Care event not found")
+        
+        # Mark event as completed
         result = await db.care_events.update_one(
             {"id": event_id},
             {"$set": {
@@ -1399,6 +1405,18 @@ async def complete_care_event(event_id: str):
         
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Care event not found")
+        
+        # Update member engagement status (since this event now counts as contact)
+        now = datetime.now(timezone.utc)
+        await db.members.update_one(
+            {"id": event["member_id"]},
+            {"$set": {
+                "last_contact_date": now.isoformat(),
+                "days_since_last_contact": 0,
+                "engagement_status": "active",
+                "updated_at": now.isoformat()
+            }}
+        )
         
         return {"success": True, "message": "Care event marked as completed"}
     except HTTPException:
