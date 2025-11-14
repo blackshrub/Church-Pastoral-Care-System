@@ -1859,6 +1859,9 @@ async def complete_grief_stage(stage_id: str, notes: Optional[str] = None):
                 {"id": stage["member_id"]},
                 {"$set": {"last_contact_date": datetime.now(timezone.utc).isoformat()}}
             )
+            
+            # Invalidate dashboard cache
+            await invalidate_dashboard_cache(stage["campus_id"])
         
         return {"success": True, "message": "Grief stage marked as completed"}
     except HTTPException:
