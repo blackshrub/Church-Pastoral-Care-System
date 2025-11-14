@@ -185,6 +185,8 @@
     "accident_illness": "Dukungan Medis",
     "regular_contact": "Kontak Rutin"
   },
+  
+  "relationship_options": {
     "parent": "Orang Tua",
     "child": "Anak",
     "sibling": "Saudara Kandung",
