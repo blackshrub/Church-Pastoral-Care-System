@@ -1376,32 +1376,6 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                     "data": stage
                 })
         
-        # Upcoming accident follow-ups (1-7 days)
-        for followup in accident_followups:
-            sched_date = datetime.strptime(followup["scheduled_date"], '%Y-%m-%d').date()
-            if sched_date == today:
-                today_tasks.append({
-                    "type": "accident_followup",
-                    "date": followup["scheduled_date"],
-                    "member_id": followup["member_id"],
-                    "member_name": member_map.get(followup["member_id"], {}).get("name"),
-                    "member_phone": member_map.get(followup["member_id"], {}).get("phone"),
-                    "member_photo_url": member_map.get(followup["member_id"], {}).get("photo_url"),
-                    "details": f"{followup['stage'].replace('_', ' ')}",
-                    "data": followup
-                })
-            elif tomorrow <= sched_date <= week_ahead:
-                upcoming_tasks.append({
-                    "type": "accident_followup",
-                    "date": followup["scheduled_date"],
-                    "member_id": followup["member_id"],
-                    "member_name": member_map.get(followup["member_id"], {}).get("name"),
-                    "member_phone": member_map.get(followup["member_id"], {}).get("phone"),
-                    "member_photo_url": member_map.get(followup["member_id"], {}).get("photo_url"),
-                    "details": f"{followup['stage'].replace('_', ' ')}",
-                    "data": followup
-                })
-        
         # Sort all upcoming tasks by date
         upcoming_tasks.sort(key=lambda x: x["date"])
         
