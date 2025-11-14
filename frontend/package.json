@@ -63,6 +63,7 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
+    "build:analyze": "ANALYZE=true craco build",
     "test": "craco test"
   },
   "browserslist": {
