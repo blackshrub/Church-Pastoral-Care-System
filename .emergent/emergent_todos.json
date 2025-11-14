@@ -5,11 +5,15 @@
   },
   {
     "content": "Update Dashboard to use translation keys for all text",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add remaining Dashboard translation keys and text",
-    "status": "pending"
+    "status": "completed"
+  },
+  {
+    "content": "Test translations on Dashboard",
+    "status": "in_progress"
   },
   {
     "content": "Update other pages to use translation keys",
