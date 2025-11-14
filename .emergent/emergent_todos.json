@@ -1,10 +1,10 @@
 [
   {
-    "content": "Fix language toggle not updating immediately",
-    "status": "completed"
+    "content": "Fix payment_date field not showing initially for one-time payments",
+    "status": "in_progress"
   },
   {
-    "content": "Verify care event forms have all required fields",
-    "status": "completed"
+    "content": "Add missing Indonesian translations",
+    "status": "pending"
   }
 ]
