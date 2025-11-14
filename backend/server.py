@@ -1259,6 +1259,81 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                                  key=lambda x: x.get("days_since_last_contact", 0), 
                                  reverse=True)[:10]
         
+        # UPCOMING TASKS (1-7 days ahead, excluding today)
+        upcoming_tasks = []
+        tomorrow = today + timedelta(days=1)
+        week_ahead = today + timedelta(days=7)
+        
+        # Upcoming grief stages (1-7 days)
+        for stage in grief_stages:
+            sched_date = datetime.strptime(stage["scheduled_date"], '%Y-%m-%d').date()
+            if tomorrow <= sched_date <= week_ahead:
+                upcoming_tasks.append({
+                    "type": "grief_support",
+                    "date": stage["scheduled_date"],
+                    "member_id": stage["member_id"],
+                    "member_name": member_map.get(stage["member_id"], {}).get("name"),
+                    "member_phone": member_map.get(stage["member_id"], {}).get("phone"),
+                    "member_photo_url": member_map.get(stage["member_id"], {}).get("photo_url"),
+                    "details": f"{stage['stage'].replace('_', ' ')} stage",
+                    "data": stage
+                })
+        
+        # Upcoming accident follow-ups (1-7 days)
+        for followup in accident_followups:
+            sched_date = datetime.strptime(followup["scheduled_date"], '%Y-%m-%d').date()
+            if tomorrow <= sched_date <= week_ahead:
+                upcoming_tasks.append({
+                    "type": "accident_followup",
+                    "date": followup["scheduled_date"],
+                    "member_id": followup["member_id"],
+                    "member_name": member_map.get(followup["member_id"], {}).get("name"),
+                    "member_phone": member_map.get(followup["member_id"], {}).get("phone"),
+                    "member_photo_url": member_map.get(followup["member_id"], {}).get("photo_url"),
+                    "details": f"{followup['stage'].replace('_', ' ')}",
+                    "data": followup
+                })
+        
+        # Upcoming financial aid (1-7 days) - calculate next payment dates
+        for schedule in aid_schedules:
+            start = datetime.strptime(schedule["start_date"], '%Y-%m-%d').date()
+            next_payment = None
+            
+            if schedule["frequency"] == "weekly":
+                # Find next weekly payment
+                days_since = (today - start).days
+                next_week = start + timedelta(days=((days_since // 7) + 1) * 7)
+                if tomorrow <= next_week <= week_ahead:
+                    next_payment = next_week
+            elif schedule["frequency"] == "monthly":
+                # Check if payment date is in next 7 days
+                try:
+                    this_month_payment = today.replace(day=start.day)
+                    if tomorrow <= this_month_payment <= week_ahead:
+                        next_payment = this_month_payment
+                    else:
+                        # Check next month
+                        next_month = (today.replace(day=1) + timedelta(days=32)).replace(day=start.day)
+                        if tomorrow <= next_month <= week_ahead:
+                            next_payment = next_month
+                except:
+                    pass
+            
+            if next_payment:
+                upcoming_tasks.append({
+                    "type": "financial_aid",
+                    "date": next_payment.isoformat(),
+                    "member_id": schedule["member_id"],
+                    "member_name": member_map.get(schedule["member_id"], {}).get("name"),
+                    "member_phone": member_map.get(schedule["member_id"], {}).get("phone"),
+                    "member_photo_url": member_map.get(schedule["member_id"], {}).get("photo_url"),
+                    "details": f"{schedule['frequency'].title()} - Rp {schedule['aid_amount']:,}",
+                    "data": schedule
+                })
+        
+        # Sort all upcoming tasks by date
+        upcoming_tasks.sort(key=lambda x: x["date"])
+        
         return {
             "birthdays_today": birthdays_today,
             "upcoming_birthdays": upcoming_birthdays,
