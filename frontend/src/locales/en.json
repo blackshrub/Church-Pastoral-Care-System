@@ -185,6 +185,8 @@
     "accident_illness": "Medical Support",
     "regular_contact": "Regular Contact"
   },
+  
+  "relationship_options": {
     "parent": "Parent",
     "child": "Child",
     "sibling": "Sibling",
