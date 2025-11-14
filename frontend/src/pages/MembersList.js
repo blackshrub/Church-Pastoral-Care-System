@@ -111,12 +111,14 @@ export const MembersList = () => {
       
       const response = await axios.get(`${API}/members?${params.toString()}`);
       setMembers(response.data || []);
+      setSearchLoading(false); // Clear search loading
       
       // Calculate total pages
       const totalMembers = 805;
       setTotalPages(Math.ceil(totalMembers / pageSize));
       setCurrentPage(page);
     } catch (error) {
+      setSearchLoading(false); // Clear loading on error too
       toast.error(t('error_messages.failed_to_save'));
       console.error('Error loading members:', error);
     } finally {
