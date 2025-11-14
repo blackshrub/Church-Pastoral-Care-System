@@ -1009,6 +1009,9 @@ async def list_members(
     try:
         query = get_campus_filter(current_user)
         
+        # Exclude archived members by default
+        query["is_archived"] = {"$ne": True}
+        
         if engagement_status:
             query["engagement_status"] = engagement_status
         
