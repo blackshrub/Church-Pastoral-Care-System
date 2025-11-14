@@ -182,6 +182,10 @@
   "recipient": "Penerima",
   "given_on": "Diberikan pada",
   "by_type": "Berdasarkan Jenis",
+  "aid_types_label": "Jenis Bantuan",
+  "aid_event": "kejadian bantuan",
+  "provided": "diberikan",
+  "assistance_provided": "bantuan diberikan",
   
   "_comment_analytics_page": "Analytics Page",
   "pastoral_care_analytics": "Analitik Perawatan Pastoral",
