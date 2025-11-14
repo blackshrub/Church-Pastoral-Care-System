@@ -1081,7 +1081,9 @@ export const Dashboard = () => {
                 <p className="text-center text-muted-foreground py-6">No birthdays coming up</p>
               ) : (
                 <div className="space-y-2">
-                  {upcomingBirthdays.map(event => (
+                  {upcomingBirthdays
+                    .sort((a, b) => new Date(a.event_date) - new Date(b.event_date))
+                    .map(event => (
                     <div key={event.id} className="p-3 bg-purple-50 rounded flex justify-between items-center">
                       <div className="flex-1">
                         <MemberNameWithAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} memberId={event.member_id} />
