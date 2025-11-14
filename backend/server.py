@@ -520,8 +520,8 @@ async def calculate_engagement_status_async(last_contact: Optional[datetime]) ->
     else:
         return EngagementStatus.DISCONNECTED, days_since
 
-def calculate_engagement_status(last_contact: Optional[datetime]) -> tuple[EngagementStatus, int]:
-    """Calculate engagement status and days since last contact"""
+def calculate_engagement_status(last_contact: Optional[datetime], at_risk_days: int = 60, disconnected_days: int = 90) -> tuple[EngagementStatus, int]:
+    """Calculate engagement status and days since last contact (with configurable thresholds)"""
     if not last_contact:
         return EngagementStatus.DISCONNECTED, 999
     
@@ -539,9 +539,9 @@ def calculate_engagement_status(last_contact: Optional[datetime]) -> tuple[Engag
     now = datetime.now(timezone.utc)
     days_since = (now - last_contact).days
     
-    if days_since < 30:
+    if days_since < at_risk_days:
         return EngagementStatus.ACTIVE, days_since
-    elif days_since < 60:
+    elif days_since < disconnected_days:
         return EngagementStatus.AT_RISK, days_since
     else:
         return EngagementStatus.DISCONNECTED, days_since
