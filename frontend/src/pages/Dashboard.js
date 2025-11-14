@@ -868,7 +868,8 @@ export const Dashboard = () => {
                               try {
                                 await axios.post(`${API}/financial-aid-schedules/${schedule.id}/mark-distributed`);
                                 toast.success('Payment distributed! Schedule advanced to next occurrence.');
-                                loadReminders();
+                                // Update local state
+                                setFinancialAidDue(prev => prev.filter(s => s.id !== schedule.id));
                               } catch (error) {
                                 toast.error('Failed to mark as distributed');
                               }
