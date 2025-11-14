@@ -350,7 +350,7 @@ export const Analytics = () => {
             </Card>
             
             <Card>
-              <CardHeader><CardTitle>Engagement by Membership Status</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('engagement_by_membership')}</CardTitle></CardHeader>
               <CardContent>
                 <BarChart data={trendsData.membership_trends || []} color={COLORS.primary[2]} height={300} />
               </CardContent>
