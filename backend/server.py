@@ -1184,9 +1184,22 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         
         for followup in accident_followups:
             sched_date = datetime.strptime(followup["scheduled_date"], '%Y-%m-%d').date()
-            if sched_date <= today:
-                days_overdue = (today - sched_date).days
-                # Only include if within writeoff threshold (0 = never writeoff)
+            days_overdue = (today - sched_date).days
+            
+            if sched_date == today:
+                # Due TODAY - add to today_tasks
+                today_tasks.append({
+                    "type": "accident_followup",
+                    "date": followup["scheduled_date"],
+                    "member_id": followup["member_id"],
+                    "member_name": member_map.get(followup["member_id"], {}).get("name"),
+                    "member_phone": member_map.get(followup["member_id"], {}).get("phone"),
+                    "member_photo_url": member_map.get(followup["member_id"], {}).get("photo_url"),
+                    "details": f"{followup['stage'].replace('_', ' ')}",
+                    "data": followup
+                })
+            elif sched_date < today:
+                # OVERDUE - check writeoff threshold for Follow-up tab
                 if accident_writeoff == 0 or days_overdue <= accident_writeoff:
                     accident_today.append({
                         **followup,
