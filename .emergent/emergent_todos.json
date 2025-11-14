@@ -1,18 +1,18 @@
 [
   {
     "content": "Remove AI pastoral recommendation widget from Dashboard",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Update all Dashboard tab actions to use local state (no refresh)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update care event form submissions to use local state",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test all actions maintain current tab and update locally",
-    "status": "pending"
+    "status": "completed"
   }
 ]
