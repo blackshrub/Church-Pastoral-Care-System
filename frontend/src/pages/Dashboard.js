@@ -1159,7 +1159,7 @@ export const Dashboard = () => {
             </Card>
           )}
           
-          {hospitalFollowUp.length === 0 && griefDue.length === 0 && (
+          {hospitalFollowUp.length === 0 && griefDue.length === 0 && accidentFollowUp.length === 0 && (
             <Card><CardContent className="p-6 text-center">No follow-ups needed today</CardContent></Card>
           )}
         </TabsContent>
