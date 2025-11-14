@@ -866,6 +866,7 @@ export const Dashboard = () => {
                               }}>
                                 {t('mark_completed')}
                               </Button>
+                              )}
                             </div>
                           </div>
                         );
