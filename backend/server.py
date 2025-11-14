@@ -2187,6 +2187,32 @@ async def complete_grief_stage(stage_id: str, notes: Optional[str] = None):
         logger.error(f"Error completing grief stage: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/grief-support/{stage_id}/ignore")
+async def ignore_grief_stage(stage_id: str, user: dict = Depends(get_current_user)):
+    """Mark a grief support stage as ignored/dismissed"""
+    try:
+        stage = await db.grief_support.find_one({"id": stage_id}, {"_id": 0})
+        if not stage:
+            raise HTTPException(status_code=404, detail="Grief stage not found")
+        
+        await db.grief_support.update_one(
+            {"id": stage_id},
+            {"$set": {
+                "ignored": True,
+                "ignored_at": datetime.now(timezone.utc).isoformat(),
+                "ignored_by": user.get("id")
+            }}
+        )
+        
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(stage["campus_id"])
+        
+        return {"success": True, "message": "Grief stage ignored"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/grief-support/{stage_id}/send-reminder")
 async def send_grief_reminder(stage_id: str):
     """Send WhatsApp reminder for grief stage"""
