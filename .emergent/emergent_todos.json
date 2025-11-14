@@ -1,15 +1,15 @@
 [
   {
     "content": "Add overdue_writeoff settings to backend model and database",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add Overdue Write-off configuration UI in Settings page",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update dashboard calculation to respect writeoff thresholds",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Add three-dots menu with Ignore button to overdue cards",
