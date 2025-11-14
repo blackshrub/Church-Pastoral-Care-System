@@ -2354,25 +2354,34 @@ async def complete_accident_stage(stage_id: str, notes: Optional[str] = None):
 async def create_aid_schedule(schedule: dict, current_user: dict = Depends(get_current_user)):
     """Create a financial aid schedule"""
     try:
-        # Calculate next occurrence based on frequency - must be TODAY or FUTURE
-        today = date.today()
+        # Calculate next occurrence based on frequency
         start_date = date.fromisoformat(schedule['start_date']) if isinstance(schedule['start_date'], str) else schedule['start_date']
-        next_occurrence = today  # Start from today
+        next_occurrence = start_date
         
         if schedule['frequency'] == 'weekly' and schedule.get('day_of_week'):
-            # Find next occurrence of the specified weekday from today onward
+            # Find first occurrence of the specified weekday from start_date onward
             days_ahead = {'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3, 'friday': 4, 'saturday': 5, 'sunday': 6}
             target_weekday = days_ahead[schedule['day_of_week']]
-            current_weekday = today.weekday()
+            start_weekday = start_date.weekday()
             
-            if target_weekday >= current_weekday:
-                # This week
-                days_to_add = target_weekday - current_weekday
+            # Find first occurrence (could be start_date itself or next occurrence of that weekday)
+            if target_weekday >= start_weekday:
+                # Same week as start
+                days_to_add = target_weekday - start_weekday
             else:
                 # Next week
-                days_to_add = 7 - current_weekday + target_weekday
+                days_to_add = 7 - start_weekday + target_weekday
             
-            next_occurrence = today + timedelta(days=days_to_add)
+            first_occurrence = start_date + timedelta(days=days_to_add)
+            
+            # Now find next occurrence from first_occurrence
+            today = date.today()
+            if first_occurrence >= today:
+                next_occurrence = first_occurrence
+            else:
+                # Calculate how many weeks have passed since first occurrence
+                weeks_passed = ((today - first_occurrence).days // 7) + 1
+                next_occurrence = first_occurrence + timedelta(days=weeks_passed * 7)
             
         elif schedule['frequency'] == 'monthly' and schedule.get('day_of_month'):
             # Find next occurrence of this day of month from today onward
