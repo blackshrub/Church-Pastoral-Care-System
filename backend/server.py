@@ -490,6 +490,31 @@ async def get_engagement_settings():
     except:
         return {"atRiskDays": 60, "disconnectedDays": 90}
 
+async def get_writeoff_settings():
+    """Get overdue write-off threshold settings from database"""
+    try:
+        settings = await db.settings.find_one({"key": "overdue_writeoff"}, {"_id": 0})
+        if settings:
+            return settings.get("data", {
+                "birthday": 7,
+                "financial_aid": 0,
+                "accident_illness": 14,
+                "grief_support": 14
+            })
+        return {
+            "birthday": 7,
+            "financial_aid": 0,
+            "accident_illness": 14,
+            "grief_support": 14
+        }
+    except:
+        return {
+            "birthday": 7,
+            "financial_aid": 0,
+            "accident_illness": 14,
+            "grief_support": 14
+        }
+
 async def calculate_engagement_status_async(last_contact: Optional[datetime]) -> tuple[EngagementStatus, int]:
     """Calculate engagement status using configurable thresholds"""
     settings = await get_engagement_settings()
