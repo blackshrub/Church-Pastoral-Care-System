@@ -17,6 +17,7 @@ export const Settings = () => {
   const [atRiskDays, setAtRiskDays] = useState(60);
   const [inactiveDays, setInactiveDays] = useState(90);
   const [campusCount, setCampusCount] = useState(0);
+  const [campusTimezone, setCampusTimezone] = useState('Asia/Jakarta');
   const [griefStages, setGriefStages] = useState([
     { stage: '1_week', days: 7, name: '1 Week After' },
     { stage: '2_weeks', days: 14, name: '2 Weeks After' },
