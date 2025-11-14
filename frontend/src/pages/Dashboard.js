@@ -109,7 +109,7 @@ const markAccidentComplete = async (eventId, setAccidentFollowUp) => {
   }
 };
 
-const markMemberContacted = async (memberId, memberName, user, loadReminders) => {
+const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers, setDisconnectedMembers) => {
   try {
     // Create a regular contact event which updates last_contact_date
     await axios.post(`${API}/care-events`, {
@@ -121,7 +121,9 @@ const markMemberContacted = async (memberId, memberName, user, loadReminders) =>
       description: 'Contacted via Reminders page'
     });
     toast.success(`${memberName} marked as contacted! Status updated to Active.`);
-    loadReminders(); // Refresh to remove from at-risk/disconnected
+    // Update local state - remove from both at-risk and disconnected
+    setAtRiskMembers(prev => prev.filter(m => m.id !== memberId));
+    setDisconnectedMembers(prev => prev.filter(m => m.id !== memberId));
   } catch (error) {
     toast.error('Failed to mark as contacted');
   }
