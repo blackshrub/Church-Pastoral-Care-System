@@ -1125,7 +1125,8 @@ export const Dashboard = () => {
                               try {
                                 await axios.post(`${API}/accident-followup/${followup.id}/ignore`);
                                 toast.success('Accident follow-up ignored');
-                                loadReminders();
+                                // Update local state
+                                setAccidentFollowUp(prev => prev.filter(a => a.id !== followup.id));
                               } catch (error) {
                                 toast.error('Failed to ignore');
                               }
