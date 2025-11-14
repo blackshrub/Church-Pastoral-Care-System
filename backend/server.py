@@ -2938,9 +2938,10 @@ async def get_grief_completion_rate():
 async def sync_members_from_external_api(
     api_url: str,
     api_key: Optional[str] = None,
+    campus_id: Optional[str] = None,
     current_admin: dict = Depends(get_current_admin)
 ):
-    """Continuously sync members from external API"""
+    """Continuously sync members from external API with archiving"""
     try:
         headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
         
@@ -2948,36 +2949,71 @@ async def sync_members_from_external_api(
             response = await client.get(api_url, headers=headers)
             external_members = response.json()
         
+        sync_campus_id = campus_id or current_admin.get('campus_id')
         synced_count = 0
+        updated_count = 0
+        archived_count = 0
         errors = []
+        
+        # Track external IDs from API
+        external_ids = set()
         
         for ext_member in external_members:
             try:
+                ext_id = str(ext_member.get('id'))
+                external_ids.add(ext_id)
+                
                 # Check if member exists by external_member_id
                 existing = await db.members.find_one(
-                    {"external_member_id": ext_member.get('id')},
+                    {"external_member_id": ext_id},
                     {"_id": 0}
                 )
                 
                 if existing:
-                    # Update existing member
+                    # Update existing member with latest data
+                    update_data = {
+                        "name": ext_member.get('name'),
+                        "phone": ext_member.get('phone'),
+                        "email": ext_member.get('email'),
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                    
+                    # If member was archived, un-archive them
+                    if existing.get("is_archived"):
+                        update_data["is_archived"] = False
+                        update_data["archived_at"] = None
+                        update_data["archived_reason"] = None
+                    
+                    # Update other fields if provided
+                    if ext_member.get('birth_date'):
+                        update_data["birth_date"] = ext_member.get('birth_date')
+                    if ext_member.get('address'):
+                        update_data["address"] = ext_member.get('address')
+                    if ext_member.get('membership_status'):
+                        update_data["membership_status"] = ext_member.get('membership_status')
+                    if ext_member.get('category'):
+                        update_data["category"] = ext_member.get('category')
+                    if ext_member.get('gender'):
+                        update_data["gender"] = ext_member.get('gender')
+                    
                     await db.members.update_one(
                         {"id": existing["id"]},
-                        {"$set": {
-                            "name": ext_member.get('name'),
-                            "phone": ext_member.get('phone'),
-                            "email": ext_member.get('email'),
-                            "updated_at": datetime.now(timezone.utc).isoformat()
-                        }}
+                        {"$set": update_data}
                     )
+                    updated_count += 1
                 else:
                     # Create new member
                     member = Member(
                         name=ext_member.get('name'),
                         phone=ext_member.get('phone'),
-                        campus_id=ext_member.get('campus_id', current_admin.get('campus_id')),
-                        external_member_id=ext_member.get('id'),
-                        email=ext_member.get('email')
+                        campus_id=sync_campus_id,
+                        external_member_id=ext_id,
+                        email=ext_member.get('email'),
+                        birth_date=ext_member.get('birth_date'),
+                        address=ext_member.get('address'),
+                        membership_status=ext_member.get('membership_status'),
+                        category=ext_member.get('category'),
+                        gender=ext_member.get('gender')
                     )
                     member_dict = member.model_dump()
                     if member_dict.get('birth_date'):
@@ -2988,9 +3024,37 @@ async def sync_members_from_external_api(
             except Exception as e:
                 errors.append(f"Error syncing {ext_member.get('name')}: {str(e)}")
         
+        # Archive members that exist in our DB but not in external API source
+        # (Only for members with external_member_id from this source)
+        existing_external_members = await db.members.find(
+            {
+                "campus_id": sync_campus_id,
+                "external_member_id": {"$exists": True, "$ne": None},
+                "is_archived": {"$ne": True}
+            },
+            {"_id": 0, "id": 1, "name": 1, "external_member_id": 1}
+        ).to_list(None)
+        
+        for member in existing_external_members:
+            if member["external_member_id"] not in external_ids:
+                # Member no longer in external source - archive them
+                await db.members.update_one(
+                    {"id": member["id"]},
+                    {"$set": {
+                        "is_archived": True,
+                        "archived_at": datetime.now(timezone.utc).isoformat(),
+                        "archived_reason": "Removed from external API source",
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }}
+                )
+                archived_count += 1
+                logger.info(f"Archived member {member['name']} - no longer in external source")
+        
         return {
             "success": True,
             "synced_count": synced_count,
+            "updated_count": updated_count,
+            "archived_count": archived_count,
             "total_received": len(external_members),
             "errors": errors
         }
