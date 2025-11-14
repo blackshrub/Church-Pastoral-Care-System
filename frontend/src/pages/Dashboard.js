@@ -748,7 +748,7 @@ export const Dashboard = () => {
                                 Completed
                               </Button>
                             ) : (
-                              <Button size="sm" variant="outline" onClick={() => markBirthdayComplete(event.id, loadReminders)}>
+                              <Button size="sm" variant="outline" onClick={() => markBirthdayComplete(event.id, setBirthdaysToday)}>
                                 Mark Complete
                               </Button>
                             )}
