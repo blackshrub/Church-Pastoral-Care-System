@@ -1626,6 +1626,9 @@ async def delete_care_event(event_id: str):
         # Also delete related grief support stages
         await db.grief_support.delete_many({"care_event_id": event_id})
         
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(event["campus_id"])
+        
         return {"success": True, "message": "Care event deleted successfully"}
     except HTTPException:
         raise
