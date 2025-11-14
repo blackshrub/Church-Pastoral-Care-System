@@ -68,12 +68,12 @@ export const MembersList = () => {
   useEffect(() => {
     loadMembers(currentPage);
     loadFamilyGroups();
-  }, [currentPage, search, filterStatus]);
+  }, [currentPage, debouncedSearch, filterStatus]);
 
   useEffect(() => {
     // Reset to page 1 when search/filter changes
     setCurrentPage(1);
-  }, [search, filterStatus]);
+  }, [debouncedSearch, filterStatus]);
   
   const loadMembers = async (page = 1) => {
     try {
