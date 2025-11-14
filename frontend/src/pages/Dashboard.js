@@ -117,8 +117,8 @@ const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers,
       campus_id: user?.campus_id || '2b3f9094-eef4-4af4-a3ff-730ef4adeb8a', // Use user's campus or default
       event_type: 'regular_contact',
       event_date: new Date().toISOString().split('T')[0],
-      title: `Contact with ${memberName}`,
-      description: 'Contacted via Reminders page'
+      title: t('contact_with', {name: memberName}),
+      description: t('contacted_via_reminders')
     });
     toast.success(`${memberName} marked as contacted! Status updated to Active.`);
     // Update local state - remove from both at-risk and disconnected
@@ -830,7 +830,7 @@ export const Dashboard = () => {
         <TabsContent value="financial" className="space-y-4">
           <Card className="card-border-left-green">
             <CardHeader>
-              <CardTitle>Financial Aid Due Today</CardTitle>
+              <CardTitle>{t('financial_aid_due_today')}</CardTitle>
             </CardHeader>
             <CardContent>
               {financialAidDue.length === 0 ? (
@@ -928,7 +928,7 @@ export const Dashboard = () => {
         <TabsContent value="disconnected" className="space-y-4">
           <Card className="card-border-left-red">
             <CardHeader>
-              <CardTitle>Members Disconnected ({engagementSettings.inactiveDays}+ days no contact)</CardTitle>
+              <CardTitle>{t('members_disconnected_days', {days: engagementSettings.inactiveDays})}</CardTitle>
             </CardHeader>
             <CardContent>
               {disconnectedMembers.length === 0 ? (
@@ -962,7 +962,7 @@ export const Dashboard = () => {
         <TabsContent value="at-risk" className="space-y-4">
           <Card className="card-border-left-amber">
             <CardHeader>
-              <CardTitle>Members at Risk ({engagementSettings.atRiskDays}-{engagementSettings.inactiveDays-1} days no contact)</CardTitle>
+              <CardTitle>{t('members_at_risk_days', {min: engagementSettings.atRiskDays, max: engagementSettings.inactiveDays-1})}</CardTitle>
             </CardHeader>
             <CardContent>
               {atRiskMembers.length === 0 ? (
@@ -1018,7 +1018,7 @@ export const Dashboard = () => {
                         <MemberNameWithAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} memberId={event.member_id} />
                         <p className="text-sm text-muted-foreground ml-13">
                           {formatDate(event.event_date, 'dd MMM yyyy')} 
-                          <span className="ml-2 text-red-600 font-medium">({event.days_overdue} days ago)</span>
+                          <span className="ml-2 text-red-600 font-medium">({event.days_overdue} {t('days_ago')})</span>
                         </p>
                       </div>
                       <div className="flex gap-2">
