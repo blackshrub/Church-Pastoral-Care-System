@@ -2874,6 +2874,36 @@ async def update_accident_followup(config: list, current_admin: dict = Depends(g
         logger.error(f"Error updating accident followup settings: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/settings/user-preferences/{user_id}")
+async def get_user_preferences(user_id: str):
+    """Get user preferences (language, etc.)"""
+    try:
+        prefs = await db.user_preferences.find_one({"user_id": user_id}, {"_id": 0})
+        if not prefs:
+            return {"language": "id"}  # Default Indonesian
+        return prefs.get("data", {"language": "id"})
+    except Exception as e:
+        logger.error(f"Error getting user preferences: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.put("/settings/user-preferences/{user_id}")
+async def update_user_preferences(user_id: str, preferences: dict):
+    """Update user preferences"""
+    try:
+        await db.user_preferences.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "user_id": user_id,
+                "data": preferences,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }},
+            upsert=True
+        )
+        return {"success": True, "message": "User preferences updated"}
+    except Exception as e:
+        logger.error(f"Error updating user preferences: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ==================== NOTIFICATION LOGS ENDPOINTS ====================
 
 @api_router.get("/notification-logs")
