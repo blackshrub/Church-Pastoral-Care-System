@@ -16,6 +16,21 @@ from zoneinfo import ZoneInfo
 
 # Jakarta timezone (UTC+7)
 JAKARTA_TZ = ZoneInfo("Asia/Jakarta")
+
+def now_jakarta():
+    """Get current time in Jakarta timezone"""
+    return datetime.now(JAKARTA_TZ)
+
+def to_jakarta(dt):
+    """Convert datetime to Jakarta timezone"""
+    if dt.tzinfo is None:
+        # Assume UTC if no timezone
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(JAKARTA_TZ)
+
+def get_jakarta_date_str():
+    """Get current date in Jakarta as YYYY-MM-DD string"""
+    return now_jakarta().strftime('%Y-%m-%d')
 import httpx
 from PIL import Image
 import io
