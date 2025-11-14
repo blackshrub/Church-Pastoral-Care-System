@@ -354,9 +354,10 @@ export const Settings = () => {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-semibold text-sm mb-2">How Write-off Works:</h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Tasks overdue beyond the threshold are automatically hidden from overdue tabs</li>
-                  <li>• Set to <strong>0</strong> to never hide (task stays visible forever)</li>
-                  <li>• Hidden tasks can still be manually ignored using the "Ignore" button</li>
+                  <li>• Tasks overdue beyond the threshold are <strong>automatically hidden</strong> from dashboard tabs</li>
+                  <li>• Active overdue tasks can still be <strong>manually ignored</strong> using the "Ignore" button before auto write-off</li>
+                  <li>• Set to <strong>0</strong> to never auto-hide (tasks stay visible until manually ignored)</li>
+                  <li>• Ignored tasks remain visible in member profile history (greyed out)</li>
                   <li>• Write-off helps keep dashboard focused on actionable items</li>
                   <li>• <strong>Note:</strong> At-Risk and Disconnected status are open-ended (no write-off)</li>
                 </ul>
