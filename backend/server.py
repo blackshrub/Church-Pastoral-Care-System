@@ -3610,6 +3610,64 @@ async def get_all_config():
 
 # ==================== SETTINGS CONFIGURATION ENDPOINTS ====================
 
+@api_router.post("/admin/recalculate-engagement")
+async def recalculate_all_engagement_status(user: dict = Depends(get_current_user)):
+    """Recalculate engagement status for all members (admin only)"""
+    try:
+        if user.get("role") not in [UserRole.FULL_ADMIN, UserRole.CAMPUS_ADMIN]:
+            raise HTTPException(status_code=403, detail="Only admins can recalculate engagement")
+        
+        # Get engagement settings
+        settings = await get_engagement_settings()
+        at_risk_days = settings.get("atRiskDays", 60)
+        disconnected_days = settings.get("disconnectedDays", 90)
+        
+        # Get all members
+        members = await db.members.find({}, {"_id": 0, "id": 1, "last_contact_date": 1}).to_list(None)
+        
+        updated_count = 0
+        stats = {"active": 0, "at_risk": 0, "disconnected": 0}
+        
+        for member in members:
+            status, days = calculate_engagement_status(
+                member.get("last_contact_date"),
+                at_risk_days,
+                disconnected_days
+            )
+            
+            await db.members.update_one(
+                {"id": member["id"]},
+                {"$set": {
+                    "engagement_status": status,
+                    "days_since_last_contact": days,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            
+            stats[status] = stats.get(status, 0) + 1
+            updated_count += 1
+        
+        # Clear dashboard cache for all campuses
+        await db.dashboard_cache.delete_many({})
+        
+        logger.info(f"Recalculated engagement for {updated_count} members")
+        
+        return {
+            "success": True,
+            "updated_count": updated_count,
+            "stats": stats,
+            "thresholds": {
+                "at_risk_days": at_risk_days,
+                "disconnected_days": disconnected_days
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error recalculating engagement: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.get("/settings/engagement")
 async def get_engagement_settings():
     """Get engagement threshold settings"""
