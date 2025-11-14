@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { offlineStorage } from '@/utils/offlineStorage';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
