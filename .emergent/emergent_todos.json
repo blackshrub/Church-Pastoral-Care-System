@@ -1,14 +1,14 @@
 [
   {
-    "content": "Update Financial Aid page to use translation keys",
-    "status": "completed"
+    "content": "Remove birthday from Dashboard care event form dropdown",
+    "status": "in_progress"
   },
   {
-    "content": "Update Analytics page to use translation keys",
-    "status": "completed"
+    "content": "Remove birthday from Member profile care event form dropdown",
+    "status": "pending"
   },
   {
-    "content": "Test translations on both pages",
-    "status": "completed"
+    "content": "Test birthday removal and verify forms work correctly",
+    "status": "pending"
   }
 ]
