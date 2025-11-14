@@ -1,18 +1,18 @@
 [
   {
-    "content": "Remove birthday from Dashboard care event form dropdown",
-    "status": "completed"
+    "content": "Implement UTC+7 timezone handling universally (frontend & backend)",
+    "status": "in_progress"
   },
   {
-    "content": "Remove birthday from Member profile care event form dropdown",
-    "status": "completed"
+    "content": "Add birthday section to member profile timeline with Mark Complete button",
+    "status": "pending"
   },
   {
-    "content": "Fix Calendar birthday date display (UTC timezone issue)",
-    "status": "completed"
+    "content": "Test timezone consistency across all pages",
+    "status": "pending"
   },
   {
-    "content": "Test all fixes - birthday forms, calendar dates, translations",
-    "status": "completed"
+    "content": "Test birthday completion flow in member profile",
+    "status": "pending"
   }
 ]
