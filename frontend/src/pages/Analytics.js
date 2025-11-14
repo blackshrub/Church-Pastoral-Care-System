@@ -343,7 +343,7 @@ export const Analytics = () => {
         <TabsContent value="trends" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
-              <CardHeader><CardTitle>Population Analysis by Age Group</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('population_analysis_by_age')}</CardTitle></CardHeader>
               <CardContent>
                 <BarChart data={trendsData.age_groups || []} color={COLORS.demographic[0]} height={300} />
               </CardContent>
@@ -358,7 +358,7 @@ export const Analytics = () => {
           </div>
           
           <Card>
-            <CardHeader><CardTitle>AI Insights & Recommendations</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('ai_insights_recommendations')}</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -406,14 +406,14 @@ export const Analytics = () => {
         <TabsContent value="engagement" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
-              <CardHeader><CardTitle>Member Engagement Status</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('member_engagement_status')}</CardTitle></CardHeader>
               <CardContent>
                 <PieChart data={demographicData.engagement || []} colors={['#059669', '#f59e0b', '#ef4444']} height={300} />
               </CardContent>
             </Card>
             
             <Card>
-              <CardHeader><CardTitle>Care Events by Month ({new Date().getFullYear()})</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('care_events_by_month')} ({new Date().getFullYear()})</CardTitle></CardHeader>
               <CardContent>
                 <AreaChart data={engagementData.trends || []} dataKey="events" color={COLORS.primary[0]} height={300} />
               </CardContent>
@@ -425,14 +425,14 @@ export const Analytics = () => {
         <TabsContent value="financial" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
-              <CardHeader><CardTitle>Financial Aid by Type</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('financial_aid_by_type')}</CardTitle></CardHeader>
               <CardContent>
                 <BarChart data={financialData.byType || []} color={COLORS.financial[0]} height={300} formatValue={(value) => `Rp ${value.toLocaleString('id-ID')}`} />
               </CardContent>
             </Card>
             
             <Card>
-              <CardHeader><CardTitle>Aid Distribution Summary</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('aid_distribution_summary')}</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-green-50 rounded">
@@ -462,7 +462,7 @@ export const Analytics = () => {
         {/* Care Events Tab */}
         <TabsContent value="care" className="space-y-6">
           <Card>
-            <CardHeader><CardTitle>Care Events Distribution</CardTitle></CardHeader>
+            <CardHeader><CardTitle>{t('care_events_distribution')}</CardTitle></CardHeader>
             <CardContent>
               <PieChart data={eventsByType} colors={COLORS.primary} height={400} />
             </CardContent>
@@ -473,7 +473,7 @@ export const Analytics = () => {
         <TabsContent value="predictive" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
-              <CardHeader><CardTitle>Member Care Insights</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('member_care_insights')}</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   <div className="p-3 bg-red-50 rounded">
@@ -495,7 +495,7 @@ export const Analytics = () => {
             </Card>
             
             <Card>
-              <CardHeader><CardTitle>Financial Aid Effectiveness</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('financial_aid_effectiveness')}</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-3">
                   {financialData.byType?.slice(0, 4).map(type => (
