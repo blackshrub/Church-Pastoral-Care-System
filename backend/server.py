@@ -1264,10 +1264,24 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         tomorrow = today + timedelta(days=1)
         week_ahead = today + timedelta(days=7)
         
-        # Upcoming grief stages (1-7 days)
+        # TODAY TASKS (due exactly today, all types mixed)
+        today_tasks = []
+        
+        # Today's grief stages (not overdue, exactly today)
         for stage in grief_stages:
             sched_date = datetime.strptime(stage["scheduled_date"], '%Y-%m-%d').date()
-            if tomorrow <= sched_date <= week_ahead:
+            if sched_date == today:
+                today_tasks.append({
+                    "type": "grief_support",
+                    "date": stage["scheduled_date"],
+                    "member_id": stage["member_id"],
+                    "member_name": member_map.get(stage["member_id"], {}).get("name"),
+                    "member_phone": member_map.get(stage["member_id"], {}).get("phone"),
+                    "member_photo_url": member_map.get(stage["member_id"], {}).get("photo_url"),
+                    "details": f"{stage['stage'].replace('_', ' ')} stage",
+                    "data": stage
+                })
+            elif tomorrow <= sched_date <= week_ahead:
                 upcoming_tasks.append({
                     "type": "grief_support",
                     "date": stage["scheduled_date"],
