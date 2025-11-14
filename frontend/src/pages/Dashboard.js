@@ -1103,7 +1103,8 @@ export const Dashboard = () => {
                           try {
                             await axios.post(`${API}/accident-followup/${followup.id}/complete`);
                             toast.success('Accident follow-up completed!');
-                            loadReminders();
+                            // Update local state
+                            setAccidentFollowUp(prev => prev.filter(a => a.id !== followup.id));
                           } catch (error) {
                             toast.error('Failed to complete');
                           }
