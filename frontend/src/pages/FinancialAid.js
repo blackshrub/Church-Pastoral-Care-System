@@ -81,13 +81,27 @@ export const FinancialAid = () => {
   const loadFinancialAidData = async () => {
     try {
       setLoading(true);
-      const [summaryRes, eventsRes] = await Promise.all([
+      const [summaryRes, eventsRes, membersRes] = await Promise.all([
         axios.get(`${API}/financial-aid/summary`),
-        axios.get(`${API}/care-events?event_type=financial_aid`)
+        axios.get(`${API}/care-events?event_type=financial_aid`),
+        axios.get(`${API}/members?limit=1000`) // Get all members for photo mapping
       ]);
       
       setSummary(summaryRes.data);
-      setAidEvents(eventsRes.data);
+      
+      // Add member photos to events
+      const memberMap = {};
+      membersRes.data.forEach(m => memberMap[m.id] = { 
+        name: m.name, 
+        photo_url: m.photo_url 
+      });
+      
+      const eventsWithPhotos = eventsRes.data.map(event => ({
+        ...event,
+        member_photo_url: memberMap[event.member_id]?.photo_url
+      }));
+      
+      setAidEvents(eventsWithPhotos);
     } catch (error) {
       console.error('Error loading financial aid:', error);
     } finally {
