@@ -1909,12 +1909,20 @@ async def update_care_event(event_id: str, update: CareEventUpdate):
 async def delete_care_event(event_id: str):
     """Delete care event"""
     try:
+        # Get the care event first to access campus_id
+        event = await db.care_events.find_one({"id": event_id}, {"_id": 0})
+        if not event:
+            raise HTTPException(status_code=404, detail="Care event not found")
+        
         result = await db.care_events.delete_one({"id": event_id})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Care event not found")
         
         # Also delete related grief support stages
         await db.grief_support.delete_many({"care_event_id": event_id})
+        
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(event["campus_id"])
         
         return {"success": True, "message": "Care event deleted successfully"}
     except HTTPException:
