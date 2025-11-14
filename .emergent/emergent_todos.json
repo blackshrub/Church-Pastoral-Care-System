@@ -1,18 +1,22 @@
 [
   {
-    "content": "Add birthdays back to Upcoming tab (1-7 days ahead)",
-    "status": "completed"
+    "content": "Add overdue_writeoff settings to backend model and database",
+    "status": "in_progress"
   },
   {
-    "content": "Create new Birthday tab for overdue birthdays",
-    "status": "completed"
+    "content": "Add Overdue Write-off configuration UI in Settings page",
+    "status": "pending"
   },
   {
-    "content": "Update Today tab to only show birthdays due today",
-    "status": "completed"
+    "content": "Update dashboard calculation to respect writeoff thresholds",
+    "status": "pending"
   },
   {
-    "content": "Test all birthday flows across tabs",
-    "status": "completed"
+    "content": "Add three-dots menu with Ignore button to overdue cards",
+    "status": "pending"
+  },
+  {
+    "content": "Create ignore/dismiss endpoint for care events",
+    "status": "pending"
   }
 ]
