@@ -1262,10 +1262,6 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                                  key=lambda x: x.get("days_since_last_contact", 0), 
                                  reverse=True)[:10]
         
-        # Calculate date ranges for upcoming tasks
-        tomorrow = today + timedelta(days=1)
-        week_ahead = today + timedelta(days=7)
-        
         # Process all birthdays
         for member in members:
             if not member.get("birth_date"):
