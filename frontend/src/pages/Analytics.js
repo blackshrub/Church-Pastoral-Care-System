@@ -247,7 +247,7 @@ export const Analytics = () => {
               <div>
                 <p className="text-sm text-muted-foreground">{t('total_members')}</p>
                 <p className="text-3xl font-bold">{memberStats?.total || 0}</p>
-                <p className="text-xs text-muted-foreground">{memberStats?.withPhotos || 0} with photos</p>
+                <p className="text-xs text-muted-foreground">{memberStats?.withPhotos || 0} {t('with_photos')}</p>
               </div>
               <Users className="w-8 h-8 text-teal-600" />
             </div>
@@ -260,7 +260,7 @@ export const Analytics = () => {
               <div>
                 <p className="text-sm text-muted-foreground">{t('total_aid')}</p>
                 <p className="text-2xl font-bold">Rp {financialData?.totalAid?.toLocaleString('id-ID') || 0}</p>
-                <p className="text-xs text-muted-foreground">{financialData?.schedules || 0} active schedules</p>
+                <p className="text-xs text-muted-foreground">{financialData?.schedules || 0} {t('active_schedules')}</p>
               </div>
               <DollarSign className="w-8 h-8 text-amber-600" />
             </div>
@@ -273,7 +273,7 @@ export const Analytics = () => {
               <div>
                 <p className="text-sm text-muted-foreground">{t('grief_support')}</p>
                 <p className="text-3xl font-bold">{griefData?.completion_rate || 0}%</p>
-                <p className="text-xs text-muted-foreground">completion rate</p>
+                <p className="text-xs text-muted-foreground">{t('completion_rate')}</p>
               </div>
               <Heart className="w-8 h-8 text-pink-600" />
             </div>
@@ -284,7 +284,7 @@ export const Analytics = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Avg Member Age</p>
+                <p className="text-sm text-muted-foreground">{t('avg_member_age')}</p>
                 <p className="text-3xl font-bold">{memberStats?.avgAge || 0}</p>
                 <p className="text-xs text-muted-foreground">years old</p>
               </div>
@@ -331,7 +331,7 @@ export const Analytics = () => {
             </Card>
             
             <Card>
-              <CardHeader><CardTitle>Member Categories</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('member_categories')}</CardTitle></CardHeader>
               <CardContent>
                 <BarChart data={demographicData.category || []} color={COLORS.primary[2]} height={250} />
               </CardContent>
