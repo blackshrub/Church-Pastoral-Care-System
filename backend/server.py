@@ -312,6 +312,9 @@ class CareEvent(BaseModel):
     completed: bool = False
     completed_at: Optional[datetime] = None
     
+    # Member information (enriched from members collection)
+    member_name: Optional[str] = None
+    
     # Grief support fields (only relationship, use event_date as mourning date)
     grief_relationship: Optional[str] = None
     grief_stage: Optional[GriefStage] = None
