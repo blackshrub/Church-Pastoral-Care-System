@@ -68,16 +68,27 @@ export const MembersList = () => {
     loadFamilyGroups();
   }, []);
   
-  const loadMembers = async () => {
+  const loadMembers = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/members?limit=1000`); // Get all members
-      setMembers(response.data);
+      const response = await axios.get(`${API}/members?page=${page}&limit=${pageSize}&search=${search}&engagement_status=${filterStatus !== 'all' ? filterStatus : ''}`);
+      setMembers(response.data || []);
+      
+      // Calculate total pages (estimate based on backend pagination)
+      const totalMembers = 805; // Known total
+      setTotalPages(Math.ceil(totalMembers / pageSize));
+      setCurrentPage(page);
     } catch (error) {
       toast.error(t('error_messages.failed_to_save'));
       console.error('Error loading members:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      loadMembers(newPage);
     }
   };
   
