@@ -63,6 +63,68 @@ const webpackConfig = {
         };
       }
 
+      // Production optimizations
+      if (process.env.NODE_ENV === 'production') {
+        // Code splitting optimization
+        webpackConfig.optimization = {
+          ...webpackConfig.optimization,
+          splitChunks: {
+            chunks: 'all',
+            cacheGroups: {
+              // Separate vendor bundle for react and react-dom
+              reactVendor: {
+                test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+                name: 'react-vendor',
+                priority: 40,
+                reuseExistingChunk: true,
+              },
+              // Separate bundle for UI libraries
+              uiVendor: {
+                test: /[\\/]node_modules[\\/](@radix-ui|lucide-react|sonner)[\\/]/,
+                name: 'ui-vendor',
+                priority: 30,
+                reuseExistingChunk: true,
+              },
+              // Separate bundle for charts
+              chartsVendor: {
+                test: /[\\/]node_modules[\\/](recharts)[\\/]/,
+                name: 'charts-vendor',
+                priority: 25,
+                reuseExistingChunk: true,
+              },
+              // Common chunks
+              common: {
+                minChunks: 2,
+                priority: 10,
+                reuseExistingChunk: true,
+                enforce: true,
+              },
+            },
+          },
+          // Minimize runtime chunk for better caching
+          runtimeChunk: 'single',
+        };
+
+        // Minimize bundle size
+        webpackConfig.performance = {
+          maxAssetSize: 512000, // 500kb
+          maxEntrypointSize: 512000,
+          hints: 'warning',
+        };
+      }
+
+      // Add bundle analyzer in production build
+      if (process.env.ANALYZE === 'true') {
+        const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+        webpackConfig.plugins.push(
+          new BundleAnalyzerPlugin({
+            analyzerMode: 'static',
+            reportFilename: 'bundle-report.html',
+            openAnalyzer: false,
+          })
+        );
+      }
+
       // Add health check plugin to webpack if enabled
       if (config.enableHealthCheck && healthPluginInstance) {
         webpackConfig.plugins.push(healthPluginInstance);
