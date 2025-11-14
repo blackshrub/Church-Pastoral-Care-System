@@ -1418,6 +1418,29 @@ async def complete_care_event(event_id: str):
             }}
         )
         
+        # For birthday completions, also create a regular contact event for timeline
+        if event["event_type"] == "birthday":
+            # Get member name for the title
+            member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0, "name": 1})
+            member_name = member["name"] if member else "Member"
+            
+            contact_event = {
+                "id": str(uuid.uuid4()),
+                "member_id": event["member_id"],
+                "campus_id": event["campus_id"],
+                "event_type": "regular_contact",
+                "event_date": datetime.now(timezone.utc).date().isoformat(),
+                "title": "Birthday Contact",
+                "description": f"Contacted {member_name} for their birthday celebration",
+                "completed": True,
+                "completed_at": now.isoformat(),
+                "reminder_sent": False,
+                "created_at": now.isoformat(),
+                "updated_at": now.isoformat()
+            }
+            
+            await db.care_events.insert_one(contact_event)
+        
         return {"success": True, "message": "Care event marked as completed"}
     except HTTPException:
         raise
