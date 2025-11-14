@@ -1003,14 +1003,18 @@ async def list_members(
     engagement_status: Optional[EngagementStatus] = None,
     family_group_id: Optional[str] = None,
     search: Optional[str] = None,
+    show_archived: bool = False,
     current_user: dict = Depends(get_current_user)
 ):
     """List all members with pagination"""
     try:
         query = get_campus_filter(current_user)
         
-        # Exclude archived members by default
-        query["is_archived"] = {"$ne": True}
+        # Exclude archived members by default (unless show_archived=true)
+        if not show_archived:
+            query["is_archived"] = {"$ne": True}
+        else:
+            query["is_archived"] = True
         
         if engagement_status:
             query["engagement_status"] = engagement_status
