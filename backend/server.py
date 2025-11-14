@@ -1153,7 +1153,7 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         
         # Grief support due (today and overdue)
         grief_stages = await db.grief_support.find(
-            {"campus_id": campus_id, "completed": False},
+            {"campus_id": campus_id, "completed": False, "ignored": {"$ne": True}},
             {"_id": 0}
         ).to_list(None)
         
