@@ -348,7 +348,8 @@ export const Dashboard = () => {
         aid_amount: '',
         grief_relationship: '',
         hospital_name: '',
-        schedule_frequency: 'one_time'
+        schedule_frequency: 'one_time',
+        payment_date: new Date().toISOString().split('T')[0]
       });
       loadReminders();
     } catch (error) {
