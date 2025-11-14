@@ -79,8 +79,8 @@ export const Layout = ({ children }) => {
                     <div className="text-right hidden md:block">
                       <p className="text-sm font-semibold text-gray-700 hover:text-teal-700 transition-colors">{user?.name}</p>
                       <p className="text-xs text-gray-500 hover:text-teal-600 transition-colors">
-                        {user?.role === 'full_admin' ? 'Full Administrator' : 
-                         user?.role === 'campus_admin' ? 'Campus Admin' : 'Pastor'}
+                        {user?.role === 'full_admin' ? t('full_admin') : 
+                         user?.role === 'campus_admin' ? t('campus_admin') : t('pastor')}
                       </p>
                     </div>
                     <ChevronDown className="w-4 h-4" />
@@ -91,31 +91,31 @@ export const Layout = ({ children }) => {
                     <>
                       <DropdownMenuItem onClick={() => navigate('/admin')}>
                         <Shield className="w-4 h-4 mr-2" />
-                        Admin Dashboard
+                        {t('admin_dashboard')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                     </>
                   )}
                   <DropdownMenuItem onClick={() => navigate('/import-export')}>
                     <Upload className="w-4 h-4 mr-2" />
-                    Import/Export
+                    {t('import_export')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/messaging')}>
                     <MessageSquare className="w-4 h-4 mr-2" />
-                    Messaging
+                    {t('messaging')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/whatsapp-logs')}>
                     <Bell className="w-4 h-4 mr-2" />
-                    WhatsApp Logs
+                    {t('whatsapp_logs')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/settings')}>
                     <Cog className="w-4 h-4 mr-2" />
-                    Settings
+                    {t('settings')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => { logout(); navigate('/login'); }} className="text-red-600">
                     <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    {t('logout')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
