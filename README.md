@@ -124,130 +124,132 @@ POST /api/grief-support/{id}/complete
 - **Photo optimization**: Multi-size images for different screen densities
 - **Authentication**: JWT with role-based permissions
 
+## 🚀 **Quick Start**
+
 ### **Prerequisites**
 - Python 3.11+
 - Node.js 18+
 - MongoDB 5.0+
-- Yarn package manager
+- WhatsApp Gateway (configured at dermapack.net:3001)
 
-### **Local Development**
+### **Installation**
 
-1. **Clone Repository**
 ```bash
-git clone https://github.com/your-org/gkbj-pastoral-care
-cd gkbj-pastoral-care
-```
-
-2. **Backend Setup**
-```bash
+# Backend setup
 cd backend
 pip install -r requirements.txt
-cp .env.example .env
-```
+python create_indexes.py  # Performance optimization
+python import_data.py     # Load 805 members + photos
+python server.py          # Start API server
 
-3. **Configure Environment Variables (.env)**
-```bash
-# Database
-MONGO_URL="mongodb://localhost:27017"
-DB_NAME="pastoral_care_db"
-
-# Church Configuration
-CHURCH_NAME="GKBJ"
-WHATSAPP_GATEWAY_URL="http://dermapack.net:3001"
-
-# Authentication
-JWT_SECRET_KEY="your-secret-key-change-in-production"
-
-# CORS
-CORS_ORIGINS="*"
-```
-
-4. **Initialize Database**
-```bash
-# Create performance indexes (5-10x faster queries)
-python create_indexes.py
-
-# Import sample data (optional)
-python import_data.py
-```
-
-5. **Start Backend**
-```bash
-python server.py
-# Server runs on http://localhost:8001
-```
-
-6. **Frontend Setup**
-```bash
+# Frontend setup
 cd frontend
 yarn install
+yarn start               # Start web interface
+
+# Access
+URL: http://localhost:3000
+Login: admin@gkbj.church / admin123
 ```
 
-7. **Configure Frontend Environment (.env)**
+## 📊 **Production Data**
+
+### **Current Dataset**
+- **805 Members** with complete demographic profiles
+- **657 Profile Photos** optimized for web and mobile
+- **947 Care Events** across all types with automation
+- **278 Family Groups** for household organization
+- **Active Schedules** for recurring financial aid
+- **Timeline Systems** for grief and accident follow-up
+
+### **Verified Working**
+- **Daily WhatsApp digest** sending to 6281290080025
+- **AI recommendations** with real-time refresh
+- **Financial aid advancement** with perfect date calculations
+- **Birthday audit trail** with timeline integration
+- **Member engagement tracking** with accurate status updates
+
+## 🎯 **Daily Operations**
+
+### **Staff Workflow**
+1. **8 AM**: Receive WhatsApp digest with member tasks and wa.me links
+2. **Homepage**: View AI suggestions + 6-tab task organization
+3. **Task completion**: Mark birthdays/grief/financial aid as complete
+4. **Member contact**: Click wa.me links for instant WhatsApp
+5. **Financial aid**: Schedule recurring payments, mark distributed
+6. **Timeline tracking**: Monitor grief and accident follow-up progress
+
+### **Task Management Tabs**
+- **Today**: Birthdays + grief stages due today
+- **Follow-up**: Accident recovery + overdue grief support
+- **Financial Aid**: Due payments with advancement capability
+- **Disconnected**: 90+ days no contact requiring reconnection
+- **At Risk**: 60-89 days no contact needing attention
+- **Upcoming**: Next 7 days birthdays for planning
+
+## 🔧 **Configuration**
+
+### **Environment Variables**
 ```bash
+# Backend
+MONGO_URL="mongodb://localhost:27017"
+DB_NAME="pastoral_care_db"
+JWT_SECRET_KEY="your-secure-secret"
+WHATSAPP_GATEWAY_URL="http://dermapack.net:3001"
+CHURCH_NAME="GKBJ"
+
+# Frontend  
 REACT_APP_BACKEND_URL="http://localhost:8001"
 ```
 
-8. **Start Frontend**
-```bash
-yarn start
-# App runs on http://localhost:3000
+### **Configurable Settings (via API)**
+- **Engagement thresholds**: At-risk (60 days), Inactive (90 days)
+- **Grief stages**: 6 configurable timelines (default: 7, 14, 30, 90, 180, 365 days)
+- **Accident follow-up**: 3 configurable stages (default: 3, 7, 14 days)
+
+## 📱 **Mobile Development**
+
+### **API-First Design**
+All configurations and data accessible via REST API for mobile app development:
+
+```http
+# Get all configuration data
+GET /api/config/all
+{
+  "aid_types": [{value: "education", label: "Education Support"}],
+  "event_types": [{value: "birthday", label: "Birthday"}],
+  "settings": {
+    "engagement": {atRiskDays: 60, inactiveDays: 90},
+    "grief_stages": [...]
+  }
+}
+
+# Member management with pagination
+GET /api/members?page=1&limit=25
+POST /api/members
+PUT /api/members/{id}
+
+# Care event management
+POST /api/care-events
+DELETE /api/care-events/{id}  # Auto-recalculates engagement
 ```
 
-### **Production Deployment**
+## 🔒 **Security & Permissions**
 
-#### **Backend Deployment (Docker)**
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY . .
-RUN python create_indexes.py
-
-EXPOSE 8001
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]
+### **Authentication**
+```http
+POST /api/auth/login
+{
+  "email": "admin@gkbj.church",
+  "password": "admin123"
+}
+→ Returns JWT token for API access
 ```
 
-#### **Frontend Deployment (Static)**
-```bash
-# Build optimized PWA
-yarn build
-
-# Deploy to static hosting (Netlify, Vercel, CloudFlare)
-# Ensure service worker and manifest.json are served correctly
-```
-
-#### **Database Setup**
-```bash
-# MongoDB with replica set for optimal performance
-mongo --eval "rs.initiate()"
-
-# Create production indexes
-python create_indexes.py
-```
-
-#### **WhatsApp Gateway**
-Ensure your WhatsApp gateway is accessible:
-```bash
-# Test gateway connection
-curl http://your-gateway:3001/app/login
-```
-
-### **Environment Variables (Production)**
-```bash
-# Backend (.env)
-MONGO_URL="mongodb://your-mongo-cluster:27017/pastoral_care_db"
-JWT_SECRET_KEY="your-secure-jwt-secret"
-WHATSAPP_GATEWAY_URL="https://your-whatsapp-gateway.com"
-CHURCH_NAME="GKBJ"
-CORS_ORIGINS="https://your-domain.com"
-
-# Frontend (.env)
-REACT_APP_BACKEND_URL="https://your-backend-api.com"
-```
+### **Role Hierarchy**
+- **Full Administrator**: All campuses, all features, user management
+- **Campus Administrator**: Single campus, user management for campus
+- **Pastor**: Pastoral care features for assigned campus
 
 ## 📚 **API Documentation**
 
