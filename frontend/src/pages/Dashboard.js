@@ -1158,7 +1158,7 @@ export const Dashboard = () => {
                             Contact
                           </a>
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => markGriefStageComplete(stage.id, loadReminders)}>
+                        <Button size="sm" variant="outline" onClick={() => markGriefStageComplete(stage.id, setGriefDue)}>
                           Mark Complete
                         </Button>
                         <DropdownMenu>
