@@ -259,17 +259,17 @@ export const MemberDetail = () => {
           </Button>
         </Link>
         
-        <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+        <div className="flex flex-row items-start gap-3 sm:gap-6">
           <MemberAvatar member={member} size="xl" className="shrink-0" />
-          <div className="flex-1 min-w-0 w-full">
-            <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-col gap-3">
               <div className="flex-1 min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-manrope font-bold text-foreground truncate">{member.name}</h1>
-                <p className="text-muted-foreground mt-1">{member.phone}</p>
-                <div className="flex flex-wrap items-center gap-3 mt-3">
+                <h1 className="text-xl sm:text-3xl font-manrope font-bold text-foreground truncate">{member.name}</h1>
+                <p className="text-sm sm:text-base text-muted-foreground mt-1">{member.phone}</p>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
                   <EngagementBadge status={member.engagement_status} days={member.days_since_last_contact} />
                   {member.last_contact_date && (
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-xs sm:text-sm text-muted-foreground">
                       {t('last_contact')}: {formatDate(member.last_contact_date, 'dd MMM yyyy')}
                     </span>
                   )}
