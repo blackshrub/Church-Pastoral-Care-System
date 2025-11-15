@@ -2523,6 +2523,9 @@ async def get_member_aid_schedules(member_id: str, current_user: dict = Depends(
             if s.get("is_active") or (s.get("ignored_occurrences") and len(s.get("ignored_occurrences", [])) > 0)
         ]
         
+        logger.info(f"Total schedules: {len(schedules)}, Active+WithHistory: {len(filtered)}")
+        logger.info(f"Stopped with history: {[s.get('title') for s in schedules if not s.get('is_active') and s.get('ignored_occurrences')]}")
+        
         return filtered
     except Exception as e:
         logger.error(f"Error getting member aid schedules: {str(e)}")
