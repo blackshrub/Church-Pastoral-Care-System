@@ -2548,6 +2548,9 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
             }}
         )
         
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(schedule["campus_id"])
+        
         return {
             "success": True,
             "message": "Payment marked as distributed and schedule advanced",
