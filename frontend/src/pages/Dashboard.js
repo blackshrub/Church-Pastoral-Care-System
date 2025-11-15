@@ -624,7 +624,7 @@ export const Dashboard = () => {
                             <Input type="number" min="1" max="31" value={quickEvent.day_of_month || ''} onChange={(e) => setQuickEvent({...quickEvent, day_of_month: parseInt(e.target.value) || 1})} placeholder="13" required />
                           </div>
                           <div>
-                            <Label className="text-xs">End Month</Label>
+                            <Label className="text-xs">End Month (optional)</Label>
                             <Input type="month" value={quickEvent.schedule_end_date ? quickEvent.schedule_end_date.substring(0, 7) : ''} onChange={(e) => setQuickEvent({...quickEvent, schedule_end_date: e.target.value + '-01'})} />
                           </div>
                         </div>
