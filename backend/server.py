@@ -2184,6 +2184,13 @@ async def undo_grief_stage(stage_id: str, user: dict = Depends(get_current_user)
         if not stage:
             raise HTTPException(status_code=404, detail="Grief stage not found")
         
+        # Delete the timeline event that was created when stage was completed
+        await db.care_events.delete_many({
+            "member_id": stage["member_id"],
+            "event_type": "regular_contact",
+            "title": {"$regex": f"Grief Support: {stage['stage'].replace('_', ' ')}", "$options": "i"}
+        })
+        
         await db.grief_support.update_one(
             {"id": stage_id},
             {"$set": {
