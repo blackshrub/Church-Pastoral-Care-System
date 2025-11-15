@@ -228,8 +228,9 @@ button:active:not(:disabled) {
 }
 
 button:focus-visible {
-  outline: 2px solid hsl(174, 94%, 39%);
-  outline-offset: 2px;
+  outline: 2px solid hsl(174, 94%, 39%) !important;
+  outline-offset: 2px !important;
+  outline-width: 2px !important;
 }
 
 /* Focus management for accessibility */
