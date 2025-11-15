@@ -1070,7 +1070,8 @@ export const MemberDetail = () => {
                                       try {
                                         await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
                                         toast.success('Schedule stopped');
-                                        loadMemberData();
+                                        // Update local state to remove stopped schedule
+                                        setAidSchedules(prev => prev.filter(s => s.id !== schedule.id));
                                       } catch (error) {
                                         toast.error('Failed to stop schedule');
                                       }
@@ -1082,7 +1083,14 @@ export const MemberDetail = () => {
                                     try {
                                       const response = await axios.post(`${API}/financial-aid-schedules/${schedule.id}/ignore`);
                                       toast.success(`Payment ignored! Next payment: ${response.data.next_occurrence}`);
-                                      loadMemberData(); // Reload to show updated schedule
+                                      // Update local state with new next_occurrence and ignored list
+                                      setAidSchedules(prev => prev.map(s => 
+                                        s.id === schedule.id ? {
+                                          ...s, 
+                                          next_occurrence: response.data.next_occurrence,
+                                          ignored_occurrences: [...(s.ignored_occurrences || []), response.data.ignored_date]
+                                        } : s
+                                      ));
                                     } catch (error) {
                                       toast.error('Failed to ignore');
                                     }
