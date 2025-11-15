@@ -2315,6 +2315,12 @@ async def complete_accident_stage(stage_id: str, notes: Optional[str] = None):
         # Update member's last contact date
         stage = await db.accident_followup.find_one({"id": stage_id}, {"_id": 0})
         if stage:
+            # Get parent accident event for description
+            parent_event = await db.care_events.find_one(
+                {"id": stage["care_event_id"]},
+                {"_id": 0, "description": 1, "title": 1}
+            )
+            
             # Create a care event for this followup completion (adds to timeline)
             await db.care_events.insert_one({
                 "id": str(uuid.uuid4()),
@@ -2323,7 +2329,8 @@ async def complete_accident_stage(stage_id: str, notes: Optional[str] = None):
                 "event_type": "regular_contact",
                 "event_date": datetime.now(timezone.utc).isoformat().split('T')[0],
                 "title": f"Accident Follow-up: {stage['stage'].replace('_', ' ')}",
-                "description": notes or f"Completed {stage['stage'].replace('_', ' ')} for accident/illness recovery",
+                "description": (parent_event.get("description") if parent_event else "") + 
+                              (f"\n{notes}" if notes else ""),
                 "completed": True,
                 "created_at": datetime.now(timezone.utc).isoformat(),
                 "updated_at": datetime.now(timezone.utc).isoformat()
