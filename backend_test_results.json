@@ -1,50 +1,50 @@
 {
-  "timestamp": "2025-11-13T05:16:17.413745",
-  "total_tests": 27,
-  "passed": 27,
-  "failed": 0,
-  "success_rate": "100.0%",
+  "timestamp": "2025-11-15T17:26:21.687388",
+  "total_tests": 26,
+  "passed": 10,
+  "failed": 16,
+  "success_rate": "38.5%",
   "results": [
     {
       "test": "Create Member",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "passed": false,
+      "status_code": 403,
+      "error": "Expected 200, got 403 - {'detail': 'Not authenticated'}",
       "details": null
     },
     {
       "test": "List Members",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "passed": false,
+      "status_code": 403,
+      "error": "Expected 200, got 403 - {'detail': 'Not authenticated'}",
       "details": null
     },
     {
-      "test": "Get Member b84c953d-d603-4d85-bf96-ebac43548ea8",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "test": "Get Member",
+      "passed": false,
+      "status_code": null,
+      "error": "No member ID provided",
       "details": null
     },
     {
-      "test": "Update Member b84c953d-d603-4d85-bf96-ebac43548ea8",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "test": "Update Member",
+      "passed": false,
+      "status_code": null,
+      "error": "No member ID provided",
       "details": null
     },
     {
       "test": "Get At-Risk Members",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "passed": false,
+      "status_code": 500,
+      "error": "Expected 200, got 500 - {'detail': 'INACTIVE'}",
       "details": null
     },
     {
       "test": "Create Family Group",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "passed": false,
+      "status_code": 422,
+      "error": "Expected 200, got 422 - {'detail': [{'type': 'missing', 'loc': ['body', 'campus_id'], 'msg': 'Field required', 'input': {'group_name': 'Test Family Group 172618'}, 'url': 'https://errors.pydantic.dev/2.12/v/missing'}]}",
       "details": null
     },
     {
@@ -55,38 +55,38 @@
       "details": null
     },
     {
-      "test": "Get Family Group 8695db5b-d0ef-41bc-8d75-ecd112c39fac",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "test": "Get Family Group",
+      "passed": false,
+      "status_code": null,
+      "error": "No group ID provided",
       "details": null
     },
     {
       "test": "Create Regular Care Event",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "passed": false,
+      "status_code": null,
+      "error": "No member ID provided",
       "details": null
     },
     {
-      "test": "Create Grief Event (Auto-generate Timeline)",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "test": "Create Grief Event with Timeline",
+      "passed": false,
+      "status_code": null,
+      "error": "No member ID provided",
       "details": null
     },
     {
       "test": "Create Hospital Visit Event",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "passed": false,
+      "status_code": null,
+      "error": "No member ID provided",
       "details": null
     },
     {
       "test": "Create Financial Aid Event",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "passed": false,
+      "status_code": null,
+      "error": "No member ID provided",
       "details": null
     },
     {
@@ -97,17 +97,17 @@
       "details": null
     },
     {
-      "test": "Get Care Event 8fc28731-84bd-4ce1-836a-f8d5f7c0d409",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "test": "Get Care Event",
+      "passed": false,
+      "status_code": null,
+      "error": "No event ID provided",
       "details": null
     },
     {
-      "test": "Complete Care Event 8fc28731-84bd-4ce1-836a-f8d5f7c0d409",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "test": "Complete Care Event",
+      "passed": false,
+      "status_code": null,
+      "error": "No event ID provided",
       "details": null
     },
     {
@@ -118,24 +118,17 @@
       "details": null
     },
     {
-      "test": "Get Member Grief Timeline b84c953d-d603-4d85-bf96-ebac43548ea8",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
-      "details": null
-    },
-    {
-      "test": "Complete Grief Stage c35d9b36-4a76-48a2-ace8-ada001a0f49a",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "test": "Get Member Grief Timeline",
+      "passed": false,
+      "status_code": null,
+      "error": "No member ID provided",
       "details": null
     },
     {
       "test": "Dashboard Stats",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "passed": false,
+      "status_code": 500,
+      "error": "Expected 200, got 500 - {'detail': 'INACTIVE'}",
       "details": null
     },
     {
@@ -167,10 +160,10 @@
       "details": null
     },
     {
-      "test": "Get Member Financial Aid b84c953d-d603-4d85-bf96-ebac43548ea8",
-      "passed": true,
-      "status_code": 200,
-      "error": null,
+      "test": "Get Member Financial Aid",
+      "passed": false,
+      "status_code": null,
+      "error": "No member ID provided",
       "details": null
     },
     {
