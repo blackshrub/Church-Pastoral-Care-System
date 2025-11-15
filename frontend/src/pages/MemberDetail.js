@@ -608,24 +608,24 @@ export const MemberDetail = () => {
       
       {/* Tabbed Content - Dynamic tabs based on data */}
       <Tabs defaultValue="timeline" className="w-full">
-        <div className="overflow-x-auto">
-          <TabsList className="inline-flex w-full">
-            <TabsTrigger value="timeline" data-testid="tab-timeline">
-              <Calendar className="w-4 h-4 mr-2" />Timeline
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <TabsList className="inline-flex min-w-full w-max sm:w-full">
+            <TabsTrigger value="timeline" data-testid="tab-timeline" className="flex-shrink-0">
+              <Calendar className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Timeline</span>
             </TabsTrigger>
             {griefTimeline.length > 0 && (
-              <TabsTrigger value="grief" data-testid="tab-grief">
-                <Heart className="w-4 h-4 mr-2" />Grief ({griefTimeline.length})
+              <TabsTrigger value="grief" data-testid="tab-grief" className="flex-shrink-0">
+                <Heart className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Grief</span> ({griefTimeline.length})
               </TabsTrigger>
             )}
             {careEvents.filter(e => e.event_type === 'accident_illness').length > 0 && (
-              <TabsTrigger value="accident" data-testid="tab-accident">
-                <Hospital className="w-4 h-4 mr-2" />Accident/Illness ({careEvents.filter(e => e.event_type === 'accident_illness').length})
+              <TabsTrigger value="accident" data-testid="tab-accident" className="flex-shrink-0">
+                <Hospital className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Accident/Illness</span> ({careEvents.filter(e => e.event_type === 'accident_illness').length})
               </TabsTrigger>
             )}
             {(careEvents.filter(e => e.event_type === 'financial_aid').length > 0 || aidSchedules.length > 0) && (
-              <TabsTrigger value="aid" data-testid="tab-aid">
-                <DollarSign className="w-4 h-4 mr-2" />Aid ({careEvents.filter(e => e.event_type === 'financial_aid').length + aidSchedules.length})
+              <TabsTrigger value="aid" data-testid="tab-aid" className="flex-shrink-0">
+                <DollarSign className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Aid</span> ({careEvents.filter(e => e.event_type === 'financial_aid').length + aidSchedules.length})
               </TabsTrigger>
             )}
           </TabsList>
