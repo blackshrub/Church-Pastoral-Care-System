@@ -122,7 +122,7 @@ export const FinancialAid = () => {
   };
   
   if (loading) {
-    return <div className="space-y-6"><Skeleton className="h-96 w-full" /></div>;
+    return <div className="space-y-6 max-w-full"><Skeleton className="h-96 w-full" /></div>;
   }
   
   const chartData = summary?.by_type ? Object.entries(summary.by_type).map(([type, data]) => ({
@@ -131,9 +131,9 @@ export const FinancialAid = () => {
   })) : [];
   
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-manrope font-bold text-foreground">{t('financial_aid')}</h1>
+    <div className="space-y-6 max-w-full">
+      <div className="min-w-0">
+        <h1 className="text-3xl font-playfair font-bold text-foreground">{t('financial_aid')}</h1>
         <p className="text-muted-foreground mt-1">{t('financial_assistance_tracking')}</p>
       </div>
       
