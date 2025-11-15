@@ -5,11 +5,11 @@
   },
   {
     "content": "Increase touch target sizes to 44x44px minimum",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Improve mobile spacing and layout",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Optimize info cards for mobile",
