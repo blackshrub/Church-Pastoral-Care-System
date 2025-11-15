@@ -2455,14 +2455,21 @@ async def stop_aid_schedule(schedule_id: str, current_user: dict = Depends(get_c
 
 @api_router.get("/financial-aid-schedules/member/{member_id}")
 async def get_member_aid_schedules(member_id: str, current_user: dict = Depends(get_current_user)):
-    """Get financial aid schedules for specific member"""
+    """Get financial aid schedules for specific member (includes stopped ones with history)"""
     try:
+        # Get all schedules (active + stopped with ignored occurrences)
         schedules = await db.financial_aid_schedules.find(
-            {"member_id": member_id, "is_active": True},
+            {"member_id": member_id},
             {"_id": 0}
-        ).sort("next_occurrence", 1).to_list(10)
+        ).sort("next_occurrence", 1).to_list(20)
         
-        return schedules
+        # Filter: active schedules OR stopped schedules with history
+        filtered_schedules = [
+            s for s in schedules 
+            if s.get("is_active") or (s.get("ignored_occurrences") and len(s.get("ignored_occurrences", [])) > 0)
+        ]
+        
+        return filtered_schedules
     except Exception as e:
         logger.error(f"Error getting member aid schedules: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
