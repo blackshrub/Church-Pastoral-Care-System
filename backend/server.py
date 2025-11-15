@@ -1282,7 +1282,8 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                         "details": f"{schedule['frequency'].title()} - Rp {schedule['aid_amount']:,}",
                         "data": schedule
                     })
-            except:
+            except Exception as e:
+                logger.error(f"Error processing financial aid schedule {schedule.get('id')}: {str(e)}")
                 continue
         
         # AI suggestions (top 10 at-risk)
