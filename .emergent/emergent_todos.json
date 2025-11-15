@@ -1,6 +1,6 @@
 [
   {
-    "content": "Fix Dashboard.js horizontal overflow - add max-w-full and min-w-0 to prevent 88px overflow",
+    "content": "Fix MembersList.js horizontal overflow - optimize table for 390px viewport (244px overflow)",
     "status": "completed"
   },
   {
@@ -8,28 +8,16 @@
     "status": "pending"
   },
   {
-    "content": "Implement toast notifications for Dashboard actions (mark complete, ignore, delete) with teal theme",
-    "status": "completed"
-  },
-  {
-    "content": "Apply card-border-left patterns consistently across Dashboard task cards",
-    "status": "completed"
-  },
-  {
-    "content": "Fix MembersList.js horizontal overflow - optimize table for 390px viewport (244px overflow)",
-    "status": "in_progress"
-  },
-  {
     "content": "Add EmptyState component to MembersList with Users icon and 'Add First Member' action",
     "status": "pending"
   },
   {
     "content": "Improve MembersList search/filter bar with responsive layout and loading indicators",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Run esbuild compile check to ensure no syntax errors",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Take screenshots at 390px, 768px, 1024px to verify responsive layouts",
@@ -40,7 +28,7 @@
     "status": "pending"
   },
   {
-    "content": "Fix any bugs found by testing agent before proceeding to Phase 2",
+    "content": "Fix any bugs found by testing agent before proceeding to Phase 3",
     "status": "pending"
   }
 ]
