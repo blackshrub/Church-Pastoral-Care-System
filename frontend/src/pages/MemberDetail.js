@@ -1119,12 +1119,14 @@ export const MemberDetail = () => {
                                       variant="ghost" 
                                       className="h-6 px-2"
                                       onClick={async () => {
-                                        try {
-                                          await axios.delete(`${API}/financial-aid-schedules/${schedule.id}/ignored-occurrence/${date}`);
-                                          toast.success('Ignored occurrence removed');
-                                          loadMemberData();
-                                        } catch (error) {
-                                          toast.error('Failed to remove');
+                                        if (window.confirm(`Remove this ignored occurrence (${formatDate(date, 'dd MMM yyyy')})?`)) {
+                                          try {
+                                            await axios.delete(`${API}/financial-aid-schedules/${schedule.id}/ignored-occurrence/${date}`);
+                                            toast.success('Ignored occurrence removed');
+                                            loadMemberData();
+                                          } catch (error) {
+                                            toast.error('Failed to remove');
+                                          }
                                         }
                                       }}
                                     >
