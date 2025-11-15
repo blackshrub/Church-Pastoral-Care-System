@@ -1,10 +1,54 @@
 [
   {
-    "content": "Call testing_agent for comprehensive Phase 3 testing (frontend + backend)",
-    "status": "completed"
+    "content": "View Analytics.js current implementation and understand structure",
+    "status": "pending"
   },
   {
-    "content": "Fix any bugs found by testing agent before proceeding to Phase 4",
-    "status": "completed"
+    "content": "Apply teal/amber color scheme to all Chart.js charts in Analytics.js",
+    "status": "pending"
+  },
+  {
+    "content": "Add max-w-full to all chart containers and ensure responsive layout",
+    "status": "pending"
+  },
+  {
+    "content": "View FinancialAid.js and apply 48px height to all inputs for touch-friendly interaction",
+    "status": "pending"
+  },
+  {
+    "content": "Ensure proper form spacing and validation in FinancialAid.js",
+    "status": "pending"
+  },
+  {
+    "content": "View Settings.js and verify language toggle styling is consistent with design system",
+    "status": "pending"
+  },
+  {
+    "content": "Apply responsive patterns to Settings page sections",
+    "status": "pending"
+  },
+  {
+    "content": "View AdminDashboard.js and implement card-based layout for mobile",
+    "status": "pending"
+  },
+  {
+    "content": "Show essential columns only on mobile in AdminDashboard (Name, Role, Actions)",
+    "status": "pending"
+  },
+  {
+    "content": "Run esbuild compile check to ensure no syntax errors",
+    "status": "pending"
+  },
+  {
+    "content": "Take screenshots at 390px, 768px, 1024px for all Phase 4 pages",
+    "status": "pending"
+  },
+  {
+    "content": "Call testing_agent for comprehensive Phase 4 testing (frontend + backend)",
+    "status": "pending"
+  },
+  {
+    "content": "Fix any bugs found by testing agent before proceeding to Phase 5",
+    "status": "pending"
   }
 ]
