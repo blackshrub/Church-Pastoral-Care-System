@@ -1106,7 +1106,13 @@ export const MemberDetail = () => {
                 {/* Total Summary */}
                 <div className="pt-4 border-t">
                   <p className="text-right font-semibold text-foreground">
-                    Total Given: Rp {careEvents.filter(e => e.event_type === 'financial_aid').reduce((sum, e) => sum + (e.aid_amount || 0), 0).toLocaleString('id-ID')}
+                    Total Given: Rp {careEvents
+                      .filter(e => e.event_type === 'financial_aid' && !e.ignored && e.completed !== false)
+                      .reduce((sum, e) => sum + (e.aid_amount || 0), 0)
+                      .toLocaleString('id-ID')}
+                  </p>
+                  <p className="text-right text-xs text-muted-foreground mt-1">
+                    (Excludes ignored and pending payments)
                   </p>
                 </div>
               </div>
