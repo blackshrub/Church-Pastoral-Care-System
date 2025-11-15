@@ -1,31 +1,31 @@
 [
   {
     "content": "Redesign MemberDetail.js responsive header - profile photo sizing, name/badge layout, contact info",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Redesign vertical timeline with colored dots for event types (teal, amber, pink, purple, sage)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Apply card-based timeline design with hover effects and card-border-left patterns",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Enhance visibility of overdue/completed/ignored items with colored badges",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Verify tabs functionality and touch targets on MemberDetail page",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Apply max-w-full and responsive patterns to prevent overflow on mobile",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Run esbuild compile check to ensure no syntax errors",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Take screenshots at 390px, 768px, 1024px for Member Detail page",
