@@ -1,7 +1,7 @@
 [
   {
     "content": "Redesign MemberDetail.js responsive header - profile photo sizing, name/badge layout, contact info",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Redesign vertical timeline with colored dots for event types (teal, amber, pink, purple, sage)",
