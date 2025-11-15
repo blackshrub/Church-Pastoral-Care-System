@@ -587,11 +587,7 @@ export const Dashboard = () => {
                       )}
                       
                       {quickEvent.schedule_frequency === 'weekly' && (
-                        <div className="grid grid-cols-3 gap-3 p-3 bg-blue-50 rounded">
-                          <div>
-                            <Label className="text-xs">Start Date</Label>
-                            <Input type="date" value={quickEvent.schedule_start_date || ''} onChange={(e) => setQuickEvent({...quickEvent, schedule_start_date: e.target.value})} />
-                          </div>
+                        <div className="grid grid-cols-2 gap-3 p-3 bg-blue-50 rounded">
                           <div>
                             <Label className="text-xs">Day of Week</Label>
                             <Select value={quickEvent.day_of_week || 'monday'} onValueChange={(v) => setQuickEvent({...quickEvent, day_of_week: v})}>
