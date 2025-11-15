@@ -144,12 +144,12 @@ export const Settings = () => {
             <CardContent className="space-y-4">
               <div>
                 <Label>Schedule Time</Label>
-                <Input value="08:00" disabled />
+                <Input value="08:00" disabled className="h-12" />
                 <p className="text-xs text-muted-foreground mt-1">Jakarta Time (UTC+7) - Currently fixed</p>
               </div>
               <div>
                 <Label>WhatsApp Gateway URL</Label>
-                <Input value={process.env.REACT_APP_WHATSAPP_GATEWAY_URL || "http://dermapack.net:3001"} disabled />
+                <Input value={process.env.REACT_APP_WHATSAPP_GATEWAY_URL || "http://dermapack.net:3001"} disabled className="h-12" />
                 <p className="text-xs text-muted-foreground mt-1">Change in backend .env file</p>
               </div>
               <div className="p-4 bg-blue-50 rounded-lg">
