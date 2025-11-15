@@ -2588,6 +2588,20 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
             "updated_at": datetime.now(timezone.utc).isoformat()
         })
         
+        # Update member's last contact date and engagement status
+        settings = await get_engagement_settings()
+        status, days = calculate_engagement_status(datetime.now(timezone.utc), settings.get("atRiskDays", 60), settings.get("disconnectedDays", 90))
+        
+        await db.members.update_one(
+            {"id": schedule["member_id"]},
+            {"$set": {
+                "last_contact_date": datetime.now(timezone.utc).isoformat(),
+                "engagement_status": status,
+                "days_since_last_contact": days,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
         # Calculate next occurrence
         current_date = date.fromisoformat(schedule["next_occurrence"])
         today = date.today()
