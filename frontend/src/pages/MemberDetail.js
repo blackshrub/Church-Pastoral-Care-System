@@ -826,7 +826,7 @@ export const MemberDetail = () => {
             </p>
           ) : (
             careEvents.filter(e => e.event_type === 'grief_loss').map(event => (
-                  <div key={event.id} className="space-y-4 mb-6 p-4 border border-pink-200 rounded-lg">
+                  <div key={event.id} className="space-y-4 mb-6 p-4 border border-pink-200 bg-pink-50 rounded-lg shadow-sm">
                     <div>
                       <h4 className="font-semibold">💔 {event.title || 'Grief/Loss Event'}</h4>
                       <p className="text-sm text-muted-foreground">
@@ -948,7 +948,7 @@ export const MemberDetail = () => {
             <p className="text-sm text-muted-foreground text-center py-8">No accident/illness visits recorded.</p>
           ) : (
             careEvents.filter(e => e.event_type === 'accident_illness').map(event => (
-                  <div key={event.id} className="space-y-4 mb-6 p-4 border rounded-lg relative">
+                  <div key={event.id} className="space-y-4 mb-6 p-4 border border-blue-200 bg-blue-50 rounded-lg shadow-sm relative">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <h4 className="font-semibold text-lg mb-1">🏥 {event.description || event.title || 'Accident/Illness Visit'}</h4>
