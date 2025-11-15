@@ -712,6 +712,16 @@ export const MemberDetail = () => {
                           <div className="text-sm sm:text-base font-bold leading-none">{formatDate(event.event_date, 'dd')}</div>
                           <div className="text-[8px] sm:text-[9px] leading-none uppercase opacity-90 mt-0.5">{formatDate(event.event_date, 'MMM')}</div>
                         </div>
+                        {/* Event type icon */}
+                        <div className="mt-1 text-lg">
+                          {event.event_type === 'grief_loss' && '💔'}
+                          {event.event_type === 'accident_illness' && '🏥'}
+                          {event.event_type === 'financial_aid' && '💰'}
+                          {event.event_type === 'childbirth' && '👶'}
+                          {event.event_type === 'new_house' && '🏠'}
+                          {event.event_type === 'hospital_visit' && '🏥'}
+                          {event.event_type === 'regular_contact' && '📞'}
+                        </div>
                       </div>
                       
                       {/* Event content */}
