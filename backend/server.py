@@ -1559,17 +1559,51 @@ async def delete_member(member_id: str):
 async def delete_care_event(event_id: str):
     """Delete care event and recalculate member engagement"""
     try:
-        # Get the care event first to know which member
+        # Get the care event first to know which member and type
         event = await db.care_events.find_one({"id": event_id}, {"_id": 0})
         if not event:
             raise HTTPException(status_code=404, detail="Care event not found")
         
         member_id = event["member_id"]
+        event_type = event.get("event_type")
+        
+        # If deleting a birthday completion event, reset the birthday event to incomplete
+        if event_type == "regular_contact" and "Birthday" in event.get("title", ""):
+            # Find the birthday event for this member
+            birthday_event = await db.care_events.find_one(
+                {"member_id": member_id, "event_type": "birthday"},
+                {"_id": 0}
+            )
+            if birthday_event:
+                await db.care_events.update_one(
+                    {"id": birthday_event["id"]},
+                    {"$set": {"completed": False, "updated_at": datetime.now(timezone.utc).isoformat()}}
+                )
         
         # Delete the care event
         result = await db.care_events.delete_one({"id": event_id})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Care event not found")
+        
+        # If deleting grief/accident parent event, also delete followup timeline events
+        if event_type == "grief_loss":
+            # Delete grief support stages
+            await db.grief_support.delete_many({"care_event_id": event_id})
+            # Delete timeline events created from grief followup completions
+            await db.care_events.delete_many({
+                "member_id": member_id,
+                "event_type": "regular_contact",
+                "title": {"$regex": "Grief Support:", "$options": "i"}
+            })
+        elif event_type == "accident_illness":
+            # Delete accident followup stages
+            await db.accident_followup.delete_many({"care_event_id": event_id})
+            # Delete timeline events created from accident followup completions
+            await db.care_events.delete_many({
+                "member_id": member_id,
+                "event_type": "regular_contact",
+                "title": {"$regex": "Accident Follow-up:", "$options": "i"}
+            })
         
         # Recalculate member's last contact date from remaining NON-BIRTHDAY events
         # Birthday events don't count as contact unless completed (marked as contacted)
