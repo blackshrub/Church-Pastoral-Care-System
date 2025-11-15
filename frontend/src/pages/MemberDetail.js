@@ -708,14 +708,13 @@ export const MemberDetail = () => {
             return null;
           })()}
           
-          <Card>
-            <CardContent className="p-6">
-              {careEvents.filter(e => e.event_type !== 'birthday').length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  {t('empty_states.no_care_events')}
-                </p>
-              ) : (
-                <div className="relative max-w-full">
+          {/* Timeline - full width without card container */}
+          {careEvents.filter(e => e.event_type !== 'birthday').length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              {t('empty_states.no_care_events')}
+            </p>
+          ) : (
+            <div className="relative max-w-full">
                   {/* Timeline vertical line */}
                   <div className="absolute left-6 sm:left-7 top-12 bottom-0 w-0.5 bg-border"></div>
                   
@@ -745,9 +744,9 @@ export const MemberDetail = () => {
                     
                     return (
                     <div key={event.id} className={`flex gap-3 sm:gap-4 pb-6 relative`} data-testid={`care-event-${event.id}`}>
-                      {/* Status badge - top right */}
+                      {/* Status badge - top right, with space for three dots menu */}
                       {(isIgnored || isCompleted) && (
-                        <div className="absolute top-2 right-2 z-10">
+                        <div className="absolute top-2 right-14 z-10">
                           {isCompleted && <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">✓ Completed</span>}
                           {isIgnored && !isCompleted && <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>}
                         </div>
@@ -815,10 +814,8 @@ export const MemberDetail = () => {
                     </div>
                     );
                   })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            </div>
+          )}
         </TabsContent>
         
         {/* Grief Support Tab */}
