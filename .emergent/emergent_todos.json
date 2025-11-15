@@ -1,11 +1,11 @@
 [
   {
     "content": "Fix Add Care Event button overflow causing horizontal scroll",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Increase touch target sizes to 44x44px minimum",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Improve mobile spacing and layout",
