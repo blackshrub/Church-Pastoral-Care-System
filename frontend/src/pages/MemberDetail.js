@@ -1066,12 +1066,14 @@ export const MemberDetail = () => {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                   <DropdownMenuItem onClick={async () => {
-                                    if (window.confirm('Stop this aid schedule?')) {
+                                    if (window.confirm('Stop this aid schedule? (History will be preserved)')) {
                                       try {
                                         await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
                                         toast.success('Schedule stopped');
-                                        // Update local state to remove stopped schedule
-                                        setAidSchedules(prev => prev.filter(s => s.id !== schedule.id));
+                                        // Update local state to mark as inactive
+                                        setAidSchedules(prev => prev.map(s => 
+                                          s.id === schedule.id ? {...s, is_active: false} : s
+                                        ));
                                       } catch (error) {
                                         toast.error('Failed to stop schedule');
                                       }
