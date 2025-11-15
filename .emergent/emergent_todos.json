@@ -1,10 +1,18 @@
 [
   {
-    "content": "Move Stop Schedule to three-dots menu in MemberDetail Financial Aid",
-    "status": "completed"
+    "content": "Fix Add Care Event button overflow causing horizontal scroll",
+    "status": "in_progress"
   },
   {
-    "content": "Add archived members toggle filter in Members page",
-    "status": "completed"
+    "content": "Increase touch target sizes to 44x44px minimum",
+    "status": "pending"
+  },
+  {
+    "content": "Improve mobile spacing and layout",
+    "status": "pending"
+  },
+  {
+    "content": "Optimize info cards for mobile",
+    "status": "pending"
   }
 ]
