@@ -237,18 +237,18 @@ export const MembersList = () => {
   }
   
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-manrope font-bold text-foreground">{t('members')}</h1>
+    <div className="space-y-6 max-w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-3xl font-playfair font-bold text-foreground">{t('members')}</h1>
           <p className="text-muted-foreground mt-1">{members.length} total members</p>
         </div>
         
         <Dialog open={addModalOpen} onOpenChange={setAddModalOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-teal-500 hover:bg-teal-600 text-white" data-testid="open-add-member-modal">
-              <Plus className="w-4 h-4 mr-2" />
-              {t('add_member')}
+            <Button className="bg-teal-500 hover:bg-teal-600 text-white h-12 min-w-0" data-testid="open-add-member-modal">
+              <Plus className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{t('add_member')}</span>
             </Button>
           </DialogTrigger>
           <DialogContent data-testid="add-member-modal">
