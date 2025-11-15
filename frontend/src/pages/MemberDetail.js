@@ -249,40 +249,58 @@ export const MemberDetail = () => {
   }
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full">
       {/* Header */}
-      <div>
+      <div className="max-w-full">
         <Link to="/members">
-          <Button variant="ghost" size="sm" className="mb-4">
+          <Button variant="ghost" size="sm" className="mb-4 h-10">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Members
           </Button>
         </Link>
         
-        <div className="flex flex-row items-start gap-3 sm:gap-6">
-          <MemberAvatar member={member} size="xl" className="shrink-0" />
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col gap-3">
-              <div className="flex-1 min-w-0">
-                <h1 className="text-xl sm:text-3xl font-manrope font-bold text-foreground truncate">{member.name}</h1>
-                <p className="text-sm sm:text-base text-muted-foreground mt-1">{member.phone}</p>
-                <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 mt-2">
-                  <EngagementBadge status={member.engagement_status} days={member.days_since_last_contact} />
-                  {member.last_contact_date && (
-                    <span className="text-xs sm:text-sm text-muted-foreground">
-                      {t('last_contact')}: {formatDate(member.last_contact_date, 'dd MMM yyyy')}
-                    </span>
+        <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 max-w-full">
+          {/* Profile Photo - Larger on desktop */}
+          <div className="shrink-0">
+            <MemberAvatar member={member} size="xl" className="w-20 h-20 sm:w-32 sm:h-32" />
+          </div>
+          
+          {/* Member Info */}
+          <div className="flex-1 min-w-0 w-full">
+            <div className="space-y-3">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-playfair font-bold text-foreground">{member.name}</h1>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  {member.phone && (
+                    <a href={`tel:${member.phone}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1">
+                      📞 {member.phone}
+                    </a>
+                  )}
+                  {member.email && (
+                    <a href={`mailto:${member.email}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1">
+                      ✉️ {member.email}
+                    </a>
                   )}
                 </div>
               </div>
+              
+              {/* Engagement Badge & Last Contact */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                <EngagementBadge status={member.engagement_status} days={member.days_since_last_contact} />
+                {member.last_contact_date && (
+                  <span className="text-xs sm:text-sm text-muted-foreground">
+                    {t('last_contact')}: {formatDate(member.last_contact_date, 'dd MMM yyyy')}
+                  </span>
+                )}
+              </div>
             </div>
             
-            {/* Add Care Event button - below on mobile */}
+            {/* Add Care Event button - mobile friendly */}
             <Dialog open={eventModalOpen} onOpenChange={setEventModalOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-teal-500 hover:bg-teal-600 text-white w-full mt-3" data-testid="add-care-event-button">
-                  <Plus className="w-4 h-4 mr-2" />
-                  {t('add_care_event')}
+                <Button className="bg-teal-500 hover:bg-teal-600 text-white w-full sm:w-auto mt-4 h-12 min-w-0" data-testid="add-care-event-button">
+                  <Plus className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span className="truncate">{t('add_care_event')}</span>
                 </Button>
               </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="add-care-event-modal">
@@ -697,40 +715,51 @@ export const MemberDetail = () => {
                   {t('empty_states.no_care_events')}
                 </p>
               ) : (
-                <div className="relative">
+                <div className="relative max-w-full">
                   {/* Timeline vertical line */}
-                  <div className="absolute left-4 sm:left-8 top-8 bottom-0 w-0.5 bg-gradient-to-b from-primary-300 via-primary-200 to-transparent"></div>
+                  <div className="absolute left-4 sm:left-6 top-8 bottom-0 w-0.5 bg-border"></div>
                   
                   {careEvents.filter(e => e.event_type !== 'birthday').map((event, idx) => {
                     const isIgnored = event.ignored === true;
+                    const isCompleted = event.completed === true;
+                    
+                    // Determine dot color based on event type
+                    let dotColor = 'bg-teal-500'; // Default: regular contact, general
+                    if (event.event_type === 'birthday' || event.event_type === 'childbirth' || event.event_type === 'new_house') {
+                      dotColor = 'bg-amber-500'; // Celebrations
+                    } else if (event.event_type === 'grief_loss' || event.event_type === 'accident_illness' || event.event_type === 'hospital_visit') {
+                      dotColor = 'bg-pink-500'; // Care/follow-ups
+                    } else if (event.event_type === 'financial_aid') {
+                      dotColor = 'bg-purple-500'; // Special/aid
+                    }
+                    
+                    // Determine border color for card
+                    let borderClass = 'card-border-left-teal';
+                    if (event.event_type === 'birthday' || event.event_type === 'childbirth' || event.event_type === 'new_house') {
+                      borderClass = 'card-border-left-amber';
+                    } else if (event.event_type === 'grief_loss' || event.event_type === 'accident_illness' || event.event_type === 'hospital_visit') {
+                      borderClass = 'card-border-left-pink';
+                    } else if (event.event_type === 'financial_aid') {
+                      borderClass = 'card-border-left-purple';
+                    }
+                    
                     return (
-                    <div key={event.id} className={`flex gap-3 sm:gap-6 pb-6 relative ${isIgnored ? 'opacity-60' : ''}`} data-testid={`care-event-${event.id}`}>
-                      {isIgnored && (
+                    <div key={event.id} className={`flex gap-3 sm:gap-4 pb-6 relative ${isIgnored || isCompleted ? 'opacity-60' : ''}`} data-testid={`care-event-${event.id}`}>
+                      {/* Status badge - top right */}
+                      {(isIgnored || isCompleted) && (
                         <div className="absolute top-2 right-2 z-10">
-                          <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
+                          {isCompleted && <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded">✓ Completed</span>}
+                          {isIgnored && !isCompleted && <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>}
                         </div>
                       )}
                       
-                      {/* Timeline date marker - compact on mobile */}
-                      <div className="flex flex-col items-center shrink-0 w-10 sm:w-12">
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-teal-500 to-teal-600 border-2 border-background shadow-md flex flex-col items-center justify-center relative z-10 text-white">
-                          <div className="text-sm sm:text-base font-bold leading-none">{formatDate(event.event_date, 'dd')}</div>
-                          <div className="text-[8px] sm:text-[9px] leading-none uppercase opacity-90 mt-0.5">{formatDate(event.event_date, 'MMM')}</div>
-                        </div>
-                        {/* Event type icon */}
-                        <div className="mt-1 text-lg">
-                          {event.event_type === 'grief_loss' && '💔'}
-                          {event.event_type === 'accident_illness' && '🏥'}
-                          {event.event_type === 'financial_aid' && '💰'}
-                          {event.event_type === 'childbirth' && '👶'}
-                          {event.event_type === 'new_house' && '🏠'}
-                          {event.event_type === 'hospital_visit' && '🏥'}
-                          {event.event_type === 'regular_contact' && '📞'}
-                        </div>
+                      {/* Timeline dot - colored by event type */}
+                      <div className="flex flex-col items-center shrink-0 w-8 sm:w-10">
+                        <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full ${dotColor} border-2 border-background shadow-md relative z-10`}></div>
                       </div>
                       
-                      {/* Event content */}
-                      <Card className="flex-1 border-l-4 border-l-teal-400 min-w-0">
+                      {/* Event content card */}
+                      <Card className={`flex-1 ${borderClass} shadow-sm hover:shadow-md transition-all min-w-0 card`}>
                         <CardContent className="p-3 sm:p-4">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
