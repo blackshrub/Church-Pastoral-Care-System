@@ -357,11 +357,11 @@ export const MembersList = () => {
       </div>
       
       {/* Filters and Column Visibility */}
-      <Card className="border-border">
+      <Card className="border-border max-w-full">
         <CardContent className="p-4">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
+          <div className="flex flex-col gap-4 max-w-full">
+            <div className="flex flex-col md:flex-row gap-4 max-w-full">
+              <div className="flex-1 min-w-0">
                 <div className="relative">
                   {searchLoading ? (
                     <Loader2 className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-teal-500 animate-spin" />
@@ -378,14 +378,14 @@ export const MembersList = () => {
                       }
                     }}
                     onKeyDown={handleSearchKeyDown}
-                    className="pl-10"
+                    className="pl-10 h-12"
                     data-testid="search-members-input"
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-shrink-0">
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger className="w-full md:w-48" data-testid="filter-status-select">
+                  <SelectTrigger className="w-full md:w-48 h-12" data-testid="filter-status-select">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
