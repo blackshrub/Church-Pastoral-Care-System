@@ -429,16 +429,7 @@ export const MemberDetail = () => {
                       )}
                       
                       {newEvent.schedule_frequency === 'weekly' && (
-                        <div className="grid grid-cols-3 gap-3 p-3 bg-blue-50 dark:bg-blue-950 rounded">
-                          <div>
-                            <Label className="text-xs">Start Date *</Label>
-                            <Input
-                              type="date"
-                              value={newEvent.schedule_start_date}
-                              onChange={(e) => setNewEvent({...newEvent, schedule_start_date: e.target.value})}
-                              required
-                            />
-                          </div>
+                        <div className="grid grid-cols-2 gap-3 p-3 bg-blue-50 dark:bg-blue-950 rounded">
                           <div>
                             <Label className="text-xs">Day of Week *</Label>
                             <Select value={newEvent.day_of_week} onValueChange={(v) => setNewEvent({...newEvent, day_of_week: v})}>
