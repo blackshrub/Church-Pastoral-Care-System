@@ -716,9 +716,19 @@ export const MemberDetail = () => {
                                 {event.description}
                               </p>
                             )}
+                            {event.grief_relationship && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Relationship: {event.grief_relationship}
+                              </p>
+                            )}
+                            {event.hospital_name && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                Hospital: {event.hospital_name}
+                              </p>
+                            )}
                             {event.aid_amount && (
                               <p className="text-sm text-green-700 font-medium mt-1">
-                                Rp {event.aid_amount.toLocaleString('id-ID')}
+                                {event.aid_type && `${event.aid_type} - `}Rp {event.aid_amount.toLocaleString('id-ID')}
                               </p>
                             )}
                           </div>
