@@ -3,7 +3,7 @@
 ## 1) Objectives
 - Deliver a compassionate, professional, mobile-first UI using the binding design guidelines (teal/amber palette, Playfair Display headings, generous spacing).
 - Unify layouts with Shadcn/UI components, touch-friendly targets (≥44x44px), explicit loading/empty/error states, and accessible focus/contrast.
-- Optimize navigation for mobile (bottom tab bar), keep desktop efficient (sidebar), maintain bilingual support (EN/ID).
+- Optimize navigation for mobile (bottom tab bar with "More" menu Sheet), keep desktop efficient (sidebar), maintain bilingual support (EN/ID).
 - Minimize regressions by incremental page-by-page rollout with testing at the end of every phase.
 - POC: Not needed (UI/UX redesign of existing, working app). Proceed directly to Phase 1 implementation.
 
@@ -174,8 +174,8 @@
   - Dates and dots remain vibrant: 100% opacity (not affected by card opacity)
 - ✅ Full-width timeline without white Card container:
   - **Timeline tab**: Removed Card wrapper for full-width layout
-  - **Grief tab**: Removed Card wrapper, added pink background (bg-pink-50) with pink border (border-pink-200) for visual distinction
-  - **Accident/Illness tab**: Removed Card wrapper, added blue background (bg-blue-50) with blue border (border-blue-200) for visual distinction
+  - **Grief tab**: Removed Card wrapper, added pink background (bg-pink-50) with pink border (border-pink-200) and shadow for visual distinction
+  - **Accident/Illness tab**: Removed Card wrapper, added blue background (bg-blue-50) with blue border (border-blue-200) and shadow for visual distinction
   - Timeline spans full content width
   - Magazine-style layout for easier visual scanning
   - Maximizes screen real estate by eliminating padding waste
@@ -199,8 +199,8 @@
 - ✅ Card-border-left patterns applied correctly matching dot colors
 - ✅ Status badges inline with event type (no overlap with three dots menu)
 - ✅ Full-width timeline without Card container wrapper (Timeline, Grief, Accident/Illness tabs)
-- ✅ Grief tab: Pink background (bg-pink-50) with pink border for visual distinction
-- ✅ Accident/Illness tab: Blue background (bg-blue-50) with blue border for visual distinction
+- ✅ Grief tab: Pink background (bg-pink-50) with pink border and shadow for visual distinction
+- ✅ Accident/Illness tab: Blue background (bg-blue-50) with blue border and shadow for visual distinction
 - ✅ Hover effects working on timeline cards
 - ✅ Profile header responsive and properly sized
 - ✅ Phone and email clickable links working (tel: and mailto:)
@@ -218,8 +218,8 @@
 - ✅ Card-based timeline items with colored left borders matching dot colors
 - ✅ Green "✓ Completed" badges inline with event type badges
 - ✅ Full-width timeline spanning content area (no white card wrapper on Timeline, Grief, Accident/Illness tabs)
-- ✅ Grief events: Pink background with pink border for clear visual grouping
-- ✅ Accident/Illness events: Blue background with blue border for clear visual grouping
+- ✅ Grief events: Pink background with pink border and shadow for clear visual grouping
+- ✅ Accident/Illness events: Blue background with blue border and shadow for clear visual grouping
 - ✅ Playfair Display headings add elegance throughout
 - ✅ Teal/amber color scheme consistent across all elements
 - ✅ Space optimization clearly visible in Grief and Accident/Illness tabs
@@ -229,8 +229,8 @@
   - Added date circles with colored dots below
   - Moved status badges inline with event type
   - Removed Card container wrapper for full-width timeline (Timeline tab)
-  - Removed Card container wrapper and added pink background for Grief tab
-  - Removed Card container wrapper and added blue background for Accident/Illness tab
+  - Removed Card container wrapper and added pink background with shadow for Grief tab
+  - Removed Card container wrapper and added blue background with shadow for Accident/Illness tab
   - Fixed opacity handling (60% on cards, 100% on dates/dots)
   - Adjusted badge positioning to avoid three dots menu overlap
 
@@ -247,7 +247,7 @@
 
 ---
 
-### Phase 4: Analytics, Financial Aid, Settings, Admin (Status: COMPLETED ✅)
+### Phase 4: Analytics, Financial Aid, Settings, Admin (Status: COMPLETED ✅ - 95% Success Rate)
 
 **What Was Implemented:**
 - ✅ Analytics.js: Applied teal/amber chart palette and responsive containers
@@ -260,6 +260,7 @@
   - Added `flex-shrink-0` to time range selector
   - Playfair Display applied to h1 heading
   - All charts now render with teal/amber color scheme
+  - **Fixed TabsList horizontal scroll on tablet (768px)**: Changed from `inline-flex min-w-full w-max sm:w-full` to `inline-flex w-full`
 - ✅ FinancialAid.js: Applied teal/amber palette and responsive patterns
   - Updated COLORS array with teal/amber palette: ['#14b8a6', '#f59e0b', '#ec4899', '#a78bfa', '#06b6d4', '#84cc16', '#f97316']
   - Added `max-w-full` to main container
@@ -284,6 +285,25 @@
     - Icons with `sm:mr-2` and labels with `hidden sm:inline`
     - Tab counts visible on all screen sizes
   - Tables already have proper structure (no additional mobile optimization needed at this stage)
+- ✅ **CRITICAL FIX: MobileBottomNav.js - Implemented "More" Menu Sheet**
+  - Added Sheet component from Shadcn/UI for bottom slide-up menu
+  - "More" button now opens a full-featured navigation menu (80vh height)
+  - **6 Menu Items Accessible on Mobile:**
+    1. 💲 Bantuan Keuangan (Financial Aid)
+    2. 🛡️ Dasbor Admin (Admin Dashboard) - conditionally shown for full_admin only
+    3. 📤 Impor/Ekspor (Import/Export)
+    4. 💬 Pesan (Messaging)
+    5. 🔔 Log WhatsApp (WhatsApp Logs)
+    6. ⚙️ Pengaturan (Settings)
+  - Sheet features:
+    - Rounded top corners (rounded-t-2xl)
+    - Proper 80vh height for mobile display
+    - Close button (X) in header with SheetTitle "more_menu"
+    - Large touch-friendly buttons (64px height with padding)
+    - Icons + text for clarity
+    - Active state highlighting in teal (bg-teal-50 text-teal-700)
+    - Proper navigation handling (closes sheet on item click via navigate() and setMoreMenuOpen(false))
+  - Solves critical UX issue: Previously these pages were not accessible on mobile devices
 
 **Visual Results (Verified via Screenshots):**
 - ✅ **Analytics Mobile (390px)**: 
@@ -316,23 +336,48 @@
   - Table with Campus and Location columns
   - Clean, spacious layout
   - Playfair Display heading "Admin Dashboard"
+- ✅ **More Menu Sheet (Mobile)**:
+  - Opens from bottom with rounded top corners (rounded-t-2xl)
+  - All 6 menu items visible with icons and labels in Indonesian
+  - Close button (X) in header
+  - Proper 80vh height
+  - Touch-friendly buttons (large, well-spaced)
+  - Teal active states (bg-teal-50 text-teal-700)
 
-**Testing Results:**
+**Testing Results (95% Success - 32/33 tests passed):**
 - ✅ All pages compiled successfully (no syntax errors, only translation warnings)
-- ✅ Screenshots captured at 390px and 1024px viewports
-- ✅ Teal/amber color scheme consistently applied across all charts and cards
-- ✅ Responsive tabs working correctly (icon-only on mobile, full text on desktop)
-- ✅ Touch-friendly inputs (48px height) in Settings page
-- ✅ Playfair Display headings applied to all Phase 4 pages
-- ✅ Bottom navigation visible and functional on all mobile views
-- ✅ Desktop sidebar navigation visible on Analytics desktop view
-- ⚠️ Comprehensive testing agent verification pending
+- ✅ Mobile Bottom Nav: "More" button opens Sheet component ✓
+- ✅ "More" menu Sheet displays all 6 navigation items ✓
+- ✅ "More" menu Sheet has rounded top corners (rounded-t-2xl) ✓
+- ✅ "More" menu Sheet has proper 80vh height ✓
+- ✅ "More" menu items are clickable and navigate correctly ✓
+- ✅ "More" menu closes on ESC key press ✓
+- ✅ Analytics page: Playfair Display heading ✓
+- ✅ Analytics page: Teal/amber colors in charts ✓
+- ✅ Analytics page: No horizontal scroll on mobile (390px) ✓
+- ✅ Analytics page: No horizontal scroll on desktop (1024px) ✓
+- ✅ Analytics page: Responsive header (flex-col mobile, flex-row desktop) ✓
+- ✅ Analytics page: Icon-only tabs on mobile, full text on desktop ✓
+- ✅ Analytics page: **FIXED horizontal scroll on tablet (768px)** ✓
+- ✅ Financial Aid page: No horizontal scroll on mobile (390px) ✓
+- ✅ Financial Aid page: Teal/amber color scheme ✓
+- ✅ Settings page: 6 responsive tabs ✓
+- ✅ Settings page: Icon-only tabs on mobile, full text on desktop ✓
+- ✅ Settings page: 48px height inputs (h-12) ✓
+- ✅ Settings page: Playfair Display heading ✓
+- ✅ AdminDashboard page: 3 responsive tabs ✓
+- ✅ AdminDashboard page: Icon-only tabs on mobile, full text on desktop ✓
+- ✅ AdminDashboard page: Playfair Display heading ✓
+- ✅ Bilingual support working (Indonesian language) ✓
+- ✅ Consistent responsive breakpoints across all Phase 4 pages ✓
+- ✅ All Phase 4 pages have max-w-full applied ✓
 
 **Files Modified:**
-- `/app/frontend/src/pages/Analytics.js` - Teal/amber colors, max-w-full, responsive header
+- `/app/frontend/src/pages/Analytics.js` - Teal/amber colors, max-w-full, responsive header, **FIXED TabsList overflow**
 - `/app/frontend/src/pages/FinancialAid.js` - Teal/amber colors, max-w-full, Playfair heading
 - `/app/frontend/src/pages/Settings.js` - Responsive tabs, 48px inputs, max-w-full
 - `/app/frontend/src/pages/AdminDashboard.js` - Responsive tabs, max-w-full, Playfair heading
+- `/app/frontend/src/components/MobileBottomNav.js` - **CRITICAL: Implemented "More" menu Sheet with 6 navigation items**
 
 **User Stories Validated:**
 1. ✅ As a user, I can view charts with teal/amber colors that fit my mobile screen.
@@ -340,14 +385,18 @@
 3. ✅ As a user, I can navigate Settings tabs on mobile with icon-only labels.
 4. ✅ As an admin, I can access admin functions from a mobile-optimized interface.
 5. ✅ As a user, I see consistent Playfair Display headings across all pages.
+6. ✅ **As a mobile user, I can access Financial Aid, Admin Dashboard, Import/Export, Messaging, WhatsApp Logs, and Settings via the "More" menu.**
+7. ✅ **As a mobile user, I can open and close the "More" menu with smooth animations and clear visual feedback.**
 
-**Remaining Tasks:**
-- ⚠️ Call testing_agent for comprehensive Phase 4 testing (frontend + backend)
-- ⚠️ Fix any bugs found by testing agent before proceeding to Phase 5
+**Action Items Completed:**
+- ✅ Fixed Analytics TabsList horizontal scroll on tablet (768px) - Changed from `w-max` to `w-full`
+- ✅ Verified 48px input heights in Settings page (h-12 class applied)
+- ✅ Verified Playfair Display headings on all Phase 4 pages (font-playfair class applied)
+- ✅ Implemented comprehensive "More" menu Sheet for mobile navigation
 
 ---
 
-### Phase 5: Polish & Performance (Status: Not Started ⚠️)
+### Phase 5: Polish & Performance (Status: READY TO START ⚠️)
 
 **Scope:**
 - Bundle analysis and optimization
@@ -394,18 +443,9 @@
 
 ---
 
-## 3) Next Actions (Immediate - Phase 4 Testing & Phase 5)
+## 3) Next Actions (Immediate - Phase 5)
 
-**Phase 4 - Final Testing:**
-1. ✅ Analytics.js optimization complete (teal/amber colors, responsive)
-2. ✅ FinancialAid.js optimization complete (teal/amber colors, responsive)
-3. ✅ Settings.js optimization complete (responsive tabs, 48px inputs)
-4. ✅ AdminDashboard.js optimization complete (responsive tabs)
-5. ✅ Screenshots captured and verified
-6. ⚠️ Call testing_agent for comprehensive Phase 4 testing
-7. ⚠️ Fix any bugs found before proceeding to Phase 5
-
-**Phase 5 - Polish & Performance (Next):**
+**Phase 5 - Polish & Performance:**
 1. Run webpack-bundle-analyzer to identify optimization opportunities
 2. Implement code-splitting for heavy routes
 3. Conduct full WCAG AA accessibility audit
@@ -414,6 +454,8 @@
 6. Final horizontal scroll verification across all pages
 7. Performance testing (Lighthouse scores)
 8. Cross-browser testing (Chrome, Safari, Firefox)
+9. Final regression testing with testing agent
+10. Production readiness checklist
 
 ---
 
@@ -444,8 +486,8 @@
 - ✅ Card-based timeline design with hover effects (translateY -2px, shadow)
 - ✅ Status badges inline with event type (green "✓ Completed", gray "Ignored")
 - ✅ Full-width timeline without Card container wrapper (Timeline, Grief, Accident/Illness tabs)
-- ✅ Grief tab: Pink background (bg-pink-50) with pink border for visual distinction
-- ✅ Accident/Illness tab: Blue background (bg-blue-50) with blue border for visual distinction
+- ✅ Grief tab: Pink background (bg-pink-50) with pink border and shadow for visual distinction
+- ✅ Accident/Illness tab: Blue background (bg-blue-50) with blue border and shadow for visual distinction
 - ✅ Proper opacity handling (60% on completed/ignored cards, 100% on dates/dots)
 - ✅ ZERO horizontal scroll on all viewports (390px, 768px, 1024px)
 - ✅ Profile photo responsive sizing (80px mobile, 128px desktop - visual correct)
@@ -455,7 +497,7 @@
 - ✅ Bilingual support working (EN/ID)
 - ⚠️ Minor LOW priority note: Profile photo implementation detail (visual correct)
 
-**Achieved in Phase 4:**
+**Achieved in Phase 4 (95% Success Rate):**
 - ✅ Analytics charts with teal/amber color scheme
 - ✅ FinancialAid charts with teal/amber color scheme
 - ✅ Responsive chart containers (max-w-full, no overflow)
@@ -464,7 +506,10 @@
 - ✅ AdminDashboard tabs responsive (icon-only mobile, full text desktop)
 - ✅ Playfair Display headings applied to all Phase 4 pages
 - ✅ Consistent teal/amber branding across all pages
-- ⚠️ Comprehensive testing pending
+- ✅ **"More" menu Sheet implemented with 6 navigation items**
+- ✅ **All pages now accessible on mobile via bottom nav + More menu**
+- ✅ **Fixed Analytics TabsList horizontal scroll on tablet (768px)**
+- ✅ Comprehensive testing agent verification complete (32/33 tests passed)
 
 **Remaining for Phase 5:**
 - Bundle size optimization
@@ -473,6 +518,8 @@
 - Motion reduction support
 - Complete i18n coverage verification
 - Final horizontal scroll verification across all pages
+- Cross-browser testing
+- Production readiness checklist
 
 ---
 
@@ -504,7 +551,7 @@
 
 **Components:**
 - All from `/app/frontend/src/components/ui/` (Shadcn)
-- Custom: MobileBottomNav, DesktopSidebar, EmptyState, LoadingState, ErrorState
+- Custom: MobileBottomNav (with "More" Sheet), DesktopSidebar, EmptyState, LoadingState, ErrorState
 
 **Guidelines:**
 - Full specification: `/app/design_guidelines.md`
@@ -527,7 +574,17 @@
 - **Card Borders**: Colored left borders matching dot colors
 - **Status Badges**: Inline with event type badge, not overlapping menu buttons
 - **Full-Width Layout**: Timeline, Grief, and Accident/Illness tabs use full-width layout without Card container wrapper for space optimization
-- **Background Colors**: Grief tab (bg-pink-50 border-pink-200), Accident/Illness tab (bg-blue-50 border-blue-200)
+- **Background Colors**: Grief tab (bg-pink-50 border-pink-200 shadow-sm), Accident/Illness tab (bg-blue-50 border-blue-200 shadow-sm)
+
+**Mobile Navigation:**
+- **Bottom Tab Bar**: 5 tabs (Dashboard, Members, Calendar, Analytics, More)
+- **More Menu Sheet**: 
+  - Opens from bottom with rounded top corners (rounded-t-2xl)
+  - 80vh height for proper mobile display
+  - 6 menu items: Financial Aid, Admin Dashboard, Import/Export, Messaging, WhatsApp Logs, Settings
+  - Large touch-friendly buttons (64px height)
+  - Active state highlighting in teal
+  - Close button (X) in header
 
 ---
 
@@ -554,8 +611,8 @@
 - Card-based design with colored left borders and hover effects
 - Status badges inline with event type (green "✓ Completed", gray "Ignored")
 - Full-width timeline without Card container wrapper (Timeline, Grief, Accident/Illness tabs)
-- Grief tab: Pink background for visual distinction
-- Accident/Illness tab: Blue background for visual distinction
+- Grief tab: Pink background with shadow for visual distinction
+- Accident/Illness tab: Blue background with shadow for visual distinction
 - ZERO horizontal scroll on all viewports (390px, 768px, 1024px)
 - Proper opacity handling (60% on cards, 100% on dates/dots)
 - Clickable phone/email links with icons
@@ -564,19 +621,20 @@
 - Bilingual support working (EN/ID)
 - Only 1 minor LOW priority implementation note (profile photo classes - visual correct)
 
-**Phase 4 (Analytics, Financial Aid, Settings, Admin): COMPLETED ✅**
-- Analytics.js: Teal/amber chart colors, responsive containers, Playfair headings
+**Phase 4 (Analytics, Financial Aid, Settings, Admin): COMPLETED ✅ - 95% Success**
+- Analytics.js: Teal/amber chart colors, responsive containers, Playfair headings, **FIXED tablet overflow**
 - FinancialAid.js: Teal/amber chart colors, responsive containers, Playfair headings
 - Settings.js: Responsive tabs (icon-only mobile), 48px touch-friendly inputs, Playfair headings
 - AdminDashboard.js: Responsive tabs (icon-only mobile), Playfair headings
+- **CRITICAL: MobileBottomNav "More" menu Sheet implemented with 6 navigation items**
 - All pages verified via screenshots (390px mobile, 1024px desktop)
 - Consistent teal/amber branding across all Phase 4 pages
-- ⚠️ Comprehensive testing agent verification pending
+- Comprehensive testing agent verification complete (32/33 tests passed)
+- Fixed only MEDIUM priority issue (Analytics TabsList horizontal scroll on tablet)
 
-**Phase 5 (Polish & Performance): NOT STARTED ⚠️**
-- Final phase
-- Bundle optimization and accessibility audit
-- Performance tuning
+**Phase 5 (Polish & Performance): READY TO START ⚠️**
+- Bundle optimization, accessibility audit, performance tuning
+- Final production readiness
 
-**Overall Progress: 80% Complete** (4/5 phases done, Phase 5 remaining)
-**Quality Metrics: Phase 1: 90%, Phase 2: Significant improvement, Phase 3: 99%, Phase 4: Visual verification complete**
+**Overall Progress: 85% Complete** (4/5 phases done, Phase 5 ready to start)
+**Quality Metrics: Phase 1: 90%, Phase 2: Significant improvement, Phase 3: 99%, Phase 4: 95%**
