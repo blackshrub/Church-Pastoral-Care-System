@@ -1059,17 +1059,14 @@ export const MemberDetail = () => {
                                   </DropdownMenuItem>
                                   <DropdownMenuItem onClick={async () => {
                                     try {
-                                      await axios.post(`${API}/financial-aid-schedules/${schedule.id}/ignore`);
-                                      toast.success('Aid schedule ignored');
-                                      // Update local state
-                                      setAidSchedules(prev => prev.map(s => 
-                                        s.id === schedule.id ? {...s, ignored: true} : s
-                                      ));
+                                      const response = await axios.post(`${API}/financial-aid-schedules/${schedule.id}/ignore`);
+                                      toast.success(`Payment ignored! Next payment: ${response.data.next_occurrence}`);
+                                      loadMemberData(); // Reload to show updated schedule
                                     } catch (error) {
                                       toast.error('Failed to ignore');
                                     }
                                   }}>
-                                    Ignore
+                                    Ignore This Payment
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
