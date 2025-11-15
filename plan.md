@@ -9,7 +9,7 @@
 
 ## 2) Implementation Steps (Phases)
 
-### Phase 1: Foundation & Navigation (Status: COMPLETED ✅)
+### Phase 1: Foundation & Navigation (Status: COMPLETED ✅ - 90% Success)
 
 **What Was Implemented:**
 - ✅ Applied design tokens (colors, typography, spacing, motion) in `src/index.css` per design_guidelines.md
@@ -173,9 +173,12 @@
   - Card content opacity: 60% for completed/ignored items
   - Dates and dots remain vibrant: 100% opacity (not affected by card opacity)
 - ✅ Full-width timeline without white Card container:
-  - Removed Card wrapper around timeline
+  - **Timeline tab**: Removed Card wrapper for full-width layout
+  - **Grief tab**: Removed Card wrapper for full-width layout and space optimization
+  - **Accident/Illness tab**: Removed Card wrapper for full-width layout and space optimization
   - Timeline spans full content width
   - Magazine-style layout for easier visual scanning
+  - Maximizes screen real estate by eliminating padding waste
 - ✅ Member Info Card responsive improvements:
   - Grid layout: 2 cols mobile, 3 cols tablet (sm), 4 cols desktop (md)
   - Added `min-w-0` and `truncate` to all info items
@@ -195,7 +198,7 @@
 - ✅ Date circles showing correct DD MMM format (e.g., "15 NOV")
 - ✅ Card-border-left patterns applied correctly matching dot colors
 - ✅ Status badges inline with event type (no overlap with three dots menu)
-- ✅ Full-width timeline without Card container wrapper
+- ✅ Full-width timeline without Card container wrapper (Timeline, Grief, Accident/Illness tabs)
 - ✅ Hover effects working on timeline cards
 - ✅ Profile header responsive and properly sized
 - ✅ Phone and email clickable links working (tel: and mailto:)
@@ -212,15 +215,18 @@
 - ✅ Colored dots below dates: teal, amber, pink, purple distinguishable
 - ✅ Card-based timeline items with colored left borders matching dot colors
 - ✅ Green "✓ Completed" badges inline with event type badges
-- ✅ Full-width timeline spanning content area (no white card wrapper)
+- ✅ Full-width timeline spanning content area (no white card wrapper on Timeline, Grief, Accident/Illness tabs)
 - ✅ Playfair Display headings add elegance throughout
 - ✅ Teal/amber color scheme consistent across all elements
+- ✅ Space optimization clearly visible in Grief and Accident/Illness tabs
 
 **Files Modified:**
 - `/app/frontend/src/pages/MemberDetail.js` - Complete header and timeline redesign with iterative refinements:
   - Added date circles with colored dots below
   - Moved status badges inline with event type
-  - Removed Card container wrapper for full-width timeline
+  - Removed Card container wrapper for full-width timeline (Timeline tab)
+  - Removed Card container wrapper for full-width Grief tab
+  - Removed Card container wrapper for full-width Accident/Illness tab
   - Fixed opacity handling (60% on cards, 100% on dates/dots)
   - Adjusted badge positioning to avoid three dots menu overlap
 
@@ -230,44 +236,64 @@
 3. ✅ As a user, I can edit a care event in a modal and see a success toast.
 4. ✅ As a user, I can switch between Events/Follow-ups/Aid tabs on mobile with large triggers.
 5. ✅ As a user, I can visually recognize completed items with inline green badges and dimmed card content.
+6. ✅ As a user, I can view full-width event cards in Grief and Accident/Illness tabs without padding eating up space.
 
 **Known Minor Issues (LOW Priority):**
 - Profile photo responsive sizing implementation uses fixed 'xl' size prop with additional className (visual appearance is correct across all breakpoints, just an implementation detail that could be refined in MemberAvatar component)
 
 ---
 
-### Phase 4: Analytics, Financial Aid, Settings, Admin (Status: Not Started ⚠️)
+### Phase 4: Analytics, Financial Aid, Settings, Admin (Status: IN PROGRESS 🔄)
 
 **Scope:**
 - Analytics.js: apply teal/amber chart palette, responsive containers, readable axes/legends
-  - Replace recharts with Chart.js (lighter bundle, already done)
+  - Chart.js already implemented (lighter bundle than recharts)
   - Apply teal/amber color scheme to all charts
   - Ensure chart containers are responsive (max-w-full)
   - Make legends readable on mobile
   - Test all chart types (bar, line, pie, doughnut)
+  - Verify no horizontal scroll at 390px, 768px, 1024px
 - FinancialAid.js: mobile-friendly forms
   - Label spacing with proper hierarchy
   - 48px height inputs for touch-friendly interaction
   - Clear schedules/recurrence chips with proper spacing
   - Responsive date pickers
   - Proper form validation with error states
+  - Apply max-w-full patterns throughout
 - Settings.js: mobile-optimized settings page
-  - Add language toggle using Select component
+  - Language toggle already exists, ensure proper styling
   - Ensure sections are readable on mobile
   - Proper spacing between settings groups
-  - Touch-friendly toggle switches
+  - Touch-friendly toggle switches (≥44x44px)
+  - Apply responsive patterns
 - AdminDashboard.js: mobile table patterns
   - Stacked rows/cards on mobile
   - Essential columns visible (Name, Role, Actions)
   - Proper responsive behavior for user/campus management
-  - Touch-friendly action buttons
+  - Touch-friendly action buttons (48px height)
+  - Apply max-w-full to prevent overflow
+
+**Implementation Plan:**
+1. View current Analytics.js implementation
+2. Apply teal (#14b8a6) and amber (#f59e0b) to all Chart.js charts
+3. Add max-w-full to chart containers
+4. Test chart responsiveness at 390px, 768px, 1024px
+5. View FinancialAid.js and apply 48px input heights
+6. Ensure proper form spacing and validation
+7. View Settings.js and verify language toggle styling
+8. Apply responsive patterns to settings sections
+9. View AdminDashboard.js and implement card-based mobile layout
+10. Show essential columns only on mobile (Name, Role, Actions)
 
 **Testing:**
+- Run esbuild compile check
+- Take screenshots at 390px, 768px, 1024px for all Phase 4 pages
 - Call testing agent (both frontend & backend)
 - Validate chart rendering at all breakpoints
 - Test form submission for financial aid
 - Verify language toggling updates all labels
 - Test admin actions (add user, edit campus, etc.)
+- Fix any bugs found before proceeding to Phase 5
 
 **User Stories:**
 1. As a user, I can view charts that fit my mobile screen without clipped labels.
@@ -328,40 +354,44 @@
 ## 3) Next Actions (Immediate - Phase 4)
 
 **Analytics.js Optimization:**
-1. Apply teal/amber color scheme to all Chart.js charts
+1. View current Analytics.js implementation
+2. Apply teal/amber color scheme to all Chart.js charts
    - Primary color: teal (#14b8a6)
    - Secondary color: amber (#f59e0b)
    - Accent colors: pink, purple, sage for additional data series
-2. Ensure chart containers are responsive
+3. Ensure chart containers are responsive
    - Add `max-w-full` to all chart wrapper divs
    - Test at 390px, 768px, 1024px viewports
    - Verify legends don't cause overflow
-3. Make axes and labels readable on mobile
+4. Make axes and labels readable on mobile
    - Adjust font sizes for mobile (smaller but readable)
    - Rotate x-axis labels if needed
    - Ensure touch-friendly legend items
 
 **FinancialAid.js Mobile Forms:**
-4. Apply 48px height to all inputs
-5. Ensure proper spacing and hierarchy
-6. Test date pickers on mobile
-7. Verify form validation and error states
+5. Apply 48px height to all inputs
+6. Ensure proper spacing and hierarchy
+7. Test date pickers on mobile
+8. Verify form validation and error states
+9. Apply max-w-full patterns throughout
 
 **Settings.js Optimization:**
-8. Add language toggle with proper styling
-9. Ensure sections are mobile-readable
-10. Test settings changes persist correctly
+10. Verify language toggle styling
+11. Ensure sections are mobile-readable
+12. Test settings changes persist correctly
+13. Apply responsive patterns
 
 **AdminDashboard.js Mobile Tables:**
-11. Implement card-based layout for mobile
-12. Show essential columns only (Name, Role, Actions)
-13. Test user/campus management actions
+14. Implement card-based layout for mobile
+15. Show essential columns only (Name, Role, Actions)
+16. Test user/campus management actions
+17. Apply max-w-full patterns
 
 **Testing & Verification:**
-14. Run esbuild compile check
-15. Take screenshots at 390px, 768px, 1024px for all Phase 4 pages
-16. Call testing agent for comprehensive Phase 4 testing
-17. Fix any bugs found before proceeding to Phase 5
+18. Run esbuild compile check
+19. Take screenshots at 390px, 768px, 1024px for all Phase 4 pages
+20. Call testing agent for comprehensive Phase 4 testing
+21. Fix any bugs found before proceeding to Phase 5
 
 ---
 
@@ -391,7 +421,7 @@
 - ✅ Date circles with DD MMM format for chronological reference
 - ✅ Card-based timeline design with hover effects (translateY -2px, shadow)
 - ✅ Status badges inline with event type (green "✓ Completed", gray "Ignored")
-- ✅ Full-width timeline without Card container wrapper
+- ✅ Full-width timeline without Card container wrapper (Timeline, Grief, Accident/Illness tabs)
 - ✅ Proper opacity handling (60% on completed/ignored cards, 100% on dates/dots)
 - ✅ ZERO horizontal scroll on all viewports (390px, 768px, 1024px)
 - ✅ Profile photo responsive sizing (80px mobile, 128px desktop - visual correct)
@@ -399,6 +429,7 @@
 - ✅ Member info card with responsive grid layout
 - ✅ Three dots menu accessible (no overlap with badges)
 - ✅ Bilingual support working (EN/ID)
+- ✅ **Space optimization**: Removed Card containers from Grief and Accident/Illness tabs for full-width layout
 - ⚠️ Minor LOW priority note: Profile photo implementation detail (visual correct)
 
 **Target for Phase 4:**
@@ -467,6 +498,7 @@
   - Sage: Spiritual growth, counseling
 - **Card Borders**: Colored left borders matching dot colors
 - **Status Badges**: Inline with event type badge, not overlapping menu buttons
+- **Full-Width Layout**: Timeline, Grief, and Accident/Illness tabs use full-width layout without Card container wrapper for space optimization
 
 ---
 
@@ -492,25 +524,27 @@
 - Timeline with colored dots (teal, amber, pink, purple) AND date circles (DD MMM)
 - Card-based design with colored left borders and hover effects
 - Status badges inline with event type (green "✓ Completed", gray "Ignored")
-- Full-width timeline without Card container wrapper
+- Full-width timeline without Card container wrapper (Timeline, Grief, Accident/Illness tabs)
 - ZERO horizontal scroll on all viewports (390px, 768px, 1024px)
 - Proper opacity handling (60% on cards, 100% on dates/dots)
 - Clickable phone/email links with icons
 - Member info card with responsive grid
 - Three dots menu accessible (no badge overlap)
 - Bilingual support working (EN/ID)
+- **Final optimization**: Removed Card containers from Grief and Accident/Illness tabs for space optimization
 - Only 1 minor LOW priority implementation note (profile photo classes - visual correct)
 
-**Phase 4 (Analytics, Financial Aid, Settings, Admin): NOT STARTED ⚠️**
-- Next priority
-- Focus on chart optimization and mobile forms
-- Language toggle in Settings
-- Admin table/card patterns
+**Phase 4 (Analytics, Financial Aid, Settings, Admin): IN PROGRESS 🔄**
+- Starting implementation
+- Focus on chart optimization with teal/amber palette
+- Mobile-friendly forms with 48px inputs
+- Language toggle verification in Settings
+- Admin table/card patterns for mobile
 
 **Phase 5 (Polish & Performance): NOT STARTED ⚠️**
 - Final phase
 - Bundle optimization and accessibility audit
 - Performance tuning
 
-**Overall Progress: 60% Complete** (3/5 phases done, Phase 4 next)
+**Overall Progress: 60% Complete** (3/5 phases done, Phase 4 in progress)
 **Quality Metrics: Phase 1: 90%, Phase 2: Significant improvement, Phase 3: 99%**
