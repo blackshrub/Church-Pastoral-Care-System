@@ -1,23 +1,15 @@
 [
   {
-    "content": "Apply teal/amber color scheme to all Chart.js charts in Analytics.js",
-    "status": "completed"
-  },
-  {
-    "content": "Add max-w-full to all chart containers and ensure responsive layout",
-    "status": "completed"
-  },
-  {
     "content": "View FinancialAid.js and apply 48px height to all inputs for touch-friendly interaction",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Ensure proper form spacing and validation in FinancialAid.js",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "View Settings.js and verify language toggle styling is consistent with design system",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Apply responsive patterns to Settings page sections",
