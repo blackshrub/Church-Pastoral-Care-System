@@ -1,6 +1,6 @@
 [
   {
-    "content": "Run esbuild compile check to ensure no syntax errors",
+    "content": "Take screenshots at 390px, 768px, 1024px to verify responsive layouts",
     "status": "completed"
   },
   {
@@ -12,12 +12,8 @@
     "status": "pending"
   },
   {
-    "content": "Take screenshots at 390px, 768px, 1024px to verify responsive layouts",
-    "status": "in_progress"
-  },
-  {
     "content": "Call testing_agent for comprehensive Phase 2 testing (frontend + backend)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Fix any bugs found by testing agent before proceeding to Phase 3",
