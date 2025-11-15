@@ -1357,6 +1357,7 @@ export const Dashboard = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
+                                {/* Type-specific complete actions */}
                                 {task.type === 'financial_aid' && (
                                   <DropdownMenuItem onClick={async () => {
                                     try {
@@ -1370,6 +1371,46 @@ export const Dashboard = () => {
                                     {t('mark_distributed')}
                                   </DropdownMenuItem>
                                 )}
+                                {task.type === 'grief_support' && (
+                                  <DropdownMenuItem onClick={async () => {
+                                    try {
+                                      await axios.post(`${API}/grief-support/${task.data.id}/complete`);
+                                      toast.success('Grief stage completed!');
+                                      setUpcomingTasks(prev => prev.filter((t, i) => i !== index));
+                                    } catch (error) {
+                                      toast.error('Failed to complete');
+                                    }
+                                  }}>
+                                    Mark Complete
+                                  </DropdownMenuItem>
+                                )}
+                                {task.type === 'accident_followup' && (
+                                  <DropdownMenuItem onClick={async () => {
+                                    try {
+                                      await axios.post(`${API}/accident-followup/${task.data.id}/complete`);
+                                      toast.success('Follow-up completed!');
+                                      setUpcomingTasks(prev => prev.filter((t, i) => i !== index));
+                                    } catch (error) {
+                                      toast.error('Failed to complete');
+                                    }
+                                  }}>
+                                    Mark Complete
+                                  </DropdownMenuItem>
+                                )}
+                                {task.type === 'birthday' && (
+                                  <DropdownMenuItem onClick={async () => {
+                                    try {
+                                      await axios.post(`${API}/care-events/${task.data.id}/complete`);
+                                      toast.success('Birthday marked complete!');
+                                      setUpcomingTasks(prev => prev.filter((t, i) => i !== index));
+                                    } catch (error) {
+                                      toast.error('Failed to complete');
+                                    }
+                                  }}>
+                                    Mark Complete
+                                  </DropdownMenuItem>
+                                )}
+                                {/* Ignore option for all types */}
                                 <DropdownMenuItem onClick={async () => {
                                   try {
                                     if (task.type === 'grief_support') {
