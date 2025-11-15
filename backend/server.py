@@ -2313,29 +2313,47 @@ async def create_aid_schedule(schedule: dict, current_user: dict = Depends(get_c
         next_occurrence = start_date
         
         if schedule['frequency'] == 'weekly' and schedule.get('day_of_week'):
-            # Find first occurrence of the specified weekday from start_date onward
+            # For weekly: Find next occurrence of specified weekday from TODAY
             days_ahead = {'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3, 'friday': 4, 'saturday': 5, 'sunday': 6}
             target_weekday = days_ahead[schedule['day_of_week']]
-            start_weekday = start_date.weekday()
+            current_weekday = today.weekday()
             
-            # Find first occurrence (could be start_date itself or next occurrence of that weekday)
-            if target_weekday >= start_weekday:
-                # Same week as start
-                days_to_add = target_weekday - start_weekday
+            if target_weekday >= current_weekday:
+                # This week
+                days_to_add = target_weekday - current_weekday
             else:
                 # Next week
-                days_to_add = 7 - start_weekday + target_weekday
+                days_to_add = 7 - current_weekday + target_weekday
             
-            first_occurrence = start_date + timedelta(days=days_to_add)
+            next_occurrence = today + timedelta(days=days_to_add)
             
-            # Now find next occurrence from first_occurrence
-            today = date.today()
-            if first_occurrence >= today:
+        elif schedule['frequency'] == 'monthly' and schedule.get('day_of_month'):
+            # For monthly: Use start_date (supports backdating)
+            day_of_month = schedule['day_of_month']
+            start_month = start_date.month
+            start_year = start_date.year
+            
+            # Validate day exists in the specified month
+            try:
+                first_occurrence = date(start_year, start_month, day_of_month)
+                
+                # If first occurrence is in the past, that's fine (it's backdate)
+                # It will show as overdue
                 next_occurrence = first_occurrence
-            else:
-                # Calculate how many weeks have passed since first occurrence
-                weeks_passed = ((today - first_occurrence).days // 7) + 1
-                next_occurrence = first_occurrence + timedelta(days=weeks_passed * 7)
+                
+                # If first occurrence already passed, advance to next month
+                if next_occurrence < today:
+                    if start_month == 12:
+                        next_occurrence = date(start_year + 1, 1, day_of_month)
+                    else:
+                        next_occurrence = date(start_year, start_month + 1, day_of_month)
+                        
+            except ValueError:
+                # Day doesn't exist in this month (e.g., Feb 31, Nov 31)
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Day {day_of_month} does not exist in the specified month"
+                )
             
         elif schedule['frequency'] == 'monthly' and schedule.get('day_of_month'):
             # Find next occurrence of this day of month from today onward
