@@ -2564,25 +2564,54 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
 
 @api_router.post("/financial-aid-schedules/{schedule_id}/ignore")
 async def ignore_financial_aid_schedule(schedule_id: str, user: dict = Depends(get_current_user)):
-    """Mark a financial aid schedule as ignored/dismissed"""
+    """Mark a specific financial aid occurrence as ignored (not the entire schedule)"""
     try:
         schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0})
         if not schedule:
             raise HTTPException(status_code=404, detail="Financial aid schedule not found")
         
+        current_occurrence = schedule.get("next_occurrence")
+        if not current_occurrence:
+            raise HTTPException(status_code=400, detail="No next occurrence to ignore")
+        
+        # Add current occurrence to ignored list
+        ignored_list = schedule.get("ignored_occurrences", [])
+        if current_occurrence not in ignored_list:
+            ignored_list.append(current_occurrence)
+        
+        # Calculate next occurrence (skip ignored dates)
+        current_date = date.fromisoformat(current_occurrence) if isinstance(current_occurrence, str) else current_occurrence
+        
+        if schedule["frequency"] == "weekly":
+            next_date = current_date + timedelta(weeks=1)
+        elif schedule["frequency"] == "monthly":
+            if current_date.month == 12:
+                next_date = current_date.replace(year=current_date.year + 1, month=1)
+            else:
+                next_date = current_date.replace(month=current_date.month + 1)
+        elif schedule["frequency"] == "annually":
+            next_date = current_date.replace(year=current_date.year + 1)
+        else:
+            next_date = current_date
+        
         await db.financial_aid_schedules.update_one(
             {"id": schedule_id},
             {"$set": {
-                "ignored": True,
-                "ignored_at": datetime.now(timezone.utc).isoformat(),
-                "ignored_by": user.get("id")
+                "ignored_occurrences": ignored_list,
+                "next_occurrence": next_date.isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
             }}
         )
         
         # Invalidate dashboard cache
         await invalidate_dashboard_cache(schedule["campus_id"])
         
-        return {"success": True, "message": "Financial aid schedule ignored"}
+        return {
+            "success": True, 
+            "message": f"Occurrence on {current_occurrence} ignored. Next payment: {next_date.isoformat()}",
+            "ignored_date": current_occurrence,
+            "next_occurrence": next_date.isoformat()
+        }
     except HTTPException:
         raise
     except Exception as e:
