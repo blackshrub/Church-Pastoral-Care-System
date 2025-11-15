@@ -692,65 +692,86 @@ export const MemberDetail = () => {
                   {t('empty_states.no_care_events')}
                 </p>
               ) : (
-                <div className="space-y-4">
-                  {careEvents.filter(e => e.event_type !== 'birthday').map((event) => {
+                <div className="relative">
+                  {/* Timeline vertical line */}
+                  <div className="absolute left-8 top-8 bottom-0 w-0.5 bg-gradient-to-b from-primary-300 via-primary-200 to-transparent"></div>
+                  
+                  {careEvents.filter(e => e.event_type !== 'birthday').map((event, idx) => {
                     const isIgnored = event.ignored === true;
                     return (
-                    <div key={event.id} className={`flex gap-4 pb-4 border-l-2 border-primary-200 pl-6 ml-3 relative timeline-item ${isIgnored ? 'opacity-60' : ''}`} data-testid={`care-event-${event.id}`}>
+                    <div key={event.id} className={`flex gap-6 pb-8 relative ${isIgnored ? 'opacity-60' : ''}`} data-testid={`care-event-${event.id}`}>
                       {isIgnored && (
-                        <div className="absolute top-0 right-0">
+                        <div className="absolute top-2 right-2 z-10">
                           <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
                         </div>
                       )}
-                      <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary-500 border-2 border-background"></div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <EventTypeBadge type={event.event_type} />
-                              <span className="text-xs text-muted-foreground">
-                                {formatDate(event.event_date, 'dd MMM yyyy')}
-                              </span>
-                              {event.completed && (
-                                <CheckCircle2 className="w-4 h-4 text-green-600" />
-                              )}
-                            </div>
-                            <h5 className="font-playfair font-semibold text-sm text-foreground mb-1">{event.title}</h5>
-                            {event.description && (
-                              <p className="text-sm whitespace-pre-line font-bold text-foreground">
-                                {event.description}
-                              </p>
-                            )}
-                            {event.grief_relationship && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                Relationship: {event.grief_relationship}
-                              </p>
-                            )}
-                            {event.hospital_name && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                Hospital: {event.hospital_name}
-                              </p>
-                            )}
-                            {event.aid_amount && (
-                              <p className="text-sm text-green-700 font-medium mt-1">
-                                {event.aid_type && `${event.aid_type} - `}Rp {event.aid_amount.toLocaleString('id-ID')}
-                              </p>
-                            )}
+                      
+                      {/* Timeline dot and date */}
+                      <div className="flex flex-col items-center shrink-0">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 border-4 border-background shadow-lg flex items-center justify-center relative z-10">
+                          <Calendar className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="mt-2 text-center">
+                          <div className="text-xs font-bold text-foreground">
+                            {formatDate(event.event_date, 'dd')}
                           </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button size="sm" variant="ghost" className="min-h-[44px] min-w-[44px]">
-                                <MoreVertical className="w-5 h-5" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleDeleteEvent(event.id)} className="text-red-600">
-                                <Trash2 className="w-4 h-4 mr-2" />Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="text-xs text-muted-foreground">
+                            {formatDate(event.event_date, 'MMM')}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {formatDate(event.event_date, 'yyyy')}
+                          </div>
                         </div>
                       </div>
+                      
+                      {/* Event content */}
+                      <Card className="flex-1 border-l-4 border-l-primary-400">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <EventTypeBadge type={event.event_type} />
+                                {event.completed && (
+                                  <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                )}
+                              </div>
+                              <h5 className="font-playfair font-semibold text-base text-foreground mb-2">{event.title}</h5>
+                              {event.description && (
+                                <p className="text-sm whitespace-pre-line font-bold text-foreground mb-2">
+                                  {event.description}
+                                </p>
+                              )}
+                              {event.grief_relationship && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  Relationship: {event.grief_relationship}
+                                </p>
+                              )}
+                              {event.hospital_name && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  Hospital: {event.hospital_name}
+                                </p>
+                              )}
+                              {event.aid_amount && (
+                                <p className="text-sm text-green-700 font-medium mt-2">
+                                  {event.aid_type && `${event.aid_type} - `}Rp {event.aid_amount.toLocaleString('id-ID')}
+                                </p>
+                              )}
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="sm" variant="ghost" className="min-h-[44px] min-w-[44px]">
+                                  <MoreVertical className="w-5 h-5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleDeleteEvent(event.id)} className="text-red-600">
+                                  <Trash2 className="w-4 h-4 mr-2" />Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </CardContent>
+                      </Card>
                     </div>
                     );
                   })}
