@@ -117,21 +117,23 @@ export const Settings = () => {
   };
   
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Settings & Configuration</h1>
+    <div className="space-y-6 max-w-full">
+      <div className="min-w-0">
+        <h1 className="text-3xl font-playfair font-bold">Settings & Configuration</h1>
         <p className="text-muted-foreground mt-1">System configuration and automation settings</p>
       </div>
       
-      <Tabs defaultValue="automation">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="automation"><Bell className="w-4 h-4 mr-2" />Automation</TabsTrigger>
-          <TabsTrigger value="grief"><Heart className="w-4 h-4 mr-2" />Grief Support</TabsTrigger>
-          <TabsTrigger value="accident"><Zap className="w-4 h-4 mr-2" />Accident/Illness</TabsTrigger>
-          <TabsTrigger value="engagement"><Users className="w-4 h-4 mr-2" />Engagement</TabsTrigger>
-          <TabsTrigger value="writeoff"><Clock className="w-4 h-4 mr-2" />Write-off Policy</TabsTrigger>
-          <TabsTrigger value="system"><SettingsIcon className="w-4 h-4 mr-2" />System</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="automation" className="max-w-full">
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <TabsList className="inline-flex min-w-full w-max sm:w-full sm:grid sm:grid-cols-6">
+            <TabsTrigger value="automation" className="flex-shrink-0"><Bell className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Automation</span></TabsTrigger>
+            <TabsTrigger value="grief" className="flex-shrink-0"><Heart className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Grief Support</span></TabsTrigger>
+            <TabsTrigger value="accident" className="flex-shrink-0"><Zap className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Accident/Illness</span></TabsTrigger>
+            <TabsTrigger value="engagement" className="flex-shrink-0"><Users className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Engagement</span></TabsTrigger>
+            <TabsTrigger value="writeoff" className="flex-shrink-0"><Clock className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Write-off Policy</span></TabsTrigger>
+            <TabsTrigger value="system" className="flex-shrink-0"><SettingsIcon className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">System</span></TabsTrigger>
+          </TabsList>
+        </div>
         
         <TabsContent value="automation">
           <Card>
