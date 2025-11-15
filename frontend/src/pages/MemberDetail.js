@@ -840,7 +840,7 @@ export const MemberDetail = () => {
                             )}
                             {!stage.completed && !isIgnored && (
                               <div className="flex gap-1">
-                                <Button size="sm" variant="outline" onClick={async () => {
+                                <Button size="sm" variant="outline" className="min-h-[44px]" onClick={async () => {
                                   try {
                                     await axios.post(`${API}/grief-support/${stage.id}/complete`);
                                     toast.success(t('success_messages.stage_completed'));
@@ -978,7 +978,7 @@ export const MemberDetail = () => {
                             )}
                             {!stage.completed && !isIgnored && (
                               <div className="flex gap-1">
-                                <Button size="sm" variant="outline" onClick={async () => {
+                                <Button size="sm" variant="outline" className="min-h-[44px]" onClick={async () => {
                                   try {
                                     await axios.post(`${API}/accident-followup/${stage.id}/complete`);
                                     toast.success('Follow-up completed');
