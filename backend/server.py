@@ -2135,6 +2135,27 @@ async def complete_grief_stage(stage_id: str, notes: Optional[str] = None):
         # Update member's last contact date
         stage = await db.grief_support.find_one({"id": stage_id}, {"_id": 0})
         if stage:
+            # Get parent grief event for description
+            parent_event = await db.care_events.find_one(
+                {"id": stage["care_event_id"]},
+                {"_id": 0, "description": 1, "title": 1, "grief_relationship": 1}
+            )
+            
+            # Create a care event for this grief stage completion (adds to timeline)
+            await db.care_events.insert_one({
+                "id": str(uuid.uuid4()),
+                "member_id": stage["member_id"],
+                "campus_id": stage["campus_id"],
+                "event_type": "regular_contact",
+                "event_date": datetime.now(timezone.utc).isoformat().split('T')[0],
+                "title": f"Grief Support: {stage['stage'].replace('_', ' ')}",
+                "description": (parent_event.get("description") if parent_event else "") + 
+                              (f"\n{notes}" if notes else ""),
+                "completed": True,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            })
+            
             await db.members.update_one(
                 {"id": stage["member_id"]},
                 {"$set": {"last_contact_date": datetime.now(timezone.utc).isoformat()}}
