@@ -1018,7 +1018,7 @@ export const MemberDetail = () => {
                 {/* Scheduled Financial Aid (Future payments) */}
                 <div className="border-t pt-4">
                   <h4 className="font-semibold text-foreground">Upcoming Scheduled Payments</h4>
-                  {aidSchedules.length === 0 ? (
+                  {aidSchedules.filter(s => s.is_active !== false).length === 0 ? (
                     <p className="text-sm text-muted-foreground py-4">No scheduled aid.</p>
                   ) : (
                     <div className="space-y-3 mt-3">
