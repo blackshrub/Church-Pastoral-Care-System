@@ -1,14 +1,10 @@
 [
   {
-    "content": "Take screenshot of preview URL to verify visual changes are applied",
+    "content": "Call testing_agent for Phase 1 comprehensive frontend testing",
     "status": "completed"
   },
   {
-    "content": "Call testing_agent for Phase 1 comprehensive frontend testing",
-    "status": "in_progress"
-  },
-  {
     "content": "Fix any bugs found by testing agent before proceeding to Phase 2",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
