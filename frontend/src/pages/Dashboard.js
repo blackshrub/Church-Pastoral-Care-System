@@ -1329,19 +1329,59 @@ export const Dashboard = () => {
                     const config = typeConfig[task.type] || { icon: '📋', color: 'gray', label: 'Task' };
                     
                     return (
-                      <div key={index} className={`p-4 bg-${config.color}-50 rounded-lg border border-${config.color}-200 flex justify-between items-center`}>
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="text-2xl">{config.icon}</div>
-                          <div className="flex-1">
-                            <MemberNameWithAvatar 
-                              member={{name: task.member_name, photo_url: task.member_photo_url}} 
-                              memberId={task.member_id} 
-                            />
-                            <p className="text-sm text-muted-foreground">{config.label}: {task.details}</p>
-                            <p className="text-xs text-muted-foreground">{formatDate(task.date, 'dd MMM yyyy')}</p>
+                      <div key={index} className={`p-4 bg-${config.color}-50 rounded-lg border border-${config.color}-200`}>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="text-2xl">{config.icon}</div>
+                            <div className="flex-1">
+                              <MemberNameWithAvatar 
+                                member={{name: task.member_name, photo_url: task.member_photo_url}} 
+                                memberId={task.member_id} 
+                              />
+                              <p className="text-sm text-muted-foreground">{config.label}: {task.details}</p>
+                              <p className="text-xs text-muted-foreground">{formatDate(task.date, 'dd MMM yyyy')}</p>
+                            </div>
+                            <div className={`px-3 py-1 bg-${config.color}-100 text-${config.color}-700 rounded-full text-sm font-medium`}>
+                              {daysUntil} {daysUntil === 1 ? 'day' : 'days'}
+                            </div>
                           </div>
-                          <div className={`px-3 py-1 bg-${config.color}-100 text-${config.color}-700 rounded-full text-sm font-medium`}>
-                            {daysUntil} {daysUntil === 1 ? 'day' : 'days'}
+                          <div className="flex gap-2 ml-4">
+                            <Button size="sm" className={`bg-${config.color}-500 hover:bg-${config.color}-600 text-white`} asChild>
+                              <a href={formatPhoneForWhatsApp(task.member_phone)} target="_blank" rel="noopener noreferrer">
+                                {t('contact')}
+                              </a>
+                            </Button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="sm" variant="ghost">
+                                  <MoreVertical className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={async () => {
+                                  try {
+                                    if (task.type === 'grief_support') {
+                                      await axios.post(`${API}/grief-support/${task.data.id}/ignore`);
+                                      toast.success('Grief stage ignored');
+                                    } else if (task.type === 'accident_followup') {
+                                      await axios.post(`${API}/accident-followup/${task.data.id}/ignore`);
+                                      toast.success('Accident followup ignored');
+                                    } else if (task.type === 'financial_aid') {
+                                      await axios.post(`${API}/financial-aid-schedules/${task.data.id}/ignore`);
+                                      toast.success('Financial aid ignored');
+                                    } else if (task.type === 'birthday') {
+                                      await axios.post(`${API}/care-events/${task.data.id}/ignore`);
+                                      toast.success('Birthday ignored');
+                                    }
+                                    setUpcomingTasks(prev => prev.filter((t, i) => i !== index));
+                                  } catch (error) {
+                                    toast.error('Failed to ignore');
+                                  }
+                                }}>
+                                  {t('ignore')}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         </div>
                       </div>
