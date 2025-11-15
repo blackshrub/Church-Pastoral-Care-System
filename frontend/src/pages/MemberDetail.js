@@ -1086,9 +1086,7 @@ export const MemberDetail = () => {
                     )}
                   </div>
                 ))
-              )}
-            </CardContent>
-          </Card>
+          )}
         </TabsContent>
         
         {/* Financial Aid Tab */}
