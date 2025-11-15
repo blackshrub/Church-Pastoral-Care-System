@@ -326,7 +326,7 @@ export const Analytics = () => {
       
       <Tabs defaultValue="demographics" className="w-full">
         <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <TabsList className="inline-flex min-w-full w-max sm:w-full">
+          <TabsList className="inline-flex w-full">
             <TabsTrigger value="demographics" className="flex-shrink-0 text-xs">
               <Users className="w-3 h-3 sm:mr-1" />
               <span className="hidden sm:inline">{t('demographics')}</span>
