@@ -125,7 +125,9 @@ export const MemberDetail = () => {
             aid_type: newEvent.aid_type,
             aid_amount: parseFloat(newEvent.aid_amount),
             frequency: newEvent.schedule_frequency,
-            start_date: newEvent.schedule_start_date,
+            start_date: newEvent.schedule_frequency === 'weekly' 
+              ? new Date().toISOString().split('T')[0]  // Use today for weekly
+              : newEvent.schedule_start_date,
             end_date: newEvent.schedule_end_date || null,
             day_of_week: newEvent.day_of_week,
             day_of_month: newEvent.day_of_month,
