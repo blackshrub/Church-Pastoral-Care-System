@@ -84,7 +84,13 @@ export const MemberDetail = () => {
       ]);
       
       setMember(memberRes.data);
-      setCareEvents(eventsRes.data);
+      setCareEvents((eventsRes.data || []).sort((a, b) => {
+        // Primary sort by event_date (descending - newest first)
+        const dateCompare = new Date(b.event_date) - new Date(a.event_date);
+        if (dateCompare !== 0) return dateCompare;
+        // Secondary sort by created_at (descending - most recent first)
+        return new Date(b.created_at) - new Date(a.created_at);
+      }));
       setGriefTimeline(griefRes.data);
       setAccidentTimeline(accidentRes.data);
       setAidSchedules(aidSchedulesRes.data || []);
