@@ -78,8 +78,12 @@ export const MemberDetail = () => {
       const [memberRes, eventsRes, griefRes, accidentRes, aidSchedulesRes] = await Promise.all([
         axios.get(`${API}/members/${id}`),
         axios.get(`${API}/care-events?member_id=${id}`),
-        axios.get(`${API}/grief-support/member/${id}`),
-        axios.get(`${API}/accident-followup/member/${id}`),
+        axios.get(`${API}/grief-support/member/${id}`, {
+          headers: {'Cache-Control': 'no-cache'}
+        }),
+        axios.get(`${API}/accident-followup/member/${id}`, {
+          headers: {'Cache-Control': 'no-cache'}
+        }),
         axios.get(`${API}/financial-aid-schedules/member/${id}`)
       ]);
       
