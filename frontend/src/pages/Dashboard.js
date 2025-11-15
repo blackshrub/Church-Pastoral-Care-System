@@ -1358,6 +1358,19 @@ export const Dashboard = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
+                                {task.type === 'financial_aid' && (
+                                  <DropdownMenuItem onClick={async () => {
+                                    try {
+                                      await axios.post(`${API}/financial-aid-schedules/${task.data.id}/mark-distributed`);
+                                      toast.success('Payment distributed!');
+                                      setUpcomingTasks(prev => prev.filter((t, i) => i !== index));
+                                    } catch (error) {
+                                      toast.error('Failed to mark as distributed');
+                                    }
+                                  }}>
+                                    {t('mark_distributed')}
+                                  </DropdownMenuItem>
+                                )}
                                 <DropdownMenuItem onClick={async () => {
                                   try {
                                     if (task.type === 'grief_support') {
