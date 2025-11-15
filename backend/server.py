@@ -2176,6 +2176,34 @@ async def ignore_grief_stage(stage_id: str, user: dict = Depends(get_current_use
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/grief-support/{stage_id}/undo")
+async def undo_grief_stage(stage_id: str, user: dict = Depends(get_current_user)):
+    """Undo completion or ignore of grief support stage"""
+    try:
+        stage = await db.grief_support.find_one({"id": stage_id}, {"_id": 0})
+        if not stage:
+            raise HTTPException(status_code=404, detail="Grief stage not found")
+        
+        await db.grief_support.update_one(
+            {"id": stage_id},
+            {"$set": {
+                "completed": False,
+                "completed_at": None,
+                "ignored": False,
+                "ignored_at": None,
+                "ignored_by": None
+            }}
+        )
+        
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(stage["campus_id"])
+        
+        return {"success": True, "message": "Grief support stage reset"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/grief-support/{stage_id}/send-reminder")
 async def send_grief_reminder(stage_id: str):
     """Send WhatsApp reminder for grief stage"""
