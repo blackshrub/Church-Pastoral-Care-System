@@ -114,11 +114,11 @@ const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers,
     // Create a regular contact event which updates last_contact_date
     await axios.post(`${API}/care-events`, {
       member_id: memberId,
-      campus_id: user?.campus_id || '2b3f9094-eef4-4af4-a3ff-730ef4adeb8a', // Use user's campus or default
+      campus_id: user?.campus_id || '2b3f9094-eef4-4af4-a3ff-730ef4adeb8a',
       event_type: 'regular_contact',
       event_date: new Date().toISOString().split('T')[0],
-      title: t('contact_with', {name: memberName}),
-      description: t('contacted_via_reminders')
+      title: `Contact with ${memberName}`,
+      description: 'Contacted via Reminders page'
     });
     toast.success(`${memberName} marked as contacted! Status updated to Active.`);
     // Update local state - remove from both at-risk and disconnected
@@ -126,6 +126,7 @@ const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers,
     setDisconnectedMembers(prev => prev.filter(m => m.id !== memberId));
   } catch (error) {
     toast.error('Failed to mark as contacted');
+    console.error('Error marking member contacted:', error);
   }
 };
 
