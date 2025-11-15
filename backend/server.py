@@ -2391,6 +2391,9 @@ async def create_aid_schedule(schedule: dict, current_user: dict = Depends(get_c
         
         await db.financial_aid_schedules.insert_one(schedule_dict)
         
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(schedule['campus_id'])
+        
         return aid_schedule
     except Exception as e:
         logger.error(f"Error creating aid schedule: {str(e)}")
