@@ -1231,6 +1231,8 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
             {"_id": 0}
         ).to_list(None)
         
+        logger.info(f"Found {len(aid_schedules)} active financial aid schedules for campus")
+        
         aid_due = []  # OVERDUE only (past due)
         for schedule in aid_schedules:
             # Use the pre-calculated next_occurrence field from schedule
