@@ -310,7 +310,8 @@ export const Dashboard = () => {
         schedule_frequency: 'one_time',
         payment_date: new Date().toISOString().split('T')[0]
       });
-      // Note: Dashboard will auto-refresh from cache on next navigation
+      // Refresh dashboard to show new tasks
+      loadReminders();
     } catch (error) {
       toast.error('Failed to add events');
     }
