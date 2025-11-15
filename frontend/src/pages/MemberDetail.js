@@ -1115,6 +1115,7 @@ export const MemberDetail = () => {
                     (Excludes ignored and pending payments)
                   </p>
                 </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
