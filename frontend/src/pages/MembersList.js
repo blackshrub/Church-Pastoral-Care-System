@@ -498,7 +498,7 @@ export const MembersList = () => {
                       </TableCell>
                       <TableCell className="hidden md:table-cell">{member.phone || '-'}</TableCell>
                       <TableCell className="hidden lg:table-cell">{member.age || '-'}</TableCell>
-                      <TableCell>{member.gender || '-'}</TableCell>
+                      <TableCell className="hidden lg:table-cell">{member.gender || '-'}</TableCell>
                       <TableCell>
                         <EngagementBadge status={member.engagement_status} days={member.days_since_last_contact} />
                       </TableCell>
@@ -507,8 +507,8 @@ export const MembersList = () => {
                           <Link to={`/members/${member.id}`}>
                             <Button size="sm" variant="outline">{t('view')}</Button>
                           </Link>
-                          <Button size="sm" variant="ghost" onClick={() => { setEditingMember(member); setEditModalOpen(true); }}>Edit</Button>
-                          <Button size="sm" variant="ghost" className="text-red-600" onClick={() => handleDeleteMember(member.id, member.name)}>Delete</Button>
+                          <Button size="sm" variant="ghost" className="hidden sm:inline-flex" onClick={() => { setEditingMember(member); setEditModalOpen(true); }}>Edit</Button>
+                          <Button size="sm" variant="ghost" className="text-red-600 hidden sm:inline-flex" onClick={() => handleDeleteMember(member.id, member.name)}>Delete</Button>
                         </div>
                       </TableCell>
                     </TableRow>
