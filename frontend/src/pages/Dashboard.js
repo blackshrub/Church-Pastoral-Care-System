@@ -1621,83 +1621,72 @@ export const Dashboard = () => {
                 <CardTitle>{t('upcoming_tasks_next_7_days')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {upcomingTasks.map((task, index) => {
                     const taskDate = new Date(task.date);
                     const todayDate = new Date();
-                    // Set both to midnight to get accurate day difference
                     taskDate.setHours(0, 0, 0, 0);
                     todayDate.setHours(0, 0, 0, 0);
                     const daysUntil = Math.round((taskDate - todayDate) / (1000 * 60 * 60 * 24));
+                    
                     const typeConfig = {
-                      birthday: { icon: '🎂', color: 'amber', label: 'Birthday' },
-                      grief_support: { icon: '💔', color: 'pink', label: 'Grief Support' },
-                      accident_followup: { icon: '🏥', color: 'blue', label: 'Accident Follow-up' },
-                      financial_aid: { icon: '💰', color: 'green', label: 'Financial Aid' }
+                      birthday: { icon: '🎂', color: 'amber', ringColor: 'ring-amber-400', bgClass: 'bg-amber-50', borderClass: 'border-amber-200', btnClass: 'bg-amber-500 hover:bg-amber-600', label: 'Birthday' },
+                      grief_support: { icon: '💔', color: 'pink', ringColor: 'ring-purple-400', bgClass: 'bg-purple-50', borderClass: 'border-purple-200', btnClass: 'bg-purple-500 hover:bg-purple-600', label: 'Grief Support' },
+                      accident_followup: { icon: '🏥', color: 'blue', ringColor: 'ring-teal-400', bgClass: 'bg-teal-50', borderClass: 'border-teal-200', btnClass: 'bg-teal-500 hover:bg-teal-600', label: 'Accident Follow-up' },
+                      financial_aid: { icon: '💰', color: 'green', ringColor: 'ring-purple-400', bgClass: 'bg-purple-50', borderClass: 'border-purple-200', btnClass: 'bg-purple-500 hover:bg-purple-600', label: 'Financial Aid' }
                     };
-                    const config = typeConfig[task.type] || { icon: '📋', color: 'gray', label: 'Task' };
+                    const config = typeConfig[task.type] || { icon: '📋', color: 'gray', ringColor: 'ring-gray-400', bgClass: 'bg-gray-50', borderClass: 'border-gray-200', btnClass: 'bg-gray-500 hover:bg-gray-600', label: 'Task' };
                     
                     return (
-                      <div key={index} className={`p-4 bg-${config.color}-50 rounded-lg border border-${config.color}-200`}>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-3 flex-1">
-                            <div className="text-2xl">{config.icon}</div>
-                            <div className="flex-1">
-                              <MemberNameWithAvatar 
-                                member={{name: task.member_name, photo_url: task.member_photo_url}} 
-                                memberId={task.member_id} 
-                              />
-                              <p className="text-sm text-muted-foreground">{config.label}: {task.details}</p>
-                              <p className="text-xs text-muted-foreground">{formatDate(task.date, 'dd MMM yyyy')}</p>
-                            </div>
-                            <div className={`px-3 py-1 bg-${config.color}-100 text-${config.color}-700 rounded-full text-sm font-medium`}>
-                              {daysUntil} {daysUntil === 1 ? 'day' : 'days'}
-                            </div>
+                      <div key={index} className={`p-4 ${config.bgClass} rounded-lg border ${config.borderClass} relative hover:shadow-lg transition-all`}>
+                        {/* Days Until Badge - Top Right */}
+                        <span className="absolute top-3 right-3 px-2 py-1 bg-blue-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                          in {daysUntil}d
+                        </span>
+                        
+                        <div className="flex items-start gap-3 mb-3">
+                          {/* Avatar with colored ring */}
+                          <div className={`flex-shrink-0 rounded-full ring-2 ${config.ringColor}`}>
+                            <MemberAvatar member={{name: task.member_name, photo_url: task.member_photo_url}} size="md" />
                           </div>
-                          <div className="flex gap-2 ml-4">
-                            <Button size="sm" className={`bg-${config.color}-500 hover:bg-${config.color}-600 text-white`} asChild>
-                              <a href={formatPhoneForWhatsApp(task.member_phone)} target="_blank" rel="noopener noreferrer">
-                                {t('contact')}
+                          
+                          <div className="flex-1 min-w-0">
+                            <Link to={`/members/${task.member_id}`} className="font-semibold text-base hover:text-teal-600">
+                              {task.member_name}
+                            </Link>
+                            {task.member_phone && (
+                              <a href={`tel:${task.member_phone}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1 mt-1">
+                                📞 {task.member_phone}
                               </a>
-                            </Button>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button size="sm" variant="ghost">
-                                  <MoreVertical className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                {/* Type-specific complete actions */}
-                                {task.type === 'financial_aid' && (
-                                  <DropdownMenuItem onClick={async () => {
-                                    try {
-                                      await axios.post(`${API}/financial-aid-schedules/${task.data.id}/mark-distributed`);
-                                      toast.success('Payment distributed!');
-                                      setUpcomingTasks(prev => prev.filter((t, i) => i !== index));
-                                    } catch (error) {
-                                      toast.error('Failed to mark as distributed');
-                                    }
-                                  }}>
-                                    {t('mark_distributed')}
-                                  </DropdownMenuItem>
-                                )}
-                                {task.type === 'grief_support' && (
-                                  <DropdownMenuItem onClick={async () => {
-                                    try {
-                                      await axios.post(`${API}/grief-support/${task.data.id}/complete`);
-                                      toast.success('Grief stage completed!');
-                                      setUpcomingTasks(prev => prev.filter((t, i) => i !== index));
-                                    } catch (error) {
-                                      toast.error('Failed to complete');
-                                    }
-                                  }}>
-                                    Mark Complete
-                                  </DropdownMenuItem>
-                                )}
-                                {task.type === 'accident_followup' && (
-                                  <DropdownMenuItem onClick={async () => {
-                                    try {
-                                      await axios.post(`${API}/accident-followup/${task.data.id}/complete`);
+                            )}
+                            <p className="text-sm text-muted-foreground mt-1">
+                              <span className="font-medium">{config.label}:</span> {task.details}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              📅 {formatDate(task.date, 'dd MMM yyyy')}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Actions */}
+                        <div className="flex gap-2">
+                          <Button size="default" className={`${config.btnClass} text-white h-11 flex-1 min-w-0`} asChild>
+                            <a href={formatPhoneForWhatsApp(task.member_phone)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                              <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                              </svg>
+                              <span className="truncate">{t('contact_whatsapp')}</span>
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
                                       toast.success('Follow-up completed!');
                                       setUpcomingTasks(prev => prev.filter((t, i) => i !== index));
                                     } catch (error) {
