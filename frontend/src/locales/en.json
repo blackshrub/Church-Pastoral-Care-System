@@ -644,6 +644,12 @@
   
   "_comment_bulk_messaging": "Bulk Messaging Page",
   "bulk_messaging_page": {
+    "title": "Bulk Messaging",
+    "select_recipients": "Select Recipients",
+    "compose_message": "Compose Message",
+    "recipients_selected": "{{count}} recipients selected",
+    "sending": "Sending...",
+    "send_to_recipients": "Send to {{count}} Recipients",
     "failed_load_users": "Failed to load users",
     "select_recipient": "Select at least one recipient",
     "enter_message": "Enter a message",
@@ -654,6 +660,26 @@
   
   "_comment_import_export": "Import/Export Page",
   "import_export_page": {
+    "title": "Import/Export Data",
+    "csv_import": "CSV Import",
+    "select_csv_file": "Select CSV File",
+    "json_import": "JSON Import",
+    "json_data": "JSON Data",
+    "api_sync_continuous": "API Sync (Continuous)",
+    "external_api_url": "External API URL *",
+    "api_key_optional": "API Key (optional)",
+    "sync_interval_minutes": "Sync Interval (minutes) *",
+    "assign_campus": "Assign to Campus *",
+    "export_members": "Export Members",
+    "export_care_events": "Export Care Events",
+    "active_sync_jobs": "Active API Sync Jobs",
+    "api_url": "API URL",
+    "update_sync": "Update Sync",
+    "test_connection": "Test Connection",
+    "sync_now": "Sync Now",
+    "import": "Import",
+    "export_csv": "Export CSV",
+    "export_json": "Export JSON",
     "sync_updated": "Sync job updated!",
     "imported_count": "Imported {{count}} members!",
     "errors_occurred": "{{count}} errors occurred",
@@ -672,6 +698,8 @@
   
   "_comment_whatsapp_logs": "WhatsApp Logs Page",
   "whatsapp_logs_page": {
+    "title": "WhatsApp Notification Logs",
+    "recent_notifications": "Recent Notifications",
     "logs_loaded": "Loaded {{count}} logs",
     "failed_load_logs": "Failed to load logs",
     "message_sent": "Message sent!",
