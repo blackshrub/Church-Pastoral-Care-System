@@ -888,12 +888,13 @@ export const Dashboard = () => {
                                   </a>
                                 )}
                                 <p className="text-sm text-muted-foreground mt-1">
-                                  <span className="font-medium">{config.label}:</span> {task.details}
+                                  <span className="font-medium">{config.label}</span>
                                   {task.type === 'grief_support' && (
                                     <span className="ml-2 px-2 py-0.5 bg-purple-500 text-white text-xs rounded">
                                       {getGriefStageBadge(task.data.stage)}
                                     </span>
                                   )}
+                                  {task.type !== 'grief_support' && `: ${task.details}`}
                                   {task.days_since_last_contact && <span className="ml-2 text-xs">• Last contact {task.days_since_last_contact}d ago</span>}
                                 </p>
                               </div>
