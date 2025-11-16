@@ -8,6 +8,10 @@
     "status": "completed"
   },
   {
+    "content": "Apply same fix to MemberDetail.js page",
+    "status": "completed"
+  },
+  {
     "content": "Test cache invalidation works in both staging and production",
     "status": "completed"
   }
