@@ -749,7 +749,7 @@ export const Dashboard = () => {
                               <PopoverTrigger asChild>
                                 <Button variant="outline" className="w-full h-12 justify-start text-left font-normal" type="button">
                                   <CalendarIcon className="mr-2 h-4 w-4" />
-                                  {quickEvent.schedule_end_date ? formatDateFns(new Date(quickEvent.schedule_end_date), 'dd MMM yyyy') : <span className="text-muted-foreground">No end date</span>}
+                                  {quickEvent.schedule_end_date ? formatDateFns(new Date(quickEvent.schedule_end_date), 'dd MMM yyyy') : <span className="text-muted-foreground">{t('form_placeholders.no_end_date')}</span>}
                                 </Button>
                               </PopoverTrigger>
                               <PopoverContent className="p-0 z-[9999]" side="bottom" align="start">
@@ -816,9 +816,9 @@ export const Dashboard = () => {
                             <div>
                               <Label className="font-semibold text-xs">End Month (optional)</Label>
                               <Select value={(quickEvent.end_month || 'none').toString()} onValueChange={(v) => setQuickEvent({...quickEvent, end_month: v === 'none' ? null : parseInt(v)})}>
-                                <SelectTrigger className="h-12"><SelectValue placeholder="No end date" /></SelectTrigger>
+                                <SelectTrigger className="h-12"><SelectValue placeholder={t('form_placeholders.no_end_date')} /></SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="none">No end date</SelectItem>
+                                  <SelectItem value="none">{t('form_placeholders.no_end_date')}</SelectItem>
                                   <SelectItem value="1">{t('months.january')}</SelectItem>
                                   <SelectItem value="2">{t('months.february')}</SelectItem>
                                   <SelectItem value="3">{t('months.march')}</SelectItem>
@@ -837,9 +837,9 @@ export const Dashboard = () => {
                             <div>
                               <Label className="font-semibold text-xs">End Year (optional)</Label>
                               <Select value={(quickEvent.end_year || 'none').toString()} onValueChange={(v) => setQuickEvent({...quickEvent, end_year: v === 'none' ? null : parseInt(v)})}>
-                                <SelectTrigger className="h-12"><SelectValue placeholder="No end date" /></SelectTrigger>
+                                <SelectTrigger className="h-12"><SelectValue placeholder={t('form_placeholders.no_end_date')} /></SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="none">No end date</SelectItem>
+                                  <SelectItem value="none">{t('form_placeholders.no_end_date')}</SelectItem>
                                   {[...Array(10)].map((_, i) => {
                                     const year = new Date().getFullYear() + i;
                                     return <SelectItem key={year} value={year.toString()}>{year}</SelectItem>;
