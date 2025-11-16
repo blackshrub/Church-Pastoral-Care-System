@@ -73,7 +73,7 @@ export const LoginPage = () => {
             <Heart className="h-12 w-12 text-primary-500" fill="currentColor" />
           </div>
           <CardTitle className="text-2xl font-manrope font-bold">{t('app_title')}</CardTitle>
-          <CardDescription>Sign in to access the pastoral care system</CardDescription>
+          <CardDescription>{t('login_page.sign_in_subtitle')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -90,7 +90,7 @@ export const LoginPage = () => {
               ) : (
                 <Select value={campusId} onValueChange={setCampusId}>
                   <SelectTrigger data-testid="campus-select">
-                    <SelectValue placeholder="Select your campus" />
+                    <SelectValue placeholder={t('login_page.select_campus_placeholder')} />
                   </SelectTrigger>
                   <SelectContent className="max-h-[300px] overflow-y-auto">
                     {campuses.map((campus) => (
@@ -101,7 +101,7 @@ export const LoginPage = () => {
                   </SelectContent>
                 </Select>
               )}
-              <p className="text-xs text-muted-foreground">Select your campus (required for all users)</p>
+              <p className="text-xs text-muted-foreground">{t('login_page.select_campus_required')}</p>
             </div>
             
             <div className="space-y-2">
@@ -111,7 +111,7 @@ export const LoginPage = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@gkbj.church"
+                placeholder={t('login_page.email_placeholder')}
                 required
                 data-testid="login-email-input"
               />
@@ -124,7 +124,7 @@ export const LoginPage = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder={t('login_page.password_placeholder')}
                 required
                 data-testid="login-password-input"
               />
