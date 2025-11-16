@@ -351,7 +351,7 @@ export const MemberDetail = () => {
                             {newEvent.event_date ? formatDateFns(new Date(newEvent.event_date), 'dd MMM yyyy') : <span className="text-muted-foreground">Select date...</span>}
                           </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80 p-0 z-[100]" side="bottom" align="start" sideOffset={5}>
+                        <PopoverContent className="w-auto p-3 z-[9999]" side="bottom" align="center">
                           <CalendarComponent
                             mode="single"
                             selected={newEvent.event_date ? new Date(newEvent.event_date) : undefined}
