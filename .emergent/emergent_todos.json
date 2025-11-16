@@ -1,11 +1,11 @@
 [
   {
     "content": "Migrate Follow-up tab content from old standalone tab (line 1585) to new nested Overdue -> Follow-ups child tab (line 1323)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Migrate Financial Aid tab content from old standalone tab (line 1345) to new nested Overdue -> Aid child tab (line 1328)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Migrate At Risk tab content from old standalone tab (line 1532) to new nested Overdue -> At Risk child tab (line 1333)",
