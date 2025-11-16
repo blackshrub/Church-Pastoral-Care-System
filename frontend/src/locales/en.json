@@ -449,6 +449,7 @@
     "member_contacted": "{{name}} marked as contacted! Status updated to Active.",
     "action_undone": "Action undone",
     "ignored": "Ignored",
+    "completed": "Completed!",
     "failed_complete": "Failed to complete",
     "failed_mark_distributed": "Failed to mark as distributed",
     "failed_ignore": "Failed to ignore",
