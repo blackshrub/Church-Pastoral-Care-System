@@ -97,7 +97,7 @@ export const AdminDashboard = () => {
         </div>
         
         <TabsContent value="campuses">
-          <Card>
+          <Card className="max-w-full overflow-hidden">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Manage Campuses</CardTitle>
