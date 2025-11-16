@@ -45,7 +45,37 @@ Enterprise pastoral care system for GKBJ ensuring no member is left behind throu
 - **Complete transparency**: Recipient lists with profile integration
 - **Aid analytics**: Type effectiveness and distribution insights
 
-### 📱 **Mobile App Integration Ready**
+### 📱 **Mobile-First Design**
+
+### **Dashboard Refactor (3-Level Nested Tabs)**
+The system features a mobile-optimized dashboard preventing horizontal overflow:
+
+**Level 1 - Main Tabs:**
+- Today (tasks due today)
+- Overdue (with 5 nested child tabs)
+- Upcoming (next 7 days)
+
+**Level 2 - Overdue Child Tabs:**
+- Birthday, F-Ups, Aid, At Risk, Inactive
+
+**Adaptive Tab Behavior:**
+- **Active tab**: Icon + full text label
+- **Inactive tabs**: Icon only
+- **Result**: No horizontal scrolling on mobile devices
+
+### **Consistent Pattern Across Pages**
+Same mobile-first tab pattern implemented on:
+- Dashboard (3 main + 5 nested tabs)
+- Analytics (6 tabs: Demographics, Trends, Engagement, Financial, Care, Predictive)
+- Settings (6 tabs: Automation, Grief, Accident, Engagement, Write-off, System)
+
+### **Mobile Optimizations**
+- Button text shortened: "Mark contacted" → "Contacted"
+- Tab names condensed: "Follow-ups" → "F-Ups", "Disconnected" → "Inactive"
+- Larger touch targets (w-4 h-4 icons vs w-3 h-3)
+- No horizontal overflow on any page
+
+## 📱 **Mobile App Integration Ready**
 - **Complete API coverage**: All data accessible via REST endpoints
 - **Configuration endpoints**: Dropdown values, settings, thresholds via API
 - **Real-time updates**: No localStorage dependencies
