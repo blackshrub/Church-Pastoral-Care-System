@@ -112,10 +112,10 @@ export const AdminDashboard = () => {
                 <CardTitle>{t('admin_dashboard_page.manage_campuses')}</CardTitle>
                 <Dialog open={campusModalOpen} onOpenChange={setCampusModalOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-teal-500 hover:bg-teal-600 text-white"><Plus className="w-4 h-4 mr-2" />Add Campus</Button>
+                    <Button className="bg-teal-500 hover:bg-teal-600 text-white"><Plus className="w-4 h-4 mr-2" />{t('admin_dashboard_page.add_campus')}</Button>
                   </DialogTrigger>
                   <DialogContent>
-                    <DialogHeader><DialogTitle>{newCampus.id ? 'Edit Campus' : 'Add Campus'}</DialogTitle></DialogHeader>
+                    <DialogHeader><DialogTitle>{newCampus.id ? t('admin_dashboard_page.edit_campus') : t('admin_dashboard_page.add_campus')}</DialogTitle></DialogHeader>
                     <form onSubmit={handleAddCampus} className="space-y-4">
                       <div><Label>{t('admin_dashboard_page.campus_name')}</Label><Input value={newCampus.campus_name} onChange={(e) => setNewCampus({...newCampus, campus_name: e.target.value})} required /></div>
                       <div><Label>{t('admin_dashboard_page.location')}</Label><Input value={newCampus.location} onChange={(e) => setNewCampus({...newCampus, location: e.target.value})} /></div>
@@ -241,7 +241,7 @@ export const AdminDashboard = () => {
                 <CardTitle>{t('admin_dashboard_page.manage_users')}</CardTitle>
                 <Dialog open={userModalOpen} onOpenChange={setUserModalOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-teal-500 hover:bg-teal-600 text-white"><Plus className="w-4 h-4 mr-2" />Add User</Button>
+                    <Button className="bg-teal-500 hover:bg-teal-600 text-white"><Plus className="w-4 h-4 mr-2" />{t('admin_dashboard_page.add_user')}</Button>
                   </DialogTrigger>
                   <DialogContent>
                     <DialogHeader><DialogTitle>{t('admin_dashboard_page.add_user')}</DialogTitle></DialogHeader>
@@ -373,7 +373,7 @@ export const AdminDashboard = () => {
         <TabsContent value="settings">
           <div className="space-y-6">
             <Card>
-              <CardHeader><CardTitle>Recalculate Engagement Status</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('admin_dashboard_page.recalculate_engagement')}</CardTitle></CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
@@ -408,7 +408,7 @@ export const AdminDashboard = () => {
             </Card>
             
             <Card>
-              <CardHeader><CardTitle>Daily Digest System</CardTitle></CardHeader>
+              <CardHeader><CardTitle>{t('admin_dashboard_page.daily_digest_system')}</CardTitle></CardHeader>
               <CardContent>
                 <div className="p-4 bg-blue-50 rounded-lg">
                   <p className="font-medium">📋 How It Works:</p>
