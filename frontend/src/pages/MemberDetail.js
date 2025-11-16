@@ -526,18 +526,20 @@ export const MemberDetail = () => {
                                 {newEvent.payment_date ? formatDateFns(new Date(newEvent.payment_date), 'dd MMM yyyy') : <span className="text-muted-foreground">Select payment date...</span>}
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-[340px] p-3 z-[9999]" side="bottom" align="center">
-                              <CalendarComponent
-                                mode="single"
-                                selected={newEvent.payment_date ? new Date(newEvent.payment_date) : undefined}
-                                onSelect={(date) => {
-                                  if (date) {
-                                    setNewEvent({...newEvent, payment_date: formatDateFns(date, 'yyyy-MM-dd')});
-                                    setPaymentDateOpen(false);
-                                  }
-                                }}
-                                initialFocus
-                              />
+                            <PopoverContent className="p-0 z-[9999]" side="bottom" align="start">
+                              <div className="w-[280px]">
+                                <CalendarComponent
+                                  mode="single"
+                                  selected={newEvent.payment_date ? new Date(newEvent.payment_date) : undefined}
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      setNewEvent({...newEvent, payment_date: formatDateFns(date, 'yyyy-MM-dd')});
+                                      setPaymentDateOpen(false);
+                                    }
+                                  }}
+                                  initialFocus
+                                />
+                              </div>
                             </PopoverContent>
                           </Popover>
                           <p className="text-xs text-muted-foreground mt-1">Date when aid was given</p>
@@ -570,18 +572,20 @@ export const MemberDetail = () => {
                                   {newEvent.schedule_end_date ? formatDateFns(new Date(newEvent.schedule_end_date), 'dd MMM yyyy') : <span className="text-muted-foreground">No end date</span>}
                                 </Button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-[340px] p-3 z-[9999]" side="bottom" align="center">
-                                <CalendarComponent
-                                  mode="single"
-                                  selected={newEvent.schedule_end_date ? new Date(newEvent.schedule_end_date) : undefined}
-                                  onSelect={(date) => {
-                                    if (date) {
-                                      setNewEvent({...newEvent, schedule_end_date: formatDateFns(date, 'yyyy-MM-dd')});
-                                      setEndDateOpen(false);
-                                    }
-                                  }}
-                                  initialFocus
-                                />
+                              <PopoverContent className="p-0 z-[9999]" side="bottom" align="start">
+                                <div className="w-[280px]">
+                                  <CalendarComponent
+                                    mode="single"
+                                    selected={newEvent.schedule_end_date ? new Date(newEvent.schedule_end_date) : undefined}
+                                    onSelect={(date) => {
+                                      if (date) {
+                                        setNewEvent({...newEvent, schedule_end_date: formatDateFns(date, 'yyyy-MM-dd')});
+                                        setEndDateOpen(false);
+                                      }
+                                    }}
+                                    initialFocus
+                                  />
+                                </div>
                               </PopoverContent>
                             </Popover>
                           </div>
