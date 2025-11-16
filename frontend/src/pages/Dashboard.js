@@ -129,40 +129,46 @@ const formatPhoneForWhatsApp = (phone) => {
   return `https://wa.me/${formatted}`;
 };
 
-const markBirthdayComplete = async (eventId, setBirthdaysToday) => {
+const markBirthdayComplete = async (eventId, setBirthdaysToday, loadReminders) => {
   try {
     await axios.post(`${API}/care-events/${eventId}/complete`);
     toast.success('Birthday task completed!');
-    // Update local state
+    // Update local state immediately for instant feedback
     setBirthdaysToday(prev => prev.filter(b => b.id !== eventId));
+    // Reload all dashboard data to sync with backend cache
+    await loadReminders();
   } catch (error) {
     toast.error('Failed to complete');
   }
 };
 
-const markGriefStageComplete = async (stageId, setGriefDue) => {
+const markGriefStageComplete = async (stageId, setGriefDue, loadReminders) => {
   try {
     await axios.post(`${API}/grief-support/${stageId}/complete`);
     toast.success('Grief stage completed!');
-    // Update local state
+    // Update local state immediately for instant feedback
     setGriefDue(prev => prev.filter(s => s.id !== stageId));
+    // Reload all dashboard data to sync with backend cache
+    await loadReminders();
   } catch (error) {
     toast.error('Failed to complete');
   }
 };
 
-const markAccidentComplete = async (eventId, setAccidentFollowUp) => {
+const markAccidentComplete = async (eventId, setAccidentFollowUp, loadReminders) => {
   try {
     await axios.post(`${API}/care-events/${eventId}/complete`);
     toast.success('Accident follow-up completed!');
-    // Update local state
+    // Update local state immediately for instant feedback
     setAccidentFollowUp(prev => prev.filter(a => a.id !== eventId));
+    // Reload all dashboard data to sync with backend cache
+    await loadReminders();
   } catch (error) {
     toast.error('Failed to complete');
   }
 };
 
-const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers, setDisconnectedMembers) => {
+const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers, setDisconnectedMembers, loadReminders) => {
   try {
     // Create a regular contact event which updates last_contact_date
     await axios.post(`${API}/care-events`, {
@@ -174,9 +180,11 @@ const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers,
       description: 'Contacted via Reminders page'
     });
     toast.success(`${memberName} marked as contacted! Status updated to Active.`);
-    // Update local state - remove from both at-risk and disconnected
+    // Update local state immediately for instant feedback
     setAtRiskMembers(prev => prev.filter(m => m.id !== memberId));
     setDisconnectedMembers(prev => prev.filter(m => m.id !== memberId));
+    // Reload all dashboard data to sync with backend cache
+    await loadReminders();
   } catch (error) {
     toast.error('Failed to mark as contacted');
     console.error('Error marking member contacted:', error);
