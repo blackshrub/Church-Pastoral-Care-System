@@ -905,7 +905,7 @@ export const Dashboard = () => {
             <TabsTrigger value="today" className="flex-1">
               <Bell className="w-4 h-4 mr-2" />
               <span>Today</span>
-              <span className="ml-1 text-xs">({birthdaysToday.length + todayTasks.length})</span>
+              <span className="ml-1 text-xs">({birthdaysToday.filter(b => !b.completed).length + todayTasks.filter(t => !t.completed).length})</span>
             </TabsTrigger>
             <TabsTrigger value="overdue" className="flex-1">
               <AlertTriangle className="w-4 h-4 mr-2" />
