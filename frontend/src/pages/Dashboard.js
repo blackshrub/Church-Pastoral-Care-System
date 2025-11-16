@@ -1184,7 +1184,7 @@ export const Dashboard = () => {
                 <TabsTrigger value="birthdays" className="flex-shrink-0">
                   <Cake className="w-4 h-4" />
                   {activeOverdueTab === 'birthdays' ? (
-                    <span className="ml-2">Birthdays ({overdueBirthdays.length})</span>
+                    <span className="ml-2">Birthday ({overdueBirthdays.length})</span>
                   ) : (
                     <span className="ml-1">({overdueBirthdays.length})</span>
                   )}
@@ -1192,7 +1192,7 @@ export const Dashboard = () => {
                 <TabsTrigger value="followups" className="flex-shrink-0">
                   <Hospital className="w-4 h-4" />
                   {activeOverdueTab === 'followups' ? (
-                    <span className="ml-2">Followup ({griefDue.length + accidentFollowUp.length})</span>
+                    <span className="ml-2">F-Ups ({griefDue.length + accidentFollowUp.length})</span>
                   ) : (
                     <span className="ml-1">({griefDue.length + accidentFollowUp.length})</span>
                   )}
