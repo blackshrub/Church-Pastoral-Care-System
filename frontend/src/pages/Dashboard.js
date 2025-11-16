@@ -1658,7 +1658,7 @@ export const Dashboard = () => {
                               variant="outline" 
                               onClick={async () => {
                                 triggerHaptic();
-                                if (window.confirm(`Mark financial aid as distributed to ${schedule.member_name}?`)) {
+                                if (window.confirm(t('confirmations.mark_distributed', {name: schedule.member_name}))) {
                                   try {
                                     await axios.post(`${API}/financial-aid-schedules/${schedule.id}/mark-distributed`);
                                     toast.success(t('toasts.payment_distributed_advanced'));
@@ -1696,7 +1696,7 @@ export const Dashboard = () => {
                                 <DropdownMenuItem 
                                   className="text-red-600"
                                   onClick={async () => {
-                                    if (window.confirm(`Stop financial aid schedule for ${schedule.member_name}?`)) {
+                                    if (window.confirm(t('confirmations.stop_schedule', {name: schedule.member_name}))) {
                                       try {
                                         await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
                                         toast.success('Schedule stopped');
