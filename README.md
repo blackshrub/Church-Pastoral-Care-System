@@ -76,11 +76,14 @@ Enterprise pastoral care system for GKBJ ensuring no member is left behind throu
 - **Photo optimization** with multi-size serving
 
 ### **Frontend (React PWA)**
+- **Mobile-first design** with 3-level nested tab architecture
+- **Adaptive tabs** showing icon-only when inactive, full text when active
 - **Real-time updates** prioritized over caching
 - **Professional pagination** (25 items/page) for large datasets
 - **Lazy image loading** for optimal performance
-- **Mobile-responsive** with horizontal scrolling tabs
+- **No horizontal overflow** on mobile devices
 - **PWA capability** with home screen installation
+- **Consistent UX** across Dashboard, Analytics, and Settings pages
 
 ## 📱 **Mobile App Integration**
 
