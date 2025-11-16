@@ -1,14 +1,14 @@
 [
   {
     "content": "Implement all 10 form modal improvements to Dashboard 'Add New Care Event' modal",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Implement all 10 form modal improvements to Member Profile 'Add Care Event' modal",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test form modals on mobile (390px) and verify touch-friendly inputs",
-    "status": "pending"
+    "status": "completed"
   }
 ]
