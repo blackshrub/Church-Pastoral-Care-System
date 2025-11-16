@@ -1124,48 +1124,60 @@ export const Dashboard = () => {
                 <CardDescription>{t('birthdays_passed_not_acknowledged')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {overdueBirthdays
                     .sort((a, b) => (b.days_overdue || 0) - (a.days_overdue || 0))
                     .map(event => (
-                    <div key={event.id} className="p-4 bg-amber-50 rounded-lg border border-amber-200 flex justify-between items-center">
-                      <div className="flex-1">
-                        <MemberNameWithAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} memberId={event.member_id} />
-                        <p className="text-sm text-muted-foreground ml-13">
-                          {formatDate(event.event_date, 'dd MMM yyyy')} 
-                          <span className="ml-2 text-red-600 font-medium">({event.days_overdue} {t('days_ago')})</span>
-                        </p>
+                    <div key={event.id} className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                      <div className="flex items-start gap-3 mb-3">
+                        <MemberAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} size="md" />
+                        <div className="flex-1 min-w-0">
+                          <Link to={`/members/${event.member_id}`} className="font-semibold text-base hover:text-teal-600">
+                            {event.member_name}
+                          </Link>
+                          {event.member_phone && (
+                            <a href={`tel:${event.member_phone}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1 mt-1">
+                              📞 {event.member_phone}
+                            </a>
+                          )}
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {formatDate(event.event_date, 'dd MMM yyyy')} 
+                            <span className="ml-2 text-red-600 font-medium">({event.days_overdue} {t('days_ago')})</span>
+                          </p>
+                        </div>
                       </div>
+                      
+                      {/* Actions - Horizontal compact layout */}
                       <div className="flex gap-2">
-                        <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white" asChild>
+                        <Button size="default" className="bg-amber-500 hover:bg-amber-600 text-white h-11 flex-1 min-w-0" asChild>
                           <a href={formatPhoneForWhatsApp(event.member_phone)} target="_blank" rel="noopener noreferrer">
-                            {t('contact')}
+                            <Phone className="w-4 h-4 mr-1 flex-shrink-0" />
+                            <span className="truncate">{t('contact_whatsapp')}</span>
                           </a>
                         </Button>
-                        <Button size="sm" variant="outline" onClick={async () => {
+                        <Button size="default" variant="outline" onClick={async () => {
                           try {
                             await axios.post(`${API}/care-events/${event.id}/complete`);
                             toast.success('Birthday marked as completed!');
-                            // Update local state
                             setOverdueBirthdays(prev => prev.filter(b => b.id !== event.id));
                           } catch (error) {
                             toast.error('Failed to mark as completed');
                           }
-                        }}>
-                          {t('mark_completed')}
+                        }} className="h-11 flex-1 min-w-0">
+                          <Check className="w-4 h-4 mr-1" />
+                          <span className="truncate">{t('mark_complete')}</span>
                         </Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button size="sm" variant="ghost">
-                              <MoreVertical className="w-4 h-4" />
+                            <Button size="default" variant="ghost" className="h-11 w-11 p-0 flex-shrink-0">
+                              <MoreVertical className="w-5 h-5" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
+                          <DropdownMenuContent align="end" className="w-32">
                             <DropdownMenuItem onClick={async () => {
                               try {
                                 await axios.post(`${API}/care-events/${event.id}/ignore`);
                                 toast.success('Birthday ignored');
-                                // Update local state
                                 setOverdueBirthdays(prev => prev.filter(b => b.id !== event.id));
                               } catch (error) {
                                 toast.error('Failed to ignore');
