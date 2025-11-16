@@ -1280,7 +1280,7 @@ export const Dashboard = () => {
                     <div key={event.id} className="p-4 bg-amber-50 rounded-lg border border-amber-200 relative hover:shadow-lg transition-all">
                       {/* Overdue Badge - Top Right */}
                       {event.days_overdue > 0 && (
-                        <span className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                        <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
                           {event.days_overdue}d overdue
                         </span>
                       )}
@@ -1371,7 +1371,7 @@ export const Dashboard = () => {
                     <div key={event.id} className="p-4 bg-blue-50 rounded-lg border border-blue-200 relative hover:shadow-lg transition-all">
                       {/* Overdue Badge */}
                       {event.days_overdue > 0 && (
-                        <span className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                        <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
                           {event.days_overdue}d overdue
                         </span>
                       )}
@@ -1520,7 +1520,7 @@ export const Dashboard = () => {
                     <div key={stage.id} className="p-4 bg-purple-50 rounded-lg border border-purple-200 relative hover:shadow-lg transition-all">
                       {/* Overdue Badge */}
                       {stage.days_overdue > 0 && (
-                        <span className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                        <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
                           {stage.days_overdue}d overdue
                         </span>
                       )}
