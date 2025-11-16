@@ -1043,11 +1043,21 @@ export const Dashboard = () => {
                 <div className="space-y-4">
                   {financialAidDue.map(schedule => (
                     <div key={schedule.id} className="p-4 bg-purple-50 rounded-lg border border-purple-200 relative hover:shadow-lg transition-all">
-                      <div className="flex-1">
-                        <MemberNameWithAvatar 
-                          member={{name: schedule.member_name, photo_url: schedule.member_photo_url}} 
-                          memberId={schedule.member_id} 
-                        />
+                      {/* Overdue Badge */}
+                      {schedule.days_overdue > 0 && (
+                        <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                          {schedule.days_overdue}d overdue
+                        </span>
+                      )}
+                      
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="flex-shrink-0 rounded-full ring-2 ring-purple-400">
+                          <MemberAvatar 
+                            member={{name: schedule.member_name, photo_url: schedule.member_photo_url}} 
+                            size="md" 
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
                         <p className="text-sm text-muted-foreground ml-13">
                           {schedule.frequency} - Rp {schedule.aid_amount?.toLocaleString('id-ID')} ({schedule.aid_type})
                         </p>
