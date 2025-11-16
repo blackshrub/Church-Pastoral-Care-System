@@ -890,10 +890,10 @@ export const Dashboard = () => {
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-4">
                   <Button type="button" variant="outline" onClick={() => setQuickEventOpen(false)} className="flex-1 h-12">
-                    Cancel
+                    {t('buttons.cancel')}
                   </Button>
                   <Button type="submit" className="flex-1 h-12 bg-teal-500 hover:bg-teal-600 text-white font-semibold" disabled={selectedMemberIds.length === 0}>
-                    Save Care Event
+                    {t('buttons.save_care_event')}
                   </Button>
                 </div>
               </form>
@@ -1768,7 +1768,7 @@ export const Dashboard = () => {
                             </Button>
                             <Button size="default" variant="outline" onClick={() => { triggerHaptic(); markMemberContacted(member.id, member.name, user, setAtRiskMembers, setDisconnectedMembers, loadReminders); }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
                               <Check className="w-4 h-4 mr-1" />
-                              <span className="truncate">Contacted</span>
+                              <span className="truncate">{t('buttons.contacted')}</span>
                             </Button>
                           </div>
                         </div>
@@ -1826,7 +1826,7 @@ export const Dashboard = () => {
                             </Button>
                             <Button size="default" variant="outline" onClick={() => { triggerHaptic(); markMemberContacted(member.id, member.name, user, setAtRiskMembers, setDisconnectedMembers, loadReminders); }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
                               <Check className="w-4 h-4 mr-1" />
-                              <span className="truncate">Contacted</span>
+                              <span className="truncate">{t('buttons.contacted')}</span>
                             </Button>
                           </div>
                         </div>
