@@ -2762,6 +2762,9 @@ async def get_member_aid_schedules(member_id: str, current_user: dict = Depends(
             {"_id": 0}
         ).sort("next_occurrence", 1).to_list(20)
         
+        # Log all schedule IDs found
+        logger.info(f"[GET AID SCHEDULES] Found schedule IDs: {[s.get('id') for s in schedules]}")
+        
         # Filter: active schedules OR stopped schedules with ignored history
         filtered = [
             s for s in schedules 
