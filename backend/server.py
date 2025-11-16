@@ -2583,14 +2583,32 @@ async def create_aid_schedule(schedule: dict, current_user: dict = Depends(get_c
                     next_occurrence = date(today.year, today.month + 1, min(day_of_month, 31))
                     
         elif schedule['frequency'] == 'annually' and schedule.get('month_of_year'):
-            # Find next occurrence of this month from today onward
+            # Find next occurrence of this month/day from today onward
             month_of_year = schedule['month_of_year']
+            day_of_month = schedule.get('day_of_month', 1)  # Default to 1st if not specified
             
             # Try this year first
-            next_occurrence = date(today.year, month_of_year, 1)
-            if next_occurrence < today:
-                # This year's month has passed, go to next year
-                next_occurrence = date(today.year + 1, month_of_year, 1)
+            try:
+                next_occurrence = date(today.year, month_of_year, day_of_month)
+                if next_occurrence < today:
+                    # This year's date has passed, go to next year
+                    next_occurrence = date(today.year + 1, month_of_year, day_of_month)
+            except ValueError:
+                # Day doesn't exist in month (e.g., Feb 31), use last day of month
+                if month_of_year == 2:
+                    # February - check leap year
+                    if (today.year % 4 == 0 and today.year % 100 != 0) or (today.year % 400 == 0):
+                        day_of_month = min(day_of_month, 29)
+                    else:
+                        day_of_month = min(day_of_month, 28)
+                elif month_of_year in [4, 6, 9, 11]:
+                    day_of_month = min(day_of_month, 30)
+                else:
+                    day_of_month = min(day_of_month, 31)
+                
+                next_occurrence = date(today.year, month_of_year, day_of_month)
+                if next_occurrence < today:
+                    next_occurrence = date(today.year + 1, month_of_year, day_of_month)
         
         aid_schedule = FinancialAidSchedule(
             member_id=schedule['member_id'],
