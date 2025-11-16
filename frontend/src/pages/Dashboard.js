@@ -1205,7 +1205,7 @@ export const Dashboard = () => {
                 <TabsTrigger value="birthdays" className="flex-shrink-0">
                   <Cake className="w-4 h-4" />
                   {activeOverdueTab === 'birthdays' ? (
-                    <span className="ml-2">Birthday ({overdueBirthdays.length})</span>
+                    <span className="ml-2">{t('nested_tabs.birthday')} ({overdueBirthdays.length})</span>
                   ) : (
                     <span className="ml-1">({overdueBirthdays.length})</span>
                   )}
@@ -1213,7 +1213,7 @@ export const Dashboard = () => {
                 <TabsTrigger value="followups" className="flex-shrink-0">
                   <Hospital className="w-4 h-4" />
                   {activeOverdueTab === 'followups' ? (
-                    <span className="ml-2">F-Ups ({griefDue.length + accidentFollowUp.length})</span>
+                    <span className="ml-2">{t('nested_tabs.followups')} ({griefDue.length + accidentFollowUp.length})</span>
                   ) : (
                     <span className="ml-1">({griefDue.length + accidentFollowUp.length})</span>
                   )}
@@ -1221,7 +1221,7 @@ export const Dashboard = () => {
                 <TabsTrigger value="financial" className="flex-shrink-0">
                   <DollarSign className="w-4 h-4" />
                   {activeOverdueTab === 'financial' ? (
-                    <span className="ml-2">Aid ({financialAidDue.length})</span>
+                    <span className="ml-2">{t('nested_tabs.aid')} ({financialAidDue.length})</span>
                   ) : (
                     <span className="ml-1">({financialAidDue.length})</span>
                   )}
@@ -1229,7 +1229,7 @@ export const Dashboard = () => {
                 <TabsTrigger value="atrisk" className="flex-shrink-0">
                   <AlertTriangle className="w-4 h-4" />
                   {activeOverdueTab === 'atrisk' ? (
-                    <span className="ml-2">At Risk ({atRiskMembers.length})</span>
+                    <span className="ml-2">{t('nested_tabs.at_risk')} ({atRiskMembers.length})</span>
                   ) : (
                     <span className="ml-1">({atRiskMembers.length})</span>
                   )}
@@ -1237,7 +1237,7 @@ export const Dashboard = () => {
                 <TabsTrigger value="disconnected" className="flex-shrink-0">
                   <Users className="w-4 h-4" />
                   {activeOverdueTab === 'disconnected' ? (
-                    <span className="ml-2">Inactive ({disconnectedMembers.length})</span>
+                    <span className="ml-2">{t('nested_tabs.inactive')} ({disconnectedMembers.length})</span>
                   ) : (
                     <span className="ml-1">({disconnectedMembers.length})</span>
                   )}
