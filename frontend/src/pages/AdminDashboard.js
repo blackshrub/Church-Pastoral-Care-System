@@ -40,7 +40,7 @@ export const AdminDashboard = () => {
       setCampuses(c.data);
       setUsers(u.data);
     } catch (error) {
-      toast.error('Failed to load');
+      toast.error(t('toasts.failed_load'));
     } finally {
       setLoading(false);
     }
@@ -52,11 +52,11 @@ export const AdminDashboard = () => {
       if (newCampus.id) {
         // Update existing campus
         await axios.put(`${API}/campuses/${newCampus.id}`, { campus_name: newCampus.campus_name, location: newCampus.location });
-        toast.success('Campus updated');
+        toast.success(t('toasts.campus_updated'));
       } else {
         // Create new campus
         await axios.post(`${API}/campuses`, newCampus);
-        toast.success('Campus created!');
+        toast.success(t('toasts.campus_created'));
       }
       setCampusModalOpen(false);
       setNewCampus({ id: null, campus_name: '', location: '' });
