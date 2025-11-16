@@ -1483,10 +1483,8 @@ export const MemberDetail = () => {
                                 <DropdownMenuItem onClick={async () => {
                                   if (window.confirm('Clear all ignored payments for this schedule? Future payments will continue.')) {
                                     try {
-                                      // Clear all ignored occurrences by setting to empty array
-                                      await axios.put(`${API}/financial-aid-schedules/${schedule.id}`, {
-                                        ignored_occurrences: []
-                                      });
+                                      // Use new endpoint to clear ignored occurrences
+                                      await axios.post(`${API}/financial-aid-schedules/${schedule.id}/clear-ignored`);
                                       toast.success('All ignored payments cleared');
                                       queryClient.invalidateQueries(['member', id]);
                                       queryClient.invalidateQueries(['dashboard']);
