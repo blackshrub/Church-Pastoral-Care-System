@@ -1,23 +1,23 @@
 [
   {
     "content": "Scan AdminDashboard.js, FinancialAid.js, Calendar.js, LoginPage.js for hardcoded text",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add missing translation keys for these 4 pages to en.json and id.json",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update LoginPage.js with translation keys",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update AdminDashboard.js with translation keys",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update FinancialAid.js with translation keys",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Update Calendar.js with translation keys",
