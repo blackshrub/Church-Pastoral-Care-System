@@ -47,18 +47,31 @@ class DashboardAPITester:
             print(f"❌ Failed - Error: {str(e)}")
             return False, {}
 
-    def test_login(self, email, password):
+    def test_login(self, email, password, campus_id=None):
         """Test login and get token"""
         print("\n" + "="*60)
         print("TESTING AUTHENTICATION")
         print("="*60)
+        
+        # First get campuses if no campus_id provided
+        if not campus_id:
+            print("\n🔍 Fetching available campuses...")
+            try:
+                response = requests.get(f"{self.base_url}/api/campuses", timeout=10)
+                if response.status_code == 200:
+                    campuses = response.json()
+                    if campuses:
+                        campus_id = campuses[0]['id']
+                        print(f"   Using campus: {campuses[0]['campus_name']}")
+            except Exception as e:
+                print(f"   Error fetching campuses: {str(e)}")
         
         success, response = self.run_test(
             "Login API",
             "POST",
             "api/auth/login",
             200,
-            data={"email": email, "password": password}
+            data={"email": email, "password": password, "campus_id": campus_id}
         )
         if success and 'access_token' in response:
             self.token = response['access_token']
