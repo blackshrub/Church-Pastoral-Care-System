@@ -556,7 +556,7 @@ export const Dashboard = () => {
                 {quickEvent.event_type !== 'financial_aid' && (
                   <div>
                     <Label className="font-semibold">{t('event_date_required')}</Label>
-                    <Popover modal={true}>
+                    <Popover modal={true} open={eventDateOpen} onOpenChange={setEventDateOpen}>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full h-12 justify-start text-left font-normal" type="button">
                           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -570,6 +570,7 @@ export const Dashboard = () => {
                           onSelect={(date) => {
                             if (date) {
                               setQuickEvent({...quickEvent, event_date: formatDateFns(date, 'yyyy-MM-dd')});
+                              setEventDateOpen(false); // Close calendar after selection
                             }
                           }}
                           initialFocus
