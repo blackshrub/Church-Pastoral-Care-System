@@ -1115,39 +1115,56 @@ export const MemberDetail = () => {
                 ) : (
                   <div className="space-y-3">
                     {careEvents.filter(e => e.event_type === 'financial_aid').map(event => (
-                      <div key={event.id} className={`p-4 rounded-lg border ${event.ignored ? 'bg-gray-100 opacity-60 border-gray-300' : 'bg-green-50 border-green-200'} relative`}>
+                      <div key={event.id} className={`p-4 rounded-lg border relative hover:shadow-lg transition-all ${event.ignored ? 'bg-gray-50 border-gray-300 card-border-left-gray opacity-70' : event.completed ? 'bg-green-50 border-green-200 card-border-left-sage' : 'bg-purple-50 border-purple-200 card-border-left-purple'}`}>
+                        {/* Status Badge */}
                         {event.ignored && (
-                          <div className="absolute top-2 right-2">
-                            <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
-                          </div>
+                          <span className="absolute top-3 right-3 px-2 py-1 bg-gray-400 text-white text-xs font-semibold rounded shadow-sm z-10">
+                            Ignored
+                          </span>
                         )}
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <p className="font-semibold text-foreground">{t(`aid_types.${event.aid_type}`)}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {formatDate(event.event_date, 'dd MMM yyyy')}
-                            </p>
-                            {event.aid_notes && (
-                              <p className="text-sm text-muted-foreground mt-1">{event.aid_notes}</p>
-                            )}
+                        {event.completed && !event.ignored && (
+                          <span className="absolute top-3 right-3 px-2 py-1 bg-green-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                            Completed
+                          </span>
+                        )}
+                        
+                        <div className="flex items-start gap-3 mb-3">
+                          {/* Aid Type Icon */}
+                          <div className="text-3xl flex-shrink-0">
+                            {getAidTypeIcon(event.aid_type)}
                           </div>
-                          <div className="flex items-start gap-2">
-                            <p className="text-lg font-bold text-green-700">
+                          
+                          <div className="flex-1 min-w-0">
+                            {/* Amount - Hero */}
+                            <p className="text-lg font-bold text-foreground">
                               Rp {event.aid_amount?.toLocaleString('id-ID')}
                             </p>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button size="sm" variant="ghost">
-                                  <MoreVertical className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleDeleteEvent(event.id)} className="text-red-600">
-                                  <Trash2 className="w-4 h-4 mr-2" />Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            {/* Aid Type */}
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {event.aid_type?.charAt(0).toUpperCase() + event.aid_type?.slice(1)}
+                            </p>
+                            {/* Date */}
+                            <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                              📅 {formatDate(event.event_date, 'dd MMM yyyy')}
+                            </p>
+                            {/* Notes */}
+                            {event.aid_notes && (
+                              <p className="text-xs text-muted-foreground mt-2 italic">{event.aid_notes}</p>
+                            )}
                           </div>
+                          
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size="sm" variant="ghost" className="h-8 w-8 p-0 flex-shrink-0">
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-32">
+                              <DropdownMenuItem onClick={() => handleDeleteEvent(event.id)} className="text-red-600">
+                                <Trash2 className="w-4 h-4 mr-2" />Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
                     ))}
