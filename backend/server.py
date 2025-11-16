@@ -2696,6 +2696,63 @@ async def remove_ignored_occurrence(schedule_id: str, date: str, current_user: d
         logger.error(f"Error removing ignored occurrence: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.delete("/financial-aid-schedules/{schedule_id}/ignored-occurrence/{occurrence_date}")
+async def remove_ignored_occurrence(schedule_id: str, occurrence_date: str):
+    """Remove a specific ignored occurrence from the schedule"""
+    try:
+        schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0, "ignored_occurrences": 1, "campus_id": 1})
+        if not schedule:
+            raise HTTPException(status_code=404, detail="Schedule not found")
+        
+        # Remove the occurrence from ignored list
+        ignored_list = schedule.get("ignored_occurrences", [])
+        if occurrence_date in ignored_list:
+            ignored_list.remove(occurrence_date)
+        
+        await db.financial_aid_schedules.update_one(
+            {"id": schedule_id},
+            {"$set": {
+                "ignored_occurrences": ignored_list,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(schedule["campus_id"])
+        
+        return {"success": True, "message": "Ignored occurrence removed"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error removing ignored occurrence: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/financial-aid-schedules/{schedule_id}/clear-ignored")
+async def clear_all_ignored_occurrences(schedule_id: str):
+    """Clear all ignored occurrences for a schedule"""
+    try:
+        schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0, "campus_id": 1})
+        if not schedule:
+            raise HTTPException(status_code=404, detail="Schedule not found")
+        
+        await db.financial_aid_schedules.update_one(
+            {"id": schedule_id},
+            {"$set": {
+                "ignored_occurrences": [],
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        # Invalidate dashboard cache
+        await invalidate_dashboard_cache(schedule["campus_id"])
+        
+        return {"success": True, "message": "All ignored occurrences cleared"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error clearing ignored occurrences: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.delete("/financial-aid-schedules/{schedule_id}")
 async def delete_aid_schedule(schedule_id: str, current_user: dict = Depends(get_current_user)):
     """Delete a financial aid schedule"""
