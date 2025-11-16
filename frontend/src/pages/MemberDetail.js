@@ -339,37 +339,53 @@ export const MemberDetail = () => {
                     </Select>
                   </div>
                   {newEvent.event_type !== 'financial_aid' && (
-                    <div className="space-y-2">
-                      <Label>Event Date *</Label>
-                      <Input
-                        type="date"
-                        value={newEvent.event_date}
-                        onChange={(e) => setNewEvent({...newEvent, event_date: e.target.value})}
-                        required
-                        data-testid="event-date-input"
-                      />
+                    <div>
+                      <Label className="font-semibold">Event Date</Label>
+                      <Popover modal={true}>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" className="w-full h-12 justify-start text-left font-normal" type="button">
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {newEvent.event_date ? formatDateFns(new Date(newEvent.event_date), 'dd MMM yyyy') : <span className="text-muted-foreground">Select date...</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 p-0 z-[100]" side="bottom" align="start" sideOffset={5}>
+                          <CalendarComponent
+                            mode="single"
+                            selected={newEvent.event_date ? new Date(newEvent.event_date) : undefined}
+                            onSelect={(date) => {
+                              if (date) {
+                                setNewEvent({...newEvent, event_date: formatDateFns(date, 'yyyy-MM-dd')});
+                              }
+                            }}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   )}
                 </div>
                 
-                <div className="space-y-2">
-                  <Label>Description</Label>
+                <div>
+                  <Label className="font-semibold">Description</Label>
                   <Textarea
                     value={newEvent.description}
                     onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
                     rows={3}
+                    className="min-h-[5rem]"
+                    placeholder="Additional details..."
                     data-testid="event-description-input"
                   />
                 </div>
                 
                 {/* Title only for Financial Aid */}
                 {newEvent.event_type === 'financial_aid' && (
-                  <div className="space-y-2">
-                    <Label>Aid Name/Title *</Label>
+                  <div>
+                    <Label className="font-semibold">Aid Name/Title</Label>
                     <Input
                       value={newEvent.title}
                       onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
                       placeholder="e.g., Monthly Education Support"
+                      className="h-12"
                       required
                       data-testid="event-title-input"
                     />
