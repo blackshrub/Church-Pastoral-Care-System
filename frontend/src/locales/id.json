@@ -621,5 +621,21 @@
     "distributed": "Didistribusikan",
     "stop_schedule": "Hentikan Jadwal",
     "ignore_payment": "Abaikan Pembayaran Ini"
+  },
+  
+  "_comment_admin_dashboard": "Admin Dashboard Page",
+  "admin_dashboard": {
+    "user_created": "Pengguna dibuat!",
+    "recalculation_started": "✅ Perhitungan ulang dimulai! Harap tunggu 15 detik lalu refresh halaman untuk melihat hitungan terbaru.",
+    "failed_start_recalculation": "Gagal memulai perhitungan ulang"
+  },
+  
+  "_comment_login_page": "Login Page",
+  "login_page": {
+    "sign_in_subtitle": "Masuk untuk mengakses sistem perawatan pastoral",
+    "select_campus_placeholder": "Pilih kampus Anda",
+    "email_placeholder": "admin@gkbj.church",
+    "password_placeholder": "Masukkan kata sandi Anda",
+    "select_campus_required": "Pilih kampus Anda (wajib untuk semua pengguna)"
   }
 }
