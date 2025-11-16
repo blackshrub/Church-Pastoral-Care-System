@@ -121,15 +121,21 @@ export const AdminDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Campus</TableHead>
-                      <TableHead className="hidden sm:table-cell">Location</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+                <div className="min-w-full">
+                  <Table className="table-fixed w-full">
+                    <colgroup>
+                      <col className="w-[60%]" />
+                      <col className="w-[0%] sm:w-[30%]" />
+                      <col className="w-[40%] sm:w-[10%]" />
+                    </colgroup>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-auto">Campus</TableHead>
+                        <TableHead className="hidden sm:table-cell">Location</TableHead>
+                        <TableHead className="w-16 text-right pr-2">⋮</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                     {campuses.map(c => (
                       <TableRow key={c.id}>
                         <TableCell>
