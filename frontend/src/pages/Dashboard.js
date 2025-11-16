@@ -1058,15 +1058,22 @@ export const Dashboard = () => {
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                        <p className="text-sm text-muted-foreground ml-13">
-                          {schedule.frequency} - Rp {schedule.aid_amount?.toLocaleString('id-ID')} ({schedule.aid_type})
-                        </p>
-                        <p className="text-xs ml-13">
-                          <span className={schedule.days_overdue > 0 ? 'text-red-600 font-medium' : 'text-green-600'}>
-                            {schedule.days_overdue > 0 ? `Overdue ${schedule.days_overdue} days` : 'Due today'} - 
+                          <Link to={`/members/${schedule.member_id}`} className="font-semibold text-base hover:text-teal-600">
+                            {schedule.member_name}
+                          </Link>
+                          {schedule.member_phone && (
+                            <a href={`tel:${schedule.member_phone}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1 mt-1">
+                              📞 {schedule.member_phone}
+                            </a>
+                          )}
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {schedule.frequency.charAt(0).toUpperCase() + schedule.frequency.slice(1)} - Rp {schedule.aid_amount?.toLocaleString('id-ID')} ({schedule.aid_type})
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
                             Scheduled: {formatDate(schedule.next_occurrence)}
-                          </span>
-                        </p>
+                            {schedule.member_age && <span className="ml-2">• {schedule.member_age} years old</span>}
+                          </p>
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" className="bg-green-500 hover:bg-green-600 text-white" asChild>
