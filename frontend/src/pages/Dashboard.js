@@ -201,6 +201,9 @@ export const Dashboard = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quickEventOpen, setQuickEventOpen] = useState(false);
+  const [eventDateOpen, setEventDateOpen] = useState(false);
+  const [paymentDateOpen, setPaymentDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
   const [allMembers, setAllMembers] = useState([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState([]);
   const [memberSearch, setMemberSearch] = useState('');
