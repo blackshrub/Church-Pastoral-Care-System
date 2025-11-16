@@ -1,10 +1,10 @@
 [
   {
     "content": "Implement Member Profile Financial Aid tab improvements - bold amounts, icons, colored borders, status badges, structured layout",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test Member Profile Financial Aid tab at 390px",
-    "status": "pending"
+    "status": "completed"
   }
 ]
