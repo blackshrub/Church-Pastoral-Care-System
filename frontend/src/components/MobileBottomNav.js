@@ -9,7 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export const MobileBottomNav = () => {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
