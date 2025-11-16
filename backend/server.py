@@ -2771,7 +2771,7 @@ async def get_member_aid_schedules(member_id: str, current_user: dict = Depends(
         if len(filtered) == 0 and len(schedules) > 0:
             # Debug why filter returned nothing
             for s in schedules[:3]:  # Check first 3
-                logger.info(f"  Debug schedule: id={s.get('id')[:8]}, is_active={s.get('is_active')} (type={type(s.get('is_active'))}), ignored_occ={s.get('ignored_occurrences')} (type={type(s.get('ignored_occurrences'))})")
+                logger.info(f"  Debug schedule: id={s.get('id')[:8]}, is_active={s.get('is_active')} (type={type(s.get('is_active'))}), ignored_occ={s.get('ignored_occurrences')} (type={type(s.get('ignored_occurrences'))}), member_id={s.get('member_id')[:8] if s.get('member_id') else 'None'}")
         
         return filtered
     except Exception as e:
