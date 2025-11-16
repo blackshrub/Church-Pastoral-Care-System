@@ -33,37 +33,16 @@ export const Layout = ({ children }) => {
                 <span className="text-lg font-playfair font-bold text-teal-700">FaithTracker</span>
               </Link>
               
-              {/* Right Side - User Menu & Language */}
+              {/* Right Side - User Info & Language */}
               <div className="flex items-center gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-1 hover:bg-teal-50">
-                      <div className="w-7 h-7 bg-teal-100 rounded-full flex items-center justify-center">
-                        <span className="text-xs font-semibold text-teal-700">
-                          {user?.name?.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <ChevronDown className="w-3 h-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <div className="px-2 py-2 border-b">
-                      <p className="text-sm font-semibold text-gray-700">{user?.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {user?.role === 'full_admin' ? t('full_admin') : 
-                         user?.role === 'campus_admin' ? t('campus_admin') : t('pastor')}
-                      </p>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={() => { logout(); navigate('/login'); }} 
-                      className="text-red-600"
-                    >
-                      <LogOut className="w-4 h-4 mr-2" />
-                      {t('logout')}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {/* User Info Display - No Dropdown on Mobile */}
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 bg-teal-100 rounded-full flex items-center justify-center">
+                    <span className="text-xs font-semibold text-teal-700">
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                </div>
                 <LanguageToggle />
               </div>
             </div>
