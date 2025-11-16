@@ -1653,6 +1653,7 @@ export const Dashboard = () => {
                                     await axios.post(`${API}/financial-aid-schedules/${schedule.id}/mark-distributed`);
                                     toast.success('Payment distributed! Schedule advanced to next occurrence.');
                                     setFinancialAidDue(prev => prev.filter(s => s.id !== schedule.id));
+                                    await loadReminders();
                                   } catch (error) {
                                     toast.error('Failed to mark as distributed');
                                   }
@@ -1675,6 +1676,7 @@ export const Dashboard = () => {
                                     await axios.post(`${API}/financial-aid-schedules/${schedule.id}/ignore`);
                                     toast.success('Financial aid schedule ignored');
                                     setFinancialAidDue(prev => prev.filter(s => s.id !== schedule.id));
+                                    await loadReminders();
                                   } catch (error) {
                                     toast.error('Failed to ignore');
                                   }
@@ -1689,6 +1691,7 @@ export const Dashboard = () => {
                                         await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
                                         toast.success('Schedule stopped');
                                         setFinancialAidDue(prev => prev.filter(s => s.id !== schedule.id));
+                                        await loadReminders();
                                       } catch (error) {
                                         toast.error('Failed to stop schedule');
                                       }
