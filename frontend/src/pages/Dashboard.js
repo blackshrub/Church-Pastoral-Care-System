@@ -129,7 +129,7 @@ const formatPhoneForWhatsApp = (phone) => {
   return `https://wa.me/${formatted}`;
 };
 
-const markBirthdayComplete = async (eventId, setBirthdaysToday, loadReminders) => {
+const markBirthdayComplete = async (eventId, setBirthdaysToday, loadReminders, t) => {
   try {
     await axios.post(`${API}/care-events/${eventId}/complete`);
     toast.success(t('toasts.birthday_completed'));
@@ -142,7 +142,7 @@ const markBirthdayComplete = async (eventId, setBirthdaysToday, loadReminders) =
   }
 };
 
-const markGriefStageComplete = async (stageId, setGriefDue, loadReminders) => {
+const markGriefStageComplete = async (stageId, setGriefDue, loadReminders, t) => {
   try {
     await axios.post(`${API}/grief-support/${stageId}/complete`);
     toast.success(t('toasts.grief_completed'));
@@ -155,7 +155,7 @@ const markGriefStageComplete = async (stageId, setGriefDue, loadReminders) => {
   }
 };
 
-const markAccidentComplete = async (eventId, setAccidentFollowUp, loadReminders) => {
+const markAccidentComplete = async (eventId, setAccidentFollowUp, loadReminders, t) => {
   try {
     await axios.post(`${API}/care-events/${eventId}/complete`);
     toast.success(t('toasts.accident_completed'));
@@ -168,7 +168,7 @@ const markAccidentComplete = async (eventId, setAccidentFollowUp, loadReminders)
   }
 };
 
-const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers, setDisconnectedMembers, loadReminders) => {
+const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers, setDisconnectedMembers, loadReminders, t) => {
   try {
     // Create a regular contact event which updates last_contact_date
     await axios.post(`${API}/care-events`, {
