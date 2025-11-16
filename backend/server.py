@@ -1378,6 +1378,8 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                     "member_name": member_map.get(stage["member_id"], {}).get("name"),
                     "member_phone": member_map.get(stage["member_id"], {}).get("phone"),
                     "member_photo_url": member_map.get(stage["member_id"], {}).get("photo_url"),
+                    "member_age": member_map.get(stage["member_id"], {}).get("age"),
+                    "days_since_last_contact": member_map.get(stage["member_id"], {}).get("days_since_last_contact"),
                     "details": f"{stage['stage'].replace('_', ' ')} stage",
                     "data": stage
                 })
