@@ -898,34 +898,18 @@ export const Dashboard = () => {
       
       <Tabs defaultValue="today" className="w-full">
         <div className="overflow-hidden">
-          <TabsList className="flex flex-wrap w-full gap-1">
-            <TabsTrigger value="today" className="flex-shrink-0 flex-grow">
+          <TabsList className="flex w-full">
+            <TabsTrigger value="today" className="flex-1">
               <Bell className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{t('today')}</span> ({birthdaysToday.length + todayTasks.length})
+              <span className="hidden sm:inline">Today</span>
             </TabsTrigger>
-            <TabsTrigger value="birthday" className="flex-shrink-0 flex-grow">
-              <Cake className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{t('birthdays')}</span> ({overdueBirthdays.length})
-            </TabsTrigger>
-            <TabsTrigger value="followup" className="flex-shrink-0 flex-grow">
-              <Hospital className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{t('followup')}</span> ({griefDue.length + accidentFollowUp.length})
-            </TabsTrigger>
-            <TabsTrigger value="financial" className="flex-shrink-0 flex-grow">
-              <DollarSign className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{t('aid')}</span> ({financialAidDue.length})
-            </TabsTrigger>
-            <TabsTrigger value="disconnected" className="flex-shrink-0 flex-grow">
-              <Users className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{t('disconnected')}</span> ({disconnectedMembers.length})
-            </TabsTrigger>
-            <TabsTrigger value="at-risk" className="flex-shrink-0 flex-grow">
+            <TabsTrigger value="overdue" className="flex-1">
               <AlertTriangle className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{t('at_risk')}</span> ({atRiskMembers.length})
+              <span className="hidden sm:inline">Overdue</span>
             </TabsTrigger>
-            <TabsTrigger value="upcoming" className="flex-shrink-0 flex-grow">
+            <TabsTrigger value="upcoming" className="flex-1">
               <Heart className="w-4 h-4 sm:mr-2" />
-              <span className="hidden sm:inline">{t('upcoming')}</span> ({upcomingTasks.length})
+              <span className="hidden sm:inline">Upcoming</span>
             </TabsTrigger>
           </TabsList>
         </div>
