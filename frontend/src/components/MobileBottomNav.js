@@ -98,6 +98,7 @@ export const MobileBottomNav = () => {
               <button
                 className="flex flex-col items-center justify-center gap-1 transition-colors duration-200 text-gray-600 hover:text-teal-500"
                 data-testid="nav-more"
+                aria-label={t('more_menu')}
               >
                 <MoreHorizontal className="h-5 w-5" />
                 <span className="text-xs font-medium">{t('more')}</span>
@@ -122,8 +123,9 @@ export const MobileBottomNav = () => {
                           ? 'bg-teal-50 text-teal-700 font-semibold'
                           : 'text-gray-700 hover:bg-teal-50 hover:text-teal-700'
                       }`}
+                      aria-label={`Navigate to ${item.name}`}
                     >
-                      <Icon className="h-6 w-6" />
+                      <Icon className="h-6 w-6" aria-hidden="true" />
                       <span className="text-base">{item.name}</span>
                     </button>
                   );
