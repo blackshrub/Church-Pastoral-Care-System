@@ -1916,12 +1916,15 @@ export const Dashboard = () => {
                                 else if (task.type === 'accident_followup') endpoint = `${API}/accident-followup/${task.data.id}/complete`;
                                 else if (task.type === 'birthday') endpoint = `${API}/care-events/${task.data.id}/complete`;
                                 
+                                console.log('Upcoming complete:', task.type, endpoint, task.data);
+                                
                                 if (endpoint) {
                                   await axios.post(endpoint);
                                   toast.success(t('toasts.completed'));
                                   await queryClient.invalidateQueries(['dashboard']);
                                 }
                               } catch (error) {
+                                console.error('Error completing upcoming task:', error);
                                 toast.error(t('toasts.failed'));
                               }
                             }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
