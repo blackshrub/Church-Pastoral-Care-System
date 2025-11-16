@@ -1354,6 +1354,7 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                         "member_name": member["name"],
                         "member_phone": member["phone"],
                         "member_photo_url": member.get("photo_url"),
+                        "member_age": member.get("age"),
                         "days_overdue": days_overdue
                     })
             elif tomorrow <= this_year_birthday <= week_ahead:
