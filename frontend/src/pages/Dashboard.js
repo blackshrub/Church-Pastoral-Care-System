@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import LazyImage from '@/components/LazyImage';
-import MemberAvatar from '@/components/MemberAvatar';
+import { MemberAvatar } from '@/components/MemberAvatar';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
