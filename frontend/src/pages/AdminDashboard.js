@@ -139,14 +139,14 @@ export const AdminDashboard = () => {
                           </div>
                         </TableCell>
                         <TableCell className="hidden sm:table-cell">{c.location || '-'}</TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right pr-2">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" position="popper" sideOffset={5}>
+                            <DropdownMenuContent align="end" className="w-32">
                               <DropdownMenuItem onClick={() => {
                                 setNewCampus({campus_name: c.campus_name, location: c.location || ''});
                                 setCampusModalOpen(true);
