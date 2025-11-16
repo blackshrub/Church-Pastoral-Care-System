@@ -1356,9 +1356,19 @@ export const Dashboard = () => {
               <CardContent>
                 <div className="space-y-4">
                   {accidentFollowUp.map(followup => (
-                    <div key={followup.id} className="p-4 bg-teal-50 rounded-lg border border-teal-200">
+                    <div key={followup.id} className="p-4 bg-teal-50 rounded-lg border border-teal-200 relative hover:shadow-lg transition-all">
+                      {/* Overdue Badge */}
+                      {followup.days_overdue > 0 && (
+                        <span className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                          {followup.days_overdue}d overdue
+                        </span>
+                      )}
+                      
                       <div className="flex items-start gap-3 mb-3">
-                        <MemberAvatar member={{name: followup.member_name, photo_url: followup.member_photo_url}} size="md" />
+                        {/* Avatar with teal ring */}
+                        <div className="flex-shrink-0 rounded-full ring-2 ring-teal-400">
+                          <MemberAvatar member={{name: followup.member_name, photo_url: followup.member_photo_url}} size="md" />
+                        </div>
                         <div className="flex-1 min-w-0">
                           <Link to={`/members/${followup.member_id}`} className="font-semibold text-base hover:text-teal-600">
                             {followup.member_name}
@@ -1368,7 +1378,13 @@ export const Dashboard = () => {
                               📞 {followup.member_phone}
                             </a>
                           )}
-                          <p className="text-sm text-muted-foreground mt-1">{followup.stage.replace('_', ' ')} - Due: {formatDate(followup.scheduled_date)}</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            <span className="px-2 py-0.5 bg-teal-500 text-white text-xs rounded mr-2">
+                              {followup.stage.replace('_', ' ')}
+                            </span>
+                            Due: {formatDate(followup.scheduled_date)}
+                            {followup.days_since_last_contact && <span className="ml-2 text-xs">• Last contact {followup.days_since_last_contact}d ago</span>}
+                          </p>
                         </div>
                       </div>
                       <div className="flex gap-2">
@@ -1381,6 +1397,7 @@ export const Dashboard = () => {
                           </a>
                         </Button>
                         <Button size="default" variant="outline" onClick={async () => {
+                          triggerHaptic();
                           try {
                             await axios.post(`${API}/accident-followup/${followup.id}/complete`);
                             toast.success('Accident follow-up completed!');
@@ -1388,7 +1405,7 @@ export const Dashboard = () => {
                           } catch (error) {
                             toast.error('Failed to complete');
                           }
-                        }} className="h-11 flex-1 min-w-0">
+                        }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
                           <Check className="w-4 h-4 mr-1" />
                           <span className="truncate">{t('mark_complete')}</span>
                         </Button>
