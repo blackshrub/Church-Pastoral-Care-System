@@ -1,22 +1,26 @@
 [
   {
-    "content": "Examine i18n setup and existing translation files",
-    "status": "completed"
+    "content": "Get list of all pages and components to scan",
+    "status": "in_progress"
   },
   {
-    "content": "Scan all components for hardcoded English text",
-    "status": "completed"
+    "content": "Scan all pages for hardcoded English text and compile master list",
+    "status": "pending"
   },
   {
-    "content": "Generate complete Indonesian translations for all missing keys",
-    "status": "completed"
+    "content": "Add all missing translation keys to en.json with proper structure",
+    "status": "pending"
   },
   {
-    "content": "Replace hardcoded English text with translation calls in Dashboard.js",
-    "status": "completed"
+    "content": "Add all Indonesian translations to id.json",
+    "status": "pending"
   },
   {
-    "content": "Check and test translations compilation",
-    "status": "completed"
+    "content": "Replace hardcoded text in all pages with t() calls using interpolation",
+    "status": "pending"
+  },
+  {
+    "content": "Verify all pages compile and translations work",
+    "status": "pending"
   }
 ]
