@@ -232,11 +232,11 @@ export const Analytics = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
-              <SelectItem value="year">This Year</SelectItem>
-              <SelectItem value="6months">Last 6 Months</SelectItem>
-              <SelectItem value="3months">Last 3 Months</SelectItem>
-              <SelectItem value="custom">Custom Date Range</SelectItem>
+              <SelectItem value="all">{t('misc.all_time')}</SelectItem>
+              <SelectItem value="year">{t('misc.this_year')}</SelectItem>
+              <SelectItem value="6months">{t('misc.last_6_months')}</SelectItem>
+              <SelectItem value="3months">{t('misc.last_3_months')}</SelectItem>
+              <SelectItem value="custom">{t('misc.custom_date_range')}</SelectItem>
             </SelectContent>
           </Select>
           
@@ -247,7 +247,7 @@ export const Analytics = () => {
                 value={customStartDate}
                 onChange={(e) => setCustomStartDate(e.target.value)}
                 className="px-3 py-2 border rounded text-sm"
-                placeholder="Start date"
+                placeholder={t('misc.start_date')}
               />
               <span className="text-muted-foreground">to</span>
               <input
@@ -255,7 +255,7 @@ export const Analytics = () => {
                 value={customEndDate}
                 onChange={(e) => setCustomEndDate(e.target.value)}
                 className="px-3 py-2 border rounded text-sm"
-                placeholder="End date"
+                placeholder={t('misc.end_date')}
               />
               <Button 
                 size="sm" 
@@ -263,7 +263,7 @@ export const Analytics = () => {
                 onClick={() => loadAnalytics()}
                 disabled={!customStartDate || !customEndDate}
               >
-                Apply
+                {t('misc.apply')}
               </Button>
             </div>
           )}
