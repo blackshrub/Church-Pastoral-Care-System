@@ -1,18 +1,18 @@
 [
   {
-    "content": "Migrate Follow-up tab content from old standalone tab (line 1585) to new nested Overdue -> Follow-ups child tab (line 1323)",
+    "content": "Migrate Follow-up tab content from old standalone tab to new nested Overdue -> Follow-ups child tab",
     "status": "completed"
   },
   {
-    "content": "Migrate Financial Aid tab content from old standalone tab (line 1345) to new nested Overdue -> Aid child tab (line 1328)",
+    "content": "Migrate Financial Aid tab content from old standalone tab to new nested Overdue -> Aid child tab",
     "status": "completed"
   },
   {
-    "content": "Migrate At Risk tab content from old standalone tab (line 1532) to new nested Overdue -> At Risk child tab (line 1333)",
+    "content": "Migrate At Risk tab content from old standalone tab to new nested Overdue -> At Risk child tab",
     "status": "completed"
   },
   {
-    "content": "Migrate Disconnected tab content from old standalone tab (line 1479) to new nested Overdue -> Disconnected child tab (line 1338)",
+    "content": "Migrate Disconnected tab content from old standalone tab to new nested Overdue -> Disconnected child tab",
     "status": "completed"
   },
   {
@@ -21,6 +21,6 @@
   },
   {
     "content": "Test all migrated tabs and verify task counts work correctly",
-    "status": "in_progress"
+    "status": "completed"
   }
 ]
