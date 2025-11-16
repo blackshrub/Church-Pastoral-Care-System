@@ -61,7 +61,7 @@ const formatPhoneForWhatsApp = (phone) => {
 const markBirthdayComplete = async (eventId, loadReminders) => {
   try {
     await axios.post(`${API}/care-events/${eventId}/complete`);
-    toast.success('Birthday task completed!');
+    toast.success(t('toasts.birthday_completed'));
     loadReminders();
   } catch (error) {
     toast.error('Failed to complete');
@@ -71,7 +71,7 @@ const markBirthdayComplete = async (eventId, loadReminders) => {
 const markGriefStageComplete = async (stageId, loadReminders) => {
   try {
     await axios.post(`${API}/grief-support/${stageId}/complete`);
-    toast.success('Grief stage completed!');
+    toast.success(t('toasts.grief_completed'));
     loadReminders();
   } catch (error) {
     toast.error('Failed to complete');
@@ -81,7 +81,7 @@ const markGriefStageComplete = async (stageId, loadReminders) => {
 const markAccidentComplete = async (eventId, loadReminders) => {
   try {
     await axios.post(`${API}/care-events/${eventId}/complete`);
-    toast.success('Accident follow-up completed!');
+    toast.success(t('toasts.accident_completed'));
     loadReminders();
   } catch (error) {
     toast.error('Failed to complete');
@@ -99,10 +99,10 @@ const markMemberContacted = async (memberId, memberName, user, loadReminders) =>
       title: `Contact with ${memberName}`,
       description: 'Contacted via Reminders page'
     });
-    toast.success(`${memberName} marked as contacted! Status updated to Active.`);
+    toast.success(t('toasts.member_contacted', {name: memberName}));
     loadReminders(); // Refresh to remove from at-risk/disconnected
   } catch (error) {
-    toast.error('Failed to mark as contacted');
+    toast.error(t('toasts.failed_mark_contacted'));
   }
 };
 
@@ -355,10 +355,10 @@ export const Reminders = () => {
                             if (window.confirm(`Mark financial aid as distributed to ${schedule.member_name}?`)) {
                               try {
                                 await axios.post(`${API}/financial-aid-schedules/${schedule.id}/mark-distributed`);
-                                toast.success('Payment distributed! Schedule advanced to next occurrence.');
+                                toast.success(t('toasts.payment_distributed_advanced'));
                                 loadReminders();
                               } catch (error) {
-                                toast.error('Failed to mark as distributed');
+                                toast.error(t('toasts.failed_mark_distributed'));
                               }
                             }
                           }}
@@ -373,10 +373,10 @@ export const Reminders = () => {
                             if (window.confirm(`Stop financial aid schedule for ${schedule.member_name}?`)) {
                               try {
                                 await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
-                                toast.success('Schedule stopped');
+                                toast.success(t('toasts.schedule_stopped'));
                                 loadReminders();
                               } catch (error) {
-                                toast.error('Failed to stop schedule');
+                                toast.error(t('toasts.failed_stop_schedule'));
                               }
                             }
                           }}
