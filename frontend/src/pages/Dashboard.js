@@ -1151,7 +1151,7 @@ export const Dashboard = () => {
                                         await loadReminders();
                                       }
                                     } catch (error) {
-                                      toast.error('Failed to mark as completed');
+                                      toast.error(t('toasts.failed_mark_completed'));
                                     }
                                   }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
                                     <Check className="w-4 h-4 mr-1" />
@@ -1302,11 +1302,11 @@ export const Dashboard = () => {
                               triggerHaptic();
                               try {
                                 await axios.post(`${API}/care-events/${event.id}/complete`);
-                                toast.success('Birthday marked as completed!');
+                                toast.success(t('toasts.birthday_marked_completed'));
                                 setOverdueBirthdays(prev => prev.filter(b => b.id !== event.id));
                                 await loadReminders();
                               } catch (error) {
-                                toast.error('Failed to mark as completed');
+                                toast.error(t('toasts.failed_mark_completed'));
                               }
                             }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
                               <Check className="w-4 h-4 mr-1" />
@@ -1322,7 +1322,7 @@ export const Dashboard = () => {
                                 <DropdownMenuItem onClick={async () => {
                                   try {
                                     await axios.post(`${API}/care-events/${event.id}/ignore`);
-                                    toast.success('Birthday ignored');
+                                    toast.success(t('toasts.birthday_ignored'));
                                     setOverdueBirthdays(prev => prev.filter(b => b.id !== event.id));
                                     await loadReminders();
                                   } catch (error) {
