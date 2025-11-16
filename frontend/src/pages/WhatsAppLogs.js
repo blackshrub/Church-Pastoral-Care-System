@@ -69,7 +69,7 @@ export const WhatsAppLogs = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">WhatsApp Notification Logs</h1>
+          <h1 className="text-3xl font-bold">{t('whatsapp_logs_page.title')}</h1>
           <p className="text-muted-foreground mt-1">View and retry failed messages</p>
         </div>
         <Button onClick={loadLogs} variant="outline">
@@ -79,7 +79,7 @@ export const WhatsAppLogs = () => {
       
       <Card>
         <CardHeader>
-          <CardTitle>Recent Notifications</CardTitle>
+          <CardTitle>{t('whatsapp_logs_page.recent_notifications')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
