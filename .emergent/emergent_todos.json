@@ -1,31 +1,23 @@
 [
   {
     "content": "Run webpack-bundle-analyzer to identify large dependencies and optimization opportunities",
-    "status": "pending"
-  },
-  {
-    "content": "Implement prefers-reduced-motion support for users with motion sensitivity",
     "status": "completed"
   },
   {
     "content": "Verify complete i18n coverage (EN/ID) - check for any missing translations",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Final horizontal scroll verification across all pages (390px, 768px, 1024px)",
-    "status": "in_progress"
-  },
-  {
-    "content": "Add proper aria-labels to all icon-only buttons for screen reader accessibility",
     "status": "completed"
   },
   {
     "content": "Verify all interactive elements have unique data-testid for testing",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Run Lighthouse performance audit and address critical issues",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Final comprehensive testing with testing_agent",
