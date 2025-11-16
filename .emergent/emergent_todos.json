@@ -1,6 +1,22 @@
 [
   {
-    "content": "Internationalization - All critical pages and components complete",
-    "status": "completed"
+    "content": "Search for all window.location.reload() calls across the codebase",
+    "status": "in_progress"
+  },
+  {
+    "content": "Identify what causes forced page reloads",
+    "status": "pending"
+  },
+  {
+    "content": "Replace forced reloads with proper data refetching",
+    "status": "pending"
+  },
+  {
+    "content": "Verify no stale data appears after mutations",
+    "status": "pending"
+  },
+  {
+    "content": "Test PWA experience without forced reloads",
+    "status": "pending"
   }
 ]
