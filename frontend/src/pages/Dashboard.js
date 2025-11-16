@@ -1660,7 +1660,10 @@ export const Dashboard = () => {
                               </a>
                             )}
                             <p className="text-sm text-muted-foreground mt-1">
-                              <span className="font-medium">{config.label}:</span> {task.details}
+                              <span className="font-medium">{config.label}:</span> 
+                              {task.type === 'accident_followup' ? ` ${getAccidentStageBadge(task.data.stage)}` :
+                               task.type === 'grief_support' ? ` ${getGriefStageBadge(task.data.stage)}` :
+                               ` ${task.details}`}
                             </p>
                             <p className="text-xs text-muted-foreground mt-1">
                               📅 {formatDate(task.date, 'dd MMM yyyy')}
