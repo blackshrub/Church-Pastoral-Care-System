@@ -15,6 +15,7 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 export const Settings = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [atRiskDays, setAtRiskDays] = useState(60);
   const [inactiveDays, setInactiveDays] = useState(90);
