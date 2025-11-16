@@ -1388,6 +1388,7 @@ export const MemberDetail = () => {
                                       await axios.post(`${API}/financial-aid-schedules/${schedule.id}/mark-distributed`);
                                       toast.success('Payment distributed! Schedule advanced to next occurrence.');
                                       queryClient.invalidateQueries(['member', id]);
+                                      queryClient.invalidateQueries(['dashboard']);
                                     } catch (error) {
                                       toast.error('Failed to mark payment');
                                     }
@@ -1402,6 +1403,7 @@ export const MemberDetail = () => {
                                       await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
                                       toast.success('Schedule stopped');
                                       queryClient.invalidateQueries(['member', id]);
+                                      queryClient.invalidateQueries(['dashboard']);
                                     } catch (error) {
                                       toast.error('Failed to stop schedule');
                                     }
@@ -1415,6 +1417,7 @@ export const MemberDetail = () => {
                                       const response = await axios.post(`${API}/financial-aid-schedules/${schedule.id}/ignore`);
                                       toast.success(`Payment ignored! Next payment: ${response.data.next_occurrence}`);
                                       queryClient.invalidateQueries(['member', id]);
+                                      queryClient.invalidateQueries(['dashboard']);
                                     } catch (error) {
                                       toast.error('Failed to ignore');
                                     }
