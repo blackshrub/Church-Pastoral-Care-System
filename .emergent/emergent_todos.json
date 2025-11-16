@@ -1,14 +1,6 @@
 [
   {
-    "content": "Rename 'Delete Entire Schedule' button in Ignored section to 'Clear All Ignored Payments'",
-    "status": "in_progress"
-  },
-  {
-    "content": "Change button action to clear ignored_occurrences array instead of deleting schedule",
-    "status": "pending"
-  },
-  {
-    "content": "Test clearing ignored payments keeps upcoming schedule visible",
-    "status": "pending"
+    "content": "Renamed button and created new endpoint for clearing ignored payments",
+    "status": "completed"
   }
 ]
