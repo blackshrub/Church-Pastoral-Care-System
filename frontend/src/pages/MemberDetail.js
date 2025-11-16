@@ -100,16 +100,17 @@ export const MemberDetail = () => {
     try {
       setLoading(true);
       const timestamp = Date.now();
+      const cacheHeaders = {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      };
+      
       const [memberRes, eventsRes, griefRes, accidentRes, aidSchedulesRes] = await Promise.all([
-        axios.get(`${API}/members/${id}?t=${timestamp}`),
-        axios.get(`${API}/care-events?member_id=${id}&t=${timestamp}`),
-        axios.get(`${API}/grief-support/member/${id}?t=${timestamp}`, {
-          headers: {'Cache-Control': 'no-cache'}
-        }),
-        axios.get(`${API}/accident-followup/member/${id}?t=${timestamp}`, {
-          headers: {'Cache-Control': 'no-cache'}
-        }),
-        axios.get(`${API}/financial-aid-schedules/member/${id}?t=${timestamp}`)
+        axios.get(`${API}/members/${id}?t=${timestamp}`, { headers: cacheHeaders }),
+        axios.get(`${API}/care-events?member_id=${id}&t=${timestamp}`, { headers: cacheHeaders }),
+        axios.get(`${API}/grief-support/member/${id}?t=${timestamp}`, { headers: cacheHeaders }),
+        axios.get(`${API}/accident-followup/member/${id}?t=${timestamp}`, { headers: cacheHeaders }),
+        axios.get(`${API}/financial-aid-schedules/member/${id}?t=${timestamp}`, { headers: cacheHeaders })
       ]);
       
       setMember(memberRes.data);
