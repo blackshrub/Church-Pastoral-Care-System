@@ -1,6 +1,30 @@
 [
   {
-    "content": "Complete systematic internationalization of BulkMessaging, ImportExport, WhatsAppLogs",
-    "status": "completed"
+    "content": "Deep scan AdminDashboard.js for ALL hardcoded text (titles, labels, buttons, table headers, etc.)",
+    "status": "in_progress"
+  },
+  {
+    "content": "Deep scan FinancialAid.js for ALL hardcoded text",
+    "status": "pending"
+  },
+  {
+    "content": "Deep scan Calendar.js for ALL hardcoded text",
+    "status": "pending"
+  },
+  {
+    "content": "Deep scan LoginPage.js for ALL hardcoded text",
+    "status": "pending"
+  },
+  {
+    "content": "Add comprehensive translation keys for all 4 pages",
+    "status": "pending"
+  },
+  {
+    "content": "Replace ALL hardcoded text in all 4 pages",
+    "status": "pending"
+  },
+  {
+    "content": "Verify complete translation coverage",
+    "status": "pending"
   }
 ]
