@@ -106,7 +106,7 @@ export const MobileBottomNav = () => {
             </SheetTrigger>
             <SheetContent side="bottom" className="h-[80vh] rounded-t-2xl">
               <SheetHeader className="mb-4">
-                <SheetTitle className="text-2xl font-playfair">Menu</SheetTitle>
+                <SheetTitle className="text-2xl font-playfair">{t('components.menu')}</SheetTitle>
               </SheetHeader>
               
               <div className="space-y-6 overflow-y-auto h-[calc(80vh-100px)]">
