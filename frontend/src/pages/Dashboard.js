@@ -204,6 +204,7 @@ export const Dashboard = () => {
   const [eventDateOpen, setEventDateOpen] = useState(false);
   const [paymentDateOpen, setPaymentDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
+  const [activeOverdueTab, setActiveOverdueTab] = useState('birthdays');
   const [allMembers, setAllMembers] = useState([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState([]);
   const [memberSearch, setMemberSearch] = useState('');
