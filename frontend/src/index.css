@@ -348,4 +348,22 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   body {
     padding-bottom: 64px;
   }
+  
+  /* Compact table cells on mobile for Admin Dashboard */
+  table th,
+  table td {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  
+  table th:first-child,
+  table td:first-child {
+    padding-left: 0.75rem !important;
+  }
+  
+  table th:last-child,
+  table td:last-child {
+    padding-right: 0.75rem !important;
+    width: 3rem;
+  }
 }
