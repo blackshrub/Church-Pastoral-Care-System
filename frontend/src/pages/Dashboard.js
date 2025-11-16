@@ -539,7 +539,7 @@ export const Dashboard = () => {
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full h-12 justify-start text-left font-normal">
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {quickEvent.event_date ? formatDate(quickEvent.event_date, 'dd MMM yyyy') : "Select date..."}
+                          {quickEvent.event_date ? formatDateFns(new Date(quickEvent.event_date), 'dd MMM yyyy') : "Select date..."}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
@@ -548,7 +548,7 @@ export const Dashboard = () => {
                           selected={quickEvent.event_date ? new Date(quickEvent.event_date) : undefined}
                           onSelect={(date) => {
                             if (date) {
-                              setQuickEvent({...quickEvent, event_date: date.toISOString().split('T')[0]});
+                              setQuickEvent({...quickEvent, event_date: formatDateFns(date, 'yyyy-MM-dd')});
                             }
                           }}
                           initialFocus
