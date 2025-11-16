@@ -121,7 +121,7 @@ export const AdminDashboard = () => {
                       <div><Label>{t('admin_dashboard_page.location')}</Label><Input value={newCampus.location} onChange={(e) => setNewCampus({...newCampus, location: e.target.value})} /></div>
                       <div className="flex gap-2 justify-end">
                         <Button type="button" variant="outline" onClick={() => setCampusModalOpen(false)}>{t('cancel')}</Button>
-                        <Button type="submit" className="bg-primary-500">Save</Button>
+                        <Button type="submit" className="bg-primary-500">{t('admin_dashboard_page.save')}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -272,7 +272,7 @@ export const AdminDashboard = () => {
                       )}
                       <div className="flex gap-2 justify-end">
                         <Button type="button" variant="outline" onClick={() => setUserModalOpen(false)}>{t('cancel')}</Button>
-                        <Button type="submit" className="bg-teal-500 hover:bg-teal-600 text-white">Create</Button>
+                        <Button type="submit" className="bg-teal-500 hover:bg-teal-600 text-white">{t('admin_dashboard_page.create')}</Button>
                       </div>
                     </form>
                   </DialogContent>
@@ -377,12 +377,11 @@ export const AdminDashboard = () => {
               <CardContent>
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    Recalculate engagement status for all members using current threshold settings (At-Risk: 60 days, Disconnected: 90 days).
-                    This is useful after changing engagement thresholds or when deploying to production.
+                    {t('admin_dashboard_page.recalculate_description')}
                   </p>
                   <Button 
                     onClick={async () => {
-                      if (window.confirm('Recalculate engagement status for all 805 members? This process runs in the background and may take 10-15 seconds.')) {
+                      if (window.confirm(t('admin_dashboard_page.recalculate_confirm'))) {
                         try {
                           // Fire the request (don't wait for response due to long processing time)
                           axios.post(`${API}/admin/recalculate-engagement`, {}, {
@@ -401,7 +400,7 @@ export const AdminDashboard = () => {
                     }}
                     className="bg-teal-500 hover:bg-teal-600 text-white"
                   >
-                    Recalculate All Members
+                    {t('admin_dashboard_page.recalculate_button')}
                   </Button>
                 </div>
               </CardContent>
@@ -411,8 +410,8 @@ export const AdminDashboard = () => {
               <CardHeader><CardTitle>{t('admin_dashboard_page.daily_digest_system')}</CardTitle></CardHeader>
               <CardContent>
                 <div className="p-4 bg-blue-50 rounded-lg">
-                  <p className="font-medium">📋 How It Works:</p>
-                  <p className="text-sm mt-2">Every day at 8 AM Jakarta time, pastoral team receives WhatsApp with task list: birthdays, grief support, hospital follow-ups, at-risk members. Team then personally contacts each member.</p>
+                  <p className="font-medium">{t('admin_dashboard_page.digest_how_it_works')}</p>
+                  <p className="text-sm mt-2">{t('admin_dashboard_page.digest_explanation')}</p>
                 </div>
               </CardContent>
             </Card>
