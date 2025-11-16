@@ -153,7 +153,7 @@ Same commands after applying optimizations
 
 ### Lighthouse Score
 Run Chrome DevTools Lighthouse on:
-- https://member-pulse-3.preview.emergentagent.com
+- https://church-connect-59.preview.emergentagent.com
 
 Target scores:
 - Performance: 90+
