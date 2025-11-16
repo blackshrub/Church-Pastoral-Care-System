@@ -1447,9 +1447,19 @@ export const Dashboard = () => {
               <CardContent>
                 <div className="space-y-4">
                   {griefDue.map(stage => (
-                    <div key={stage.id} className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                    <div key={stage.id} className="p-4 bg-purple-50 rounded-lg border border-purple-200 relative hover:shadow-lg transition-all">
+                      {/* Overdue Badge */}
+                      {stage.days_overdue > 0 && (
+                        <span className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                          {stage.days_overdue}d overdue
+                        </span>
+                      )}
+                      
                       <div className="flex items-start gap-3 mb-3">
-                        <MemberAvatar member={{name: stage.member_name, photo_url: stage.member_photo_url}} size="md" />
+                        {/* Avatar with purple ring */}
+                        <div className="flex-shrink-0 rounded-full ring-2 ring-purple-400">
+                          <MemberAvatar member={{name: stage.member_name, photo_url: stage.member_photo_url}} size="md" />
+                        </div>
                         <div className="flex-1 min-w-0">
                           <Link to={`/members/${stage.member_id}`} className="font-semibold text-base hover:text-teal-600">
                             {stage.member_name}
@@ -1459,7 +1469,13 @@ export const Dashboard = () => {
                               📞 {stage.member_phone}
                             </a>
                           )}
-                          <p className="text-sm text-muted-foreground mt-1">{stage.stage.replace('_', ' ')} after mourning</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            <span className="px-2 py-0.5 bg-purple-500 text-white text-xs rounded mr-2">
+                              {getGriefStageBadge(stage.stage)}
+                            </span>
+                            after mourning
+                            {stage.days_since_last_contact && <span className="ml-2 text-xs">• Last contact {stage.days_since_last_contact}d ago</span>}
+                          </p>
                         </div>
                       </div>
                       <div className="flex gap-2">
@@ -1471,7 +1487,7 @@ export const Dashboard = () => {
                             <span className="truncate">{t('contact_whatsapp')}</span>
                           </a>
                         </Button>
-                        <Button size="default" variant="outline" onClick={() => markGriefStageComplete(stage.id, setGriefDue)} className="h-11 flex-1 min-w-0">
+                        <Button size="default" variant="outline" onClick={() => { triggerHaptic(); markGriefStageComplete(stage.id, setGriefDue); }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
                           <Check className="w-4 h-4 mr-1" />
                           <span className="truncate">{t('mark_complete')}</span>
                         </Button>
@@ -1486,7 +1502,6 @@ export const Dashboard = () => {
                               try {
                                 await axios.post(`${API}/grief-support/${stage.id}/ignore`);
                                 toast.success('Grief stage ignored');
-                                // Update local state
                                 setGriefDue(prev => prev.filter(s => s.id !== stage.id));
                               } catch (error) {
                                 toast.error('Failed to ignore');
