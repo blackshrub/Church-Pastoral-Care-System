@@ -758,27 +758,27 @@ export const Dashboard = () => {
                             </div>
                           </div>
                           
-                          {/* Actions - Responsive layout */}
-                          <div className="flex flex-col sm:flex-row gap-2">
+                          {/* Actions - Horizontal compact layout */}
+                          <div className="flex gap-2">
                             <Button 
-                              size="lg" 
-                              className="bg-amber-500 hover:bg-amber-600 text-white h-12 flex-1" 
+                              size="default" 
+                              className="bg-amber-500 hover:bg-amber-600 text-white h-11 flex-1 min-w-0" 
                               asChild
                             >
                               <a href={formatPhoneForWhatsApp(event.member_phone)} target="_blank" rel="noopener noreferrer">
-                                <MessageSquare className="w-4 h-4 mr-2" />
-                                {t('contact_whatsapp')}
+                                <MessageSquare className="w-4 h-4 mr-1 flex-shrink-0" />
+                                <span className="truncate">{t('contact_whatsapp')}</span>
                               </a>
                             </Button>
                             {event.completed ? (
-                              <Button size="lg" variant="outline" disabled className="bg-green-100 text-green-700 border-green-300 h-12 flex-1">
-                                <Check className="w-4 h-4 mr-2" />
-                                {t('completed')}
+                              <Button size="default" variant="outline" disabled className="bg-green-100 text-green-700 border-green-300 h-11 flex-1 min-w-0">
+                                <Check className="w-4 h-4 mr-1" />
+                                <span className="truncate">{t('completed')}</span>
                               </Button>
                             ) : (
-                              <Button size="lg" variant="outline" onClick={() => markBirthdayComplete(event.id, setBirthdaysToday)} className="h-12 flex-1">
-                                <Check className="w-4 h-4 mr-2" />
-                                {t('mark_complete')}
+                              <Button size="default" variant="outline" onClick={() => markBirthdayComplete(event.id, setBirthdaysToday)} className="h-11 flex-1 min-w-0">
+                                <Check className="w-4 h-4 mr-1" />
+                                <span className="truncate">{t('mark_complete')}</span>
                               </Button>
                             )}
                           </div>
