@@ -121,14 +121,25 @@ export const AdminDashboard = () => {
             <CardContent>
               <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
                 <Table>
-                  <TableHeader><TableRow><TableHead>Campus</TableHead><TableHead>Location</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Campus</TableHead>
+                      <TableHead className="hidden sm:table-cell">Location</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
                   <TableBody>
                     {campuses.map(c => (
                       <TableRow key={c.id}>
-                        <TableCell>{c.campus_name}</TableCell>
-                        <TableCell>{c.location || '-'}</TableCell>
                         <TableCell>
-                          <div className="flex gap-2">
+                          <div>
+                            <p className="font-medium">{c.campus_name}</p>
+                            <p className="text-xs text-muted-foreground sm:hidden">{c.location || '-'}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell">{c.location || '-'}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex gap-1 justify-end">
                             <Button size="sm" variant="outline" onClick={() => {
                               setNewCampus({campus_name: c.campus_name, location: c.location || ''});
                               setCampusModalOpen(true);
