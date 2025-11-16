@@ -70,7 +70,7 @@ export const AdminDashboard = () => {
     e.preventDefault();
     try {
       await axios.post(`${API}/auth/register`, newUser);
-      toast.success(t('admin_dashboard.user_created'));
+      toast.success(t('admin_dashboard_page.user_created'));
       setUserModalOpen(false);
       setNewUser({ email: '', password: '', name: '', phone: '', role: 'pastor', campus_id: '' });
       loadData();
@@ -391,11 +391,11 @@ export const AdminDashboard = () => {
                             // Ignore timeout errors - backend still processing
                           });
                           
-                          toast.success(t('admin_dashboard.recalculation_started'), {
+                          toast.success(t('admin_dashboard_page.recalculation_started'), {
                             duration: 8000
                           });
                         } catch (error) {
-                          toast.error(t('admin_dashboard.failed_start_recalculation'));
+                          toast.error(t('admin_dashboard_page.failed_start_recalculation'));
                         }
                       }
                     }}
