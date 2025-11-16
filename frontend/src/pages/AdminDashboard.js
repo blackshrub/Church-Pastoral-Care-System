@@ -119,9 +119,9 @@ export const AdminDashboard = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="max-h-[400px] overflow-y-auto">
+              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
                 <Table>
-                  <TableHeader><TableRow><TableHead>Campus</TableHead><TableHead>Location</TableHead></TableRow></TableHeader>
+                  <TableHeader><TableRow><TableHead>Campus</TableHead><TableHead>Location</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
                   <TableBody>
                     {campuses.map(c => (
                       <TableRow key={c.id}>
@@ -172,8 +172,8 @@ export const AdminDashboard = () => {
                       <div><Label>Password *</Label><Input type="password" value={newUser.password} onChange={(e) => setNewUser({...newUser, password: e.target.value})} required /></div>
                       <div><Label>Role *</Label>
                         <Select value={newUser.role} onValueChange={(v) => setNewUser({...newUser, role: v})}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
+                          <SelectTrigger className="h-12"><SelectValue /></SelectTrigger>
+                          <SelectContent position="popper" sideOffset={5}>
                             <SelectItem value="campus_admin">Campus Admin</SelectItem>
                             <SelectItem value="pastor">Pastor</SelectItem>
                             <SelectItem value="full_admin">Full Admin</SelectItem>
@@ -183,8 +183,8 @@ export const AdminDashboard = () => {
                       {newUser.role !== 'full_admin' && (
                         <div><Label>Campus *</Label>
                           <Select value={newUser.campus_id} onValueChange={(v) => setNewUser({...newUser, campus_id: v})}>
-                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                            <SelectContent className="max-h-[200px] overflow-y-auto">
+                            <SelectTrigger className="h-12"><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent position="popper" sideOffset={5} className="max-h-[200px] overflow-y-auto">
                               {campuses.map(c => <SelectItem key={c.id} value={c.id}>{c.campus_name}</SelectItem>)}
                             </SelectContent>
                           </Select>
