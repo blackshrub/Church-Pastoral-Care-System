@@ -1116,15 +1116,18 @@ export const MemberDetail = () => {
                   <div className="space-y-3">
                     {careEvents.filter(e => e.event_type === 'financial_aid').map(event => (
                       <div key={event.id} className={`p-4 rounded-lg border relative hover:shadow-lg transition-all ${event.ignored ? 'bg-gray-50 border-gray-300 card-border-left-gray opacity-70' : event.completed ? 'bg-green-50 border-green-200 card-border-left-sage' : 'bg-purple-50 border-purple-200 card-border-left-purple'}`}>
-                        {/* Status Badge */}
-                        {event.ignored && (
+                        {/* Status Badge - Past aid is already given, so show "Given" */}
+                        {event.ignored ? (
                           <span className="absolute top-3 right-3 px-2 py-1 bg-gray-400 text-white text-xs font-semibold rounded shadow-sm z-10">
                             Ignored
                           </span>
-                        )}
-                        {event.completed && !event.ignored && (
+                        ) : event.completed ? (
                           <span className="absolute top-3 right-3 px-2 py-1 bg-green-500 text-white text-xs font-semibold rounded shadow-sm z-10">
                             Completed
+                          </span>
+                        ) : (
+                          <span className="absolute top-3 right-3 px-2 py-1 bg-purple-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                            Given
                           </span>
                         )}
                         
