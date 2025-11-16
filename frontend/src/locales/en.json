@@ -346,5 +346,78 @@
     "no_financial_aid": "No financial aid recorded yet.",
     "no_tasks_today": "No tasks for today!",
     "no_results_found": "No results found"
+  },
+  
+  "_comment_hardcoded_ui": "Hardcoded UI Text",
+  "main_tabs": {
+    "today": "Today",
+    "overdue": "Overdue",
+    "upcoming": "Upcoming"
+  },
+  
+  "nested_tabs": {
+    "birthday": "Birthday",
+    "followups": "F-Ups",
+    "aid": "Aid",
+    "at_risk": "At Risk",
+    "inactive": "Inactive"
+  },
+  
+  "buttons": {
+    "contacted": "Contacted",
+    "cancel": "Cancel",
+    "save_care_event": "Save Care Event"
+  },
+  
+  "days_of_week": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+  
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  
+  "form_placeholders": {
+    "search_name_phone": "Search by name or phone number...",
+    "select_event_type": "Select event type...",
+    "additional_details": "Additional details...",
+    "monthly_education_support": "e.g., Monthly Education Support",
+    "select_relationship": "Select relationship",
+    "hospital_example": "e.g., RSU Jakarta, Ciputra Hospital",
+    "select_aid_type": "Select aid type...",
+    "amount_example": "1500000",
+    "select_frequency": "Select frequency...",
+    "day_example": "13",
+    "year_example": "2030",
+    "no_end_date": "No end date",
+    "select_date": "Select date...",
+    "select_payment_date": "Select payment date..."
+  },
+  
+  "labels": {
+    "selected_members": "Selected Members",
+    "selected_members_count": "Selected Members ({{count}})",
+    "tasks_due_today": "Tasks Due Today",
+    "overdue_followups": "Overdue Follow-ups",
+    "members_needing_care": "Members Needing Care",
+    "call_wish_birthday": "Call to wish happy birthday",
+    "payment_type": "Payment Type"
   }
 }
