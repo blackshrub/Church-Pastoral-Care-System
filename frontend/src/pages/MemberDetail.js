@@ -137,7 +137,7 @@ export const MemberDetail = () => {
   
   useEffect(() => {
     if (id) {
-      loadMemberData();
+      queryClient.invalidateQueries(['member', id]);
     }
   }, [id]);
   
@@ -280,7 +280,7 @@ export const MemberDetail = () => {
         end_month: null,
         end_year: null
       });
-      loadMemberData();
+      queryClient.invalidateQueries(['member', id]);
     } catch (error) {
       toast.error(t('error_messages.failed_to_save'));
     }
@@ -291,7 +291,7 @@ export const MemberDetail = () => {
     try {
       await axios.delete(`${API}/care-events/${eventId}`);
       toast.success(t('toasts.event_deleted'));
-      loadMemberData();
+      queryClient.invalidateQueries(['member', id]);
     } catch (error) {
       toast.error(t('toasts.failed_delete'));
     }
@@ -315,7 +315,7 @@ export const MemberDetail = () => {
     try {
       await axios.post(`${API}/care-events/${eventId}/complete`);
       toast.success(t('toasts.birthday_marked_completed'));
-      loadMemberData();
+      queryClient.invalidateQueries(['member', id]);
       // Trigger dashboard cache refresh by making a call
       axios.get(`${API}/dashboard/reminders`).catch(() => {});
     } catch (error) {
@@ -328,7 +328,7 @@ export const MemberDetail = () => {
     try {
       await axios.post(`${API}/grief-support/${stageId}/complete`);
       toast.success(t('success_messages.stage_completed'));
-      loadMemberData();
+      queryClient.invalidateQueries(['member', id]);
     } catch (error) {
       toast.error(t('error_messages.failed_to_save'));
       console.error('Error completing stage:', error);
@@ -1088,7 +1088,7 @@ export const MemberDetail = () => {
                                     try {
                                       await axios.post(`${API}/grief-support/${stage.id}/undo`);
                                       toast.success(t('toasts.action_undone'));
-                                      loadMemberData(); // Reload to remove timeline event and update tabs
+                                      queryClient.invalidateQueries(['member', id]); // Reload to remove timeline event and update tabs
                                     } catch (error) {
                                       toast.error(t('toasts.failed_undo'));
                                     }
@@ -1104,7 +1104,7 @@ export const MemberDetail = () => {
                                   try {
                                     await axios.post(`${API}/grief-support/${stage.id}/complete`);
                                     toast.success(t('success_messages.stage_completed'));
-                                    loadMemberData(); // Reload to show timeline event
+                                    queryClient.invalidateQueries(['member', id]); // Reload to show timeline event
                                   } catch (error) {
                                     toast.error(t('toasts.failed'));
                                   }
@@ -1222,7 +1222,7 @@ export const MemberDetail = () => {
                                     try {
                                       await axios.post(`${API}/accident-followup/${stage.id}/undo`);
                                       toast.success(t('toasts.action_undone'));
-                                      loadMemberData(); // Reload to remove timeline event and update tabs
+                                      queryClient.invalidateQueries(['member', id]); // Reload to remove timeline event and update tabs
                                     } catch (error) {
                                       toast.error(t('toasts.failed_undo'));
                                     }
@@ -1238,7 +1238,7 @@ export const MemberDetail = () => {
                                   try {
                                     await axios.post(`${API}/accident-followup/${stage.id}/complete`);
                                     toast.success('Follow-up completed');
-                                    loadMemberData(); // Reload to show timeline event
+                                    queryClient.invalidateQueries(['member', id]); // Reload to show timeline event
                                   } catch (error) {
                                     toast.error(t('toasts.failed'));
                                   }
@@ -1429,7 +1429,7 @@ export const MemberDetail = () => {
                                     try {
                                       await axios.post(`${API}/financial-aid-schedules/${schedule.id}/mark-distributed`);
                                       toast.success('Payment distributed! Schedule advanced to next occurrence.');
-                                      loadMemberData();
+                                      queryClient.invalidateQueries(['member', id]);
                                     } catch (error) {
                                       toast.error('Failed to mark payment');
                                     }
@@ -1443,7 +1443,7 @@ export const MemberDetail = () => {
                                     try {
                                       await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
                                       toast.success('Schedule stopped');
-                                      loadMemberData();
+                                      queryClient.invalidateQueries(['member', id]);
                                     } catch (error) {
                                       toast.error('Failed to stop schedule');
                                     }
@@ -1456,7 +1456,7 @@ export const MemberDetail = () => {
                                     try {
                                       const response = await axios.post(`${API}/financial-aid-schedules/${schedule.id}/ignore`);
                                       toast.success(`Payment ignored! Next payment: ${response.data.next_occurrence}`);
-                                      loadMemberData();
+                                      queryClient.invalidateQueries(['member', id]);
                                     } catch (error) {
                                       toast.error('Failed to ignore');
                                     }
@@ -1499,7 +1499,7 @@ export const MemberDetail = () => {
                                           try {
                                             await axios.delete(`${API}/financial-aid-schedules/${schedule.id}/ignored-occurrence/${date}`);
                                             toast.success('Ignored occurrence removed');
-                                            loadMemberData();
+                                            queryClient.invalidateQueries(['member', id]);
                                           } catch (error) {
                                             toast.error('Failed to remove');
                                           }
@@ -1524,7 +1524,7 @@ export const MemberDetail = () => {
                                     try {
                                       await axios.delete(`${API}/financial-aid-schedules/${schedule.id}`);
                                       toast.success('Schedule deleted');
-                                      loadMemberData();
+                                      queryClient.invalidateQueries(['member', id]);
                                     } catch (error) {
                                       toast.error(t('toasts.failed_delete'));
                                     }
