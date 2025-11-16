@@ -894,7 +894,9 @@ export const Dashboard = () => {
       {/* Task Management */}
       <div>
         <h2 className="text-2xl font-playfair font-bold mb-4">{t('todays_tasks_reminders')}</h2>
-        <p className="text-muted-foreground mb-4">{todayTasks.length + birthdaysToday.length} {t('tasks_need_attention')}</p>
+        <p className="text-muted-foreground mb-4">
+          {birthdaysToday.filter(b => !b.completed).length + todayTasks.filter(t => !t.completed).length} {t('tasks_need_attention')}
+        </p>
       </div>
       
       <Tabs defaultValue="today" className="w-full">
