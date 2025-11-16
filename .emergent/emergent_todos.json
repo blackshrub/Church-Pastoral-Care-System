@@ -1,11 +1,11 @@
 [
   {
     "content": "Update Settings.js with translation keys",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Update Analytics.js with translation keys",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update MembersList.js with translation keys",
@@ -16,7 +16,7 @@
     "status": "pending"
   },
   {
-    "content": "Verify all 4 pages compile and work correctly",
-    "status": "pending"
+    "content": "Verify all updated pages compile correctly",
+    "status": "completed"
   }
 ]
