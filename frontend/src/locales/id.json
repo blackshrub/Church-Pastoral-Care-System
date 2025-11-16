@@ -638,5 +638,46 @@
     "email_placeholder": "admin@gkbj.church",
     "password_placeholder": "Masukkan kata sandi Anda",
     "select_campus_required": "Pilih kampus Anda (wajib untuk semua pengguna)"
+  },
+  
+  "_comment_bulk_messaging": "Bulk Messaging Page",
+  "bulk_messaging": {
+    "failed_load_users": "Gagal memuat pengguna",
+    "select_recipient": "Pilih minimal satu penerima",
+    "enter_message": "Masukkan pesan",
+    "sent_results": "Terkirim ke {{sent}} penerima, {{failed}} gagal",
+    "bulk_send_failed": "Pengiriman massal gagal",
+    "type_message_placeholder": "Ketik pesan Anda ke tim pastoral..."
+  },
+  
+  "_comment_import_export": "Import/Export Page",
+  "import_export": {
+    "sync_updated": "Pekerjaan sinkronisasi diperbarui!",
+    "imported_count": "Mengimpor {{count}} jemaat!",
+    "errors_occurred": "{{count}} kesalahan terjadi",
+    "import_failed": "Impor gagal",
+    "import_failed_json": "Impor gagal - periksa format JSON",
+    "enter_api_url": "Masukkan URL API terlebih dahulu",
+    "api_no_data": "API tidak mengembalikan data",
+    "api_success": "Koneksi API berhasil!",
+    "api_failed": "Koneksi API gagal",
+    "api_sync_created": "Sinkronisasi API dibuat! {{count}} jemaat disinkronkan.",
+    "api_sync_failed": "Sinkronisasi API gagal",
+    "members_exported": "Jemaat diekspor!",
+    "events_exported": "Kejadian diekspor!",
+    "export_failed": "Ekspor gagal"
+  },
+  
+  "_comment_whatsapp_logs": "WhatsApp Logs Page",
+  "whatsapp_logs": {
+    "logs_loaded": "Memuat {{count}} log",
+    "failed_load_logs": "Gagal memuat log",
+    "message_sent": "Pesan terkirim!",
+    "failed_send": "Gagal mengirim pesan"
+  },
+  
+  "_comment_reminders": "Reminders Page",  
+  "reminders_page": {
+    "failed_load_reminders": "Gagal memuat pengingat"
   }
 }
