@@ -1449,6 +1449,7 @@ export const Dashboard = () => {
                                 await axios.post(`${API}/accident-followup/${followup.id}/complete`);
                                 toast.success('Accident follow-up completed!');
                                 setAccidentFollowUp(prev => prev.filter(a => a.id !== followup.id));
+                                await loadReminders();
                               } catch (error) {
                                 toast.error('Failed to complete');
                               }
@@ -1467,8 +1468,8 @@ export const Dashboard = () => {
                                   try {
                                     await axios.post(`${API}/accident-followup/${followup.id}/ignore`);
                                     toast.success('Accident follow-up ignored');
-                                    // Update local state
                                     setAccidentFollowUp(prev => prev.filter(a => a.id !== followup.id));
+                                    await loadReminders();
                                   } catch (error) {
                                     toast.error('Failed to ignore');
                                   }
@@ -1550,6 +1551,7 @@ export const Dashboard = () => {
                                     await axios.post(`${API}/grief-support/${stage.id}/ignore`);
                                     toast.success('Grief stage ignored');
                                     setGriefDue(prev => prev.filter(s => s.id !== stage.id));
+                                    await loadReminders();
                                   } catch (error) {
                                     toast.error('Failed to ignore');
                                   }
