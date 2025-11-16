@@ -31,6 +31,7 @@ export const Analytics = () => {
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('demographics');
   
   useEffect(() => {
     loadAnalytics();
