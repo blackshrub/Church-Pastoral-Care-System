@@ -1955,6 +1955,7 @@ export const Dashboard = () => {
                                   await axios.post(endpoint);
                                   toast.success('Completed!');
                                   setUpcomingTasks(prev => prev.filter((t, i) => i !== index));
+                                  await loadReminders();
                                 }
                               } catch (error) {
                                 toast.error('Failed');
