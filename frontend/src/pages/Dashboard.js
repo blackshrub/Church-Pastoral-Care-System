@@ -179,7 +179,7 @@ const markMemberContacted = async (memberId, memberName, user, setAtRiskMembers,
       title: `Contact with ${memberName}`,
       description: 'Contacted via Reminders page'
     });
-    toast.success(`${memberName} marked as contacted! Status updated to Active.`);
+    toast.success(t('toasts.member_contacted', {name: memberName}));
     // Update local state immediately for instant feedback
     setAtRiskMembers(prev => prev.filter(m => m.id !== memberId));
     setDisconnectedMembers(prev => prev.filter(m => m.id !== memberId));
