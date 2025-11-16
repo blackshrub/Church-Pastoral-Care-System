@@ -2754,6 +2754,8 @@ async def stop_aid_schedule(schedule_id: str, current_user: dict = Depends(get_c
 async def get_member_aid_schedules(member_id: str, current_user: dict = Depends(get_current_user)):
     """Get financial aid schedules for specific member (active + stopped with history)"""
     try:
+        logger.info(f"[GET AID SCHEDULES] Querying for member_id={member_id}")
+        
         # Get all schedules (active + stopped with ignored occurrences)
         schedules = await db.financial_aid_schedules.find(
             {"member_id": member_id},
