@@ -9,11 +9,11 @@
   },
   {
     "content": "Convert Dashboard.js to React Query (queries + mutations)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Convert MemberDetail.js to React Query",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Convert MembersList.js to React Query",
