@@ -511,9 +511,9 @@ export const MemberDetail = () => {
                       {newEvent.schedule_frequency === 'weekly' && (
                         <div className="grid grid-cols-2 gap-3 p-3 bg-blue-50 dark:bg-blue-950 rounded">
                           <div>
-                            <Label className="text-xs">Day of Week *</Label>
+                            <Label className="font-semibold text-xs">Day of Week</Label>
                             <Select value={newEvent.day_of_week} onValueChange={(v) => setNewEvent({...newEvent, day_of_week: v})}>
-                              <SelectTrigger><SelectValue /></SelectTrigger>
+                              <SelectTrigger className="h-12"><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="monday">Monday</SelectItem>
                                 <SelectItem value="tuesday">Tuesday</SelectItem>
@@ -526,12 +526,27 @@ export const MemberDetail = () => {
                             </Select>
                           </div>
                           <div>
-                            <Label className="text-xs">End Date (optional)</Label>
-                            <Input
-                              type="date"
-                              value={newEvent.schedule_end_date}
-                              onChange={(e) => setNewEvent({...newEvent, schedule_end_date: e.target.value})}
-                            />
+                            <Label className="font-semibold text-xs">End Date (optional)</Label>
+                            <Popover modal={true}>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" className="w-full h-12 justify-start text-left font-normal" type="button">
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {newEvent.schedule_end_date ? formatDateFns(new Date(newEvent.schedule_end_date), 'dd MMM yyyy') : <span className="text-muted-foreground">No end date</span>}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-3 z-[9999]" side="bottom" align="center">
+                                <CalendarComponent
+                                  mode="single"
+                                  selected={newEvent.schedule_end_date ? new Date(newEvent.schedule_end_date) : undefined}
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      setNewEvent({...newEvent, schedule_end_date: formatDateFns(date, 'yyyy-MM-dd')});
+                                    }
+                                  }}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
                           </div>
                         </div>
                       )}
@@ -548,7 +563,7 @@ export const MemberDetail = () => {
                             />
                           </div>
                           <div>
-                            <Label className="text-xs">Day of Month *</Label>
+                            <Label className="font-semibold text-xs">Day of Month</Label>
                             <Input
                               type="number"
                               min="1"
@@ -556,6 +571,7 @@ export const MemberDetail = () => {
                               value={newEvent.day_of_month || ''}
                               onChange={(e) => setNewEvent({...newEvent, day_of_month: parseInt(e.target.value) || 1})}
                               placeholder="13"
+                              className="h-12"
                               required
                             />
                           </div>
