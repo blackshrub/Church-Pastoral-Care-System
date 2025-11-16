@@ -25,9 +25,9 @@ const API = `${BACKEND_URL}/api`;
 const formatDate = (dateStr, format = 'short') => {
   try {
     if (format === 'dd MMM yyyy') {
-      return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+      return new Date(dateStr).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
     }
-    return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    return new Date(dateStr).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
   } catch { return dateStr; }
 };
 
