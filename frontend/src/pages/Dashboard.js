@@ -976,6 +976,7 @@ export const Dashboard = () => {
                                 // Grief/Accident: Compact horizontal buttons
                                 <>
                                   <Button size="default" variant="outline" onClick={async () => {
+                                    triggerHaptic();
                                     try {
                                       if (task.type === 'grief_support') {
                                         await markGriefStageComplete(task.data.id, setGriefDue);
@@ -987,7 +988,7 @@ export const Dashboard = () => {
                                     } catch (error) {
                                       toast.error('Failed to mark as completed');
                                     }
-                                  }} className="h-11 flex-1 min-w-0">
+                                  }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
                                     <Check className="w-4 h-4 mr-1" />
                                     <span className="truncate">{t('mark_complete')}</span>
                                   </Button>
