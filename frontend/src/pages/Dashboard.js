@@ -1663,7 +1663,9 @@ export const Dashboard = () => {
                               {task.type === 'birthday' ? (
                                 <>
                                   <span className="font-medium">Birthday</span>
-                                  {task.member_age && <span className="ml-2 text-xs">• Will be {task.member_age + 1} years old</span>}
+                                  {task.member_age && typeof task.member_age === 'number' && (
+                                    <span className="ml-2 text-xs">• Will be {task.member_age + 1} years old</span>
+                                  )}
                                 </>
                               ) : task.type === 'accident_followup' ? (
                                 <>
