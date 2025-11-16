@@ -1,18 +1,22 @@
 [
   {
-    "content": "Fix Dashboard.js mutation functions to reload data after changes",
-    "status": "completed"
+    "content": "Examine i18n setup and existing translation files",
+    "status": "in_progress"
   },
   {
-    "content": "Add cache-busting headers to axios GET requests in production",
-    "status": "completed"
+    "content": "Scan all components for hardcoded English text",
+    "status": "pending"
   },
   {
-    "content": "Apply same fix to MemberDetail.js page",
-    "status": "completed"
+    "content": "Generate complete Indonesian translations for all missing keys",
+    "status": "pending"
   },
   {
-    "content": "Test cache invalidation works in both staging and production",
-    "status": "completed"
+    "content": "Replace hardcoded English text with translation calls",
+    "status": "pending"
+  },
+  {
+    "content": "Verify translations work correctly in both languages",
+    "status": "pending"
   }
 ]
