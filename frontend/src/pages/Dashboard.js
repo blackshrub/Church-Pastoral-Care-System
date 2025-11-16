@@ -1455,11 +1455,11 @@ export const Dashboard = () => {
                               triggerHaptic();
                               try {
                                 await axios.post(`${API}/accident-followup/${followup.id}/complete`);
-                                toast.success('Accident follow-up completed!');
+                                toast.success(t('toasts.accident_completed'));
                                 setAccidentFollowUp(prev => prev.filter(a => a.id !== followup.id));
                                 await loadReminders();
                               } catch (error) {
-                                toast.error('Failed to complete');
+                                toast.error(t('toasts.failed_complete'));
                               }
                             }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
                               <Check className="w-4 h-4 mr-1" />
@@ -1475,7 +1475,7 @@ export const Dashboard = () => {
                                 <DropdownMenuItem onClick={async () => {
                                   try {
                                     await axios.post(`${API}/accident-followup/${followup.id}/ignore`);
-                                    toast.success('Accident follow-up ignored');
+                                    toast.success(t('toasts.accident_ignored'));
                                     setAccidentFollowUp(prev => prev.filter(a => a.id !== followup.id));
                                     await loadReminders();
                                   } catch (error) {
@@ -1557,7 +1557,7 @@ export const Dashboard = () => {
                                 <DropdownMenuItem onClick={async () => {
                                   try {
                                     await axios.post(`${API}/grief-support/${stage.id}/ignore`);
-                                    toast.success('Grief stage ignored');
+                                    toast.success(t('toasts.grief_ignored'));
                                     setGriefDue(prev => prev.filter(s => s.id !== stage.id));
                                     await loadReminders();
                                   } catch (error) {
