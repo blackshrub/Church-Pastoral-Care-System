@@ -5,6 +5,31 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#14b8a6" />
         <meta name="description" content="GKBJ Pastoral Care Management System" />
+        
+        <!-- Suppress ResizeObserver error globally -->
+        <script>
+            // Suppress ResizeObserver loop limit exceeded error
+            window.addEventListener('error', function(e) {
+                if (e.message === 'ResizeObserver loop limit exceeded' || 
+                    e.message === 'ResizeObserver loop completed with undelivered notifications.') {
+                    e.stopImmediatePropagation();
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            });
+            
+            // Override console.error to filter ResizeObserver warnings
+            const _error = console.error;
+            console.error = function() {
+                const args = Array.from(arguments);
+                if (args.length > 0 && typeof args[0] === 'string' && 
+                    args[0].includes('ResizeObserver')) {
+                    return;
+                }
+                _error.apply(console, args);
+            };
+        </script>
+        
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
