@@ -1,18 +1,22 @@
 [
   {
     "content": "Examine i18n setup and existing translation files",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Scan all components for hardcoded English text",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Generate complete Indonesian translations for all missing keys",
+    "status": "in_progress"
+  },
+  {
+    "content": "Replace hardcoded English text with translation calls in Dashboard.js",
     "status": "pending"
   },
   {
-    "content": "Replace hardcoded English text with translation calls",
+    "content": "Replace hardcoded English text in other pages",
     "status": "pending"
   },
   {
