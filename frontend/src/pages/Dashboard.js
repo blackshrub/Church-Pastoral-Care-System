@@ -865,9 +865,36 @@ export const Dashboard = () => {
                         const config = typeConfig[task.type] || { icon: '📋', color: 'gray', bgClass: 'bg-gray-50', borderClass: 'border-gray-200', btnClass: 'bg-gray-500 hover:bg-gray-600', label: 'Task' };
                         
                         return (
-                          <div key={index} className={`p-4 ${config.bgClass} rounded-lg border ${config.borderClass}`}>
+                          <div key={index} className={`p-4 ${config.bgClass} rounded-lg border ${config.borderClass} relative hover:shadow-lg transition-all`}>
+                            {/* Overdue Badge */}
+                            {task.days_overdue > 0 && (
+                              <span className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm">
+                                {task.days_overdue}d overdue
+                              </span>
+                            )}
+                            
+                            {/* Stage Badge for Grief */}
+                            {task.type === 'grief_support' && (
+                              <span className="absolute top-2 left-2 px-2 py-1 bg-purple-500 text-white text-xs font-semibold rounded shadow-sm">
+                                {getGriefStageBadge(task.data.stage)}
+                              </span>
+                            )}
+                            
                             <div className="flex items-start gap-3 mb-3">
-                              <div className="text-3xl flex-shrink-0">{config.icon}</div>
+                              {/* Avatar with colored ring */}
+                              <div className="relative flex-shrink-0">
+                                <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${
+                                  config.color === 'pink' ? 'from-pink-400 to-pink-600' : 
+                                  config.color === 'blue' ? 'from-blue-400 to-blue-600' : 
+                                  'from-purple-400 to-purple-600'
+                                } p-0.5`}>
+                                  <div className="bg-white rounded-full w-full h-full"></div>
+                                </div>
+                                <div className="relative">
+                                  <div className="text-3xl flex-shrink-0">{config.icon}</div>
+                                </div>
+                              </div>
+                              
                               <div className="flex-1 min-w-0">
                                 <Link to={`/members/${task.member_id}`} className="font-semibold text-base hover:text-teal-600">
                                   {task.member_name}
@@ -879,6 +906,7 @@ export const Dashboard = () => {
                                 )}
                                 <p className="text-sm text-muted-foreground mt-1">
                                   <span className="font-medium">{config.label}:</span> {task.details}
+                                  {task.days_since_last_contact && <span className="ml-2 text-xs">• Last contact {task.days_since_last_contact}d ago</span>}
                                 </p>
                               </div>
                             </div>
