@@ -513,7 +513,7 @@ export const Dashboard = () => {
                 </div>
                 
                 {/* Event Details */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/10 rounded-lg">
+                <div className="space-y-4">
                   <div>
                     <Label className="font-semibold">{t('event_type_required')} *</Label>
                     <Select value={quickEvent.event_type} onValueChange={(v) => setQuickEvent({...quickEvent, event_type: v})}>
