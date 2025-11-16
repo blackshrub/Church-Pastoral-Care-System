@@ -905,7 +905,7 @@ export const Dashboard = () => {
                                     }
                                   }} className="h-11 flex-1 min-w-0">
                                     <Check className="w-4 h-4 mr-1" />
-                                    <span className="truncate">{t('mark_completed')}</span>
+                                    <span className="truncate">{t('mark_complete')}</span>
                                   </Button>
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
