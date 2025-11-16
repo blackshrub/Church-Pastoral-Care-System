@@ -681,5 +681,11 @@
   "_comment_reminders": "Reminders Page",  
   "reminders_page": {
     "failed_load_reminders": "Failed to load reminders"
+  },
+  
+  "_comment_components": "Reusable Components",
+  "components": {
+    "app_name": "FaithTracker",
+    "menu": "Menu"
   }
 }
