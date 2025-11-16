@@ -485,7 +485,7 @@ export const ImportExport = () => {
                   </div>
                 </div>
                 <Button type="button" disabled={!apiUrl || importing} className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleApiTest}>
-                  {importing ? 'Testing...' : 'Test API Connection'}
+                  {importing ? t('import_export_page.testing') : t('import_export_page.test_connection')}
                 </Button>
                 
                 {showApiPreview && apiValidation && (
@@ -551,7 +551,7 @@ export const ImportExport = () => {
                         
                         {apiValidation.mappingErrors.length === 0 ? (
                           <Button onClick={handleApiSyncConfirm} className="bg-teal-500 hover:bg-teal-600 text-white">
-                            ✅ Confirm API Sync Setup ({apiValidation.total} members, every {syncInterval} min)
+                            ✅ {t('import_export_page.confirm_sync', {total: apiValidation.total, interval: syncInterval})}
                           </Button>
                         ) : (
                           <p className="text-red-600 text-sm">Fix field mapping errors before proceeding</p>
