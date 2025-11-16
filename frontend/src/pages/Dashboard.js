@@ -719,10 +719,13 @@ export const Dashboard = () => {
                   </div>
                 )}
                 
-                <div className="flex gap-2 justify-end">
-                  <Button type="button" variant="outline" onClick={() => setQuickEventOpen(false)}>Cancel</Button>
-                  <Button type="submit" className="bg-teal-500 hover:bg-teal-600 text-white" disabled={selectedMemberIds.length === 0}>
-                    Save for {selectedMemberIds.length} Member{selectedMemberIds.length !== 1 ? 's' : ''}
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <Button type="button" variant="outline" onClick={() => setQuickEventOpen(false)} className="flex-1 h-12">
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="flex-1 h-12 bg-teal-500 hover:bg-teal-600 text-white font-semibold" disabled={selectedMemberIds.length === 0}>
+                    Save Care Event
                   </Button>
                 </div>
               </form>
