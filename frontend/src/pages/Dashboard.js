@@ -732,34 +732,52 @@ export const Dashboard = () => {
               {birthdaysToday.length > 0 && (
                 <Card className="card-border-left-amber">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      🎂 Birthdays Today ({birthdaysToday.length})
+                    <CardTitle className="flex items-center gap-2 text-xl">
+                      🎂 {t('birthdays_today')} ({birthdaysToday.length})
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                       {birthdaysToday.map(event => (
-                        <div key={event.id} className="p-3 bg-amber-50 rounded flex justify-between items-center">
-                          <div className="flex-1">
-                            <MemberNameWithAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} memberId={event.member_id} />
-                            <p className="text-sm text-muted-foreground ml-13">
-                              {event.completed ? "Birthday contact completed ✅" : "Call to wish happy birthday"}
-                            </p>
+                        <div key={event.id} className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                          <div className="flex items-start gap-3 mb-3">
+                            <MemberAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} size="md" />
+                            <div className="flex-1 min-w-0">
+                              <Link to={`/members/${event.member_id}`} className="font-semibold text-base hover:text-teal-600">
+                                {event.member_name}
+                              </Link>
+                              {event.member_phone && (
+                                <a href={`tel:${event.member_phone}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1 mt-1">
+                                  📞 {event.member_phone}
+                                </a>
+                              )}
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {event.completed ? "✅ Birthday contact completed" : "Call to wish happy birthday"}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex gap-2">
-                            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white" asChild>
+                          
+                          {/* Actions - Responsive layout */}
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <Button 
+                              size="lg" 
+                              className="bg-amber-500 hover:bg-amber-600 text-white h-12 flex-1" 
+                              asChild
+                            >
                               <a href={formatPhoneForWhatsApp(event.member_phone)} target="_blank" rel="noopener noreferrer">
-                                {t('contact')}
+                                <MessageSquare className="w-4 h-4 mr-2" />
+                                {t('contact_whatsapp')}
                               </a>
                             </Button>
                             {event.completed ? (
-                              <Button size="sm" variant="outline" disabled className="bg-green-100 text-green-700 border-green-300">
-                                <Check className="w-4 h-4" />
-                                Completed
+                              <Button size="lg" variant="outline" disabled className="bg-green-100 text-green-700 border-green-300 h-12 flex-1">
+                                <Check className="w-4 h-4 mr-2" />
+                                {t('completed')}
                               </Button>
                             ) : (
-                              <Button size="sm" variant="outline" onClick={() => markBirthdayComplete(event.id, setBirthdaysToday)}>
-                                Mark Complete
+                              <Button size="lg" variant="outline" onClick={() => markBirthdayComplete(event.id, setBirthdaysToday)} className="h-12 flex-1">
+                                <Check className="w-4 h-4 mr-2" />
+                                {t('mark_complete')}
                               </Button>
                             )}
                           </div>
