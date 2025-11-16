@@ -325,32 +325,32 @@ export const Analytics = () => {
         </Card>
       </div>
       
-      <Tabs defaultValue="demographics" className="w-full">
+      <Tabs defaultValue="demographics" className="w-full" onValueChange={(v) => setActiveTab(v)}>
         <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
           <TabsList className="inline-flex w-full">
-            <TabsTrigger value="demographics" className="flex-shrink-0 text-xs">
-              <Users className="w-3 h-3 sm:mr-1" />
-              <span className="hidden sm:inline">{t('demographics')}</span>
+            <TabsTrigger value="demographics" className="flex-shrink-0">
+              <Users className="w-4 h-4" />
+              {activeTab === 'demographics' && <span className="ml-2">{t('demographics')}</span>}
             </TabsTrigger>
-            <TabsTrigger value="trends" className="flex-shrink-0 text-xs">
-              <TrendingUp className="w-3 h-3 sm:mr-1" />
-              <span className="hidden sm:inline">{t('trends')}</span>
+            <TabsTrigger value="trends" className="flex-shrink-0">
+              <TrendingUp className="w-4 h-4" />
+              {activeTab === 'trends' && <span className="ml-2">{t('trends')}</span>}
             </TabsTrigger>
-            <TabsTrigger value="engagement" className="flex-shrink-0 text-xs">
-              <TrendingUp className="w-3 h-3 sm:mr-1" />
-              <span className="hidden sm:inline">{t('engagement')}</span>
+            <TabsTrigger value="engagement" className="flex-shrink-0">
+              <TrendingUp className="w-4 h-4" />
+              {activeTab === 'engagement' && <span className="ml-2">{t('engagement')}</span>}
             </TabsTrigger>
-            <TabsTrigger value="financial" className="flex-shrink-0 text-xs">
-              <DollarSign className="w-3 h-3 sm:mr-1" />
-              <span className="hidden sm:inline">{t('financial_aid')}</span>
+            <TabsTrigger value="financial" className="flex-shrink-0">
+              <DollarSign className="w-4 h-4" />
+              {activeTab === 'financial' && <span className="ml-2">{t('financial_aid')}</span>}
             </TabsTrigger>
-            <TabsTrigger value="care" className="flex-shrink-0 text-xs">
-              <Heart className="w-3 h-3 sm:mr-1" />
-              <span className="hidden sm:inline">{t('care')}</span>
+            <TabsTrigger value="care" className="flex-shrink-0">
+              <Heart className="w-4 h-4" />
+              {activeTab === 'care' && <span className="ml-2">{t('care')}</span>}
             </TabsTrigger>
-            <TabsTrigger value="predictive" className="flex-shrink-0 text-xs">
-              <Target className="w-3 h-3 sm:mr-1" />
-              <span className="hidden sm:inline">{t('predict')}</span>
+            <TabsTrigger value="predictive" className="flex-shrink-0">
+              <Target className="w-4 h-4" />
+              {activeTab === 'predictive' && <span className="ml-2">{t('predict')}</span>}
             </TabsTrigger>
           </TabsList>
         </div>
