@@ -1,6 +1,6 @@
 [
   {
-    "content": "Renamed button and created new endpoint for clearing ignored payments",
-    "status": "completed"
+    "content": "Assess React Query migration status and decide next steps",
+    "status": "in_progress"
   }
 ]
