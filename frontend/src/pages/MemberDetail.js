@@ -552,15 +552,40 @@ export const MemberDetail = () => {
                       )}
                       
                       {newEvent.schedule_frequency === 'monthly' && (
-                        <div className="grid grid-cols-3 gap-3 p-3 bg-purple-50 dark:bg-purple-950 rounded">
-                          <div>
-                            <Label className="text-xs">Start Month/Year *</Label>
-                            <Input
-                              type="month"
-                              value={newEvent.schedule_start_date.substring(0, 7)}
-                              onChange={(e) => setNewEvent({...newEvent, schedule_start_date: e.target.value + '-01'})}
-                              required
-                            />
+                        <div className="space-y-3 p-3 bg-purple-50 dark:bg-purple-950 rounded">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <Label className="font-semibold text-xs">Start Month</Label>
+                              <Select value={(newEvent.start_month || new Date().getMonth() + 1).toString()} onValueChange={(v) => setNewEvent({...newEvent, start_month: parseInt(v)})}>
+                                <SelectTrigger className="h-12"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1">January</SelectItem>
+                                  <SelectItem value="2">February</SelectItem>
+                                  <SelectItem value="3">March</SelectItem>
+                                  <SelectItem value="4">April</SelectItem>
+                                  <SelectItem value="5">May</SelectItem>
+                                  <SelectItem value="6">June</SelectItem>
+                                  <SelectItem value="7">July</SelectItem>
+                                  <SelectItem value="8">August</SelectItem>
+                                  <SelectItem value="9">September</SelectItem>
+                                  <SelectItem value="10">October</SelectItem>
+                                  <SelectItem value="11">November</SelectItem>
+                                  <SelectItem value="12">December</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Label className="font-semibold text-xs">Start Year</Label>
+                              <Select value={(newEvent.start_year || new Date().getFullYear()).toString()} onValueChange={(v) => setNewEvent({...newEvent, start_year: parseInt(v)})}>
+                                <SelectTrigger className="h-12"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  {[...Array(10)].map((_, i) => {
+                                    const year = new Date().getFullYear() + i;
+                                    return <SelectItem key={year} value={year.toString()}>{year}</SelectItem>;
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
                           <div>
                             <Label className="font-semibold text-xs">Day of Month</Label>
@@ -575,13 +600,41 @@ export const MemberDetail = () => {
                               required
                             />
                           </div>
-                          <div>
-                            <Label className="text-xs">End Month/Year (optional)</Label>
-                            <Input
-                              type="month"
-                              value={newEvent.schedule_end_date ? newEvent.schedule_end_date.substring(0, 7) : ''}
-                              onChange={(e) => setNewEvent({...newEvent, schedule_end_date: e.target.value ? e.target.value + '-01' : ''})}
-                            />
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                              <Label className="font-semibold text-xs">End Month (optional)</Label>
+                              <Select value={(newEvent.end_month || 'none').toString()} onValueChange={(v) => setNewEvent({...newEvent, end_month: v === 'none' ? null : parseInt(v)})}>
+                                <SelectTrigger className="h-12"><SelectValue placeholder="No end date" /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">No end date</SelectItem>
+                                  <SelectItem value="1">January</SelectItem>
+                                  <SelectItem value="2">February</SelectItem>
+                                  <SelectItem value="3">March</SelectItem>
+                                  <SelectItem value="4">April</SelectItem>
+                                  <SelectItem value="5">May</SelectItem>
+                                  <SelectItem value="6">June</SelectItem>
+                                  <SelectItem value="7">July</SelectItem>
+                                  <SelectItem value="8">August</SelectItem>
+                                  <SelectItem value="9">September</SelectItem>
+                                  <SelectItem value="10">October</SelectItem>
+                                  <SelectItem value="11">November</SelectItem>
+                                  <SelectItem value="12">December</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <Label className="font-semibold text-xs">End Year (optional)</Label>
+                              <Select value={(newEvent.end_year || 'none').toString()} onValueChange={(v) => setNewEvent({...newEvent, end_year: v === 'none' ? null : parseInt(v)})}>
+                                <SelectTrigger className="h-12"><SelectValue placeholder="No end date" /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">No end date</SelectItem>
+                                  {[...Array(10)].map((_, i) => {
+                                    const year = new Date().getFullYear() + i;
+                                    return <SelectItem key={year} value={year.toString()}>{year}</SelectItem>;
+                                  })}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </div>
                         </div>
                       )}
