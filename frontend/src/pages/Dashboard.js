@@ -61,7 +61,17 @@ const getGriefStageBadge = (stage) => {
     '6_months': 'Month 6',
     '1_year': 'Year 1'
   };
-  return badges[stage] || stage.replace('_', ' ');
+  return badges[stage] || stage.replace('_', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+
+const getAccidentStageBadge = (stage) => {
+  const badges = {
+    'first_followup': 'First Follow-up',
+    'second_followup': 'Second Follow-up',
+    'third_followup': 'Third Follow-up',
+    'final_check': 'Final Check'
+  };
+  return badges[stage] || stage.replace('_', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
 const triggerHaptic = () => {
