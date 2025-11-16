@@ -1173,28 +1173,33 @@ export const Dashboard = () => {
         
         {/* Overdue Tab with Nested Tabs */}
         <TabsContent value="overdue" className="space-y-4">
-          <Tabs defaultValue="birthdays" className="w-full">
+          <Tabs defaultValue="birthdays" className="w-full" onValueChange={(v) => setActiveOverdueTab(v)}>
             <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
               <TabsList className="inline-flex min-w-full w-max sm:w-full">
                 <TabsTrigger value="birthdays" className="flex-shrink-0">
-                  <Cake className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Birthdays</span> ({overdueBirthdays.length})
+                  <Cake className="w-4 h-4" />
+                  {activeOverdueTab === 'birthdays' && <span className="ml-2">Birthdays</span>}
+                  {activeOverdueTab !== 'birthdays' && <span className="ml-2 sm:inline hidden">({overdueBirthdays.length})</span>}
                 </TabsTrigger>
                 <TabsTrigger value="followups" className="flex-shrink-0">
-                  <Hospital className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Follow-ups</span> ({griefDue.length + accidentFollowUp.length})
+                  <Hospital className="w-4 h-4" />
+                  {activeOverdueTab === 'followups' && <span className="ml-2">Follow-ups</span>}
+                  {activeOverdueTab !== 'followups' && <span className="ml-2 sm:inline hidden">({griefDue.length + accidentFollowUp.length})</span>}
                 </TabsTrigger>
                 <TabsTrigger value="financial" className="flex-shrink-0">
-                  <DollarSign className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Aid</span> ({financialAidDue.length})
+                  <DollarSign className="w-4 h-4" />
+                  {activeOverdueTab === 'financial' && <span className="ml-2">Aid</span>}
+                  {activeOverdueTab !== 'financial' && <span className="ml-2 sm:inline hidden">({financialAidDue.length})</span>}
                 </TabsTrigger>
                 <TabsTrigger value="atrisk" className="flex-shrink-0">
-                  <AlertTriangle className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">At Risk</span> ({atRiskMembers.length})
+                  <AlertTriangle className="w-4 h-4" />
+                  {activeOverdueTab === 'atrisk' && <span className="ml-2">At Risk</span>}
+                  {activeOverdueTab !== 'atrisk' && <span className="ml-2 sm:inline hidden">({atRiskMembers.length})</span>}
                 </TabsTrigger>
                 <TabsTrigger value="disconnected" className="flex-shrink-0">
-                  <Users className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Disconnected</span> ({disconnectedMembers.length})
+                  <Users className="w-4 h-4" />
+                  {activeOverdueTab === 'disconnected' && <span className="ml-2">Disconnected</span>}
+                  {activeOverdueTab !== 'disconnected' && <span className="ml-2 sm:inline hidden">({disconnectedMembers.length})</span>}
                 </TabsTrigger>
               </TabsList>
             </div>
