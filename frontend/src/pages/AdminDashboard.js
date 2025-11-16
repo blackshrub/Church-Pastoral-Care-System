@@ -88,7 +88,7 @@ export const AdminDashboard = () => {
       <h1 className="text-3xl font-playfair font-bold">Admin Dashboard</h1>
       <Tabs defaultValue="campuses" className="max-w-full">
         <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-          <TabsList className="inline-flex min-w-full w-max sm:w-full sm:grid sm:grid-cols-3">
+          <TabsList className="inline-flex w-full justify-center">
             <TabsTrigger value="campuses" className="flex-shrink-0"><Building2 className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Campuses</span> ({campuses.length})</TabsTrigger>
             <TabsTrigger value="users" className="flex-shrink-0"><UsersIcon className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Users</span> ({users.length})</TabsTrigger>
             <TabsTrigger value="settings" className="flex-shrink-0"><Shield className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Settings</span></TabsTrigger>
