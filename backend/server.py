@@ -2884,6 +2884,9 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
             next_date = current_date
         
         # Update schedule with new next occurrence
+        # Log before update for debugging
+        logger.info(f"[DISTRIBUTE] Before update - Schedule {schedule_id}: is_active={schedule.get('is_active')}, ignored_occurrences={schedule.get('ignored_occurrences')}, next_occurrence={schedule.get('next_occurrence')}")
+        
         await db.financial_aid_schedules.update_one(
             {"id": schedule_id},
             {"$set": {
@@ -2892,6 +2895,10 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }}
         )
+        
+        # Log after update for debugging
+        updated_schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0})
+        logger.info(f"[DISTRIBUTE] After update - Schedule {schedule_id}: is_active={updated_schedule.get('is_active')}, ignored_occurrences={updated_schedule.get('ignored_occurrences')}, next_occurrence={updated_schedule.get('next_occurrence')}")
         
         # Invalidate dashboard cache
         await invalidate_dashboard_cache(schedule["campus_id"])
