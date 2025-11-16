@@ -63,6 +63,9 @@ export const MemberDetail = () => {
   
   const [eventModalOpen, setEventModalOpen] = useState(false);
   const [editEventModalOpen, setEditEventModalOpen] = useState(false);
+  const [eventDateOpen, setEventDateOpen] = useState(false);
+  const [paymentDateOpen, setPaymentDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   
   const [newEvent, setNewEvent] = useState({
