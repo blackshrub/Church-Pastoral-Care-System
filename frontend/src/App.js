@@ -78,14 +78,16 @@ function AppRoutes() {
 
 function App() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading GKBJ Care...</div>}>
-      <BrowserRouter>
-        <AuthProvider>
-          <AppRoutes />
-          <Toaster />
-        </AuthProvider>
-      </BrowserRouter>
-    </Suspense>
+    <QueryClientProvider client={queryClient}>
+      <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading GKBJ Care...</div>}>
+        <BrowserRouter>
+          <AuthProvider>
+            <AppRoutes />
+            <Toaster />
+          </AuthProvider>
+        </BrowserRouter>
+      </Suspense>
+    </QueryClientProvider>
   );
 }
 
