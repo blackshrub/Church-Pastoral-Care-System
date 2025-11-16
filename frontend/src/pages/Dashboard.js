@@ -439,7 +439,9 @@ export const Dashboard = () => {
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <p className="text-xs sm:text-sm text-muted-foreground mb-1">Tasks Due Today</p>
-                <p className="text-2xl sm:text-4xl font-playfair font-bold">{birthdaysToday.length + todayTasks.length}</p>
+                <p className="text-2xl sm:text-4xl font-playfair font-bold">
+                  {birthdaysToday.filter(b => !b.completed).length + todayTasks.filter(t => !t.completed).length}
+                </p>
               </div>
               <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
                 <Bell className="w-5 h-5 sm:w-7 sm:h-7 text-amber-600" />
