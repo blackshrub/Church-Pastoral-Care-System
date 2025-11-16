@@ -1,18 +1,6 @@
 [
   {
-    "content": "Debug Upcoming tab mutation failures - actions succeed but show error toast",
-    "status": "in_progress"
-  },
-  {
-    "content": "Debug Birthday Overdue tab mutation failures - actions succeed but show error toast",
-    "status": "pending"
-  },
-  {
-    "content": "Fix error handling in React Query invalidation",
-    "status": "pending"
-  },
-  {
-    "content": "Test all tab mutations work correctly",
-    "status": "pending"
+    "content": "React Query migration complete for Dashboard and MemberDetail with all bugs fixed",
+    "status": "completed"
   }
 ]
