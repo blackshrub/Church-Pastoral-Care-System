@@ -793,7 +793,7 @@ export const Dashboard = () => {
                         <div key={event.id} className="p-4 bg-amber-50 rounded-lg border border-amber-200 relative hover:shadow-lg transition-all">
                           {/* Overdue Badge - Top Right */}
                           {event.days_overdue > 0 && (
-                            <span className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm">
+                            <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
                               {event.days_overdue}d overdue
                             </span>
                           )}
