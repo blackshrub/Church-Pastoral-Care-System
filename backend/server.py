@@ -2937,7 +2937,7 @@ async def ignore_financial_aid_schedule(schedule_id: str, user: dict = Depends(g
         current_date = date.fromisoformat(current_occurrence) if isinstance(current_occurrence, str) else current_occurrence
         
         # Log before update for debugging
-        logger.info(f"[IGNORE] Before update - Schedule {schedule_id}: is_active={schedule.get('is_active')}, ignored_occurrences={schedule.get('ignored_occurrences')}, next_occurrence={schedule.get('next_occurrence')}")
+        logger.info(f"[IGNORE] Before update - Schedule {schedule_id}: member_id={schedule.get('member_id')}, is_active={schedule.get('is_active')}, ignored_occurrences={schedule.get('ignored_occurrences')}, next_occurrence={schedule.get('next_occurrence')}")
         
         if schedule["frequency"] == "weekly":
             next_date = current_date + timedelta(weeks=1)
