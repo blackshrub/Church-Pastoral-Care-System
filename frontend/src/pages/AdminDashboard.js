@@ -83,10 +83,10 @@ export const AdminDashboard = () => {
     if (!window.confirm(`Delete ${name}?`)) return;
     try {
       await axios.delete(`${API}/users/${id}`);
-      toast.success('Deleted');
+      toast.success(t('toasts.deleted'));
       loadData();
     } catch (error) {
-      toast.error('Failed');
+      toast.error(t('toasts.failed'));
     }
   };
   
