@@ -699,7 +699,26 @@ export const Dashboard = () => {
                           </div>
                           <div>
                             <Label className="font-semibold text-xs">End Date (optional)</Label>
-                            <Input type="date" value={quickEvent.schedule_end_date || ''} onChange={(e) => setQuickEvent({...quickEvent, schedule_end_date: e.target.value})} className="h-12" />
+                            <Popover modal={true}>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" className="w-full h-12 justify-start text-left font-normal" type="button">
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {quickEvent.schedule_end_date ? formatDateFns(new Date(quickEvent.schedule_end_date), 'dd MMM yyyy') : <span className="text-muted-foreground">No end date</span>}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-80 p-0 z-[100]" side="bottom" align="start" sideOffset={5}>
+                                <CalendarComponent
+                                  mode="single"
+                                  selected={quickEvent.schedule_end_date ? new Date(quickEvent.schedule_end_date) : undefined}
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      setQuickEvent({...quickEvent, schedule_end_date: formatDateFns(date, 'yyyy-MM-dd')});
+                                    }
+                                  }}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
                           </div>
                         </div>
                       )}
