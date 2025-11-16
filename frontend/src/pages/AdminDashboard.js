@@ -251,15 +251,15 @@ export const AdminDashboard = () => {
                             {u.role === 'full_admin' ? 'Full Admin' : u.role === 'campus_admin' ? 'Campus Admin' : 'Pastor'}
                           </span>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right pr-2">
                           {u.id !== user.id && (
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
                                   <MoreVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" position="popper" sideOffset={5}>
+                              <DropdownMenuContent align="end" className="w-32">
                                 <DropdownMenuItem 
                                   className="text-red-600"
                                   onClick={() => handleDeleteUser(u.id, u.name)}
