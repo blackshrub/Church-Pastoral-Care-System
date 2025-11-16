@@ -1871,6 +1871,190 @@ const designTokens = {
 
 ---
 
+## Mobile-First Tab Pattern
+
+### 3-Level Nested Tab Architecture
+
+FaithTracker implements a sophisticated mobile-first tab system that prevents horizontal overflow while maximizing information density.
+
+**Design Pattern:**
+- **Active tab**: Shows icon + full text label
+- **Inactive tabs**: Shows icon only  
+- **Result**: No horizontal scrolling on mobile devices
+
+### Implementation Guidelines
+
+**Dashboard Page (3-Level Structure):**
+```jsx
+Level 1 - Main Tabs:
+├─ Today (with count badge)
+├─ Overdue (with count badge + nested tabs)
+└─ Upcoming (with count badge)
+
+Level 2 - Overdue Child Tabs:
+├─ Birthday (icon only when inactive, "Birthday (#)" when active)
+├─ F-Ups (icon only when inactive, "F-Ups (#)" when active)
+├─ Aid (icon only when inactive, "Aid (#)" when active)
+├─ At Risk (icon only when inactive, "At Risk (#)" when active)
+└─ Inactive (icon only when inactive, "Inactive (#)" when active)
+```
+
+**Analytics & Settings Pages:**
+```jsx
+Single-Level Tabs (6 items):
+├─ Demographics (icon + text when active, icon only when inactive)
+├─ Trends (icon + text when active, icon only when inactive)
+├─ Engagement (icon + text when active, icon only when inactive)
+├─ Financial (icon + text when active, icon only when inactive)
+├─ Care (icon + text when active, icon only when inactive)
+└─ Predictive (icon + text when active, icon only when inactive)
+```
+
+### Code Pattern
+
+**Required State Management:**
+```jsx
+const [activeTab, setActiveTab] = useState('default-value');
+const [activeOverdueTab, setActiveOverdueTab] = useState('birthdays'); // For nested tabs
+
+<Tabs defaultValue="default-value" onValueChange={(v) => setActiveTab(v)}>
+  <TabsList>
+    <TabsTrigger value="tab1">
+      <IconComponent className="w-4 h-4" />
+      {activeTab === 'tab1' && <span className="ml-2">Tab Name</span>}
+    </TabsTrigger>
+  </TabsList>
+</Tabs>
+```
+
+### Visual Specifications
+
+**Tab Sizing:**
+- Icon size: `w-4 h-4` (16px x 16px) - NOT w-3 h-3
+- Minimum touch target: 44px x 44px (iOS HIG compliance)
+- Gap between icon and text: `ml-2` (8px)
+- Tab trigger class: `flex-shrink-0` (prevents compression)
+
+**Tab List Container:**
+```jsx
+<div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+  <TabsList className="inline-flex w-full">
+    {/* Tab triggers here */}
+  </TabsList>
+</div>
+```
+
+### Text Optimization for Mobile
+
+**Shortened Labels (when active):**
+- "Birthdays" → "Birthday"
+- "Follow-ups" → "F-Ups"  
+- "Disconnected" → "Inactive"
+- "Mark contacted" → "Contacted" (button text)
+
+**Label Format:**
+- Include count badges: "Birthday (12)"
+- Use conditional rendering: `{activeTab === 'tab1' && <span>...</span>}`
+- Never use `hidden sm:inline` pattern (deprecated)
+
+### Color & Visual Feedback
+
+**Active State:**
+- Background: Light teal or highlighted state
+- Text: Primary foreground color
+- Border: 2px bottom border in primary color
+
+**Inactive State:**
+- Background: Transparent or muted
+- Icon: Muted foreground color
+- No text label (icon only)
+
+**Hover State:**
+- Background: Light hover color
+- Icon: Primary color
+- Cursor: pointer
+
+### Accessibility
+
+**ARIA Attributes:**
+```jsx
+<TabsTrigger
+  value="tab1"
+  aria-label="Full descriptive tab name"
+  data-testid="tab-name-trigger"
+>
+  {/* Visual content */}
+</TabsTrigger>
+```
+
+**Keyboard Navigation:**
+- Arrow keys move between tabs
+- Enter/Space activates tab
+- Tab key moves to tab content
+
+### Responsive Behavior
+
+**Mobile (< 640px):**
+- Icon-only for inactive tabs
+- Full text for active tab
+- Horizontal scroll if needed (with smooth scrolling)
+
+**Tablet & Desktop (≥ 640px):**
+- Same pattern (consistent UX across breakpoints)
+- May expand to show more tabs simultaneously
+
+### Count Badges
+
+**Format:**
+- Position: Adjacent to tab label
+- Style: `text-xs` with ml-1 margin
+- Content: `({count})`
+- Example: "Birthday (12)", "Aid (5)"
+
+**Implementation:**
+```jsx
+<TabsTrigger value="birthday">
+  <Cake className="w-4 h-4" />
+  {activeTab === 'birthday' ? (
+    <span className="ml-2">Birthday ({count})</span>
+  ) : (
+    <span className="ml-1">({count})</span>
+  )}
+</TabsTrigger>
+```
+
+### Best Practices
+
+**DO:**
+- ✅ Use consistent icon sizes (w-4 h-4)
+- ✅ Show full text for active tab only
+- ✅ Include count badges for quick status overview
+- ✅ Maintain flex-shrink-0 to prevent compression
+- ✅ Use activeTab state for conditional rendering
+- ✅ Provide aria-labels for accessibility
+
+**DON'T:**
+- ❌ Use `hidden sm:inline` (causes layout shifts)
+- ❌ Make icons too small (w-3 h-3 is too small)
+- ❌ Show text on all tabs simultaneously on mobile
+- ❌ Use `grid-cols-6` or similar (causes overflow)
+- ❌ Omit count badges (they provide valuable context)
+- ❌ Use text-xs or smaller for tab text
+
+### Testing Checklist
+
+- [ ] Test on mobile viewport (375px width)
+- [ ] Verify no horizontal overflow
+- [ ] Check active/inactive state transitions
+- [ ] Validate count badge updates
+- [ ] Test keyboard navigation
+- [ ] Verify touch target sizes (min 44px)
+- [ ] Check color contrast ratios
+- [ ] Test with screen reader
+
+---
+
+
 ## Summary
 
 This design system creates a **compassionate, professional, and delightful** mobile-first experience for FaithTracker. The warm teal and amber color palette conveys trust and care, while the Playfair Display headings add elegance and dignity. The generous spacing, touch-friendly interactions, and thoughtful micro-animations make the app feel polished and premium. The card-based layouts, clear typography hierarchy, and comprehensive accessibility features ensure the app is easy to use for pastors and administrators across all devices and contexts.
