@@ -2928,10 +2928,32 @@ async def ignore_financial_aid_schedule(schedule_id: str, user: dict = Depends(g
         if schedule["frequency"] == "weekly":
             next_date = current_date + timedelta(weeks=1)
         elif schedule["frequency"] == "monthly":
+            # Safely advance to next month, handling day-of-month edge cases
+            day_of_month = schedule.get("day_of_month", current_date.day)
+            
             if current_date.month == 12:
-                next_date = current_date.replace(year=current_date.year + 1, month=1)
+                # December → January next year
+                next_year = current_date.year + 1
+                next_month = 1
             else:
-                next_date = current_date.replace(month=current_date.month + 1)
+                next_year = current_date.year
+                next_month = current_date.month + 1
+            
+            # Handle months with fewer days (e.g., Jan 31 → Feb 28/29)
+            try:
+                next_date = date(next_year, next_month, day_of_month)
+            except ValueError:
+                # Day doesn't exist in next month, use last valid day
+                if next_month == 2:
+                    # February
+                    if (next_year % 4 == 0 and next_year % 100 != 0) or (next_year % 400 == 0):
+                        next_date = date(next_year, next_month, min(day_of_month, 29))
+                    else:
+                        next_date = date(next_year, next_month, min(day_of_month, 28))
+                elif next_month in [4, 6, 9, 11]:
+                    next_date = date(next_year, next_month, min(day_of_month, 30))
+                else:
+                    next_date = date(next_year, next_month, min(day_of_month, 31))
         elif schedule["frequency"] == "annually":
             next_date = current_date.replace(year=current_date.year + 1)
         else:
