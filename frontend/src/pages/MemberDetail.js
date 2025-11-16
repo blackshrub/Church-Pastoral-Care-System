@@ -366,7 +366,6 @@ export const MemberDetail = () => {
                       </Popover>
                     </div>
                   )}
-                </div>
                 
                 <div>
                   <Label className="font-semibold">Description</Label>
