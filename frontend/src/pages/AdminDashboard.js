@@ -124,25 +124,25 @@ export const AdminDashboard = () => {
                 <Table className="w-full">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-auto">Campus</TableHead>
+                      <TableHead className="pl-2 pr-1">Campus</TableHead>
                       <TableHead className="hidden sm:table-cell">Location</TableHead>
-                      <TableHead className="w-12 text-right pr-2">⋮</TableHead>
+                      <TableHead className="w-10 text-center px-1">⋮</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {campuses.map(c => (
                       <TableRow key={c.id}>
-                        <TableCell>
+                        <TableCell className="pl-2 pr-1">
                           <div>
-                            <p className="font-medium">{c.campus_name}</p>
+                            <p className="font-medium text-sm">{c.campus_name}</p>
                             <p className="text-xs text-muted-foreground sm:hidden">{c.location || '-'}</p>
                           </div>
                         </TableCell>
                         <TableCell className="hidden sm:table-cell">{c.location || '-'}</TableCell>
-                        <TableCell className="text-right pr-2">
+                        <TableCell className="w-10 text-center px-1">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
