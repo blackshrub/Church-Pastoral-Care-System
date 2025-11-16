@@ -1140,6 +1140,7 @@ export const Dashboard = () => {
                                         await axios.post(`${API}/accident-followup/${task.data.id}/complete`);
                                         toast.success('Follow-up marked complete');
                                         setTodayTasks(prev => prev.filter(t => t.data.id !== task.data.id));
+                                        await loadReminders();
                                       }
                                     } catch (error) {
                                       toast.error('Failed to mark as completed');
@@ -1165,6 +1166,7 @@ export const Dashboard = () => {
                                             toast.success('Accident follow-up ignored');
                                           }
                                           setTodayTasks(prev => prev.filter(t => t.data.id !== task.data.id));
+                                          await loadReminders();
                                         } catch (error) {
                                       toast.error('Failed to ignore');
                                     }
