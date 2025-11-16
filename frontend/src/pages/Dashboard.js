@@ -1308,7 +1308,7 @@ export const Dashboard = () => {
                           <Link to={`/members/${event.member_id}`} className="font-semibold text-base hover:text-teal-600">
                             {event.member_name}
                           </Link>
-                          {event.member_phone && (
+                          {event.member_phone && event.member_phone !== 'null' && event.member_phone !== 'NULL' && (
                             <a href={`tel:${event.member_phone}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1 mt-1">
                               📞 {event.member_phone}
                             </a>
@@ -1399,7 +1399,7 @@ export const Dashboard = () => {
                           <Link to={`/members/${event.member_id}`} className="font-semibold text-base hover:text-teal-600">
                             {event.member_name}
                           </Link>
-                          {event.member_phone && (
+                          {event.member_phone && event.member_phone !== 'null' && event.member_phone !== 'NULL' && (
                             <a href={`tel:${event.member_phone}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1 mt-1">
                               📞 {event.member_phone}
                             </a>
