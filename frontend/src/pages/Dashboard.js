@@ -891,7 +891,7 @@ export const Dashboard = () => {
                                   <div className="bg-white rounded-full w-full h-full"></div>
                                 </div>
                                 <div className="relative">
-                                  <div className="text-3xl flex-shrink-0">{config.icon}</div>
+                                  <MemberAvatar member={{name: task.member_name, photo_url: task.member_photo_url}} size="md" />
                                 </div>
                               </div>
                               
