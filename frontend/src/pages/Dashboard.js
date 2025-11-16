@@ -657,13 +657,26 @@ export const Dashboard = () => {
                       {quickEvent.schedule_frequency === 'one_time' && (
                         <div>
                           <Label className="font-semibold">Payment Date</Label>
-                          <Input
-                            type="date"
-                            value={quickEvent.payment_date || quickEvent.event_date}
-                            onChange={(e) => setQuickEvent({...quickEvent, payment_date: e.target.value})}
-                            className="h-12"
-                            required
-                          />
+                          <Popover modal={true}>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" className="w-full h-12 justify-start text-left font-normal" type="button">
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {quickEvent.payment_date ? formatDateFns(new Date(quickEvent.payment_date), 'dd MMM yyyy') : <span className="text-muted-foreground">Select payment date...</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80 p-0 z-[100]" side="bottom" align="start" sideOffset={5}>
+                              <CalendarComponent
+                                mode="single"
+                                selected={quickEvent.payment_date ? new Date(quickEvent.payment_date) : undefined}
+                                onSelect={(date) => {
+                                  if (date) {
+                                    setQuickEvent({...quickEvent, payment_date: formatDateFns(date, 'yyyy-MM-dd')});
+                                  }
+                                }}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
                         </div>
                       )}
                       
