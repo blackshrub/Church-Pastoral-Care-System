@@ -52,12 +52,56 @@ const API = `${BACKEND_URL}/api`;
 export const MemberDetail = () => {
   const { id } = useParams();
   const { t } = useTranslation();
-  const [member, setMember] = useState(null);
-  const [careEvents, setCareEvents] = useState([]);
-  const [griefTimeline, setGriefTimeline] = useState([]);
-  const [accidentTimeline, setAccidentTimeline] = useState([]);
-  const [aidSchedules, setAidSchedules] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  
+  // React Query for member data
+  const { data: memberData, isLoading } = useQuery({
+    queryKey: ['member', id],
+    queryFn: async () => {
+      const timestamp = Date.now();
+      const cacheHeaders = {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      };
+      
+      const [memberRes, eventsRes, griefRes, accidentRes, aidSchedulesRes] = await Promise.all([
+        axios.get(`${API}/members/${id}?t=${timestamp}`, { headers: cacheHeaders }),
+        axios.get(`${API}/care-events?member_id=${id}&t=${timestamp}`, { headers: cacheHeaders }),
+        axios.get(`${API}/grief-support/member/${id}?t=${timestamp}`, { headers: cacheHeaders }),
+        axios.get(`${API}/accident-followup/member/${id}?t=${timestamp}`, { headers: cacheHeaders }),
+        axios.get(`${API}/financial-aid-schedules/member/${id}?t=${timestamp}`, { headers: cacheHeaders })
+      ]);
+      
+      const sortedEvents = (eventsRes.data || []).sort((a, b) => {
+        const dateCompare = new Date(b.event_date) - new Date(a.event_date);
+        if (dateCompare !== 0) return dateCompare;
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
+      
+      return {
+        member: memberRes.data,
+        careEvents: sortedEvents,
+        griefTimeline: griefRes.data,
+        accidentTimeline: accidentRes.data,
+        aidSchedules: aidSchedulesRes.data || []
+      };
+    },
+    enabled: !!id,
+    onError: (error) => {
+      if (error.response?.status === 404) {
+        toast.error(t('error_messages.member_not_found'));
+      }
+    }
+  });
+  
+  // Extract data with defaults
+  const member = memberData?.member || null;
+  const careEvents = memberData?.careEvents || [];
+  const griefTimeline = memberData?.griefTimeline || [];
+  const accidentTimeline = memberData?.accidentTimeline || [];
+  const aidSchedules = memberData?.aidSchedules || [];
+  
+  // UI state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [selectedMembers, setSelectedMembers] = useState([]);
