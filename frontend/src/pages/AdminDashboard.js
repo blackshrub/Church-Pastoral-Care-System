@@ -270,8 +270,44 @@ export const AdminDashboard = () => {
                 </Dialog>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <CardContent className="p-4">
+              {/* Mobile Card Layout */}
+              <div className="block sm:hidden space-y-3">
+                {users.map(u => (
+                  <div key={u.id} className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm">{u.name}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{u.email}</p>
+                        <span className={`inline-block text-xs px-2 py-1 rounded mt-2 ${u.role === 'full_admin' ? 'bg-purple-100 text-purple-700' : u.role === 'campus_admin' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                          {u.role === 'full_admin' ? 'Full Admin' : u.role === 'campus_admin' ? 'Campus Admin' : 'Pastor'}
+                        </span>
+                      </div>
+                      {u.id !== user.id && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 flex-shrink-0">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-32">
+                            <DropdownMenuItem 
+                              className="text-red-600"
+                              onClick={() => handleDeleteUser(u.id, u.name)}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              {/* Desktop Table Layout */}
+              <div className="hidden sm:block overflow-x-auto">
                 <Table className="w-full">
                   <TableHeader>
                     <TableRow>
