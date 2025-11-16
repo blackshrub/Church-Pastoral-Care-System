@@ -511,7 +511,8 @@
     "no_members_at_risk": "No members at risk",
     "no_follow_ups_today": "No follow-ups needed today",
     "recipients": "recipients",
-    "avg": "avg"
+    "avg": "avg",
+    "members": "members"
   },
   
   "_comment_settings_page": "Settings Page",
