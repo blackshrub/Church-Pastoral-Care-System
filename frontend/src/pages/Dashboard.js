@@ -1367,9 +1367,9 @@ export const Dashboard = () => {
                 <div className="space-y-4">
                   {accidentFollowUp.map(followup => (
                     <div key={followup.id} className="p-4 bg-teal-50 rounded-lg border border-teal-200 relative hover:shadow-lg transition-all">
-                      {/* Overdue Badge */}
+                      {/* Overdue Badge - Better aligned */}
                       {followup.days_overdue > 0 && (
-                        <span className="absolute top-2 right-2 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                        <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
                           {followup.days_overdue}d overdue
                         </span>
                       )}
