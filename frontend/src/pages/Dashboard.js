@@ -881,18 +881,13 @@ export const Dashboard = () => {
                             )}
                             
                             <div className="flex items-start gap-3 mb-3">
-                              {/* Avatar with colored ring */}
-                              <div className="relative flex-shrink-0">
-                                <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${
-                                  config.color === 'pink' ? 'from-pink-400 to-pink-600' : 
-                                  config.color === 'blue' ? 'from-blue-400 to-blue-600' : 
-                                  'from-purple-400 to-purple-600'
-                                } p-0.5`}>
-                                  <div className="bg-white rounded-full w-full h-full"></div>
-                                </div>
-                                <div className="relative">
-                                  <MemberAvatar member={{name: task.member_name, photo_url: task.member_photo_url}} size="md" />
-                                </div>
+                              {/* Avatar with colored ring - Simplified */}
+                              <div className={`flex-shrink-0 rounded-full ring-2 ${
+                                config.color === 'pink' ? 'ring-pink-400' : 
+                                config.color === 'blue' ? 'ring-blue-400' : 
+                                'ring-purple-400'
+                              }`}>
+                                <MemberAvatar member={{name: task.member_name, photo_url: task.member_photo_url}} size="md" />
                               </div>
                               
                               <div className="flex-1 min-w-0">
