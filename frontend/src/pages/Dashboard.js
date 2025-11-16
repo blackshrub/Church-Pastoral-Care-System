@@ -409,7 +409,7 @@ export const Dashboard = () => {
   const totalTasks = birthdaysToday.length + griefDue.length + hospitalFollowUp.length + Math.min(atRiskMembers.length, 10);
   
   return (
-    <div className="space-y-8 pb-12 max-w-full overflow-x-hidden">
+    <div className="space-y-8 pb-12 max-w-full">
       {/* Welcome Section */}
       <div>
         <h1 className="text-5xl font-playfair font-bold text-foreground mb-2">
