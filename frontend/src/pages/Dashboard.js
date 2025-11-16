@@ -688,18 +688,20 @@ export const Dashboard = () => {
                                 {quickEvent.payment_date ? formatDateFns(new Date(quickEvent.payment_date), 'dd MMM yyyy') : <span className="text-muted-foreground">Select payment date...</span>}
                               </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80 p-0 z-[100]" side="bottom" align="start" sideOffset={5}>
-                              <CalendarComponent
-                                mode="single"
-                                selected={quickEvent.payment_date ? new Date(quickEvent.payment_date) : undefined}
-                                onSelect={(date) => {
-                                  if (date) {
-                                    setQuickEvent({...quickEvent, payment_date: formatDateFns(date, 'yyyy-MM-dd')});
-                                    setPaymentDateOpen(false); // Close calendar
-                                  }
-                                }}
-                                initialFocus
-                              />
+                            <PopoverContent className="p-0 z-[9999]" side="bottom" align="start">
+                              <div className="w-[280px]">
+                                <CalendarComponent
+                                  mode="single"
+                                  selected={quickEvent.payment_date ? new Date(quickEvent.payment_date) : undefined}
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      setQuickEvent({...quickEvent, payment_date: formatDateFns(date, 'yyyy-MM-dd')});
+                                      setPaymentDateOpen(false); // Close calendar
+                                    }
+                                  }}
+                                  initialFocus
+                                />
+                              </div>
                             </PopoverContent>
                           </Popover>
                         </div>
@@ -731,18 +733,20 @@ export const Dashboard = () => {
                                   {quickEvent.schedule_end_date ? formatDateFns(new Date(quickEvent.schedule_end_date), 'dd MMM yyyy') : <span className="text-muted-foreground">No end date</span>}
                                 </Button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-80 p-0 z-[100]" side="bottom" align="start" sideOffset={5}>
-                                <CalendarComponent
-                                  mode="single"
-                                  selected={quickEvent.schedule_end_date ? new Date(quickEvent.schedule_end_date) : undefined}
-                                  onSelect={(date) => {
-                                    if (date) {
-                                      setQuickEvent({...quickEvent, schedule_end_date: formatDateFns(date, 'yyyy-MM-dd')});
-                                      setEndDateOpen(false); // Close calendar
-                                    }
-                                  }}
-                                  initialFocus
-                                />
+                              <PopoverContent className="p-0 z-[9999]" side="bottom" align="start">
+                                <div className="w-[280px]">
+                                  <CalendarComponent
+                                    mode="single"
+                                    selected={quickEvent.schedule_end_date ? new Date(quickEvent.schedule_end_date) : undefined}
+                                    onSelect={(date) => {
+                                      if (date) {
+                                        setQuickEvent({...quickEvent, schedule_end_date: formatDateFns(date, 'yyyy-MM-dd')});
+                                        setEndDateOpen(false); // Close calendar
+                                      }
+                                    }}
+                                    initialFocus
+                                  />
+                                </div>
                               </PopoverContent>
                             </Popover>
                           </div>
