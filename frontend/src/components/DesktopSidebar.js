@@ -63,7 +63,7 @@ export const DesktopSidebar = () => {
             <Church className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-h3 text-teal-700 leading-tight">FaithTracker</h2>
+            <h2 className="text-h3 text-teal-700 leading-tight">{t('components.app_name')}</h2>
             <p className="text-xs text-muted-foreground">{t('pastoral_care')}</p>
           </div>
         </Link>
