@@ -216,25 +216,26 @@ export const AdminDashboard = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
-                      <TableHead className="hidden sm:table-cell">Email</TableHead>
-                      <TableHead className="hidden md:table-cell">Phone</TableHead>
+                      <TableHead className="hidden md:table-cell">Email</TableHead>
                       <TableHead>Role</TableHead>
-                      <TableHead className="hidden lg:table-cell">Campus</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {users.map(u => (
                       <TableRow key={u.id}>
-                        <TableCell>{u.name}</TableCell>
-                        <TableCell className="hidden sm:table-cell">{u.email}</TableCell>
-                        <TableCell className="hidden md:table-cell">{u.phone}</TableCell>
                         <TableCell>
-                          <span className={`text-xs px-2 py-1 rounded ${u.role === 'full_admin' ? 'bg-purple-100 text-purple-700' : u.role === 'campus_admin' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                          <div>
+                            <p className="font-medium">{u.name}</p>
+                            <p className="text-xs text-muted-foreground md:hidden">{u.email}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">{u.email}</TableCell>
+                        <TableCell>
+                          <span className={`text-xs px-2 py-1 rounded whitespace-nowrap ${u.role === 'full_admin' ? 'bg-purple-100 text-purple-700' : u.role === 'campus_admin' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
                             {u.role === 'full_admin' ? 'Full Admin' : u.role === 'campus_admin' ? 'Campus Admin' : 'Pastor'}
                           </span>
                         </TableCell>
-                        <TableCell className="hidden lg:table-cell">{u.campus_name || 'All'}</TableCell>
                         <TableCell className="text-right">
                           {u.id !== user.id && <Button variant="ghost" size="sm" onClick={() => handleDeleteUser(u.id, u.name)}><Trash2 className="w-4 h-4 text-red-600" /></Button>}
                         </TableCell>
