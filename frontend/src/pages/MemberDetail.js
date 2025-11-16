@@ -293,7 +293,7 @@ export const MemberDetail = () => {
     }
   };
   
-  if (loading) {
+  if (isLoading) {
     return <div className="space-y-6"><Skeleton className="h-96 w-full" /></div>;
   }
   
