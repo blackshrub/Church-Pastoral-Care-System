@@ -713,6 +713,8 @@
     "api_url": "API URL",
     "update_sync": "Update Sync",
     "sync_now": "Sync Now",
+    "testing": "Testing...",
+    "confirm_sync": "Confirm API Sync Setup ({{total}} members, every {{interval}} min)",
     "sync_updated": "Sync job updated!",
     "imported_count": "Imported {{count}} members!",
     "errors_occurred": "{{count}} errors occurred",
