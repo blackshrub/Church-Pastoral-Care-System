@@ -1,35 +1,11 @@
 [
   {
     "content": "View Dashboard.js Today tab task card structure and understand current layout",
+    "status": "completed"
+  },
+  {
+    "content": "Implement mobile-first Dashboard improvements - larger touch targets, better spacing, visual hierarchy",
     "status": "in_progress"
-  },
-  {
-    "content": "Implement larger touch targets - full-width primary action buttons on mobile",
-    "status": "pending"
-  },
-  {
-    "content": "Add icon-based secondary actions (Phone icon for Contact, Check icon for Complete)",
-    "status": "pending"
-  },
-  {
-    "content": "Improve visual hierarchy - larger member names (text-base/lg), readable task descriptions",
-    "status": "pending"
-  },
-  {
-    "content": "Increase spacing between task cards for better mobile readability",
-    "status": "pending"
-  },
-  {
-    "content": "Make phone numbers clickable tel: links for quick calling",
-    "status": "pending"
-  },
-  {
-    "content": "Add visual separators or section headers between Birthday tasks and Other tasks",
-    "status": "pending"
-  },
-  {
-    "content": "Add task type emoji icons (🎂 birthday, 💔 grief, 🏥 hospital) consistently",
-    "status": "pending"
   },
   {
     "content": "Test Dashboard improvements at 390px and verify usability",
