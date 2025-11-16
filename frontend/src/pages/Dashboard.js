@@ -513,28 +513,28 @@ export const Dashboard = () => {
                 </div>
                 
                 {/* Event Details */}
-                <div className="space-y-4">
-                  <div>
-                    <Label className="font-semibold">{t('event_type_required')}</Label>
-                    <Select value={quickEvent.event_type} onValueChange={(v) => setQuickEvent({...quickEvent, event_type: v})}>
-                      <SelectTrigger className="h-12"><SelectValue placeholder="Select event type..." /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="childbirth">👶 Childbirth</SelectItem>
-                        <SelectItem value="grief_loss">💔 Grief/Loss</SelectItem>
-                        <SelectItem value="new_house">🏠 New House</SelectItem>
-                        <SelectItem value="accident_illness">🚑 Accident/Illness</SelectItem>
-                        <SelectItem value="financial_aid">💰 Financial Aid</SelectItem>
-                        <SelectItem value="regular_contact">📞 Regular Contact</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {quickEvent.event_type !== 'financial_aid' && (
-                    <div>
-                      <Label className="font-semibold">{t('event_date_required')}</Label>
-                      <Input type="date" value={quickEvent.event_date} onChange={(e) => setQuickEvent({...quickEvent, event_date: e.target.value})} className="h-12" required />
-                    </div>
-                  )}
+                <div>
+                  <Label className="font-semibold">{t('event_type_required')}</Label>
+                  <Select value={quickEvent.event_type} onValueChange={(v) => setQuickEvent({...quickEvent, event_type: v})}>
+                    <SelectTrigger className="h-12"><SelectValue placeholder="Select event type..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="childbirth">👶 Childbirth</SelectItem>
+                      <SelectItem value="grief_loss">💔 Grief/Loss</SelectItem>
+                      <SelectItem value="new_house">🏠 New House</SelectItem>
+                      <SelectItem value="accident_illness">🚑 Accident/Illness</SelectItem>
+                      <SelectItem value="financial_aid">💰 Financial Aid</SelectItem>
+                      <SelectItem value="regular_contact">📞 Regular Contact</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
+                
+                {/* Event Date - Conditional */}
+                {quickEvent.event_type !== 'financial_aid' && (
+                  <div>
+                    <Label className="font-semibold">{t('event_date_required')}</Label>
+                    <Input type="date" value={quickEvent.event_date} onChange={(e) => setQuickEvent({...quickEvent, event_date: e.target.value})} className="h-12 w-full" required />
+                  </div>
+                )}
                 
                 <div>
                   <Label className="font-semibold">Description</Label>
