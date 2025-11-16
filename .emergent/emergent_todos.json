@@ -1,18 +1,6 @@
 [
   {
-    "content": "Debug accident follow-up completion timeline date issue",
-    "status": "in_progress"
-  },
-  {
-    "content": "Check backend timezone handling for timeline event creation",
-    "status": "pending"
-  },
-  {
-    "content": "Fix date conversion to use campus timezone",
-    "status": "pending"
-  },
-  {
-    "content": "Test accident follow-up completion shows correct date",
-    "status": "pending"
+    "content": "Timeline date timezone issue - Fixed in backend",
+    "status": "completed"
   }
 ]
