@@ -1,30 +1,30 @@
 [
   {
-    "content": "Dashboard.js internationalization - translations, toast messages, confirmations",
-    "status": "completed"
+    "content": "Scan Settings.js, Analytics.js, MembersList.js, MemberDetail.js for hardcoded text",
+    "status": "in_progress"
   },
   {
-    "content": "Settings.js - complete internationalization",
+    "content": "Add all missing translation keys for these 4 pages to en.json and id.json",
     "status": "pending"
   },
   {
-    "content": "Analytics.js - complete internationalization",
+    "content": "Update Settings.js with translations",
     "status": "pending"
   },
   {
-    "content": "MembersList.js - complete internationalization",
+    "content": "Update Analytics.js with translations",
     "status": "pending"
   },
   {
-    "content": "MemberDetail.js - complete internationalization",
+    "content": "Update MembersList.js with translations",
     "status": "pending"
   },
   {
-    "content": "AdminDashboard.js, FinancialAid.js, Calendar.js, LoginPage.js - complete internationalization",
+    "content": "Update MemberDetail.js with translations",
     "status": "pending"
   },
   {
-    "content": "All components - complete internationalization",
+    "content": "Verify all 4 pages compile and work correctly",
     "status": "pending"
   }
 ]
