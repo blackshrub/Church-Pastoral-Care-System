@@ -563,18 +563,20 @@ export const Dashboard = () => {
                           {quickEvent.event_date ? formatDateFns(new Date(quickEvent.event_date), 'dd MMM yyyy') : <span className="text-muted-foreground">Select date...</span>}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-80 p-0 z-[100]" side="bottom" align="start" sideOffset={5}>
-                        <CalendarComponent
-                          mode="single"
-                          selected={quickEvent.event_date ? new Date(quickEvent.event_date) : undefined}
-                          onSelect={(date) => {
-                            if (date) {
-                              setQuickEvent({...quickEvent, event_date: formatDateFns(date, 'yyyy-MM-dd')});
-                              setEventDateOpen(false); // Close calendar after selection
-                            }
-                          }}
-                          initialFocus
-                        />
+                      <PopoverContent className="p-0 z-[9999]" side="bottom" align="start">
+                        <div className="w-[280px]">
+                          <CalendarComponent
+                            mode="single"
+                            selected={quickEvent.event_date ? new Date(quickEvent.event_date) : undefined}
+                            onSelect={(date) => {
+                              if (date) {
+                                setQuickEvent({...quickEvent, event_date: formatDateFns(date, 'yyyy-MM-dd')});
+                                setEventDateOpen(false); // Close calendar after selection
+                              }
+                            }}
+                            initialFocus
+                          />
+                        </div>
                       </PopoverContent>
                     </Popover>
                   </div>
