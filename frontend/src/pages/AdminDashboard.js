@@ -181,7 +181,7 @@ export const AdminDashboard = () => {
         </TabsContent>
         
         <TabsContent value="users">
-          <Card>
+          <Card className="max-w-full overflow-hidden">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Manage Users</CardTitle>
