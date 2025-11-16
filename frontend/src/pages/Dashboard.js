@@ -517,14 +517,14 @@ export const Dashboard = () => {
                   <Input
                     value={memberSearch}
                     onChange={(e) => setMemberSearch(e.target.value)}
-                    placeholder="Search by name or phone number..."
+                    placeholder={t('form_placeholders.search_name_phone')}
                     className="h-12"
                     autoFocus
                   />
                   
                   {selectedMemberIds.length > 0 && (
                     <div className="p-3 bg-teal-50 rounded border">
-                      <p className="font-semibold text-sm mb-2">Selected Members ({selectedMemberIds.length}):</p>
+                      <p className="font-semibold text-sm mb-2">{t('labels.selected_members_count', {count: selectedMemberIds.length})}:</p>
                       <div className="flex flex-wrap gap-2">
                         {selectedMemberIds.map(id => {
                           const member = allMembers.find(m => m.id === id);
@@ -559,7 +559,7 @@ export const Dashboard = () => {
                 <div>
                   <Label className="font-semibold">{t('event_type_required')}</Label>
                   <Select value={quickEvent.event_type} onValueChange={(v) => setQuickEvent({...quickEvent, event_type: v})}>
-                    <SelectTrigger className="h-12"><SelectValue placeholder="Select event type..." /></SelectTrigger>
+                    <SelectTrigger className="h-12"><SelectValue placeholder={t('form_placeholders.select_event_type')} /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="childbirth">👶 Childbirth</SelectItem>
                       <SelectItem value="grief_loss">💔 Grief/Loss</SelectItem>
@@ -603,7 +603,7 @@ export const Dashboard = () => {
                 
                 <div>
                   <Label className="font-semibold">Description</Label>
-                  <Input value={quickEvent.description} onChange={(e) => setQuickEvent({...quickEvent, description: e.target.value})} placeholder="Additional details..." className="h-12" />
+                  <Input value={quickEvent.description} onChange={(e) => setQuickEvent({...quickEvent, description: e.target.value})} placeholder={t('form_placeholders.additional_details')} className="h-12" />
                 </div>
                 
                 {/* Title only for Financial Aid */}
