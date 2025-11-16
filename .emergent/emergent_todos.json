@@ -5,10 +5,10 @@
   },
   {
     "content": "Update MemberDetail.js with translation keys",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Verify both pages compile correctly",
-    "status": "pending"
+    "status": "completed"
   }
 ]
