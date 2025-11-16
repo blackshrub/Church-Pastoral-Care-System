@@ -30,7 +30,7 @@ export const Layout = ({ children }) => {
                 <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center">
                   <Church className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-lg font-playfair font-bold text-teal-700">FaithTracker</span>
+                <span className="text-lg font-playfair font-bold text-teal-700">{t('components.app_name')}</span>
               </Link>
               
               {/* Right Side - User Info & Language */}
