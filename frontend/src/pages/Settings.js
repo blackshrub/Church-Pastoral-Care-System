@@ -159,14 +159,14 @@ export const Settings = () => {
         <TabsContent value="automation">
           <Card>
             <CardHeader>
-              <CardTitle>Daily Digest Configuration</CardTitle>
-              <CardDescription>Configure automated daily reminders to pastoral team</CardDescription>
+              <CardTitle>{t('settings_page.daily_digest_config')}</CardTitle>
+              <CardDescription>{t('settings_page.automated_reminders')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label>Schedule Time</Label>
+                <Label>{t('settings_page.schedule_time')}</Label>
                 <Input value="08:00" disabled className="h-12" />
-                <p className="text-xs text-muted-foreground mt-1">Jakarta Time (UTC+7) - Currently fixed</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('settings_page.jakarta_time_fixed')}</p>
               </div>
               <div>
                 <Label>WhatsApp Gateway URL</Label>
