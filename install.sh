@@ -15,17 +15,32 @@
 #
 #################################################################################
 
-set -e  # Exit on error
+# Exit on error but continue for non-critical commands
+set -e
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Log file
 LOG_FILE="/var/log/faithtracker_install.log"
+
+# Create log file with proper permissions
+touch "$LOG_FILE" 2>/dev/null || LOG_FILE="/tmp/faithtracker_install.log"
+
+# Trap errors and provide helpful messages
+trap 'handle_error $? $LINENO' ERR
+
+handle_error() {
+    print_error "Installation failed at line $2 with exit code $1"
+    print_error "Check the log file for details: $LOG_FILE"
+    print_error "You can re-run this script after fixing the issue"
+    exit $1
+}
 
 # Function to print colored output
 print_info() {
