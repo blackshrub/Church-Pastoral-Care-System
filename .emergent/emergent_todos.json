@@ -25,11 +25,11 @@
   },
   {
     "content": "Write /docs/DEPLOYMENT_DEBIAN.md - step-by-step deployment guide",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create install.sh - automated one-command installation script",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create .gitignore for Python/Node/build artifacts",
