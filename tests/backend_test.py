@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 
 class DashboardAPITester:
-    def __init__(self, base_url="https://church-connect-59.preview.emergentagent.com"):
+    def __init__(self, base_url="https://church-care.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0
@@ -155,7 +155,7 @@ def main():
     print("\n" + "="*60)
     print("FAITHTRACKER DASHBOARD - BACKEND API TESTING")
     print("="*60)
-    print(f"Testing Backend: https://church-connect-59.preview.emergentagent.com")
+    print(f"Testing Backend: https://church-care.preview.emergentagent.com")
     print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     tester = DashboardAPITester()

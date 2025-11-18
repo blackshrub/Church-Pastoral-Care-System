@@ -256,7 +256,7 @@ member.days_since_last_contact;  // Number of days
 
 ## Testing Endpoints
 
-**Base URL:** https://church-connect-59.preview.emergentagent.com/api
+**Base URL:** https://church-care.preview.emergentagent.com/api
 
 **Test Account:**
 - Email: `admin@gkbj.church`

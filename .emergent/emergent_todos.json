@@ -1,34 +1,42 @@
 [
   {
-    "content": "Create comprehensive README.md with installation script instructions",
+    "content": "Explore codebase structure (backend/frontend files, existing docs, configs)",
     "status": "in_progress"
   },
   {
-    "content": "Create docs/FEATURES.md with detailed module documentation",
+    "content": "Create /docs directory and .env.example file",
     "status": "pending"
   },
   {
-    "content": "Create docs/API.md with complete API reference",
+    "content": "Write comprehensive README.md with project overview and quick start",
     "status": "pending"
   },
   {
-    "content": "Create docs/DEPLOYMENT_DEBIAN.md with step-by-step deployment guide",
+    "content": "Write /docs/FEATURES.md - detailed user-friendly feature documentation",
     "status": "pending"
   },
   {
-    "content": "Create docs/STRUCTURE.md explaining codebase organization",
+    "content": "Write /docs/API.md - complete API endpoint reference with examples",
     "status": "pending"
   },
   {
-    "content": "Create install.sh automated installation script",
+    "content": "Write /docs/STRUCTURE.md - codebase architecture guide",
     "status": "pending"
   },
   {
-    "content": "Create/update .env.example files",
+    "content": "Write /docs/DEPLOYMENT_DEBIAN.md - step-by-step deployment guide",
     "status": "pending"
   },
   {
-    "content": "Create/update .gitignore",
+    "content": "Create install.sh - automated one-command installation script",
+    "status": "pending"
+  },
+  {
+    "content": "Create .gitignore for Python/Node/build artifacts",
+    "status": "pending"
+  },
+  {
+    "content": "Final review and verification of all documentation",
     "status": "pending"
   }
 ]
