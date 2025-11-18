@@ -21,11 +21,11 @@
   },
   {
     "content": "Write /docs/STRUCTURE.md - codebase architecture guide",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Write /docs/DEPLOYMENT_DEBIAN.md - step-by-step deployment guide",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create install.sh - automated one-command installation script",
