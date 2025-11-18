@@ -1,350 +1,275 @@
-# 🎉 GKBJ Pastoral Care System
+# 🏛️ FaithTracker - Multi-Campus Pastoral Care Management System
 
-## Enterprise-Grade Church Member Care Management with AI Intelligence
+**FaithTracker** is a comprehensive, multi-tenant pastoral care management system designed specifically for the GKBJ church. It enables the pastoral care department to efficiently monitor, schedule, and manage all interactions with church members across multiple campuses.
 
-[![Production Ready](https://img.shields.io/badge/Production-Ready-green.svg)](https://church-care.preview.emergentagent.com)
-[![Mobile API Ready](https://img.shields.io/badge/Mobile%20API-Ready-blue.svg)](#mobile-api-integration)
-[![PWA Compatible](https://img.shields.io/badge/PWA-Compatible-orange.svg)](#pwa-features)
-
-Enterprise pastoral care system for GKBJ ensuring no member is left behind through systematic coordination, AI intelligence, and automated staff reminders.
-
-## 🎯 **Current Status**
-
-**Production-ready system managing 805+ church members with:**
-- **Mobile-First UI** with responsive 3-level nested tabs (no horizontal overflow)
-- **AI-Powered Pastoral Recommendations** with priority scoring
-- **Automated Daily WhatsApp Digest** to pastoral staff (verified working)
-- **Advanced Financial Aid Scheduling** (weekly/monthly/annual)
-- **Dual Timeline Systems** (6-stage grief + 3-stage accident follow-up)
-- **Complete API Integration** ready for mobile app development
-- **Enterprise Security** with comprehensive validation
-- **Real-time Data** prioritized over caching for accuracy
-
-## ✨ **Core Features**
-
-### 🎯 **Member Management (805 Members)**
-- **Complete demographics**: Name, phone, age, gender, membership, marital, category, blood type
-- **Profile photos**: 657 photos with lazy loading and multi-size optimization
-- **Family groups**: 278 household organizations
-- **Engagement tracking**: Auto-calculated status (Active/At-Risk/Inactive)
-- **Professional search**: Single character minimum with pagination (25/page)
-- **Bulk operations**: Multi-select, edit, delete with enterprise validation
-
-### 🤖 **AI Intelligence**
-- **Smart recommendations**: Priority-based follow-up suggestions
-- **Pattern recognition**: At-risk identification, senior care needs, visitor follow-up
-- **Real-time refresh**: Suggestions update after member contact
-- **Demographic analysis**: Population trends for strategic planning
-- **Urgency scoring**: High/Medium/Low priority with actionable advice
-
-### 💰 **Financial Aid Management**
-- **Recurring scheduling**: One-time, Weekly, Monthly, Annual payments
-- **Perfect date logic**: Calculates next occurrence from current date
-- **Schedule advancement**: Mark distributed → automatically advances to next payment
-- **Overdue tracking**: Missed payments accumulate until individually marked
-- **Complete transparency**: Recipient lists with profile integration
-- **Aid analytics**: Type effectiveness and distribution insights
-
-### 📱 **Mobile-First Design**
-
-### **Dashboard Refactor (3-Level Nested Tabs)**
-The system features a mobile-optimized dashboard preventing horizontal overflow:
-
-**Level 1 - Main Tabs:**
-- Today (tasks due today)
-- Overdue (with 5 nested child tabs)
-- Upcoming (next 7 days)
-
-**Level 2 - Overdue Child Tabs:**
-- Birthday, F-Ups, Aid, At Risk, Inactive
-
-**Adaptive Tab Behavior:**
-- **Active tab**: Icon + full text label
-- **Inactive tabs**: Icon only
-- **Result**: No horizontal scrolling on mobile devices
-
-### **Consistent Pattern Across Pages**
-Same mobile-first tab pattern implemented on:
-- Dashboard (3 main + 5 nested tabs)
-- Analytics (6 tabs: Demographics, Trends, Engagement, Financial, Care, Predictive)
-- Settings (6 tabs: Automation, Grief, Accident, Engagement, Write-off, System)
-
-### **Mobile Optimizations**
-- Button text shortened: "Mark contacted" → "Contacted"
-- Tab names condensed: "Follow-ups" → "F-Ups", "Disconnected" → "Inactive"
-- Larger touch targets (w-4 h-4 icons vs w-3 h-3)
-- No horizontal overflow on any page
-
-## 📱 **Mobile App Integration Ready**
-- **Complete API coverage**: All data accessible via REST endpoints
-- **Configuration endpoints**: Dropdown values, settings, thresholds via API
-- **Real-time updates**: No localStorage dependencies
-- **Authentication**: JWT tokens for secure mobile access
-- **Photo serving**: Optimized image endpoints for mobile apps
-
-### 📊 **Advanced Analytics**
-- **Demographics**: Age, gender, membership distribution with custom date ranges
-- **Engagement trends**: Member contact patterns and monthly activity
-- **Financial intelligence**: Aid effectiveness and spending patterns
-- **Care insights**: Event distribution (birthdays excluded for relevance)
-- **Predictive analytics**: Priority member identification and recommendations
-
-### 🔒 **Enterprise Security**
-- **Data validation**: CSV preview, API testing, confirmation dialogs
-- **Role-based access**: Full Admin, Campus Admin, Pastor with appropriate permissions
-- **Multi-campus support**: Data isolation and campus-specific access
-- **Audit trails**: Complete logging of all pastoral activities
-
-## 🏗️ **Architecture**
-
-### **Backend (FastAPI + MongoDB)**
-- **70+ REST endpoints** with comprehensive CRUD operations
-- **Database indexing** for optimized query performance
-- **JWT authentication** with role-based access control
-- **Automated scheduling** (APScheduler) for daily digest
-- **Configuration API** for mobile app integration
-- **Photo optimization** with multi-size serving
-
-### **Frontend (React PWA)**
-- **Mobile-first design** with 3-level nested tab architecture
-- **Adaptive tabs** showing icon-only when inactive, full text when active
-- **Real-time updates** prioritized over caching
-- **Professional pagination** (25 items/page) for large datasets
-- **Lazy image loading** for optimal performance
-- **No horizontal overflow** on mobile devices
-- **PWA capability** with home screen installation
-- **Consistent UX** across Dashboard, Analytics, and Settings pages
-
-## 📱 **Mobile App Integration**
-
-### **Complete API Coverage**
-All frontend functionality accessible via REST API:
-
-```http
-# Configuration for mobile dropdowns
-GET /api/config/all
-→ Returns all dropdown values, settings, thresholds
-
-# Member management
-GET /api/members?page=1&limit=25&search=john
-POST /api/members
-PUT /api/members/{id}
-DELETE /api/members/{id}
-
-# AI recommendations  
-GET /api/suggestions/follow-up
-→ Smart pastoral recommendations with priority
-
-# Daily automation
-GET /api/dashboard/stats
-GET /api/dashboard/upcoming?days=7
-GET /api/members/at-risk
-
-# Financial aid scheduling
-POST /api/financial-aid-schedules
-GET /api/financial-aid-schedules/due-today
-POST /api/financial-aid-schedules/{id}/mark-distributed
-
-# Timeline systems
-GET /api/grief-support/member/{id}
-GET /api/accident-followup/member/{id}
-POST /api/grief-support/{id}/complete
-```
-
-### **Mobile Development Ready**
-- **No localStorage dependencies**: All data via API
-- **Configuration endpoints**: Dynamic dropdown population
-- **Real-time data**: Fresh information guaranteed
-- **Photo optimization**: Multi-size images for different screen densities
-- **Authentication**: JWT with role-based permissions
-
-## 🚀 **Quick Start**
-
-### **Prerequisites**
-- Python 3.11+
-- Node.js 18+
-- MongoDB 5.0+
-- WhatsApp Gateway (configured at dermapack.net:3001)
-
-### **Installation**
-
-```bash
-# Backend setup
-cd backend
-pip install -r requirements.txt
-python create_indexes.py  # Performance optimization
-python import_data.py     # Load 805 members + photos
-python server.py          # Start API server
-
-# Frontend setup
-cd frontend
-yarn install
-yarn start               # Start web interface
-
-# Access
-URL: http://localhost:3000
-Login: admin@gkbj.church / admin123
-```
-
-## 📊 **Production Data**
-
-### **Current Dataset**
-- **805 Members** with complete demographic profiles
-- **657 Profile Photos** optimized for web and mobile
-- **947 Care Events** across all types with automation
-- **278 Family Groups** for household organization
-- **Active Schedules** for recurring financial aid
-- **Timeline Systems** for grief and accident follow-up
-
-### **Verified Working**
-- **Daily WhatsApp digest** sending to 6281290080025
-- **AI recommendations** with real-time refresh
-- **Financial aid advancement** with perfect date calculations
-- **Birthday audit trail** with timeline integration
-- **Member engagement tracking** with accurate status updates
-
-## 🎯 **Daily Operations**
-
-### **Staff Workflow**
-1. **8 AM**: Receive WhatsApp digest with member tasks and wa.me links
-2. **Homepage**: View AI suggestions + 6-tab task organization
-3. **Task completion**: Mark birthdays/grief/financial aid as complete
-4. **Member contact**: Click wa.me links for instant WhatsApp
-5. **Financial aid**: Schedule recurring payments, mark distributed
-6. **Timeline tracking**: Monitor grief and accident follow-up progress
-
-### **Task Management Tabs**
-**3-Level Nested Structure (Mobile-Optimized):**
-- **Today**: Birthdays + all tasks due today
-- **Overdue** (5 nested child tabs):
-  - Birthday: Overdue birthday acknowledgments
-  - F-Ups: Grief support + accident recovery follow-ups
-  - Aid: Due financial aid payments
-  - At Risk: 60-89 days no contact
-  - Inactive: 90+ days no contact requiring reconnection
-- **Upcoming**: Next 7 days tasks for planning
-
-**Mobile-First Features:**
-- Active tab shows full label, inactive shows icon only
-- No horizontal overflow on any screen size
-- Larger touch targets for better mobile usability
-- Consistent pattern across Dashboard, Analytics, Settings
-
-## 🔧 **Configuration**
-
-### **Environment Variables**
-```bash
-# Backend
-MONGO_URL="mongodb://localhost:27017"
-DB_NAME="pastoral_care_db"
-JWT_SECRET_KEY="your-secure-secret"
-WHATSAPP_GATEWAY_URL="http://dermapack.net:3001"
-CHURCH_NAME="GKBJ"
-
-# Frontend  
-REACT_APP_BACKEND_URL="http://localhost:8001"
-```
-
-### **Configurable Settings (via API)**
-- **Engagement thresholds**: At-risk (60 days), Inactive (90 days)
-- **Grief stages**: 6 configurable timelines (default: 7, 14, 30, 90, 180, 365 days)
-- **Accident follow-up**: 3 configurable stages (default: 3, 7, 14 days)
-
-## 📱 **Mobile Development**
-
-### **API-First Design**
-All configurations and data accessible via REST API for mobile app development:
-
-```http
-# Get all configuration data
-GET /api/config/all
-{
-  "aid_types": [{value: "education", label: "Education Support"}],
-  "event_types": [{value: "birthday", label: "Birthday"}],
-  "settings": {
-    "engagement": {atRiskDays: 60, inactiveDays: 90},
-    "grief_stages": [...]
-  }
-}
-
-# Member management with pagination
-GET /api/members?page=1&limit=25
-POST /api/members
-PUT /api/members/{id}
-
-# Care event management
-POST /api/care-events
-DELETE /api/care-events/{id}  # Auto-recalculates engagement
-```
-
-## 🔒 **Security & Permissions**
-
-### **Authentication**
-```http
-POST /api/auth/login
-{
-  "email": "admin@gkbj.church",
-  "password": "admin123"
-}
-→ Returns JWT token for API access
-```
-
-### **Role Hierarchy**
-- **Full Administrator**: All campuses, all features, user management
-- **Campus Administrator**: Single campus, user management for campus
-- **Pastor**: Pastoral care features for assigned campus
-
-## 📚 **Complete API Documentation**
-
-See `API_DOCUMENTATION.md` for comprehensive endpoint reference including:
-- Authentication and user management
-- Member CRUD operations with search and pagination
-- Care event creation with auto-timeline generation
-- Financial aid scheduling with advancement logic
-- AI recommendations and analytics endpoints
-- Configuration endpoints for mobile app integration
-
-## 🎮 **Testing**
-
-```bash
-# Test member search
-curl -H "Authorization: Bearer {token}" \
-  "http://localhost:8001/api/members?search=sumarni&limit=5"
-
-# Test AI recommendations  
-curl -H "Authorization: Bearer {token}" \
-  "http://localhost:8001/api/suggestions/follow-up"
-
-# Test configuration (mobile app)
-curl "http://localhost:8001/api/config/all"
-```
-
-## 📈 **Production Deployment**
-
-### **Docker Deployment**
-```dockerfile
-# Backend
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-EXPOSE 8001
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8001"]
-```
-
-### **Required Services**
-- **MongoDB**: Document storage with performance indexes
-- **WhatsApp Gateway**: go-whatsapp-web-multidevice at dermapack.net:3001
-- **Static hosting**: For frontend deployment (Netlify, Vercel)
-
-## 🎯 **Ready For**
-
-✅ **Production deployment**: Complete enterprise system  
-✅ **Mobile app development**: Full API coverage with configuration endpoints  
-✅ **Team onboarding**: Comprehensive documentation and guides  
-✅ **Daily operations**: 805-member systematic pastoral care management
+![Status](https://img.shields.io/badge/status-production--ready-brightgreen)
+![Platform](https://img.shields.io/badge/platform-FastAPI%20%2B%20React-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
-**GKBJ Pastoral Care System - Enterprise solution ensuring no member is left behind!** 🙏
+## 📋 Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+  - [One-Command Installation](#one-command-installation-recommended)
+  - [Manual Installation](#manual-installation-optional)
+- [Documentation](#documentation)
+- [Screenshots](#screenshots)
+- [Multi-Language Support](#multi-language-support)
+- [Contributing](#contributing)
+- [Support](#support)
+
+---
+
+## 🎯 Overview
+
+**FaithTracker** is built to solve the complex challenge of managing pastoral care across multiple church campuses. The system provides:
+
+- **Multi-Tenant Architecture**: Complete data isolation between campuses with role-based access control
+- **Task-Oriented Dashboards**: Intelligent task categorization (Today, Overdue, Upcoming)
+- **Comprehensive Event Tracking**: Birthdays, grief support, financial aid, hospital visits, and more
+- **Smart Scheduling**: Flexible recurring schedules with timezone-aware notifications
+- **Member Engagement Monitoring**: Track and visualize member participation over time
+- **Bilingual Interface**: Full English and Indonesian (Bahasa Indonesia) support
+
+---
+
+## ✨ Key Features
+
+### 🔐 **Multi-Tenant & Role-Based Access**
+- **Full Administrator**: Access all campuses, switch views dynamically
+- **Campus Administrator**: Manage a single campus with full control
+- **Pastor Role**: Regular pastoral care staff with task management
+
+### 👥 **Member Management**
+- Complete CRUD operations for church members
+- Photo upload and management
+- Family grouping and relationship tracking
+- Engagement status monitoring (Active, At Risk, Disconnected)
+
+### 📅 **Care Event System**
+- **Birthday Celebrations**: Automated tracking and reminders
+- **Grief & Loss Support**: Multi-stage grief care (mourning → 1 year)
+- **Financial Aid**: Track and schedule ongoing assistance (education, medical, emergency, housing, food)
+- **Hospital Visits**: Accident, illness, and recovery follow-ups
+- **Life Events**: New house, childbirth, and other celebrations
+- **Regular Contact**: Scheduled check-ins with at-risk members
+
+### 🔔 **Smart Task Management**
+- Automatic task generation from events
+- Priority-based sorting (overdue → today → upcoming)
+- One-click task completion
+- "Ignore" functionality for non-applicable tasks
+- Clear ignored history per member
+
+### 📊 **Analytics & Reporting**
+- Member engagement trends over time
+- Event type distribution
+- Campus-level statistics
+- At-risk member identification
+
+### 🌐 **Import/Export**
+- CSV import for bulk member data
+- Field mapping for custom CSV formats
+- Data export for reporting and backup
+
+### 💬 **WhatsApp Integration** *(Optional)*
+- Send reminders via WhatsApp
+- Log and track message delivery
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Framework**: [FastAPI](https://fastapi.tiangolo.com/) (Python 3.9+)
+- **Database**: [MongoDB](https://www.mongodb.com/) with Motor (async driver)
+- **Authentication**: JWT (JSON Web Tokens) with bcrypt password hashing
+- **Scheduling**: APScheduler for background jobs
+- **Image Processing**: Pillow
+
+### Frontend
+- **Framework**: [React](https://react.dev/) 18+
+- **State Management**: [TanStack React Query](https://tanstack.com/query) (for Dashboard & MemberDetail)
+- **UI Components**: [Shadcn/UI](https://ui.shadcn.com/) + [Tailwind CSS](https://tailwindcss.com/)
+- **Internationalization**: [react-i18next](https://react.i18next.com/)
+- **Charts**: Recharts
+- **HTTP Client**: Axios
+
+### Infrastructure
+- **Process Management**: Supervisord
+- **Reverse Proxy**: Nginx
+- **OS**: Debian 12 / Ubuntu 20.04+
+
+---
+
+## 🚀 Quick Start
+
+### One-Command Installation (Recommended)
+
+**For a fresh Debian 12 server**, run this single command:
+
+```bash
+wget https://raw.githubusercontent.com/YOUR-USERNAME/faithtracker/main/install.sh -O install.sh && chmod +x install.sh && sudo ./install.sh
+```
+
+**What the installer does:**
+1. ✅ Checks system prerequisites (Python, Node.js, MongoDB, Nginx)
+2. ✅ Installs missing dependencies automatically
+3. ✅ Clones the repository
+4. ✅ Configures environment variables (interactive prompts)
+5. ✅ Sets up systemd services for auto-restart
+6. ✅ Configures Nginx reverse proxy
+7. ✅ Runs smoke tests to verify installation
+
+**Interactive Configuration:**
+The installer will prompt you for:
+- MongoDB connection string
+- JWT secret key (auto-generated if not provided)
+- Domain name (for Nginx configuration)
+- WhatsApp gateway URL (optional)
+
+**Post-Installation:**
+```bash
+# Check service status
+sudo systemctl status faithtracker-backend
+sudo systemctl status nginx
+
+# View logs
+sudo journalctl -u faithtracker-backend -f
+```
+
+---
+
+### Manual Installation (Optional)
+
+If you prefer to install manually or need customization, follow the **[Detailed Deployment Guide](/docs/DEPLOYMENT_DEBIAN.md)**.
+
+#### Prerequisites
+- Python 3.9+
+- Node.js 16+ & Yarn
+- MongoDB 4.4+
+- Nginx
+
+#### Quick Manual Setup
+
+```bash
+# 1. Clone repository
+git clone https://github.com/YOUR-USERNAME/faithtracker.git
+cd faithtracker
+
+# 2. Configure environment
+cp .env.example backend/.env
+cp .env.example frontend/.env
+# Edit both .env files with your configuration
+
+# 3. Backend setup
+cd backend
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn server:app --host 0.0.0.0 --port 8001 &
+
+# 4. Frontend setup
+cd ../frontend
+yarn install
+yarn build
+# Serve with Nginx or `yarn start` for development
+```
+
+For complete step-by-step instructions, see **[/docs/DEPLOYMENT_DEBIAN.md](/docs/DEPLOYMENT_DEBIAN.md)**.
+
+---
+
+## 📚 Documentation
+
+Comprehensive documentation is available in the `/docs` directory:
+
+| Document | Description |
+|----------|-------------|
+| **[FEATURES.md](/docs/FEATURES.md)** | Detailed feature documentation with user workflows |
+| **[API.md](/docs/API.md)** | Complete API endpoint reference with request/response examples |
+| **[STRUCTURE.md](/docs/STRUCTURE.md)** | Codebase architecture and file organization |
+| **[DEPLOYMENT_DEBIAN.md](/docs/DEPLOYMENT_DEBIAN.md)** | Step-by-step deployment guide for Debian servers |
+
+---
+
+## 📸 Screenshots
+
+### Dashboard (Mobile-First Design)
+![Dashboard](docs/images/dashboard.png)
+*Task-oriented dashboard with Today, Overdue, and Upcoming tabs*
+
+### Member Detail View
+![Member Detail](docs/images/member-detail.png)
+*Complete member profile with care event history*
+
+### Analytics
+![Analytics](docs/images/analytics.png)
+*Member engagement trends and event distribution*
+
+---
+
+## 🌐 Multi-Language Support
+
+FaithTracker is fully internationalized and supports:
+- **English (en)**: Complete translation
+- **Bahasa Indonesia (id)**: Complete translation
+
+All UI text is externalized in JSON translation files (`/frontend/src/locales/`). Adding a new language is straightforward:
+
+1. Copy `en.json` to `[language-code].json`
+2. Translate all strings
+3. Update `i18n.js` to include the new language
+
+No code changes required!
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Here's how you can help:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/AmazingFeature`
+3. **Commit your changes**: `git commit -m 'Add some AmazingFeature'`
+4. **Push to the branch**: `git push origin feature/AmazingFeature`
+5. **Open a Pull Request**
+
+### Development Guidelines
+- Follow existing code style (Python: PEP 8, JavaScript: ESLint config)
+- Write clear commit messages
+- Add tests for new features
+- Update documentation as needed
+
+---
+
+## 📞 Support
+
+For questions, issues, or feature requests:
+
+- **GitHub Issues**: [github.com/YOUR-USERNAME/faithtracker/issues](https://github.com/YOUR-USERNAME/faithtracker/issues)
+- **Email**: support@yourdomain.com
+- **Documentation**: Check `/docs` directory first
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- Built for **GKBJ Church** pastoral care department
+- Powered by **FastAPI** and **React**
+- UI components by **Shadcn/UI**
+- Icons by **Lucide React**
+
+---
+
+**Made with ❤️ for pastoral care excellence**
