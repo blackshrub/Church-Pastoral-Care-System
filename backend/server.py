@@ -5264,65 +5264,88 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                 existing_members = await db.members.find({"campus_id": campus_id}, {"_id": 0}).to_list(None)
                 existing_map = {m.get("external_member_id"): m for m in existing_members if m.get("external_member_id")}
                 
-                # Apply filters
+                # Apply dynamic filters
                 filter_mode = config.get("filter_mode", "include")
+                filter_rules = config.get("filter_rules", [])
                 filtered_members = []
                 
                 for core_member in core_members:
-                    matches_filter = True  # Assume matches by default
-                    
-                    # Check if member matches any filter criteria
-                    has_filters = any([
-                        config.get("filter_gender"),
-                        config.get("filter_age_min"),
-                        config.get("filter_age_max"),
-                        config.get("filter_member_status")
-                    ])
-                    
-                    if has_filters:
-                        # Start with no match, check each filter
-                        matches_criteria = True
-                        
-                        # Gender filter
-                        if config.get("filter_gender"):
-                            if core_member.get("gender") != config["filter_gender"]:
-                                matches_criteria = False
-                        
-                        # Age filter
-                        if matches_criteria and (config.get("filter_age_min") or config.get("filter_age_max")):
-                            dob = core_member.get("date_of_birth")
-                            if dob:
-                                try:
-                                    birth_date = date.fromisoformat(dob) if isinstance(dob, str) else dob
-                                    age = (date.today() - birth_date).days // 365
-                                    
-                                    if config.get("filter_age_min") and age < config["filter_age_min"]:
-                                        matches_criteria = False
-                                    if config.get("filter_age_max") and age > config["filter_age_max"]:
-                                        matches_criteria = False
-                                except:
-                                    matches_criteria = False  # Skip if date parsing fails
-                        
-                        # Member status filter
-                        if matches_criteria and config.get("filter_member_status") and len(config["filter_member_status"]) > 0:
-                            member_status = core_member.get("member_status")
-                            if member_status not in config["filter_member_status"]:
-                                matches_criteria = False
-                        
-                        # Apply include/exclude logic
-                        if filter_mode == "include":
-                            # Include mode: only sync if matches criteria
-                            if matches_criteria:
-                                filtered_members.append(core_member)
-                        else:
-                            # Exclude mode: sync everyone EXCEPT those matching criteria
-                            if not matches_criteria:
-                                filtered_members.append(core_member)
-                    else:
-                        # No filters defined, sync all
+                    # Check if member matches filter rules
+                    if not filter_rules or len(filter_rules) == 0:
+                        # No filters, include all
                         filtered_members.append(core_member)
+                        continue
+                    
+                    matches_all_rules = True
+                    
+                    for rule in filter_rules:
+                        field_name = rule.get("field")
+                        operator = rule.get("operator")
+                        filter_value = rule.get("value")
+                        
+                        member_value = core_member.get(field_name)
+                        
+                        # Apply operator
+                        rule_matches = False
+                        
+                        if operator == "equals":
+                            rule_matches = str(member_value) == str(filter_value)
+                        
+                        elif operator == "not_equals":
+                            rule_matches = str(member_value) != str(filter_value)
+                        
+                        elif operator == "contains":
+                            if member_value and filter_value:
+                                rule_matches = str(filter_value).lower() in str(member_value).lower()
+                        
+                        elif operator == "in":
+                            if isinstance(filter_value, list):
+                                rule_matches = member_value in filter_value
+                        
+                        elif operator == "not_in":
+                            if isinstance(filter_value, list):
+                                rule_matches = member_value not in filter_value
+                        
+                        elif operator in ["greater_than", "less_than", "between"]:
+                            # Numeric or age comparison
+                            try:
+                                if "date_of_birth" in field_name or "birth" in field_name:
+                                    # Calculate age
+                                    if member_value:
+                                        birth_date = date.fromisoformat(member_value) if isinstance(member_value, str) else member_value
+                                        age = (date.today() - birth_date).days // 365
+                                        member_value = age
+                                
+                                if operator == "greater_than":
+                                    rule_matches = float(member_value) > float(filter_value)
+                                elif operator == "less_than":
+                                    rule_matches = float(member_value) < float(filter_value)
+                                elif operator == "between":
+                                    if isinstance(filter_value, list) and len(filter_value) == 2:
+                                        rule_matches = float(filter_value[0]) <= float(member_value) <= float(filter_value[1])
+                            except:
+                                rule_matches = False
+                        
+                        elif operator == "is_true":
+                            rule_matches = member_value == True or member_value == "true"
+                        
+                        elif operator == "is_false":
+                            rule_matches = member_value == False or member_value == "false"
+                        
+                        # If any rule doesn't match, mark as not matching all
+                        if not rule_matches:
+                            matches_all_rules = False
+                            break
+                    
+                    # Apply include/exclude logic
+                    if filter_mode == "include":
+                        if matches_all_rules:
+                            filtered_members.append(core_member)
+                    else:  # exclude
+                        if not matches_all_rules:
+                            filtered_members.append(core_member)
                 
-                logger.info(f"Filter mode: {filter_mode}. Filtered {len(core_members)} members to {len(filtered_members)}")
+                logger.info(f"Filter mode: {filter_mode}. Filtered {len(core_members)} members to {len(filtered_members)} using {len(filter_rules)} rules")
                 
                 # Update stats
                 stats["fetched"] = len(filtered_members)
