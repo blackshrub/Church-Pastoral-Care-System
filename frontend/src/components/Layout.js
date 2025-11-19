@@ -57,32 +57,40 @@ export const Layout = ({ children }) => {
         {/* Desktop Header - Hidden on mobile */}
         <header className="hidden sm:block bg-white border-b border-border sticky top-0 z-40">
           <div className="px-6">
-            <div className="flex items-center justify-end h-16 gap-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2 hover:bg-teal-50">
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-gray-700">{user?.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {user?.role === 'full_admin' ? t('full_admin') : 
-                         user?.role === 'campus_admin' ? t('campus_admin') : t('pastor')}
-                      </p>
-                    </div>
-                    <ChevronDown className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem 
-                    onClick={() => { logout(); navigate('/login'); }} 
-                    className="text-red-600"
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    {t('logout')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <LanguageToggle />
+            <div className="flex items-center justify-between h-16 gap-4">
+              {/* Search Bar - Desktop (flex-1 for expansion) */}
+              <div className="flex-1 max-w-2xl">
+                <SearchBar />
+              </div>
+              
+              {/* Right Side - User & Language */}
+              <div className="flex items-center gap-3">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-2 hover:bg-teal-50">
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-gray-700">{user?.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {user?.role === 'full_admin' ? t('full_admin') : 
+                           user?.role === 'campus_admin' ? t('campus_admin') : t('pastor')}
+                        </p>
+                      </div>
+                      <ChevronDown className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={() => { logout(); navigate('/login'); }} 
+                      className="text-red-600"
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      {t('logout')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <LanguageToggle />
+              </div>
             </div>
           </div>
         </header>
