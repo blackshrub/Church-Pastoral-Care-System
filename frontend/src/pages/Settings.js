@@ -698,6 +698,204 @@ export const Settings = () => {
           </Card>
           </div>
         </TabsContent>
+
+        
+        <TabsContent value="sync">
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Core API Sync Configuration</CardTitle>
+                <CardDescription>
+                  Connect to FaithFlow Enterprise (core system) to automatically sync member data. 
+                  Pastoral care events remain local and private.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label>API Base URL</Label>
+                  <Input 
+                    placeholder="https://faithflow.yourdomain.com"
+                    value={syncConfig.api_base_url}
+                    onChange={(e) => setSyncConfig({...syncConfig, api_base_url: e.target.value})}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Base URL of the core FaithFlow API (without /api suffix)</p>
+                </div>
+                
+                <div>
+                  <Label>Service Account Email</Label>
+                  <Input 
+                    type="email"
+                    placeholder="faithtracker-sync@yourdomain.com"
+                    value={syncConfig.api_email}
+                    onChange={(e) => setSyncConfig({...syncConfig, api_email: e.target.value})}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Service Account Password</Label>
+                  <Input 
+                    type="password"
+                    placeholder="Enter API password"
+                    value={syncConfig.api_password === '********' ? '' : syncConfig.api_password}
+                    onChange={(e) => setSyncConfig({...syncConfig, api_password: e.target.value})}
+                  />
+                </div>
+                
+                <div className="flex items-center gap-4 pt-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input 
+                      type="checkbox"
+                      checked={syncConfig.is_enabled}
+                      onChange={(e) => setSyncConfig({...syncConfig, is_enabled: e.target.checked})}
+                      className="w-4 h-4 text-teal-600"
+                    />
+                    <span className="text-sm font-medium">Enable Automatic Sync</span>
+                  </label>
+                  <p className="text-xs text-gray-500">(Syncs every 6 hours)</p>
+                </div>
+                
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button 
+                    onClick={testConnection}
+                    disabled={testing || !syncConfig.api_base_url || !syncConfig.api_email || !syncConfig.api_password || syncConfig.api_password === '********'}
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    {testing ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-500"></div>
+                        Testing...
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-4 h-4" />
+                        Test Connection
+                      </>
+                    )}
+                  </Button>
+                  <Button 
+                    onClick={saveSyncConfig}
+                    className="bg-teal-500 hover:bg-teal-600 text-white"
+                  >
+                    Save Configuration
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Manual Sync</CardTitle>
+                <CardDescription>
+                  Manually trigger a sync to pull the latest member data from core system.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {syncConfig.last_sync_at && (
+                  <div className="text-sm text-gray-600">
+                    <p><span className="font-medium">Last Sync:</span> {new Date(syncConfig.last_sync_at).toLocaleString()}</p>
+                    <p><span className="font-medium">Status:</span> <span className={syncConfig.last_sync_status === 'success' ? 'text-green-600' : 'text-red-600'}>
+                      {syncConfig.last_sync_status}
+                    </span></p>
+                    {syncConfig.last_sync_message && (
+                      <p><span className="font-medium">Message:</span> {syncConfig.last_sync_message}</p>
+                    )}
+                  </div>
+                )}
+                
+                <Button 
+                  onClick={syncNow}
+                  disabled={syncing || !syncConfig.is_enabled}
+                  className="bg-blue-500 hover:bg-blue-600 text-white gap-2"
+                >
+                  {syncing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="w-4 h-4" />
+                      Sync Now
+                    </>
+                  )}
+                </Button>
+                
+                {!syncConfig.is_enabled && (
+                  <p className="text-xs text-yellow-600">⚠️ Sync is disabled. Enable it in configuration above.</p>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Sync History</CardTitle>
+                <CardDescription>Recent sync operations and their results</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {syncLogs.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">No sync history yet</p>
+                ) : (
+                  <div className="space-y-2">
+                    {syncLogs.map((log) => (
+                      <div key={log.id} className={`p-3 rounded border ${
+                        log.status === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">
+                              {log.sync_type.charAt(0).toUpperCase() + log.sync_type.slice(1)} Sync
+                            </p>
+                            <p className="text-xs text-gray-600">
+                              {new Date(log.started_at).toLocaleString()} 
+                              {log.duration_seconds && ` • ${log.duration_seconds.toFixed(1)}s`}
+                            </p>
+                          </div>
+                          <div className="text-right text-xs">
+                            {log.status === 'success' ? (
+                              <>
+                                <p className="text-green-700">✓ Success</p>
+                                <p className="text-gray-600">
+                                  {log.members_created} created, {log.members_updated} updated
+                                  {log.members_archived > 0 && `, ${log.members_archived} archived`}
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <p className="text-red-700">✗ Failed</p>
+                                <p className="text-gray-600">{log.error_message}</p>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-yellow-50 border-yellow-200">
+              <CardHeader>
+                <CardTitle className="text-sm">Important Notes</CardTitle>
+              </CardHeader>
+              <CardContent className="text-xs space-y-2 text-gray-700">
+                <p>• When sync is enabled, you cannot manually create new members (read-only from core)</p>
+                <p>• Sync only updates basic profile data (name, phone, birth date, photo)</p>
+                <p>• All pastoral care events, engagement data, and notes are preserved locally</p>
+                <p>• Members deactivated in core system will be archived (hidden from lists but history preserved)</p>
+                <p>• Sync runs automatically every 6 hours when enabled</p>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default Settings;
+
       </Tabs>
     </div>
   );
