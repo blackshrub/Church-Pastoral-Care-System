@@ -133,12 +133,24 @@ export const Settings = () => {
     try {
       await axios.post(`${API}/sync/config`, syncConfig);
       toast.success('Sync configuration saved successfully');
-      loadSyncConfig();
+      await loadSyncConfig();
       
       // If sync is enabled, automatically trigger initial sync
       if (syncConfig.is_enabled) {
-        toast.info('Starting initial sync...');
-        await syncNow();
+        setTimeout(async () => {
+          toast.info('Starting initial sync...');
+          setSyncing(true);
+          try {
+            const response = await axios.post(`${API}/sync/members/pull`);
+            toast.success(response.data.message + ` - ${response.data.stats.created} created, ${response.data.stats.updated} updated`);
+            await loadSyncLogs();
+            await loadSyncConfig();
+          } catch (error) {
+            toast.error('Sync failed: ' + (error.response?.data?.detail || error.message));
+          } finally {
+            setSyncing(false);
+          }
+        }, 500);
       }
     } catch (error) {
       toast.error('Failed to save configuration: ' + (error.response?.data?.detail || error.message));
