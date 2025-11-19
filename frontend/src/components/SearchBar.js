@@ -139,7 +139,7 @@ const SearchBar = () => {
                       {member.name}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {member.phone} {member.email && `• ${member.email}`}
+                      {member.phone}
                     </p>
                   </div>
                   <div className="flex-shrink-0">
