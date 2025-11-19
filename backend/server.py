@@ -2608,13 +2608,30 @@ async def ignore_grief_stage(stage_id: str, user: dict = Depends(get_current_use
         if not stage:
             raise HTTPException(status_code=404, detail="Grief stage not found")
         
+        # Get member name for logging
+        member = await db.members.find_one({"id": stage["member_id"]}, {"_id": 0, "name": 1})
+        member_name = member["name"] if member else "Unknown"
+        
         await db.grief_support.update_one(
             {"id": stage_id},
             {"$set": {
                 "ignored": True,
                 "ignored_at": datetime.now(timezone.utc).isoformat(),
-                "ignored_by": user.get("id")
+                "ignored_by": user.get("id"),
+                "ignored_by_name": user.get("name")
             }}
+        )
+        
+        # Log activity
+        await log_activity(
+            campus_id=stage["campus_id"],
+            user_id=user["id"],
+            user_name=user["name"],
+            action_type=ActivityActionType.IGNORE_TASK,
+            member_id=stage["member_id"],
+            member_name=member_name,
+            notes=f"Ignored grief support stage: {stage['stage'].replace('_', ' ')}",
+            user_photo_url=user.get("photo_url")
         )
         
         # Invalidate dashboard cache
