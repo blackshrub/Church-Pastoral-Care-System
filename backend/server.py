@@ -684,6 +684,7 @@ async def log_activity(
             notes=notes
         )
         await db.activity_logs.insert_one(activity.model_dump())
+        logger.info(f"Activity logged: {user_name} - {action_type} - {member_name}")
     except Exception as e:
         logger.error(f"Error logging activity: {str(e)}")
         # Don't fail the main operation if logging fails
