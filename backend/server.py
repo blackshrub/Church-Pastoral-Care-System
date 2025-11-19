@@ -2114,7 +2114,7 @@ async def update_care_event(event_id: str, update: CareEventUpdate):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/care-events/{event_id}/complete")
-async def complete_care_event(event_id: str):
+async def complete_care_event(event_id: str, current_user: dict = Depends(get_current_user)):
     """Mark care event as completed and update member engagement"""
     try:
         # Get the care event first
@@ -2122,18 +2122,37 @@ async def complete_care_event(event_id: str):
         if not event:
             raise HTTPException(status_code=404, detail="Care event not found")
         
+        # Get member name for logging
+        member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0})
+        member_name = member["name"] if member else "Unknown"
+        
         # Mark event as completed
         result = await db.care_events.update_one(
             {"id": event_id},
             {"$set": {
                 "completed": True,
                 "completed_at": datetime.now(timezone.utc).isoformat(),
+                "completed_by_user_id": current_user["id"],
+                "completed_by_user_name": current_user["name"],
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }}
         )
         
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Care event not found")
+        
+        # Log activity
+        await log_activity(
+            campus_id=event["campus_id"],
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            action_type=ActivityActionType.COMPLETE_TASK,
+            member_id=event["member_id"],
+            member_name=member_name,
+            care_event_id=event_id,
+            event_type=EventType(event["event_type"]),
+            notes=f"Completed {event['event_type']} task"
+        )
         
         # Update member engagement status (since this event now counts as contact)
         now = datetime.now(timezone.utc)
@@ -2153,10 +2172,6 @@ async def complete_care_event(event_id: str):
             campus_tz = await get_campus_timezone(event["campus_id"])
             today_date = get_date_in_timezone(campus_tz)
             
-            # Get member name for the title
-            member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0, "name": 1})
-            member_name = member["name"] if member else "Member"
-            
             contact_event = {
                 "id": str(uuid.uuid4()),
                 "member_id": event["member_id"],
@@ -2167,6 +2182,8 @@ async def complete_care_event(event_id: str):
                 "description": f"Contacted {member_name} for their birthday celebration",
                 "completed": True,
                 "completed_at": now.isoformat(),
+                "completed_by_user_id": current_user["id"],
+                "completed_by_user_name": current_user["name"],
                 "reminder_sent": False,
                 "created_at": now.isoformat(),
                 "updated_at": now.isoformat()
