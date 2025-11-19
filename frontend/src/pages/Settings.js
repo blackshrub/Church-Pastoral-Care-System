@@ -171,6 +171,7 @@ export const Settings = () => {
 
   useEffect(() => {
     if (activeTab === 'sync') {
+      console.log('API Sync tab activated, loading config...');
       loadSyncConfig();
       loadSyncLogs();
     }
