@@ -1,18 +1,14 @@
 [
   {
-    "content": "Remove creation of timeline care_events when completing/ignoring grief stages",
-    "status": "completed"
+    "content": "Add activity log deletion when undoing grief stage completion",
+    "status": "in_progress"
   },
   {
-    "content": "Remove creation of timeline care_events when completing/ignoring accident stages",
-    "status": "completed"
+    "content": "Add activity log deletion when undoing accident stage completion",
+    "status": "pending"
   },
   {
-    "content": "Remove .filter(!s.ignored) so ignored stages still show in tabs with badge",
-    "status": "completed"
-  },
-  {
-    "content": "Test that grief/accident tabs show all stages with proper status badges",
-    "status": "completed"
+    "content": "Verify cascade delete removes all activity logs for grief stages when parent deleted",
+    "status": "pending"
   }
 ]
