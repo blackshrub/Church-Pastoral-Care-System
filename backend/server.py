@@ -1018,7 +1018,7 @@ async def create_member(member: MemberCreate, current_user: dict = Depends(get_c
         
         member_obj = Member(
             name=member.name,
-            phone=member.phone,
+            phone=normalize_phone_number(member.phone),
             campus_id=campus_id,
             family_group_id=family_group_id,
             external_member_id=member.external_member_id,
