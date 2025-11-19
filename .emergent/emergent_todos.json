@@ -1,15 +1,15 @@
 [
   {
     "content": "Backend: Add activity_logs collection schema and helper function to log all user actions",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Backend: Update all action endpoints to track user (complete, ignore, stop schedule, send reminder)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Backend: Create global search API endpoint (members + care events)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Backend: Create activity log API endpoint with filters (user, date range, action type)",
