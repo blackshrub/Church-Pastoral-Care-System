@@ -762,6 +762,80 @@ export const Settings = () => {
                   />
                 </div>
                 
+                {/* Polling-specific settings */}
+                {syncConfig.sync_method === 'polling' && (
+                  <div>
+                    <Label>Polling Interval (hours)</Label>
+                    <Select 
+                      value={String(syncConfig.polling_interval_hours)} 
+                      onValueChange={(v) => setSyncConfig({...syncConfig, polling_interval_hours: parseInt(v)})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Every 1 hour</SelectItem>
+                        <SelectItem value="3">Every 3 hours</SelectItem>
+                        <SelectItem value="6">Every 6 hours (recommended)</SelectItem>
+                        <SelectItem value="12">Every 12 hours</SelectItem>
+                        <SelectItem value="24">Every 24 hours</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-500 mt-1">How often to pull data from core API</p>
+                  </div>
+                )}
+                
+                {/* Webhook-specific settings */}
+                {syncConfig.sync_method === 'webhook' && syncConfig.webhook_secret && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                    <h4 className="font-medium text-sm text-blue-900">Webhook Configuration for Core System</h4>
+                    <div>
+                      <Label className="text-blue-900">Webhook URL</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          value={`${window.location.origin}/api/sync/webhook`}
+                          readOnly
+                          className="font-mono text-xs bg-white"
+                        />
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(`${window.location.origin}/api/sync/webhook`);
+                            toast.success('Webhook URL copied to clipboard');
+                          }}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-blue-900">Webhook Secret</Label>
+                      <div className="flex gap-2">
+                        <Input 
+                          value={syncConfig.webhook_secret}
+                          readOnly
+                          className="font-mono text-xs bg-white"
+                        />
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(syncConfig.webhook_secret);
+                            toast.success('Webhook secret copied to clipboard');
+                          }}
+                        >
+                          Copy
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-blue-700">
+                      ⓘ Configure these values in your core FaithFlow system's webhook settings. 
+                      The core system should send POST requests with HMAC-SHA256 signature in X-Webhook-Signature header.
+                    </p>
+                  </div>
+                )}
+                
                 <div className="flex items-center gap-4 pt-2">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input 
@@ -770,9 +844,14 @@ export const Settings = () => {
                       onChange={(e) => setSyncConfig({...syncConfig, is_enabled: e.target.checked})}
                       className="w-4 h-4 text-teal-600"
                     />
-                    <span className="text-sm font-medium">Enable Automatic Sync</span>
+                    <span className="text-sm font-medium">Enable Sync</span>
                   </label>
-                  <p className="text-xs text-gray-500">(Syncs every 6 hours)</p>
+                  {syncConfig.sync_method === 'polling' && (
+                    <p className="text-xs text-gray-500">(Syncs every {syncConfig.polling_interval_hours} hours)</p>
+                  )}
+                  {syncConfig.sync_method === 'webhook' && (
+                    <p className="text-xs text-gray-500">(Real-time sync via webhooks)</p>
+                  )}
                 </div>
                 
                 <div className="flex gap-2 pt-4 border-t">
