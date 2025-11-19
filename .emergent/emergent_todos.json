@@ -49,10 +49,6 @@
   },
   {
     "content": "Restart backend and test search API",
-    "status": "in_progress"
-  },
-  {
-    "content": "Debug activity logging - verify logs are created",
-    "status": "pending"
+    "status": "completed"
   }
 ]
