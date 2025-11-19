@@ -2570,40 +2570,7 @@ async def complete_grief_stage(stage_id: str, notes: Optional[str] = None, curre
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Grief stage not found")
         
-        # Get campus timezone for correct date
-        campus_tz = await get_campus_timezone(stage["campus_id"])
-        today_date = get_date_in_timezone(campus_tz)
-        
-        # Get parent grief event for description
-        parent_event = await db.care_events.find_one(
-            {"id": stage["care_event_id"]},
-            {"_id": 0, "description": 1, "title": 1, "grief_relationship": 1}
-        )
-        
-        # Create a care event for this grief stage completion (adds to timeline)
-        contact_event_id = str(uuid.uuid4())
-        await db.care_events.insert_one({
-            "id": contact_event_id,
-            "member_id": stage["member_id"],
-            "campus_id": stage["campus_id"],
-            "event_type": "grief_loss",
-            "event_date": today_date,  # Use campus timezone date
-            "title": f"Grief Support: {stage['stage'].replace('_', ' ')}",
-            "description": (parent_event.get("description") if parent_event else "") + 
-                          (f"\n\nRelationship: {parent_event.get('grief_relationship', 'Unknown')}" if parent_event else "") +
-                          (f"\n\nNotes: {notes}" if notes else ""),
-            "grief_stage_id": stage_id,  # Link to grief stage for undo
-            "completed": True,
-            "completed_at": datetime.now(timezone.utc).isoformat(),
-            "completed_by_user_id": current_user["id"],
-            "completed_by_user_name": current_user["name"],
-            "created_by_user_id": current_user["id"],
-            "created_by_user_name": current_user["name"],
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        })
-        
-        # Log activity
+        # Log activity (no timeline entry created - stage itself tracks completion)
         await log_activity(
             campus_id=stage["campus_id"],
             user_id=current_user["id"],
@@ -2611,12 +2578,12 @@ async def complete_grief_stage(stage_id: str, notes: Optional[str] = None, curre
             action_type=ActivityActionType.COMPLETE_TASK,
             member_id=stage["member_id"],
             member_name=member_name,
-            care_event_id=contact_event_id,
             event_type=EventType.GRIEF_LOSS,
             notes=f"Completed grief support stage: {stage['stage'].replace('_', ' ')}",
             user_photo_url=current_user.get("photo_url")
         )
         
+        # Update member's last contact date
         await db.members.update_one(
             {"id": stage["member_id"]},
             {"$set": {"last_contact_date": datetime.now(timezone.utc).isoformat()}}
