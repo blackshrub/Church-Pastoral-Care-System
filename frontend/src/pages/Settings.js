@@ -134,6 +134,12 @@ export const Settings = () => {
       await axios.post(`${API}/sync/config`, syncConfig);
       toast.success('Sync configuration saved successfully');
       loadSyncConfig();
+      
+      // If sync is enabled, automatically trigger initial sync
+      if (syncConfig.is_enabled) {
+        toast.info('Starting initial sync...');
+        await syncNow();
+      }
     } catch (error) {
       toast.error('Failed to save configuration: ' + (error.response?.data?.detail || error.message));
     }
