@@ -49,11 +49,11 @@
   },
   {
     "content": "Fix critical bug: Replace all 'inactive' with 'disconnected' in server.py",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
-    "content": "Fix critical bug: Replace all 'hospital_visit' with 'accident_illness'",
-    "status": "pending"
+    "content": "Fix critical bug: Replace all 'hospital_visit' with 'accident_illness' in server.py",
+    "status": "in_progress"
   },
   {
     "content": "Add phone number normalization for User model (WhatsApp digest bug)",
