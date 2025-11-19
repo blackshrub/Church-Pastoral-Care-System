@@ -4714,8 +4714,8 @@ async def get_activity_summary(current_user: dict = Depends(get_current_user)):
             query["campus_id"] = campus_id
         
         # Last 30 days
-        start_date = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
-        query["created_at"] = {"$gte": start_date}
+        start_datetime = datetime.now(timezone.utc) - timedelta(days=30)
+        query["created_at"] = {"$gte": start_datetime}
         
         # Total activities
         total = await db.activity_logs.count_documents(query)
