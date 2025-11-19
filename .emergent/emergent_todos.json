@@ -1,14 +1,14 @@
 [
   {
     "content": "Fix Activity Log page to display timestamps in campus timezone",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Ensure grief/accident tabs don't show timeline entries (only actual stages)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Add cascade delete of activity logs when parent event is deleted",
-    "status": "pending"
+    "status": "completed"
   }
 ]
