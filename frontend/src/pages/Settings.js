@@ -788,6 +788,76 @@ export const Settings = () => {
                     <p className="text-xs text-gray-500 mt-1">How often to pull data from core API</p>
                   </div>
                 )}
+
+                {/* Sync Filters */}
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-medium text-sm mb-3">Sync Filters (Optional)</h4>
+                  <p className="text-xs text-gray-600 mb-4">Only sync members matching these criteria. Leave empty to sync all members.</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Gender Filter</Label>
+                      <Select value={syncConfig.filter_gender || 'all'} onValueChange={(v) => setSyncConfig({...syncConfig, filter_gender: v === 'all' ? null : v})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Genders</SelectItem>
+                          <SelectItem value="Male">Male Only</SelectItem>
+                          <SelectItem value="Female">Female Only</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label>Member Status Filter</Label>
+                      <Input 
+                        placeholder="e.g., Member, Baptized (comma-separated)"
+                        value={Array.isArray(syncConfig.filter_member_status) ? syncConfig.filter_member_status.join(', ') : ''}
+                        onChange={(e) => {
+                          const statuses = e.target.value.split(',').map(s => s.trim()).filter(s => s);
+                          setSyncConfig({...syncConfig, filter_member_status: statuses.length > 0 ? statuses : null});
+                        }}
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Leave empty for all statuses</p>
+                    </div>
+                    
+                    <div>
+                      <Label>Minimum Age</Label>
+                      <Input 
+                        type="number"
+                        placeholder="e.g., 18"
+                        value={syncConfig.filter_age_min || ''}
+                        onChange={(e) => setSyncConfig({...syncConfig, filter_age_min: e.target.value ? parseInt(e.target.value) : null})}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label>Maximum Age</Label>
+                      <Input 
+                        type="number"
+                        placeholder="e.g., 65"
+                        value={syncConfig.filter_age_max || ''}
+                        onChange={(e) => setSyncConfig({...syncConfig, filter_age_max: e.target.value ? parseInt(e.target.value) : null})}
+                      />
+                    </div>
+                  </div>
+                  
+                  {(syncConfig.filter_gender || syncConfig.filter_age_min || syncConfig.filter_age_max || (syncConfig.filter_member_status && syncConfig.filter_member_status.length > 0)) && (
+                    <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                      <p className="font-medium text-blue-900 mb-1">Active Filters:</p>
+                      <ul className="space-y-0.5 text-blue-700">
+                        {syncConfig.filter_gender && <li>• Gender: {syncConfig.filter_gender}</li>}
+                        {syncConfig.filter_age_min && <li>• Minimum Age: {syncConfig.filter_age_min}</li>}
+                        {syncConfig.filter_age_max && <li>• Maximum Age: {syncConfig.filter_age_max}</li>}
+                        {syncConfig.filter_member_status && syncConfig.filter_member_status.length > 0 && (
+                          <li>• Status: {syncConfig.filter_member_status.join(', ')}</li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
                 
                 {/* Webhook-specific settings */}
                 {syncConfig.sync_method === 'webhook' && syncConfig.webhook_secret && (
