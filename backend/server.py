@@ -4923,6 +4923,369 @@ async def get_notification_logs(
 @api_router.post("/reminders/run-now")
 async def run_reminders_now(current_admin: dict = Depends(get_current_admin)):
     """Manually trigger daily reminder job (admin only)"""
+
+
+# ==================== SYNC ENDPOINTS ====================
+
+@api_router.post("/sync/config")
+async def save_sync_config(config: SyncConfigCreate, current_user: dict = Depends(get_current_user)):
+    """Save sync configuration for campus"""
+    if current_user["role"] not in [UserRole.FULL_ADMIN, UserRole.CAMPUS_ADMIN]:
+        raise HTTPException(status_code=403, detail="Only administrators can configure sync")
+    
+    try:
+        campus_id = current_user.get("campus_id")
+        if not campus_id and current_user["role"] == UserRole.FULL_ADMIN:
+            raise HTTPException(status_code=400, detail="Please select a campus first")
+        
+        # Check if config exists
+        existing = await db.sync_configs.find_one({"campus_id": campus_id}, {"_id": 0})
+        
+        sync_config = SyncConfig(
+            campus_id=campus_id,
+            api_base_url=config.api_base_url.rstrip('/'),  # Remove trailing slash
+            api_email=config.api_email,
+            api_password=config.api_password,  # In production, encrypt this
+            is_enabled=config.is_enabled
+        )
+        
+        if existing:
+            # Update existing
+            await db.sync_configs.update_one(
+                {"campus_id": campus_id},
+                {"$set": sync_config.model_dump()}
+            )
+        else:
+            # Create new
+            await db.sync_configs.insert_one(sync_config.model_dump())
+        
+        return {"success": True, "message": "Sync configuration saved"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error saving sync config: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/sync/config")
+async def get_sync_config(current_user: dict = Depends(get_current_user)):
+    """Get sync configuration for campus"""
+    try:
+        campus_id = current_user.get("campus_id")
+        if not campus_id:
+            return None
+        
+        config = await db.sync_configs.find_one({"campus_id": campus_id}, {"_id": 0})
+        if config:
+            # Don't return password to frontend
+            config["api_password"] = "********" if config.get("api_password") else ""
+        
+        return config
+    
+    except Exception as e:
+        logger.error(f"Error getting sync config: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/sync/test-connection")
+async def test_sync_connection(config: SyncConfigCreate, current_user: dict = Depends(get_current_user)):
+    """Test connection to core API"""
+    if current_user["role"] not in [UserRole.FULL_ADMIN, UserRole.CAMPUS_ADMIN]:
+        raise HTTPException(status_code=403, detail="Only administrators can test sync")
+    
+    try:
+        import httpx
+        
+        # Test login
+        login_url = f"{config.api_base_url.rstrip('/')}/api/auth/login"
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            login_response = await client.post(
+                login_url,
+                json={"email": config.api_email, "password": config.api_password}
+            )
+            
+            if login_response.status_code != 200:
+                return {
+                    "success": False,
+                    "message": f"Login failed: {login_response.text}"
+                }
+            
+            token = login_response.json().get("access_token")
+            if not token:
+                return {
+                    "success": False,
+                    "message": "No access token received"
+                }
+            
+            # Test members endpoint
+            members_url = f"{config.api_base_url.rstrip('/')}/api/members/"
+            members_response = await client.get(
+                members_url,
+                headers={"Authorization": f"Bearer {token}"}
+            )
+            
+            if members_response.status_code != 200:
+                return {
+                    "success": False,
+                    "message": f"Members API failed: {members_response.text}"
+                }
+            
+            members = members_response.json()
+            
+            return {
+                "success": True,
+                "message": f"Connection successful! Found {len(members)} members in core system.",
+                "member_count": len(members)
+            }
+    
+    except httpx.TimeoutException:
+        return {
+            "success": False,
+            "message": "Connection timeout. Please check the API URL."
+        }
+    except Exception as e:
+        logger.error(f"Error testing sync connection: {str(e)}")
+        return {
+            "success": False,
+            "message": f"Connection error: {str(e)}"
+        }
+
+@api_router.post("/sync/members/pull")
+async def sync_members_from_core(current_user: dict = Depends(get_current_user)):
+    """Pull members from core API and sync"""
+    if current_user["role"] not in [UserRole.FULL_ADMIN, UserRole.CAMPUS_ADMIN]:
+        raise HTTPException(status_code=403, detail="Only administrators can sync members")
+    
+    try:
+        import httpx
+        from io import BytesIO
+        import base64
+        
+        campus_id = current_user.get("campus_id")
+        if not campus_id:
+            raise HTTPException(status_code=400, detail="Please select a campus first")
+        
+        # Get sync config
+        config = await db.sync_configs.find_one({"campus_id": campus_id}, {"_id": 0})
+        if not config or not config.get("is_enabled"):
+            raise HTTPException(status_code=400, detail="Sync is not configured or enabled for this campus")
+        
+        # Create sync log
+        sync_log = SyncLog(
+            campus_id=campus_id,
+            sync_type="manual",
+            status="in_progress"
+        )
+        sync_log_dict = sync_log.model_dump()
+        await db.sync_logs.insert_one(sync_log_dict)
+        sync_log_id = sync_log.id
+        
+        start_time = datetime.now(timezone.utc)
+        
+        try:
+            # Login to core API
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                login_response = await client.post(
+                    f"{config['api_base_url']}/api/auth/login",
+                    json={"email": config["api_email"], "password": config["api_password"]}
+                )
+                
+                if login_response.status_code != 200:
+                    raise Exception(f"Login failed: {login_response.text}")
+                
+                token = login_response.json().get("access_token")
+                
+                # Fetch members
+                members_response = await client.get(
+                    f"{config['api_base_url']}/api/members/",
+                    headers={"Authorization": f"Bearer {token}"}
+                )
+                
+                if members_response.status_code != 200:
+                    raise Exception(f"Failed to fetch members: {members_response.text}")
+                
+                core_members = members_response.json()
+                
+                # Stats
+                stats = {
+                    "fetched": len(core_members),
+                    "created": 0,
+                    "updated": 0,
+                    "archived": 0,
+                    "unarchived": 0
+                }
+                
+                # Get existing members
+                existing_members = await db.members.find({"campus_id": campus_id}, {"_id": 0}).to_list(None)
+                existing_map = {m.get("external_member_id"): m for m in existing_members if m.get("external_member_id")}
+                
+                # Process each core member
+                for core_member in core_members:
+                    core_id = core_member.get("id")
+                    existing = existing_map.get(core_id)
+                    
+                    # Prepare member data
+                    member_data = {
+                        "external_member_id": core_id,
+                        "name": core_member.get("full_name"),
+                        "phone": normalize_phone_number(core_member.get("phone_whatsapp", "")),
+                        "birth_date": core_member.get("date_of_birth"),
+                        "gender": core_member.get("gender"),
+                        "category": core_member.get("member_status"),
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                    
+                    # Handle photo if exists
+                    photo_base64 = core_member.get("photo_base64")
+                    if photo_base64 and photo_base64.startswith("data:image"):
+                        try:
+                            # Extract base64 data
+                            image_data = photo_base64.split(",")[1] if "," in photo_base64 else photo_base64
+                            image_bytes = base64.b64decode(image_data)
+                            
+                            # Save photo
+                            upload_dir = Path(ROOT_DIR) / "uploads"
+                            upload_dir.mkdir(exist_ok=True)
+                            
+                            ext = "jpg"
+                            if "png" in photo_base64: ext = "png"
+                            filename = f"JEMAAT-{core_id[:5]}.{ext}"
+                            filepath = upload_dir / filename
+                            
+                            # Resize and save
+                            img = Image.open(BytesIO(image_bytes))
+                            img = img.convert('RGB')
+                            img.thumbnail((800, 800), Image.Resampling.LANCZOS)
+                            img.save(filepath, 'JPEG', quality=85)
+                            
+                            member_data["photo_url"] = f"/uploads/{filename}"
+                        except Exception as e:
+                            logger.error(f"Error processing photo for {core_id}: {str(e)}")
+                    
+                    # Check if member is active
+                    is_active = core_member.get("is_active", True)
+                    
+                    if existing:
+                        # Update existing member
+                        if not is_active and not existing.get("is_archived"):
+                            # Archive member
+                            member_data["is_archived"] = True
+                            member_data["archived_at"] = datetime.now(timezone.utc).isoformat()
+                            member_data["archived_reason"] = "Deactivated in core system"
+                            stats["archived"] += 1
+                        elif is_active and existing.get("is_archived"):
+                            # Unarchive member
+                            member_data["is_archived"] = False
+                            member_data["archived_at"] = None
+                            member_data["archived_reason"] = None
+                            stats["unarchived"] += 1
+                        else:
+                            stats["updated"] += 1
+                        
+                        await db.members.update_one(
+                            {"id": existing["id"]},
+                            {"$set": member_data}
+                        )
+                    else:
+                        # Create new member
+                        new_member = {
+                            "id": str(uuid.uuid4()),
+                            "campus_id": campus_id,
+                            **member_data,
+                            "is_archived": not is_active,
+                            "engagement_status": "active",
+                            "days_since_last_contact": 999,
+                            "created_at": datetime.now(timezone.utc).isoformat()
+                        }
+                        
+                        await db.members.insert_one(new_member)
+                        stats["created"] += 1
+                
+                # Update sync config
+                end_time = datetime.now(timezone.utc)
+                duration = (end_time - start_time).total_seconds()
+                
+                await db.sync_configs.update_one(
+                    {"campus_id": campus_id},
+                    {"$set": {
+                        "last_sync_at": end_time.isoformat(),
+                        "last_sync_status": "success",
+                        "last_sync_message": f"Synced {stats['fetched']} members successfully"
+                    }}
+                )
+                
+                # Update sync log
+                await db.sync_logs.update_one(
+                    {"id": sync_log_id},
+                    {"$set": {
+                        "status": "success",
+                        "members_fetched": stats["fetched"],
+                        "members_created": stats["created"],
+                        "members_updated": stats["updated"],
+                        "members_archived": stats["archived"],
+                        "members_unarchived": stats["unarchived"],
+                        "completed_at": end_time.isoformat(),
+                        "duration_seconds": duration
+                    }}
+                )
+                
+                return {
+                    "success": True,
+                    "message": "Sync completed successfully",
+                    "stats": stats,
+                    "duration_seconds": duration
+                }
+        
+        except Exception as sync_error:
+            # Log sync failure
+            end_time = datetime.now(timezone.utc)
+            duration = (end_time - start_time).total_seconds()
+            
+            await db.sync_configs.update_one(
+                {"campus_id": campus_id},
+                {"$set": {
+                    "last_sync_at": end_time.isoformat(),
+                    "last_sync_status": "error",
+                    "last_sync_message": str(sync_error)
+                }}
+            )
+            
+            await db.sync_logs.update_one(
+                {"id": sync_log_id},
+                {"$set": {
+                    "status": "error",
+                    "error_message": str(sync_error),
+                    "completed_at": end_time.isoformat(),
+                    "duration_seconds": duration
+                }}
+            )
+            
+            raise HTTPException(status_code=500, detail=str(sync_error))
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in sync members: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.get("/sync/logs")
+async def get_sync_logs(current_user: dict = Depends(get_current_user), limit: int = 20):
+    """Get sync history logs"""
+    try:
+        campus_id = current_user.get("campus_id")
+        if not campus_id:
+            return []
+        
+        logs = await db.sync_logs.find(
+            {"campus_id": campus_id},
+            {"_id": 0}
+        ).sort("started_at", -1).limit(limit).to_list(limit)
+        
+        return logs
+    
+    except Exception as e:
+        logger.error(f"Error getting sync logs: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
     try:
         logger.info(f"Manual reminder trigger by {current_admin['email']}")
         await daily_reminder_job()
