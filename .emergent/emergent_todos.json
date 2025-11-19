@@ -1,18 +1,14 @@
 [
   {
-    "content": "Fix search results to display member photos",
-    "status": "completed"
+    "content": "Add cascade delete for grief/accident followup stages when parent event is deleted",
+    "status": "in_progress"
   },
   {
-    "content": "Change grief/accident completion to use correct event type (grief_loss/accident_illness not regular_contact)",
-    "status": "completed"
+    "content": "Remove duplicate ignored entry in grief tab (already shows in timeline)",
+    "status": "pending"
   },
   {
-    "content": "Fix grief ignore toast error and add ignored badge positioning",
-    "status": "completed"
-  },
-  {
-    "content": "Create timeline items for ignored grief/accident stages",
-    "status": "completed"
+    "content": "Fix ignored badge positioning to not overlap three dots button",
+    "status": "pending"
   }
 ]
