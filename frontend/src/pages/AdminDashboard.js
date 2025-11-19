@@ -90,6 +90,52 @@ export const AdminDashboard = () => {
       toast.error(t('toasts.failed'));
     }
   };
+
+  const handleEditUser = (userToEdit) => {
+    setEditingUser(userToEdit);
+    setNewUser({
+      email: userToEdit.email,
+      password: '', // Don't show existing password
+      name: userToEdit.name,
+      phone: userToEdit.phone || '',
+      role: userToEdit.role,
+      campus_id: userToEdit.campus_id || ''
+    });
+    setUserModalOpen(true);
+  };
+  
+  const handleUpdateUser = async (e) => {
+    e.preventDefault();
+    try {
+      const updateData = {
+        name: newUser.name,
+        phone: newUser.phone,
+        role: newUser.role,
+        campus_id: newUser.campus_id || null
+      };
+      
+      // Only include password if changed
+      if (newUser.password && newUser.password.trim()) {
+        updateData.password = newUser.password;
+      }
+      
+      await axios.put(`${API}/users/${editingUser.id}`, updateData);
+      toast.success(t('User updated successfully'));
+      setUserModalOpen(false);
+      setEditingUser(null);
+      setNewUser({ email: '', password: '', name: '', phone: '', role: 'pastor', campus_id: '' });
+      loadData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update user');
+    }
+  };
+  
+  const closeUserModal = () => {
+    setUserModalOpen(false);
+    setEditingUser(null);
+    setNewUser({ email: '', password: '', name: '', phone: '', role: 'pastor', campus_id: '' });
+  };
+
   
   if (user?.role !== 'full_admin') return <Navigate to="/dashboard" />;
   if (loading) return <div className="max-w-full">Loading...</div>;
