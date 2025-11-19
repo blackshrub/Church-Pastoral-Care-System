@@ -1,14 +1,14 @@
 [
   {
     "content": "Add cascade delete for grief/accident followup stages when parent event is deleted",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Remove duplicate ignored entry in grief tab (already shows in timeline)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Fix ignored badge positioning to not overlap three dots button",
-    "status": "pending"
+    "status": "completed"
   }
 ]
