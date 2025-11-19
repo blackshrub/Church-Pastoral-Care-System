@@ -9,15 +9,15 @@
   },
   {
     "content": "Backend: Add PUT /users/{id} endpoint for updating users",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Backend: Add user profile photo upload endpoint",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Frontend: Add profile photo upload to Settings page",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Display user photos in Activity Log page",
