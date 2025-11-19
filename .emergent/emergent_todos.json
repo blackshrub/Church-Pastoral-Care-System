@@ -57,10 +57,10 @@
   },
   {
     "content": "Add phone number normalization for User model (WhatsApp digest bug)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Update documentation to reflect enum changes",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
