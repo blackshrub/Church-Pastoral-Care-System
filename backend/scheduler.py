@@ -270,6 +270,17 @@ async def send_daily_digest_to_pastoral_team():
                         "id": str(uuid.uuid4()),
                         "campus_id": campus_id,
                         "pastoral_team_user_id": user['id']
+                    })
+                    
+                    logger.info(f"✅ Sent digest to {user['name']} ({user['phone']})")
+                    
+                except Exception as user_error:
+                    logger.error(f"Error sending digest to user {user.get('email')}: {str(user_error)}")
+        
+        logger.info(f"✅ Daily reminder job completed for {len(campuses)} campuses")
+        
+    except Exception as e:
+        logger.error(f"Error in daily reminder job: {str(e)}")
 
 
 async def member_reconciliation_job():
