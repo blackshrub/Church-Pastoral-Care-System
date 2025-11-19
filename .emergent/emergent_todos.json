@@ -1,34 +1,10 @@
 [
   {
-    "content": "Backend: Create GET /api/sync/discover-fields endpoint to analyze sample data",
-    "status": "completed"
+    "content": "Backend: Change api_email from EmailStr to str in SyncConfig models",
+    "status": "in_progress"
   },
   {
-    "content": "Backend: Extract field metadata (name, type, distinct values) from core API",
-    "status": "completed"
-  },
-  {
-    "content": "Backend: Update SyncConfig to store dynamic filter rules as JSON",
-    "status": "completed"
-  },
-  {
-    "content": "Backend: Update sync logic to apply dynamic filters with operators",
-    "status": "completed"
-  },
-  {
-    "content": "Frontend: Create dynamic filter rule builder UI",
-    "status": "completed"
-  },
-  {
-    "content": "Frontend: Add filter rule with field selector, operator, and value",
-    "status": "completed"
-  },
-  {
-    "content": "Frontend: Allow adding/removing multiple filter rules",
-    "status": "completed"
-  },
-  {
-    "content": "Frontend: Show field type and distinct values as dropdowns",
-    "status": "completed"
+    "content": "Implement Option A: Archive members that no longer match filter rules",
+    "status": "pending"
   }
 ]
