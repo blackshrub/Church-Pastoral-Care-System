@@ -187,6 +187,82 @@ export const Settings = () => {
           </TabsList>
         </div>
         
+
+        <TabsContent value="profile">
+          <Card>
+            <CardHeader>
+              <CardTitle>My Profile</CardTitle>
+              <CardDescription>Manage your profile information and photo</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Profile Photo */}
+              <div className="flex items-start gap-6">
+                <div className="flex-shrink-0">
+                  {user?.photo_url ? (
+                    <img 
+                      src={`${BACKEND_URL}${user.photo_url}`} 
+                      alt={user.name}
+                      className="w-24 h-24 rounded-full object-cover border-4 border-teal-100"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-teal-100 flex items-center justify-center border-4 border-teal-200">
+                      <span className="text-3xl font-bold text-teal-700">
+                        {user?.name?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-1">Profile Photo</h3>
+                  <p className="text-sm text-gray-500 mb-3">Upload a photo for your profile. This will appear in activity logs and navigation.</p>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => document.getElementById('photo-upload').click()}
+                      disabled={uploading}
+                      className="gap-2"
+                    >
+                      <Upload className="w-4 h-4" />
+                      {uploading ? 'Uploading...' : 'Upload Photo'}
+                    </Button>
+                    <input 
+                      id="photo-upload"
+                      type="file" 
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handlePhotoUpload}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Profile Information */}
+              <div className="space-y-4 pt-6 border-t">
+                <div>
+                  <Label className="text-gray-700">Name</Label>
+                  <Input value={user?.name} disabled className="bg-gray-50" />
+                </div>
+                <div>
+                  <Label className="text-gray-700">Email</Label>
+                  <Input value={user?.email} disabled className="bg-gray-50" />
+                </div>
+                <div>
+                  <Label className="text-gray-700">Phone</Label>
+                  <Input value={user?.phone} disabled className="bg-gray-50" />
+                </div>
+                <div>
+                  <Label className="text-gray-700">Role</Label>
+                  <Input value={user?.role === 'full_admin' ? 'Full Administrator' : user?.role === 'campus_admin' ? 'Campus Administrator' : 'Pastor'} disabled className="bg-gray-50" />
+                </div>
+              </div>
+              
+              <p className="text-xs text-gray-500 pt-4 border-t">
+                To update your name, email, phone, or role, please contact a Full Administrator.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="automation">
           <Card>
             <CardHeader>
