@@ -1027,17 +1027,13 @@ export const MemberDetail = () => {
                       <div className="space-y-3">
                         {griefTimeline.filter(s => s.care_event_id === event.id).map((stage, index) => {
                           const isIgnored = stage.ignored === true;
+                          const isCompleted = stage.completed === true;
                           return (
-                          <div key={stage.id} className={`flex items-center gap-3 p-2 bg-pink-50 rounded relative ${isIgnored ? 'opacity-60' : ''}`}>
-                            {isIgnored && (
-                              <div className="absolute top-1 left-1">
-                                <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
-                              </div>
-                            )}
+                          <div key={stage.id} className={`flex items-center gap-3 p-2 bg-pink-50 rounded ${isIgnored ? 'opacity-60' : ''}`}>
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              stage.completed ? 'bg-pink-500' : 'bg-pink-200'
+                              isCompleted ? 'bg-pink-500' : 'bg-pink-200'
                             }`}>
-                              {stage.completed ? (
+                              {isCompleted ? (
                                 <span className="text-white text-xs">✓</span>
                               ) : (
                                 <span className="text-pink-700 text-xs font-bold">{index + 1}</span>
@@ -1051,41 +1047,58 @@ export const MemberDetail = () => {
                                 {formatDate(stage.scheduled_date, 'dd MMM')}
                               </p>
                             </div>
-                            {(stage.completed || isIgnored) && (
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button size="sm" variant="ghost">
-                                    <MoreVertical className="w-4 h-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={async () => {
-                                    try {
-                                      await axios.post(`${API}/grief-support/${stage.id}/undo`);
-                                      toast.success(t('toasts.action_undone'));
-                                      queryClient.invalidateQueries(['member', id]); // Reload to remove timeline event and update tabs
-                                    } catch (error) {
-                                      toast.error(t('toasts.failed_undo'));
-                                    }
-                                  }}>
-                                    Undo
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            )}
-                            {!stage.completed && !isIgnored && (
-                              <div className="flex gap-1">
+                            
+                            {/* Show button for all states */}
+                            <div className="flex gap-1">
+                              {isCompleted && (
+                                <Button size="sm" variant="outline" className="min-h-[44px] bg-green-50 text-green-700 border-green-200" disabled>
+                                  Completed
+                                </Button>
+                              )}
+                              {isIgnored && (
+                                <Button size="sm" variant="outline" className="min-h-[44px] bg-gray-100 text-gray-500 border-gray-300" disabled>
+                                  Ignored
+                                </Button>
+                              )}
+                              {!isCompleted && !isIgnored && (
                                 <Button size="sm" variant="outline" className="min-h-[44px]" onClick={async () => {
                                   try {
                                     await axios.post(`${API}/grief-support/${stage.id}/complete`);
                                     toast.success(t('success_messages.stage_completed'));
-                                    queryClient.invalidateQueries(['member', id]); // Reload to show timeline event
+                                    queryClient.invalidateQueries(['member', id]);
                                   } catch (error) {
                                     toast.error(t('toasts.failed'));
                                   }
                                 }}>
                                   Mark Complete
                                 </Button>
+                              )}
+                              
+                              {/* Three dots menu */}
+                              {(isCompleted || isIgnored) && (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button size="sm" variant="ghost">
+                                      <MoreVertical className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={async () => {
+                                      try {
+                                        await axios.post(`${API}/grief-support/${stage.id}/undo`);
+                                        toast.success(t('toasts.action_undone'));
+                                        queryClient.invalidateQueries(['member', id]);
+                                      } catch (error) {
+                                        toast.error(t('toasts.failed_undo'));
+                                      }
+                                    }}>
+                                      Undo
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
+                              
+                              {!isCompleted && !isIgnored && (
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button size="sm" variant="ghost">
@@ -1097,7 +1110,6 @@ export const MemberDetail = () => {
                                       try {
                                         await axios.post(`${API}/grief-support/${stage.id}/ignore`);
                                         toast.success('Grief stage ignored');
-                                        // Refetch member data to get updated timeline
                                         queryClient.invalidateQueries(['member', id]);
                                       } catch (error) {
                                         toast.error('Failed to ignore');
@@ -1108,8 +1120,8 @@ export const MemberDetail = () => {
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
-                              </div>
-                            )}
+                              )}
+                            </div>
                           </div>
                           );
                         })}
