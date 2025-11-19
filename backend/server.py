@@ -5309,6 +5309,99 @@ async def get_sync_logs(current_user: dict = Depends(get_current_user), limit: i
     
     except Exception as e:
         logger.error(f"Error getting sync logs: {str(e)}")
+
+
+@api_router.post("/sync/webhook")
+async def receive_sync_webhook(request: Request):
+    """
+    Webhook receiver for real-time member sync from core system
+    Validates HMAC signature for security
+    """
+    try:
+        # Get raw body for signature verification
+        body = await request.body()
+        
+        # Get signature from header
+        signature = request.headers.get("X-Webhook-Signature")
+        if not signature:
+            raise HTTPException(status_code=401, detail="Missing webhook signature")
+        
+        # Parse JSON body
+        try:
+            payload = await request.json()
+        except:
+            raise HTTPException(status_code=400, detail="Invalid JSON payload")
+        
+        # Get campus_id from payload
+        campus_id = payload.get("church_id") or payload.get("campus_id")
+        if not campus_id:
+            raise HTTPException(status_code=400, detail="Missing campus_id in payload")
+        
+        # Get sync config for this campus
+        config = await db.sync_configs.find_one({"campus_id": campus_id}, {"_id": 0})
+        if not config:
+            logger.warning(f"Webhook received for campus {campus_id} with no sync config")
+            raise HTTPException(status_code=404, detail="Sync not configured for this campus")
+        
+        if not config.get("is_enabled"):
+            logger.warning(f"Webhook received for campus {campus_id} but sync is disabled")
+            raise HTTPException(status_code=403, detail="Sync is disabled for this campus")
+        
+        # Verify webhook signature using HMAC
+        webhook_secret = config.get("webhook_secret", "")
+        expected_signature = hmac.new(
+            webhook_secret.encode(),
+            body,
+            hashlib.sha256
+        ).hexdigest()
+        
+        if not hmac.compare_digest(signature, expected_signature):
+            logger.error(f"Invalid webhook signature for campus {campus_id}")
+            raise HTTPException(status_code=401, detail="Invalid webhook signature")
+        
+        # Log webhook delivery
+        await db.webhook_logs.insert_one({
+            "id": str(uuid.uuid4()),
+            "campus_id": campus_id,
+            "event_type": payload.get("event_type"),
+            "member_id": payload.get("member_id"),
+            "payload": payload,
+            "signature_valid": True,
+            "received_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        # Process webhook based on event type
+        event_type = payload.get("event_type")
+        member_id = payload.get("member_id")
+        
+        if event_type in ["member.created", "member.updated", "member.deleted"]:
+            # Trigger a sync for this specific member (or full sync)
+            # For simplicity, we'll trigger a full sync
+            # In production, you could optimize to sync just this member
+            
+            logger.info(f"Webhook {event_type} received for campus {campus_id}, triggering sync")
+            
+            # Trigger sync in background (don't wait)
+            # Note: For production, use background task or queue
+            # For now, we'll just log and let scheduled sync handle it
+            
+            return {
+                "success": True,
+                "message": f"Webhook received: {event_type}",
+                "will_sync": "Sync will occur on next scheduled run or manual trigger"
+            }
+        else:
+            return {
+                "success": True,
+                "message": f"Webhook received but event type {event_type} not handled"
+            }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error processing webhook: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
         raise HTTPException(status_code=500, detail=str(e))
 
     try:
