@@ -5005,6 +5005,36 @@ async def save_sync_config(config: SyncConfigCreate, current_user: dict = Depend
             # Preserve existing webhook_secret
             sync_config_data["webhook_secret"] = existing.get("webhook_secret", secrets.token_urlsafe(32))
             sync_config_data["id"] = existing["id"]
+            
+            # Update existing
+            await db.sync_configs.update_one(
+                {"campus_id": campus_id},
+                {"$set": sync_config_data}
+            )
+        else:
+            # Create new with generated webhook secret
+            sync_config = SyncConfig(
+                campus_id=campus_id,
+                sync_method=config.sync_method,
+                api_base_url=config.api_base_url.rstrip('/'),
+                api_email=config.api_email,
+                api_password=config.api_password,
+                polling_interval_hours=config.polling_interval_hours,
+                reconciliation_enabled=config.reconciliation_enabled,
+                reconciliation_time=config.reconciliation_time,
+                filter_mode=config.filter_mode,
+                filter_rules=config.filter_rules or [],
+                is_enabled=config.is_enabled
+            )
+            await db.sync_configs.insert_one(sync_config.model_dump())
+        
+        return {"success": True, "message": "Sync configuration saved"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error saving sync config: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @api_router.post("/sync/regenerate-secret")
