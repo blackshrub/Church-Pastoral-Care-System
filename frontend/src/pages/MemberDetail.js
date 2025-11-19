@@ -1171,17 +1171,13 @@ export const MemberDetail = () => {
                       <div className="space-y-3">
                         {accidentTimeline.filter(t => t.care_event_id === event.id).map((stage, index) => {
                           const isIgnored = stage.ignored === true;
+                          const isCompleted = stage.completed === true;
                           return (
-                          <div key={stage.id} className={`flex items-center gap-3 p-2 bg-blue-50 rounded relative ${isIgnored ? 'opacity-60' : ''}`}>
-                            {isIgnored && (
-                              <div className="absolute top-1 right-1">
-                                <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
-                              </div>
-                            )}
+                          <div key={stage.id} className={`flex items-center gap-3 p-2 bg-blue-50 rounded ${isIgnored ? 'opacity-60' : ''}`}>
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                              stage.completed ? 'bg-blue-500' : 'bg-blue-200'
+                              isCompleted ? 'bg-blue-500' : 'bg-blue-200'
                             }`}>
-                              {stage.completed ? (
+                              {isCompleted ? (
                                 <span className="text-white text-xs">✓</span>
                               ) : (
                                 <span className="text-blue-700 text-xs font-bold">{index + 1}</span>
@@ -1196,41 +1192,58 @@ export const MemberDetail = () => {
                                 {formatDate(stage.scheduled_date, 'dd MMM')}
                               </p>
                             </div>
-                            {(stage.completed || isIgnored) && (
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button size="sm" variant="ghost">
-                                    <MoreVertical className="w-4 h-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={async () => {
-                                    try {
-                                      await axios.post(`${API}/accident-followup/${stage.id}/undo`);
-                                      toast.success(t('toasts.action_undone'));
-                                      queryClient.invalidateQueries(['member', id]); // Reload to remove timeline event and update tabs
-                                    } catch (error) {
-                                      toast.error(t('toasts.failed_undo'));
-                                    }
-                                  }}>
-                                    Undo
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            )}
-                            {!stage.completed && !isIgnored && (
-                              <div className="flex gap-1">
+                            
+                            {/* Show button for all states */}
+                            <div className="flex gap-1">
+                              {isCompleted && (
+                                <Button size="sm" variant="outline" className="min-h-[44px] bg-green-50 text-green-700 border-green-200" disabled>
+                                  Completed
+                                </Button>
+                              )}
+                              {isIgnored && (
+                                <Button size="sm" variant="outline" className="min-h-[44px] bg-gray-100 text-gray-500 border-gray-300" disabled>
+                                  Ignored
+                                </Button>
+                              )}
+                              {!isCompleted && !isIgnored && (
                                 <Button size="sm" variant="outline" className="min-h-[44px]" onClick={async () => {
                                   try {
                                     await axios.post(`${API}/accident-followup/${stage.id}/complete`);
                                     toast.success('Follow-up completed');
-                                    queryClient.invalidateQueries(['member', id]); // Reload to show timeline event
+                                    queryClient.invalidateQueries(['member', id]);
                                   } catch (error) {
                                     toast.error(t('toasts.failed'));
                                   }
                                 }}>
                                   Mark Complete
                                 </Button>
+                              )}
+                              
+                              {/* Three dots menu */}
+                              {(isCompleted || isIgnored) && (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button size="sm" variant="ghost">
+                                      <MoreVertical className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={async () => {
+                                      try {
+                                        await axios.post(`${API}/accident-followup/${stage.id}/undo`);
+                                        toast.success(t('toasts.action_undone'));
+                                        queryClient.invalidateQueries(['member', id]);
+                                      } catch (error) {
+                                        toast.error(t('toasts.failed_undo'));
+                                      }
+                                    }}>
+                                      Undo
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
+                              
+                              {!isCompleted && !isIgnored && (
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button size="sm" variant="ghost">
@@ -1242,20 +1255,18 @@ export const MemberDetail = () => {
                                       try {
                                         await axios.post(`${API}/accident-followup/${stage.id}/ignore`);
                                         toast.success('Follow-up ignored');
-                                        // Update local state
-                                        setAccidentTimeline(prev => prev.map(s => 
-                                          s.id === stage.id ? {...s, ignored: true} : s
-                                        ));
+                                        queryClient.invalidateQueries(['member', id]);
                                       } catch (error) {
                                         toast.error('Failed to ignore');
+                                        console.error('Error ignoring accident stage:', error);
                                       }
                                     }}>
                                       Ignore
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
-                              </div>
-                            )}
+                              )}
+                            </div>
                           </div>
                           );
                         })}
