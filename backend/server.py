@@ -5001,8 +5001,9 @@ async def get_sync_config(current_user: dict = Depends(get_current_user)):
         
         config = await db.sync_configs.find_one({"campus_id": campus_id}, {"_id": 0})
         if config:
-            # Don't return password to frontend
+            # Don't return actual password to frontend, but keep webhook_secret
             config["api_password"] = "********" if config.get("api_password") else ""
+            # Keep webhook_secret for display (user needs to configure it in core system)
         
         return config
     
