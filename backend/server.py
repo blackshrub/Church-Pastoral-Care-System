@@ -2906,6 +2906,9 @@ async def undo_accident_stage(stage_id: str, user: dict = Depends(get_current_us
         if not stage:
             raise HTTPException(status_code=404, detail="Accident followup not found")
         
+        # Delete timeline entries created for this stage (linked by accident_stage_id)
+        await db.care_events.delete_many({"accident_stage_id": stage_id})
+        
         # Delete activity logs related to this accident stage
         await db.activity_logs.delete_many({
             "member_id": stage["member_id"],
