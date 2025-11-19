@@ -5004,6 +5004,115 @@ async def save_sync_config(config: SyncConfigCreate, current_user: dict = Depend
                 filter_member_status=config.filter_member_status,
                 is_enabled=config.is_enabled
             )
+
+
+@api_router.post("/sync/discover-fields")
+async def discover_fields_from_core(config_test: SyncConfigCreate, current_user: dict = Depends(get_current_user)):
+    """
+    Analyze sample members from core API to discover available fields and their values
+    Returns field metadata for building dynamic filters
+    """
+    if current_user["role"] not in [UserRole.FULL_ADMIN, UserRole.CAMPUS_ADMIN]:
+        raise HTTPException(status_code=403, detail="Only administrators can discover fields")
+    
+    try:
+        import httpx
+        
+        # Login to core API
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            login_response = await client.post(
+                f"{config_test.api_base_url.rstrip('/')}/api/auth/login",
+                json={"email": config_test.api_email, "password": config_test.api_password}
+            )
+            
+            if login_response.status_code != 200:
+                raise HTTPException(status_code=400, detail="Failed to authenticate with core API")
+            
+            token = login_response.json().get("access_token")
+            
+            # Fetch members (limit to 100 for analysis)
+            members_response = await client.get(
+                f"{config_test.api_base_url.rstrip('/')}/api/members/",
+                headers={"Authorization": f"Bearer {token}"}
+            )
+            
+            if members_response.status_code != 200:
+                raise HTTPException(status_code=400, detail="Failed to fetch members from core API")
+            
+            members = members_response.json()[:100]  # Analyze first 100 members
+            
+            if len(members) == 0:
+                return {"fields": [], "message": "No members found in core system"}
+            
+            # Analyze fields
+            field_metadata = {}
+            
+            for member in members:
+                for field_name, field_value in member.items():
+                    if field_name in ["id", "church_id", "campus_id", "_id"]:
+                        continue  # Skip system fields
+                    
+                    if field_name not in field_metadata:
+                        field_metadata[field_name] = {
+                            "name": field_name,
+                            "type": None,
+                            "distinct_values": set(),
+                            "has_null": False,
+                            "sample_value": field_value
+                        }
+                    
+                    # Determine field type
+                    if field_value is None:
+                        field_metadata[field_name]["has_null"] = True
+                    elif isinstance(field_value, bool):
+                        field_metadata[field_name]["type"] = "boolean"
+                        field_metadata[field_name]["distinct_values"].add(field_value)
+                    elif isinstance(field_value, (int, float)):
+                        field_metadata[field_name]["type"] = "number"
+                    elif isinstance(field_value, str):
+                        # Check if it's a date
+                        if "date" in field_name.lower() or "birth" in field_name.lower():
+                            field_metadata[field_name]["type"] = "date"
+                        else:
+                            field_metadata[field_name]["type"] = "string"
+                            # Collect distinct values for string fields (max 50 unique values)
+                            if len(field_metadata[field_name]["distinct_values"]) < 50:
+                                field_metadata[field_name]["distinct_values"].add(field_value)
+            
+            # Convert to list and process distinct values
+            fields = []
+            for field_name, metadata in field_metadata.items():
+                field_info = {
+                    "name": field_name,
+                    "label": field_name.replace("_", " ").title(),
+                    "type": metadata["type"],
+                    "sample_value": metadata["sample_value"],
+                    "has_null": metadata["has_null"]
+                }
+                
+                # Convert distinct values to list
+                if metadata["type"] in ["string", "boolean"]:
+                    distinct_list = sorted(list(metadata["distinct_values"]))
+                    if len(distinct_list) > 0 and len(distinct_list) <= 20:  # Only if reasonable number
+                        field_info["distinct_values"] = distinct_list
+                
+                fields.append(field_info)
+            
+            # Sort fields by name
+            fields.sort(key=lambda x: x["name"])
+            
+            return {
+                "fields": fields,
+                "sample_count": len(members),
+                "message": f"Discovered {len(fields)} fields from {len(members)} sample members"
+            }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error discovering fields: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
             await db.sync_configs.insert_one(sync_config.model_dump())
         
         return {"success": True, "message": "Sync configuration saved"}
