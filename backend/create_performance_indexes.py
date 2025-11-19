@@ -85,7 +85,7 @@ async def create_indexes():
     
     # Dashboard cache indexes
     print("Creating indexes for dashboard_cache collection...")
-    await db.dashboard_cache.create_index("campus_id", unique=True)
+    await db.dashboard_cache.create_index("campus_id")
     await db.dashboard_cache.create_index("last_updated")
     print("  ✓ Dashboard cache indexes created")
     
