@@ -2096,6 +2096,10 @@ async def create_care_event(event: CareEventCreate, current_user: dict = Depends
         if current_user.get("role") in [UserRole.CAMPUS_ADMIN, UserRole.PASTOR]:
             campus_id = current_user["campus_id"]
         
+        # Get member name for logging
+        member = await db.members.find_one({"id": event.member_id}, {"_id": 0, "name": 1})
+        member_name = member["name"] if member else "Unknown"
+        
         care_event = CareEvent(
             member_id=event.member_id,
             campus_id=campus_id,
@@ -2107,7 +2111,9 @@ async def create_care_event(event: CareEventCreate, current_user: dict = Depends
             hospital_name=event.hospital_name,
             aid_type=event.aid_type,
             aid_amount=event.aid_amount,
-            aid_notes=event.aid_notes
+            aid_notes=event.aid_notes,
+            created_by_user_id=current_user["id"],
+            created_by_user_name=current_user["name"]
         )
         
         # Add initial visitation log if hospital visit
@@ -2126,8 +2132,22 @@ async def create_care_event(event: CareEventCreate, current_user: dict = Depends
         
         await db.care_events.insert_one(event_dict)
         
+        # Log activity for creating the care event
+        await log_activity(
+            campus_id=campus_id,
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            action_type=ActivityActionType.CREATE_CARE_EVENT,
+            member_id=event.member_id,
+            member_name=member_name,
+            care_event_id=care_event.id,
+            event_type=event.event_type,
+            notes=f"Created {event.event_type.value.replace('_', ' ')} event: {event.title}",
+            user_photo_url=current_user.get("photo_url")
+        )
+        
         # Update member's last contact date only for non-birthday events OR completed birthday events
-        if event.event_type != EventType.BIRTHDAY or completed:
+        if event.event_type != EventType.BIRTHDAY or event.completed:
             now = datetime.now(timezone.utc)
             await db.members.update_one(
                 {"id": event.member_id},
