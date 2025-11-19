@@ -27,6 +27,7 @@ export const AdminDashboard = () => {
   const [campusModalOpen, setCampusModalOpen] = useState(false);
   const [newCampus, setNewCampus] = useState({ id: null, campus_name: '', location: '' });
   const [userModalOpen, setUserModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
   const [newUser, setNewUser] = useState({ email: '', password: '', name: '', phone: '', role: 'pastor', campus_id: '' });
   
   useEffect(() => {
