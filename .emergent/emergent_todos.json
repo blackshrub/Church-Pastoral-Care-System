@@ -1,10 +1,22 @@
 [
   {
-    "content": "Backend: Change api_email from EmailStr to str in SyncConfig models",
-    "status": "completed"
+    "content": "Add reconciliation_enabled field to SyncConfig",
+    "status": "in_progress"
   },
   {
-    "content": "Implement Option A: Archive members that no longer match filter rules",
-    "status": "completed"
+    "content": "Add scheduled reconciliation job to APScheduler (runs at 3 AM)",
+    "status": "pending"
+  },
+  {
+    "content": "Update sync endpoint to support 'reconciliation' sync_type",
+    "status": "pending"
+  },
+  {
+    "content": "Add reconciliation toggle in Settings UI",
+    "status": "pending"
+  },
+  {
+    "content": "Test reconciliation job execution",
+    "status": "pending"
   }
 ]
