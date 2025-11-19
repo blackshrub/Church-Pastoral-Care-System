@@ -68,9 +68,12 @@ export const Settings = () => {
 
   // Sync configuration state
   const [syncConfig, setSyncConfig] = useState({
+    sync_method: 'polling',
     api_base_url: '',
     api_email: '',
     api_password: '',
+    polling_interval_hours: 6,
+    webhook_secret: '',
     is_enabled: false
   });
   const [syncLogs, setSyncLogs] = useState([]);
