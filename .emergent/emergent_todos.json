@@ -17,18 +17,18 @@
   },
   {
     "content": "Frontend: Add profile photo upload to Settings page",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Display user photos in Activity Log page",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Display user photos in Layout/Navigation",
     "status": "pending"
   },
   {
-    "content": "Test all new features",
+    "content": "Restart backend and test all features",
     "status": "pending"
   }
 ]
