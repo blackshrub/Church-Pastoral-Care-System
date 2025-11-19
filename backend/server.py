@@ -3278,9 +3278,14 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
         if not schedule:
             raise HTTPException(status_code=404, detail="Schedule not found")
         
+        # Get member name for logging
+        member = await db.members.find_one({"id": schedule["member_id"]}, {"_id": 0, "name": 1})
+        member_name = member["name"] if member else "Unknown"
+        
         # Create care event for this payment
+        payment_event_id = str(uuid.uuid4())
         await db.care_events.insert_one({
-            "id": str(uuid.uuid4()),
+            "id": payment_event_id,
             "member_id": schedule["member_id"],
             "campus_id": schedule["campus_id"],
             "event_type": "financial_aid",
@@ -3290,9 +3295,28 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
             "aid_amount": schedule["aid_amount"],
             "aid_notes": f"From {schedule['frequency']} schedule",
             "completed": True,
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+            "completed_by_user_id": current_user["id"],
+            "completed_by_user_name": current_user["name"],
+            "created_by_user_id": current_user["id"],
+            "created_by_user_name": current_user["name"],
             "created_at": datetime.now(timezone.utc).isoformat(),
             "updated_at": datetime.now(timezone.utc).isoformat()
         })
+        
+        # Log activity
+        await log_activity(
+            campus_id=schedule["campus_id"],
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            action_type=ActivityActionType.COMPLETE_TASK,
+            member_id=schedule["member_id"],
+            member_name=member_name,
+            care_event_id=payment_event_id,
+            event_type=EventType.FINANCIAL_AID,
+            notes=f"Marked {schedule.get('aid_type', 'financial aid')} as distributed - Rp {schedule.get('aid_amount', 0):,.0f}",
+            user_photo_url=current_user.get("photo_url")
+        )
         
         # Update member's last contact date and engagement status
         settings = await get_engagement_settings()
