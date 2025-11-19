@@ -47,6 +47,10 @@ export const Layout = ({ children }) => {
                 <LanguageToggle />
               </div>
             </div>
+            {/* Search Bar - Mobile (Full width below header) */}
+            <div className="pb-3">
+              <SearchBar />
+            </div>
           </div>
         </header>
         
