@@ -4697,6 +4697,14 @@ async def get_uploaded_file(filename: str):
         raise HTTPException(status_code=404, detail="File not found")
     return FileResponse(filepath)
 
+@api_router.get("/user-photos/{filename}")
+async def get_user_photo(filename: str):
+    """Serve user profile photos"""
+    filepath = Path(ROOT_DIR) / "user_photos" / filename
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail="Photo not found")
+    return FileResponse(filepath)
+
 # ==================== SEARCH ENDPOINT ====================
 
 @api_router.get("/search")
