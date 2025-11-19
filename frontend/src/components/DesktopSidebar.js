@@ -39,6 +39,7 @@ export const DesktopSidebar = () => {
       icon: Shield, 
       testId: 'sidebar-admin' 
     }] : []),
+    { name: t('activity_log'), href: '/activity-log', icon: Activity, testId: 'sidebar-activity-log' },
     { name: t('import_export'), href: '/import-export', icon: Upload, testId: 'sidebar-import-export' },
     { name: t('messaging'), href: '/messaging', icon: MessageSquare, testId: 'sidebar-messaging' },
     { name: t('whatsapp_logs'), href: '/whatsapp-logs', icon: Bell, testId: 'sidebar-whatsapp-logs' },
