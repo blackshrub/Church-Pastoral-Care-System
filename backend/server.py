@@ -575,6 +575,7 @@ class SyncConfig(BaseModel):
     polling_interval_hours: int = 6  # For polling method
     
     # Sync filters (optional - empty means sync all)
+    filter_mode: str = "include"  # "include" or "exclude"
     filter_gender: Optional[str] = None  # "Male", "Female", or None for all
     filter_age_min: Optional[int] = None  # Minimum age
     filter_age_max: Optional[int] = None  # Maximum age
