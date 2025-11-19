@@ -37,10 +37,14 @@
   },
   {
     "content": "Restart backend service to apply changes",
+    "status": "completed"
+  },
+  {
+    "content": "Test search bar functionality with screenshot",
     "status": "in_progress"
   },
   {
-    "content": "Test all features with screenshots",
+    "content": "Test Activity Log page with screenshot",
     "status": "pending"
   }
 ]
