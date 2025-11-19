@@ -1,22 +1,10 @@
 [
   {
-    "content": "Add reconciliation_enabled field to SyncConfig",
-    "status": "completed"
+    "content": "Add reconciliation information text to API Sync page",
+    "status": "in_progress"
   },
   {
-    "content": "Add scheduled reconciliation job to APScheduler (runs at 3 AM)",
-    "status": "completed"
-  },
-  {
-    "content": "Update sync endpoint to support 'reconciliation' sync_type",
-    "status": "completed"
-  },
-  {
-    "content": "Add reconciliation toggle in Settings UI",
-    "status": "completed"
-  },
-  {
-    "content": "Test reconciliation job execution",
-    "status": "completed"
+    "content": "Clean up all members and care events from database for fresh testing",
+    "status": "pending"
   }
 ]
