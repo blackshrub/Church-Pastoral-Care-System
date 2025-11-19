@@ -2842,7 +2842,31 @@ async def complete_accident_stage(stage_id: str, notes: Optional[str] = None, cu
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Accident follow-up stage not found")
         
-        # Log activity (no timeline entry - stage itself tracks completion)
+        # Create timeline entry (will show in Timeline tab, NOT in Accident tab)
+        campus_tz = await get_campus_timezone(stage["campus_id"])
+        today_date = get_date_in_timezone(campus_tz)
+        
+        timeline_event_id = str(uuid.uuid4())
+        await db.care_events.insert_one({
+            "id": timeline_event_id,
+            "member_id": stage["member_id"],
+            "campus_id": stage["campus_id"],
+            "event_type": "accident_illness",
+            "event_date": today_date,
+            "title": f"Accident Follow-up: {stage['stage'].replace('_', ' ')}",
+            "description": f"Completed accident/illness follow-up" + (f"\n\nNotes: {notes}" if notes else ""),
+            "accident_stage_id": stage_id,  # Link for undo
+            "completed": True,
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+            "completed_by_user_id": current_user["id"],
+            "completed_by_user_name": current_user["name"],
+            "created_by_user_id": current_user["id"],
+            "created_by_user_name": current_user["name"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        # Log activity
         await log_activity(
             campus_id=stage["campus_id"],
             user_id=current_user["id"],
@@ -2850,6 +2874,7 @@ async def complete_accident_stage(stage_id: str, notes: Optional[str] = None, cu
             action_type=ActivityActionType.COMPLETE_TASK,
             member_id=stage["member_id"],
             member_name=member_name,
+            care_event_id=timeline_event_id,
             event_type=EventType.ACCIDENT_ILLNESS,
             notes=f"Completed accident/illness follow-up: {stage['stage'].replace('_', ' ')}",
             user_photo_url=current_user.get("photo_url")
@@ -3559,7 +3584,31 @@ async def ignore_accident_stage(stage_id: str, user: dict = Depends(get_current_
             }}
         )
         
-        # Log activity (no timeline entry - stage itself shows ignored status)
+        # Create timeline entry (will show in Timeline tab, NOT in Accident tab)
+        campus_tz = await get_campus_timezone(stage["campus_id"])
+        today_date = get_date_in_timezone(campus_tz)
+        
+        timeline_event_id = str(uuid.uuid4())
+        await db.care_events.insert_one({
+            "id": timeline_event_id,
+            "member_id": stage["member_id"],
+            "campus_id": stage["campus_id"],
+            "event_type": "accident_illness",
+            "event_date": today_date,
+            "title": f"Accident Follow-up: {stage['stage'].replace('_', ' ')} (Ignored)",
+            "description": "Stage was marked as ignored/not applicable",
+            "accident_stage_id": stage_id,  # Link for undo
+            "ignored": True,
+            "ignored_at": datetime.now(timezone.utc).isoformat(),
+            "ignored_by": user.get("id"),
+            "ignored_by_name": user.get("name"),
+            "created_by_user_id": user.get("id"),
+            "created_by_user_name": user.get("name"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        # Log activity
         await log_activity(
             campus_id=stage["campus_id"],
             user_id=user["id"],
@@ -3567,6 +3616,7 @@ async def ignore_accident_stage(stage_id: str, user: dict = Depends(get_current_
             action_type=ActivityActionType.IGNORE_TASK,
             member_id=stage["member_id"],
             member_name=member_name,
+            care_event_id=timeline_event_id,
             event_type=EventType.ACCIDENT_ILLNESS,
             notes=f"Ignored accident/illness follow-up: {stage['stage'].replace('_', ' ')}",
             user_photo_url=user.get("photo_url")
