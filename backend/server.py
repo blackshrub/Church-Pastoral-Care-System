@@ -555,6 +555,48 @@ class ActivityLogResponse(BaseModel):
     notes: Optional[str] = None
     created_at: datetime
 
+
+# ==================== SYNC MODELS ====================
+
+class SyncConfig(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    campus_id: str
+    api_base_url: str  # e.g., https://faithflow.yourdomain.com
+    api_email: str
+    api_password: str  # Encrypted in database
+    is_enabled: bool = False
+    last_sync_at: Optional[datetime] = None
+    last_sync_status: Optional[str] = None  # success, error
+    last_sync_message: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SyncConfigCreate(BaseModel):
+    api_base_url: str
+    api_email: str
+    api_password: str
+    is_enabled: bool = False
+
+class SyncLog(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    campus_id: str
+    sync_type: str  # manual, scheduled, webhook
+    status: str  # success, error, partial
+    members_fetched: int = 0
+    members_created: int = 0
+    members_updated: int = 0
+    members_archived: int = 0
+    members_unarchived: int = 0
+    error_message: Optional[str] = None
+    started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+    duration_seconds: Optional[float] = None
+
+
 # ==================== UTILITY FUNCTIONS ====================
 
 async def get_engagement_settings():
