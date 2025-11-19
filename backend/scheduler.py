@@ -331,22 +331,6 @@ async def member_reconciliation_job():
     except Exception as e:
         logger.error(f"Error in reconciliation job: {str(e)}")
 
-                    }
-                )
-                
-                if result['success']:
-                    total_sent += 1
-                    logger.info(f"    ✓ Sent to {user['name']} ({user['phone']})")
-                else:
-                    total_failed += 1
-                    logger.error(f"    ✗ Failed to send to {user['name']}: {result.get('error')}")
-        
-        logger.info("="*60)
-        logger.info(f"Daily digest complete: {total_sent} sent, {total_failed} failed")
-        logger.info("="*60)
-        
-    except Exception as e:
-        logger.error(f"Error sending daily digest: {str(e)}")
 
 async def refresh_all_dashboard_caches():
     """Refresh dashboard cache for all active campuses"""
