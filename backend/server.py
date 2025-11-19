@@ -576,10 +576,8 @@ class SyncConfig(BaseModel):
     
     # Sync filters (optional - empty means sync all)
     filter_mode: str = "include"  # "include" or "exclude"
-    filter_gender: Optional[str] = None  # "Male", "Female", or None for all
-    filter_age_min: Optional[int] = None  # Minimum age
-    filter_age_max: Optional[int] = None  # Maximum age
-    filter_member_status: Optional[List[str]] = None  # e.g., ["Member", "Baptized"], None for all
+    filter_rules: Optional[List[Dict[str, Any]]] = None  # Dynamic filter rules
+    # Example: [{"field": "gender", "operator": "equals", "value": "Female"}, {"field": "age", "operator": "between", "value": [18, 35]}]
     
     last_sync_at: Optional[datetime] = None
     last_sync_status: Optional[str] = None  # success, error
