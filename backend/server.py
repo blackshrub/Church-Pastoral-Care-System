@@ -4994,6 +4994,10 @@ async def save_sync_config(config: SyncConfigCreate, current_user: dict = Depend
                 api_email=config.api_email,
                 api_password=config.api_password,
                 polling_interval_hours=config.polling_interval_hours,
+                filter_gender=config.filter_gender,
+                filter_age_min=config.filter_age_min,
+                filter_age_max=config.filter_age_max,
+                filter_member_status=config.filter_member_status,
                 is_enabled=config.is_enabled
             )
             await db.sync_configs.insert_one(sync_config.model_dump())
