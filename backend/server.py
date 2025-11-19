@@ -367,9 +367,11 @@ class CareEvent(BaseModel):
     # Grief support fields (only relationship, use event_date as mourning date)
     grief_relationship: Optional[str] = None
     grief_stage: Optional[GriefStage] = None
+    grief_stage_id: Optional[str] = None  # Link to grief_support stage (for timeline entries)
     
     # Accident/illness fields (merged from hospital, only hospital_name, use event_date as admission)
     hospital_name: Optional[str] = None
+    accident_stage_id: Optional[str] = None  # Link to accident_followup stage (for timeline entries)
     visitation_log: List[Dict[str, Any]] = Field(default_factory=list)
     
     # Financial aid fields
