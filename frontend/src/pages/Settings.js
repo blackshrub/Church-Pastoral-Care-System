@@ -949,6 +949,8 @@ export const Settings = () => {
                       </p>
                     </div>
                   )}
+                    </>
+                  )}
                 </div>
 
                 
