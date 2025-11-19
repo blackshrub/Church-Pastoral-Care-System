@@ -563,10 +563,13 @@ class SyncConfig(BaseModel):
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     campus_id: str
+    sync_method: str = "polling"  # "polling" or "webhook"
     api_base_url: str  # e.g., https://faithflow.yourdomain.com
     api_email: str
     api_password: str  # Encrypted in database
+    webhook_secret: str = Field(default_factory=lambda: secrets.token_urlsafe(32))  # For signature verification
     is_enabled: bool = False
+    polling_interval_hours: int = 6  # For polling method
     last_sync_at: Optional[datetime] = None
     last_sync_status: Optional[str] = None  # success, error
     last_sync_message: Optional[str] = None
@@ -574,9 +577,11 @@ class SyncConfig(BaseModel):
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class SyncConfigCreate(BaseModel):
+    sync_method: str = "polling"
     api_base_url: str
     api_email: str
     api_password: str
+    polling_interval_hours: int = 6
     is_enabled: bool = False
 
 class SyncLog(BaseModel):
