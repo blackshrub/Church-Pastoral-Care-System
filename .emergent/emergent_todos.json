@@ -1,14 +1,18 @@
 [
   {
-    "content": "Debug Activity Log page - verify API returns data and page displays it",
+    "content": "Find and fix contact at-risk/disconnected member endpoints - add activity logging",
     "status": "in_progress"
   },
   {
-    "content": "Debug member timeline - ensure completed_by fields are returned from backend",
+    "content": "Verify care_events API returns completed_by fields in response",
     "status": "pending"
   },
   {
-    "content": "Test with real user action and verify both Activity Log and Timeline display",
+    "content": "Check if MemberDetail properly displays actor info from API",
+    "status": "pending"
+  },
+  {
+    "content": "Test all action types to ensure logging works",
     "status": "pending"
   }
 ]
