@@ -504,6 +504,35 @@ class TokenResponse(BaseModel):
     token_type: str
     user: UserResponse
 
+
+class ActivityLog(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    campus_id: str
+    user_id: str
+    user_name: str
+    action_type: ActivityActionType
+    member_id: Optional[str] = None
+    member_name: Optional[str] = None
+    care_event_id: Optional[str] = None
+    event_type: Optional[EventType] = None
+    notes: Optional[str] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class ActivityLogResponse(BaseModel):
+    id: str
+    campus_id: str
+    user_id: str
+    user_name: str
+    action_type: str
+    member_id: Optional[str]
+    member_name: Optional[str]
+    care_event_id: Optional[str]
+    event_type: Optional[str]
+    notes: Optional[str]
+    created_at: datetime
+
 # ==================== UTILITY FUNCTIONS ====================
 
 async def get_engagement_settings():
