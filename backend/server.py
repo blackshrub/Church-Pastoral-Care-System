@@ -2247,21 +2247,25 @@ async def create_care_event(event: CareEventCreate, current_user: dict = Depends
         await db.care_events.insert_one(event_dict)
         
         # Log activity for creating the care event
+        # For one-time events, log as COMPLETE_TASK since they're auto-completed
+        action_type = ActivityActionType.COMPLETE_TASK if is_one_time else ActivityActionType.CREATE_CARE_EVENT
+        action_note = f"{'Completed' if is_one_time else 'Created'} {event.event_type.value.replace('_', ' ')} event: {event.title}"
+        
         await log_activity(
             campus_id=campus_id,
             user_id=current_user["id"],
             user_name=current_user["name"],
-            action_type=ActivityActionType.CREATE_CARE_EVENT,
+            action_type=action_type,
             member_id=event.member_id,
             member_name=member_name,
             care_event_id=care_event.id,
             event_type=event.event_type,
-            notes=f"Created {event.event_type.value.replace('_', ' ')} event: {event.title}",
+            notes=action_note,
             user_photo_url=current_user.get("photo_url")
         )
         
-        # Update member's last contact date only for non-birthday events OR completed birthday events
-        if event.event_type != EventType.BIRTHDAY or event.completed:
+        # Update member's last contact date for completed one-time events or non-birthday events
+        if is_one_time or (event.event_type != EventType.BIRTHDAY):
             now = datetime.now(timezone.utc)
             await db.members.update_one(
                 {"id": event.member_id},
