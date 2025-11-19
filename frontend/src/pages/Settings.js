@@ -260,6 +260,10 @@ export const Settings = () => {
               <SettingsIcon className="w-4 h-4" />
               {activeTab === 'system' && <span className="ml-2">{t('settings_page.system_tab')}</span>}
             </TabsTrigger>
+            <TabsTrigger value="sync" className="flex-shrink-0">
+              <RefreshCw className="w-4 h-4" />
+              {activeTab === 'sync' && <span className="ml-2">API Sync</span>}
+            </TabsTrigger>
           </TabsList>
         </div>
         
