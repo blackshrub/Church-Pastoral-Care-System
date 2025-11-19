@@ -1,14 +1,14 @@
 [
   {
     "content": "Update create care event endpoint to auto-complete one-time events",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Define one-time event types (regular_contact, childbirth, new_house, financial_aid one-time)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Test creating one-time events and verify they appear as completed",
-    "status": "pending"
+    "status": "completed"
   }
 ]
