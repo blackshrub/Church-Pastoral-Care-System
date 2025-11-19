@@ -3494,6 +3494,18 @@ async def ignore_financial_aid_schedule(schedule_id: str, user: dict = Depends(g
         verify_schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0})
         logger.info(f"[IGNORE] VERIFY - Schedule {schedule_id} from DB: is_active={verify_schedule.get('is_active')}, ignored={verify_schedule.get('ignored_occurrences')}")
         
+        # Log activity
+        await log_activity(
+            campus_id=schedule["campus_id"],
+            user_id=user["id"],
+            user_name=user["name"],
+            action_type=ActivityActionType.IGNORE_TASK,
+            member_id=schedule["member_id"],
+            member_name=member_name,
+            notes=f"Ignored {schedule.get('aid_type', 'financial aid')} payment on {current_occurrence}",
+            user_photo_url=user.get("photo_url")
+        )
+        
         # Invalidate dashboard cache
         await invalidate_dashboard_cache(schedule["campus_id"])
         
