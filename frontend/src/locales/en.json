@@ -312,12 +312,12 @@
   "_comment_grief": "Grief Support",
   "grief_stages": {
     "mourning": "Mourning Service",
-    "1_week": "1 Week After",
-    "2_weeks": "2 Weeks After",
-    "1_month": "1 Month After",
-    "3_months": "3 Months After",
-    "6_months": "6 Months After",
-    "1_year": "1 Year Anniversary"
+    "1_week": "First Follow-up",
+    "2_weeks": "Second Follow-up",
+    "1_month": "Third Follow-up",
+    "3_months": "Fourth Follow-up",
+    "6_months": "Fifth Follow-up",
+    "1_year": "Sixth Follow-up (1 Year Anniversary)"
   },
   
   "_comment_messages": "Messages",
