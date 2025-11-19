@@ -5507,12 +5507,24 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                     member_data = {
                         "external_member_id": core_id,
                         "name": core_member.get("full_name"),
-                        "phone": normalize_phone_number(core_member.get("phone_whatsapp", "")),
+                        "phone": normalize_phone_number(core_member.get("phone_whatsapp", "")) if core_member.get("phone_whatsapp") else None,
                         "birth_date": core_member.get("date_of_birth"),
                         "gender": core_member.get("gender"),
                         "category": core_member.get("member_status"),
                         "updated_at": datetime.now(timezone.utc).isoformat()
                     }
+                    
+                    # Calculate age if birth_date exists
+                    if core_member.get("date_of_birth"):
+                        try:
+                            dob = core_member["date_of_birth"]
+                            birth_date = date.fromisoformat(dob) if isinstance(dob, str) else dob
+                            age = (date.today() - birth_date).days // 365
+                            member_data["age"] = age
+                        except:
+                            member_data["age"] = None
+                    else:
+                        member_data["age"] = None
                     
                     # Handle photo if exists
                     photo_base64 = core_member.get("photo_base64")
