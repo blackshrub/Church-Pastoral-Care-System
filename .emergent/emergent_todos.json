@@ -1,10 +1,10 @@
 [
   {
     "content": "Add reconciliation information text to API Sync page",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Clean up all members and care events from database for fresh testing",
-    "status": "pending"
+    "status": "completed"
   }
 ]
