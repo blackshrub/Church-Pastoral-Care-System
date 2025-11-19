@@ -1,38 +1,38 @@
 [
   {
     "content": "Backend: Add sync_method field to SyncConfig (polling/webhook)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Backend: Generate webhook secret and add to SyncConfig",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Backend: Create POST /api/sync/webhook endpoint with signature verification",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Backend: Add rate limiting for webhook endpoint",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Backend: Add webhook delivery logging",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Backend: Add scheduled polling job to APScheduler",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Frontend: Add sync method selector (polling/webhook) in Settings",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Frontend: Display webhook URL and secret for core system configuration",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Frontend: Show different instructions based on selected method",
-    "status": "pending"
+    "status": "completed"
   }
 ]
