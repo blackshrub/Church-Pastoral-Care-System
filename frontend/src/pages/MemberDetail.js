@@ -1004,7 +1004,7 @@ export const MemberDetail = () => {
               No grief/loss events recorded.
             </p>
           ) : (
-            careEvents.filter(e => e.event_type === 'grief_loss').map(event => (
+            careEvents.filter(e => e.event_type === 'grief_loss' && !e.grief_stage_id).map(event => (
                   <div key={event.id} className="space-y-4 mb-6 p-4 border border-pink-200 bg-pink-50 rounded-lg shadow-sm">
                     <div>
                       <h4 className="font-semibold">💔 {event.title || 'Grief/Loss Event'}</h4>
