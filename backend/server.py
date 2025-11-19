@@ -5378,7 +5378,8 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                             upload_dir.mkdir(exist_ok=True)
                             
                             ext = "jpg"
-                            if "png" in photo_base64: ext = "png"
+                            if "png" in photo_base64:
+                                ext = "png"
                             filename = f"JEMAAT-{core_id[:5]}.{ext}"
                             filepath = upload_dir / filename
                             
