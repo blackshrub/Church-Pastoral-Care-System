@@ -5005,6 +5005,46 @@ async def save_sync_config(config: SyncConfigCreate, current_user: dict = Depend
             # Preserve existing webhook_secret
             sync_config_data["webhook_secret"] = existing.get("webhook_secret", secrets.token_urlsafe(32))
             sync_config_data["id"] = existing["id"]
+
+
+@api_router.post("/sync/regenerate-secret")
+async def regenerate_webhook_secret(current_user: dict = Depends(get_current_user)):
+    """Regenerate webhook secret for security rotation"""
+    if current_user["role"] not in [UserRole.FULL_ADMIN, UserRole.CAMPUS_ADMIN]:
+        raise HTTPException(status_code=403, detail="Only administrators can regenerate webhook secret")
+    
+    try:
+        campus_id = current_user.get("campus_id")
+        if not campus_id:
+            raise HTTPException(status_code=400, detail="Please select a campus first")
+        
+        # Generate new secret
+        new_secret = secrets.token_urlsafe(32)
+        
+        # Update config
+        result = await db.sync_configs.update_one(
+            {"campus_id": campus_id},
+            {"$set": {
+                "webhook_secret": new_secret,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Sync configuration not found")
+        
+        return {
+            "success": True,
+            "message": "Webhook secret regenerated successfully",
+            "new_secret": new_secret
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error regenerating webhook secret: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
             
             # Update existing
             await db.sync_configs.update_one(
