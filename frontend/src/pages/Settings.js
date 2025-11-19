@@ -91,9 +91,12 @@ export const Settings = () => {
   const loadSyncConfig = async () => {
     try {
       const response = await axios.get(`${API}/sync/config`);
-      console.log('Sync config loaded:', response.data);
+      console.log('Sync config API response:', response.data);
       if (response.data) {
+        console.log('Setting sync config to:', response.data);
         setSyncConfig(response.data);
+      } else {
+        console.log('No sync config data returned');
       }
     } catch (error) {
       console.error('Error loading sync config:', error);
