@@ -2285,7 +2285,8 @@ async def complete_care_event(event_id: str, current_user: dict = Depends(get_cu
             member_name=member_name,
             care_event_id=event_id,
             event_type=EventType(event["event_type"]),
-            notes=f"Completed {event['event_type']} task"
+            notes=f"Completed {event['event_type']} task",
+            user_photo_url=current_user.get("photo_url")
         )
         
         # Update member engagement status (since this event now counts as contact)
