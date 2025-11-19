@@ -1072,6 +1072,99 @@ async def list_users(current_admin: dict = Depends(get_current_admin)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.delete("/users/{user_id}")
+
+@api_router.put("/users/{user_id}", response_model=UserResponse)
+async def update_user(user_id: str, update: UserUpdate, current_user: dict = Depends(get_current_user)):
+    """Update a user (full admin only)"""
+    if current_user["role"] != "full_admin":
+        raise HTTPException(status_code=403, detail="Only full administrators can update users")
+    
+    try:
+        update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+        
+        # Normalize phone number if provided
+        if 'phone' in update_data and update_data['phone']:
+            update_data['phone'] = normalize_phone_number(update_data['phone'])
+        
+        # Hash password if provided
+        if 'password' in update_data:
+            update_data['hashed_password'] = get_password_hash(update_data['password'])
+            del update_data['password']
+        
+        update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+        
+        result = await db.users.update_one(
+            {"id": user_id},
+            {"$set": update_data}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        updated_user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        
+        # Get campus name if campus_id exists
+        if updated_user.get("campus_id"):
+            campus = await db.campuses.find_one({"id": updated_user["campus_id"]}, {"_id": 0})
+            updated_user["campus_name"] = campus["campus_name"] if campus else None
+        
+        return updated_user
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating user: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/users/{user_id}/photo")
+async def upload_user_photo(user_id: str, file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
+    """Upload user profile photo"""
+    # Users can upload their own photo or full admin can upload for others
+    if current_user["id"] != user_id and current_user["role"] != "full_admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    try:
+        # Validate file type
+        allowed_types = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/heic", "image/heif"]
+        if file.content_type not in allowed_types:
+            raise HTTPException(status_code=400, detail="Invalid file type. Only images allowed.")
+        
+        # Create uploads directory if not exists
+        upload_dir = Path(ROOT_DIR) / "user_photos"
+        upload_dir.mkdir(exist_ok=True)
+        
+        # Generate filename
+        file_ext = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
+        filename = f"USER-{user_id[:8]}.{file_ext}"
+        filepath = upload_dir / filename
+        
+        # Save file
+        contents = await file.read()
+        
+        # Resize image to 400x400
+        img = Image.open(BytesIO(contents))
+        img = img.convert('RGB')
+        img.thumbnail((400, 400), Image.Resampling.LANCZOS)
+        img.save(filepath, 'JPEG', quality=85)
+        
+        # Update user record
+        photo_url = f"/api/user-photos/{filename}"
+        await db.users.update_one(
+            {"id": user_id},
+            {"$set": {
+                "photo_url": photo_url,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        return {"message": "Photo uploaded successfully", "photo_url": photo_url}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error uploading user photo: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 async def delete_user(user_id: str, current_admin: dict = Depends(get_current_admin)):
     """Delete a user (admin only)"""
     try:
