@@ -773,11 +773,14 @@ export const Settings = () => {
                   <Label>API Username</Label>
                   <Input 
                     type="text"
-                    placeholder="faithtracker-sync@yourdomain.com or username"
+                    placeholder="admin@yourdomain.com"
                     value={syncConfig.api_email}
                     onChange={(e) => setSyncConfig({...syncConfig, api_email: e.target.value})}
                   />
-                  <p className="text-xs text-gray-500 mt-1">Username for API authentication (can be email or any string)</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Username for API authentication. 
+                    <strong className="text-yellow-600"> Note:</strong> FaithFlow Enterprise requires email format (user@domain.com)
+                  </p>
                 </div>
                 
                 <div>
