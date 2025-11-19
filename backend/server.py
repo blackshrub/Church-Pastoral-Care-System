@@ -1721,7 +1721,8 @@ async def ignore_care_event(event_id: str, user: dict = Depends(get_current_user
             member_name=member_name,
             care_event_id=event_id,
             event_type=EventType(event["event_type"]),
-            notes=f"Ignored {event['event_type']} task"
+            notes=f"Ignored {event['event_type']} task",
+            user_photo_url=user.get("photo_url")
         )
         
         # Invalidate dashboard cache
@@ -2381,7 +2382,8 @@ async def send_care_event_reminder(event_id: str, current_user: dict = Depends(g
                 member_name=member["name"],
                 care_event_id=event_id,
                 event_type=EventType(event["event_type"]),
-                notes=f"Sent WhatsApp reminder for {event['event_type']}"
+                notes=f"Sent WhatsApp reminder for {event['event_type']}",
+                user_photo_url=current_user.get("photo_url")
             )
         
         return result
@@ -3036,7 +3038,8 @@ async def clear_all_ignored_occurrences(schedule_id: str, current_user: dict = D
             action_type=ActivityActionType.CLEAR_IGNORED,
             member_id=schedule["member_id"],
             member_name=member_name,
-            notes=f"Cleared all ignored occurrences for {schedule.get('aid_type', 'financial aid')} schedule"
+            notes=f"Cleared all ignored occurrences for {schedule.get('aid_type', 'financial aid')} schedule",
+            user_photo_url=current_user.get("photo_url")
         )
         
         # Invalidate dashboard cache
@@ -3108,7 +3111,8 @@ async def stop_aid_schedule(schedule_id: str, current_user: dict = Depends(get_c
             action_type=ActivityActionType.STOP_SCHEDULE,
             member_id=schedule["member_id"],
             member_name=member_name,
-            notes=f"Stopped {schedule.get('aid_type', 'financial aid')} schedule"
+            notes=f"Stopped {schedule.get('aid_type', 'financial aid')} schedule",
+            user_photo_url=current_user.get("photo_url")
         )
         
         # Invalidate dashboard cache
