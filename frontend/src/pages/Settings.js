@@ -794,8 +794,51 @@ export const Settings = () => {
 
                 {/* Sync Filters */}
                 <div className="border-t pt-4 mt-4">
-                  <h4 className="font-medium text-sm mb-3">Sync Filters (Optional)</h4>
-                  <p className="text-xs text-gray-600 mb-4">Only sync members matching these criteria. Leave empty to sync all members.</p>
+                  <h4 className="font-medium text-sm mb-2">Sync Filters (Optional)</h4>
+                  
+                  {/* Filter Mode Selector */}
+                  <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                    <Label className="mb-2 block">Filter Mode</Label>
+                    <Select value={syncConfig.filter_mode} onValueChange={(v) => setSyncConfig({...syncConfig, filter_mode: v})}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="include">
+                          <div className="flex flex-col">
+                            <span className="font-medium">Include Mode</span>
+                            <span className="text-xs text-gray-500">Only sync members matching the filters below</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="exclude">
+                          <div className="flex flex-col">
+                            <span className="font-medium">Exclude Mode</span>
+                            <span className="text-xs text-gray-500">Sync all members EXCEPT those matching the filters</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    <div className={`mt-3 p-2 rounded text-xs ${syncConfig.filter_mode === 'include' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+                      <p className={`font-medium mb-1 ${syncConfig.filter_mode === 'include' ? 'text-green-900' : 'text-red-900'}`}>
+                        {syncConfig.filter_mode === 'include' ? '✓ Include Mode' : '✗ Exclude Mode'}
+                      </p>
+                      <p className={syncConfig.filter_mode === 'include' ? 'text-green-700' : 'text-red-700'}>
+                        {syncConfig.filter_mode === 'include' 
+                          ? 'Only members matching ALL the filters below will be synced to FaithTracker. All others are ignored.'
+                          : 'All members will be synced EXCEPT those matching the filters below. Matching members are skipped.'
+                        }
+                      </p>
+                      <p className="mt-2 text-gray-600">
+                        <strong>Example:</strong> {syncConfig.filter_mode === 'include' 
+                          ? 'Filters: Female + Age 18-35 → Only syncs women aged 18-35'
+                          : 'Filters: Female + Age 18-35 → Syncs everyone EXCEPT women aged 18-35'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <p className="text-xs text-gray-600 mb-4">Configure filters below. Leave all empty to sync all members.</p>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
