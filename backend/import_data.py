@@ -122,7 +122,7 @@ async def import_campuses_and_data():
                     "notes": None,
                     "photo_url": None,
                     "last_contact_date": None,
-                    "engagement_status": "inactive",
+                    "engagement_status": "disconnected",
                     "days_since_last_contact": 999,
                     "created_at": datetime.now(timezone.utc).isoformat(),
                     "updated_at": datetime.now(timezone.utc).isoformat()
@@ -375,7 +375,7 @@ async def import_campuses_and_data():
             {"id": member["id"]},
             {"$set": {
                 "last_contact_date": event_date.isoformat(),
-                "engagement_status": "active" if days_ago < 30 else ("at_risk" if days_ago < 60 else "inactive"),
+                "engagement_status": "active" if days_ago < 30 else ("at_risk" if days_ago < 90 else "disconnected"),
                 "days_since_last_contact": days_ago
             }}
         )
