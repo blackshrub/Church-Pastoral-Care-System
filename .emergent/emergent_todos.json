@@ -1,14 +1,22 @@
 [
   {
     "content": "Add edit user functionality in AdminDashboard page",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add phone number column to users table in AdminDashboard",
+    "status": "completed"
+  },
+  {
+    "content": "Backend: Add PUT /users/{id} endpoint for updating users",
+    "status": "in_progress"
+  },
+  {
+    "content": "Backend: Add user profile photo upload endpoint",
     "status": "pending"
   },
   {
-    "content": "Add user profile photo upload capability (backend + frontend)",
+    "content": "Frontend: Add profile photo upload to Settings page",
     "status": "pending"
   },
   {
@@ -16,7 +24,7 @@
     "status": "pending"
   },
   {
-    "content": "Display user photos in other relevant places (navigation, activity timeline)",
+    "content": "Display user photos in Layout/Navigation",
     "status": "pending"
   },
   {
