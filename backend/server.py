@@ -2797,40 +2797,7 @@ async def complete_accident_stage(stage_id: str, notes: Optional[str] = None, cu
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Accident follow-up stage not found")
         
-        # Get campus timezone for correct date
-        campus_tz = await get_campus_timezone(stage["campus_id"])
-        today_date = get_date_in_timezone(campus_tz)
-        
-        # Get parent accident event for description
-        parent_event = await db.care_events.find_one(
-            {"id": stage["care_event_id"]},
-            {"_id": 0, "description": 1, "title": 1, "hospital_name": 1}
-        )
-        
-        # Create a care event for this followup completion (adds to timeline)
-        contact_event_id = str(uuid.uuid4())
-        await db.care_events.insert_one({
-            "id": contact_event_id,
-            "member_id": stage["member_id"],
-            "campus_id": stage["campus_id"],
-            "event_type": "accident_illness",
-            "event_date": today_date,  # Use campus timezone date
-            "title": f"Accident Follow-up: {stage['stage'].replace('_', ' ')}",
-            "description": (parent_event.get("description") if parent_event else "") + 
-                          (f"\nFacility: {parent_event.get('hospital_name', 'N/A')}" if parent_event else "") +
-                          (f"\n{notes}" if notes else ""),
-            "accident_stage_id": stage_id,  # Link to accident stage for undo
-            "completed": True,
-            "completed_at": datetime.now(timezone.utc).isoformat(),
-            "completed_by_user_id": current_user["id"],
-            "completed_by_user_name": current_user["name"],
-            "created_by_user_id": current_user["id"],
-            "created_by_user_name": current_user["name"],
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        })
-        
-        # Log activity
+        # Log activity (no timeline entry - stage itself tracks completion)
         await log_activity(
             campus_id=stage["campus_id"],
             user_id=current_user["id"],
@@ -2838,12 +2805,12 @@ async def complete_accident_stage(stage_id: str, notes: Optional[str] = None, cu
             action_type=ActivityActionType.COMPLETE_TASK,
             member_id=stage["member_id"],
             member_name=member_name,
-            care_event_id=contact_event_id,
             event_type=EventType.ACCIDENT_ILLNESS,
             notes=f"Completed accident/illness follow-up: {stage['stage'].replace('_', ' ')}",
             user_photo_url=current_user.get("photo_url")
         )
         
+        # Update member's last contact date
         await db.members.update_one(
             {"id": stage["member_id"]},
             {"$set": {"last_contact_date": datetime.now(timezone.utc).isoformat()}}
