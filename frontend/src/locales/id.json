@@ -310,12 +310,12 @@
   "_comment_grief": "Grief Support",
   "grief_stages": {
     "mourning": "Upacara Dukacita",
-    "1_week": "1 Minggu Setelah",
-    "2_weeks": "2 Minggu Setelah",
-    "1_month": "1 Bulan Setelah",
-    "3_months": "3 Bulan Setelah",
-    "6_months": "6 Bulan Setelah",
-    "1_year": "1 Tahun Setelah"
+    "1_week": "Tindak Lanjut Pertama",
+    "2_weeks": "Tindak Lanjut Kedua",
+    "1_month": "Tindak Lanjut Ketiga",
+    "3_months": "Tindak Lanjut Keempat",
+    "6_months": "Tindak Lanjut Kelima",
+    "1_year": "Tindak Lanjut Keenam (Peringatan 1 Tahun)"
   },
   
   "_comment_messages": "Messages",
