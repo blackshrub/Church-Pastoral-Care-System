@@ -1132,7 +1132,7 @@ export const Settings = () => {
                     onClick={saveSyncConfig}
                     className="bg-teal-500 hover:bg-teal-600 text-white"
                   >
-                    Save Configuration
+                    {syncConfig.is_enabled ? 'Save Configuration & Sync Now' : 'Save Configuration'}
                   </Button>
                 </div>
               </CardContent>
