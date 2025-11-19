@@ -245,7 +245,7 @@ class FamilyGroup(BaseModel):
 
 class MemberCreate(BaseModel):
     name: str
-    phone: str
+    phone: Optional[str] = None
     campus_id: str
     family_group_id: Optional[str] = None
     family_group_name: Optional[str] = None
