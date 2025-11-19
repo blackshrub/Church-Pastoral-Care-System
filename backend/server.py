@@ -5102,16 +5102,6 @@ async def discover_fields_from_core(config_test: SyncConfigCreate, current_user:
         logger.error(f"Error discovering fields: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-            await db.sync_configs.insert_one(sync_config.model_dump())
-        
-        return {"success": True, "message": "Sync configuration saved"}
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error saving sync config: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 @api_router.get("/sync/config")
 async def get_sync_config(current_user: dict = Depends(get_current_user)):
     """Get sync configuration for campus"""
