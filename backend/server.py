@@ -2960,21 +2960,39 @@ async def delete_aid_schedule(schedule_id: str, current_user: dict = Depends(get
 async def stop_aid_schedule(schedule_id: str, current_user: dict = Depends(get_current_user)):
     """Manually stop a financial aid schedule"""
     try:
-        # Get schedule first to get campus_id
-        schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0, "campus_id": 1})
+        # Get schedule first
+        schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0})
         if not schedule:
             raise HTTPException(status_code=404, detail="Schedule not found")
+        
+        # Get member name for logging
+        member = await db.members.find_one({"id": schedule["member_id"]}, {"_id": 0})
+        member_name = member["name"] if member else "Unknown"
         
         result = await db.financial_aid_schedules.update_one(
             {"id": schedule_id},
             {"$set": {
                 "is_active": False,
+                "stopped_by_user_id": current_user["id"],
+                "stopped_by_user_name": current_user["name"],
+                "stopped_at": datetime.now(timezone.utc).isoformat(),
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }}
         )
         
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Schedule not found")
+        
+        # Log activity
+        await log_activity(
+            campus_id=schedule["campus_id"],
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            action_type=ActivityActionType.STOP_SCHEDULE,
+            member_id=schedule["member_id"],
+            member_name=member_name,
+            notes=f"Stopped {schedule.get('aid_type', 'financial aid')} schedule"
+        )
         
         # Invalidate dashboard cache
         await invalidate_dashboard_cache(schedule["campus_id"])
