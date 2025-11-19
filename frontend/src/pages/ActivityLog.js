@@ -114,16 +114,19 @@ const ActivityLog = () => {
     // CSV headers
     const headers = ['Date', 'Time', 'Staff Member', 'Action', 'Member', 'Event Type', 'Notes'];
     
-    // CSV rows
-    const rows = logs.map(log => [
-      new Date(log.created_at).toLocaleDateString(),
-      new Date(log.created_at).toLocaleTimeString(),
-      log.user_name,
-      formatActionType(log.action_type),
-      log.member_name || '-',
-      log.event_type ? formatEventType(log.event_type) : '-',
-      log.notes || '-'
-    ]);
+    // CSV rows with timezone-aware formatting
+    const rows = logs.map(log => {
+      const { date, time } = formatDateTime(log.created_at);
+      return [
+        date,
+        time,
+        log.user_name,
+        formatActionType(log.action_type),
+        log.member_name || '-',
+        log.event_type ? formatEventType(log.event_type) : '-',
+        log.notes || '-'
+      ];
+    });
 
     // Create CSV content
     const csvContent = [
