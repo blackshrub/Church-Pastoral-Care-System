@@ -5167,36 +5167,64 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                 existing_map = {m.get("external_member_id"): m for m in existing_members if m.get("external_member_id")}
                 
                 # Apply filters
+                filter_mode = config.get("filter_mode", "include")
                 filtered_members = []
-                for core_member in core_members:
-                    # Gender filter
-                    if config.get("filter_gender") and core_member.get("gender") != config["filter_gender"]:
-                        continue
-                    
-                    # Age filter
-                    if config.get("filter_age_min") or config.get("filter_age_max"):
-                        dob = core_member.get("date_of_birth")
-                        if dob:
-                            try:
-                                birth_date = date.fromisoformat(dob) if isinstance(dob, str) else dob
-                                age = (date.today() - birth_date).days // 365
-                                
-                                if config.get("filter_age_min") and age < config["filter_age_min"]:
-                                    continue
-                                if config.get("filter_age_max") and age > config["filter_age_max"]:
-                                    continue
-                            except:
-                                pass  # Skip age filter if date parsing fails
-                    
-                    # Member status filter
-                    if config.get("filter_member_status") and len(config["filter_member_status"]) > 0:
-                        member_status = core_member.get("member_status")
-                        if member_status not in config["filter_member_status"]:
-                            continue
-                    
-                    filtered_members.append(core_member)
                 
-                logger.info(f"Filtered {len(core_members)} members to {len(filtered_members)} based on sync filters")
+                for core_member in core_members:
+                    matches_filter = True  # Assume matches by default
+                    
+                    # Check if member matches any filter criteria
+                    has_filters = any([
+                        config.get("filter_gender"),
+                        config.get("filter_age_min"),
+                        config.get("filter_age_max"),
+                        config.get("filter_member_status")
+                    ])
+                    
+                    if has_filters:
+                        # Start with no match, check each filter
+                        matches_criteria = True
+                        
+                        # Gender filter
+                        if config.get("filter_gender"):
+                            if core_member.get("gender") != config["filter_gender"]:
+                                matches_criteria = False
+                        
+                        # Age filter
+                        if matches_criteria and (config.get("filter_age_min") or config.get("filter_age_max")):
+                            dob = core_member.get("date_of_birth")
+                            if dob:
+                                try:
+                                    birth_date = date.fromisoformat(dob) if isinstance(dob, str) else dob
+                                    age = (date.today() - birth_date).days // 365
+                                    
+                                    if config.get("filter_age_min") and age < config["filter_age_min"]:
+                                        matches_criteria = False
+                                    if config.get("filter_age_max") and age > config["filter_age_max"]:
+                                        matches_criteria = False
+                                except:
+                                    matches_criteria = False  # Skip if date parsing fails
+                        
+                        # Member status filter
+                        if matches_criteria and config.get("filter_member_status") and len(config["filter_member_status"]) > 0:
+                            member_status = core_member.get("member_status")
+                            if member_status not in config["filter_member_status"]:
+                                matches_criteria = False
+                        
+                        # Apply include/exclude logic
+                        if filter_mode == "include":
+                            # Include mode: only sync if matches criteria
+                            if matches_criteria:
+                                filtered_members.append(core_member)
+                        else:
+                            # Exclude mode: sync everyone EXCEPT those matching criteria
+                            if not matches_criteria:
+                                filtered_members.append(core_member)
+                    else:
+                        # No filters defined, sync all
+                        filtered_members.append(core_member)
+                
+                logger.info(f"Filter mode: {filter_mode}. Filtered {len(core_members)} members to {len(filtered_members)}")
                 
                 # Update stats
                 stats["fetched"] = len(filtered_members)
