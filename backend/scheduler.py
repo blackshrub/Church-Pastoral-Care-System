@@ -422,10 +422,23 @@ def start_scheduler():
             replace_existing=True
         )
         
+        # Run daily reconciliation at 3 AM Jakarta time
+        scheduler.add_job(
+            member_reconciliation_job,
+            'cron',
+            hour=3,
+            minute=0,
+            timezone='Asia/Jakarta',
+            id='member_reconciliation',
+            name='Daily Member Reconciliation',
+            replace_existing=True
+        )
+        
         scheduler.start()
         logger.info("✅ Scheduler started successfully")
         logger.info("  - Midnight cache refresh: 00:00 Asia/Jakarta")
         logger.info("  - Daily digest: 08:00 Asia/Jakarta")
+        logger.info("  - Member reconciliation: 03:00 Asia/Jakarta")
     except Exception as e:
         logger.error(f"Error starting scheduler: {str(e)}")
 
