@@ -3571,6 +3571,30 @@ async def ignore_accident_stage(stage_id: str, user: dict = Depends(get_current_
             }}
         )
         
+        # Create ignored timeline entry
+        campus_tz = await get_campus_timezone(stage["campus_id"])
+        today_date = get_date_in_timezone(campus_tz)
+        
+        ignored_event_id = str(uuid.uuid4())
+        await db.care_events.insert_one({
+            "id": ignored_event_id,
+            "member_id": stage["member_id"],
+            "campus_id": stage["campus_id"],
+            "event_type": "accident_illness",
+            "event_date": today_date,
+            "title": f"Accident Follow-up: {stage['stage'].replace('_', ' ')} (Ignored)",
+            "description": f"Stage was marked as ignored/not applicable",
+            "accident_stage_id": stage_id,
+            "ignored": True,
+            "ignored_at": datetime.now(timezone.utc).isoformat(),
+            "ignored_by": user.get("id"),
+            "ignored_by_name": user.get("name"),
+            "created_by_user_id": user.get("id"),
+            "created_by_user_name": user.get("name"),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        })
+        
         # Log activity
         await log_activity(
             campus_id=stage["campus_id"],
@@ -3579,6 +3603,8 @@ async def ignore_accident_stage(stage_id: str, user: dict = Depends(get_current_
             action_type=ActivityActionType.IGNORE_TASK,
             member_id=stage["member_id"],
             member_name=member_name,
+            care_event_id=ignored_event_id,
+            event_type=EventType.ACCIDENT_ILLNESS,
             notes=f"Ignored accident/illness follow-up: {stage['stage'].replace('_', ' ')}",
             user_photo_url=user.get("photo_url")
         )
