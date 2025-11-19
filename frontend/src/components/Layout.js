@@ -38,11 +38,19 @@ export const Layout = ({ children }) => {
               <div className="flex items-center gap-2">
                 {/* User Info Display - No Dropdown on Mobile */}
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 bg-teal-100 rounded-full flex items-center justify-center">
-                    <span className="text-xs font-semibold text-teal-700">
-                      {user?.name?.charAt(0).toUpperCase()}
-                    </span>
-                  </div>
+                  {user?.photo_url ? (
+                    <img 
+                      src={`${process.env.REACT_APP_BACKEND_URL}${user.photo_url}`}
+                      alt={user.name}
+                      className="w-7 h-7 rounded-full object-cover border border-teal-200"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 bg-teal-100 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-semibold text-teal-700">
+                        {user?.name?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <LanguageToggle />
               </div>
