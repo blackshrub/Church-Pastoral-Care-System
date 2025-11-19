@@ -3424,6 +3424,10 @@ async def ignore_financial_aid_schedule(schedule_id: str, user: dict = Depends(g
         if not schedule:
             raise HTTPException(status_code=404, detail="Financial aid schedule not found")
         
+        # Get member name for logging
+        member = await db.members.find_one({"id": schedule["member_id"]}, {"_id": 0, "name": 1})
+        member_name = member["name"] if member else "Unknown"
+        
         current_occurrence = schedule.get("next_occurrence")
         if not current_occurrence:
             raise HTTPException(status_code=400, detail="No next occurrence to ignore")
