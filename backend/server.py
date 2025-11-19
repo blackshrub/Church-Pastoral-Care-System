@@ -4678,14 +4678,18 @@ async def get_activity_logs(
         
         # Date range filter (default: last 30 days)
         if not start_date:
-            start_date = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
+            start_datetime = datetime.now(timezone.utc) - timedelta(days=30)
+        else:
+            start_datetime = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
         
         if not end_date:
-            end_date = datetime.now(timezone.utc).isoformat()
+            end_datetime = datetime.now(timezone.utc)
+        else:
+            end_datetime = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
         
         query["created_at"] = {
-            "$gte": start_date,
-            "$lte": end_date
+            "$gte": start_datetime,
+            "$lte": end_datetime
         }
         
         # Get logs
