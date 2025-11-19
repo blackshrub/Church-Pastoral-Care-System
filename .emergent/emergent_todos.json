@@ -1,14 +1,14 @@
 [
   {
     "content": "Replace ignored badge with disabled grey 'Ignored' button in grief tab",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Fix accident ignore toast error (use queryClient invalidation)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Apply same button style to accident tab for ignored stages",
-    "status": "pending"
+    "status": "completed"
   }
 ]
