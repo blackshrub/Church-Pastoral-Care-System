@@ -53,7 +53,7 @@ const ActivityLog = () => {
       const formattedDate = dateFormatter.format(date);
       const formattedTime = timeFormatter.format(date);
       
-      console.log(`Input: ${dateString} | UTC: ${utcTimestamp} | Output: ${formattedDate} ${formattedTime} | TZ: ${campusTimezone}`);
+      // Debug: console.log(`Input: ${dateString} | UTC: ${utcTimestamp} | Output: ${formattedDate} ${formattedTime} | TZ: ${campusTimezone}`);
       
       return {
         date: formattedDate,
