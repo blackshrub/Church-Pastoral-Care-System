@@ -534,28 +534,56 @@ mongo_url = "$MONGO_URL"
 db_name = "$DB_NAME"
 admin_email = "$ADMIN_EMAIL"
 admin_password = "$ADMIN_PASSWORD"
+admin_name = "$ADMIN_NAME"
+admin_phone = "$ADMIN_PHONE"
+campus_name = "$CAMPUS_NAME"
+campus_location = "$CAMPUS_LOCATION"
+campus_timezone = "$CAMPUS_TIMEZONE"
 
 client = AsyncIOMotorClient(mongo_url)
 db = client[db_name]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-async def create_admin():
+async def setup_database():
+    # Create first admin user
     user = {
+        "id": str(uuid.uuid4()),
         "email": admin_email,
         "password_hash": pwd_context.hash(admin_password),
-        "name": "Administrator",
+        "hashed_password": pwd_context.hash(admin_password),
+        "name": admin_name,
+        "phone": admin_phone,
         "role": "full_admin",
-        "church_id": None
+        "campus_id": None,
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
     }
     
-    existing = await db.users.find_one({"email": user["email"]})
-    if existing:
+    existing_user = await db.users.find_one({"email": user["email"]})
+    if existing_user:
         print("Admin user already exists")
     else:
         await db.users.insert_one(user)
-        print(f"Admin user created: {user['email']}")
+        print(f"Admin user created: {admin_name} ({admin_email})")
+    
+    # Create first campus
+    campus = {
+        "id": str(uuid.uuid4()),
+        "campus_name": campus_name,
+        "location": campus_location,
+        "timezone": campus_timezone,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    existing_campus = await db.campuses.find_one({"campus_name": campus_name})
+    if existing_campus:
+        print("Campus already exists")
+    else:
+        await db.campuses.insert_one(campus)
+        print(f"Campus created: {campus_name}")
 
-asyncio.run(create_admin())
+asyncio.run(setup_database())
 PYTHON_SCRIPT
     
     print_success "Backend setup complete"
