@@ -217,9 +217,14 @@ export const Settings = () => {
       setCampusCount(response.data.length);
       
       // Load timezone from user's campus
-      if (user?.campus_id) {
-        const campusRes = await axios.get(`${API}/campuses/${user.campus_id}`);
-        setCampusTimezone(campusRes.data.timezone || 'Asia/Jakarta');
+      if (user?.campus_id && user.campus_id !== 'campus_id') {
+        try {
+          const campusRes = await axios.get(`${API}/campuses/${user.campus_id}`);
+          setCampusTimezone(campusRes.data.timezone || 'Asia/Jakarta');
+        } catch (error) {
+          console.error('Error loading campus timezone:', error);
+          setCampusTimezone('Asia/Jakarta');
+        }
       }
       
       // Load writeoff settings
