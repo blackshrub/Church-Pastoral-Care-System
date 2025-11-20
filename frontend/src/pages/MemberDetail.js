@@ -1241,17 +1241,17 @@ export const MemberDetail = () => {
                       </div>
                       
                       {/* Display additional visits */}
-                      {careEvents.filter(e => 
-                        e.care_event_id === event.id && 
-                        e.followup_type === "additional"
-                      ).length > 0 && (
-                        <div className="mt-4">
-                          <h5 className="text-sm font-semibold mb-3 text-gray-700">📝 Additional Visits:</h5>
-                          <div className="space-y-2">
-                            {careEvents.filter(e => 
-                              e.care_event_id === event.id && 
-                              e.followup_type === "additional"
-                            ).map((visit) => (
+                      {(() => {
+                        const additionalVisits = careEvents.filter(e => 
+                          e.care_event_id === event.id && 
+                          e.followup_type === "additional"
+                        );
+                        console.log(`Additional visits for grief event ${event.id}:`, additionalVisits);
+                        return additionalVisits.length > 0 && (
+                          <div className="mt-4">
+                            <h5 className="text-sm font-semibold mb-3 text-gray-700">📝 Additional Visits:</h5>
+                            <div className="space-y-2">
+                              {additionalVisits.map((visit) => (
                               <div key={visit.id} className="flex items-start gap-3 p-2 bg-gray-50 rounded border border-gray-200">
                                 <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-300">
                                   <span className="text-white text-xs">✓</span>
