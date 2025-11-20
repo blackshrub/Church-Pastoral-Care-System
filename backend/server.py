@@ -402,6 +402,7 @@ class SetupAdminRequest(BaseModel):
     email: EmailStr
     password: str
     name: str
+    phone: str  # Required for WhatsApp notifications
 
 class SetupCampusRequest(BaseModel):
     campus_name: str
