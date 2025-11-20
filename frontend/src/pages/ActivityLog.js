@@ -1,3 +1,9 @@
+/**
+ * Activity Log Page - Staff accountability and action tracking
+ * Displays complete audit trail of all user actions with filtering and CSV export
+ * Tracks WHO did WHAT on WHICH member with timezone-aware timestamps
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
