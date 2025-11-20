@@ -36,7 +36,7 @@ ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY')
 if not ENCRYPTION_KEY:
     # Generate a key for development (in production, set in .env)
     ENCRYPTION_KEY = Fernet.generate_key().decode()
-    logger.warning("ENCRYPTION_KEY not set in .env - using temporary key. Set ENCRYPTION_KEY in production!")
+    print("WARNING: ENCRYPTION_KEY not set in .env - using temporary key. Set ENCRYPTION_KEY in production!")
 
 cipher_suite = Fernet(ENCRYPTION_KEY.encode() if isinstance(ENCRYPTION_KEY, str) else ENCRYPTION_KEY)
 
