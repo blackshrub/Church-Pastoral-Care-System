@@ -175,6 +175,33 @@ export const MemberDetail = () => {
       console.error('Full error:', error);
       const errorMsg = error.response?.data?.detail || error.message || 'Unknown error';
       toast.error('Failed to log visit: ' + errorMsg);
+
+  // Confirmation dialog state
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    title: '',
+    description: '',
+    onConfirm: () => {}
+  });
+  
+  const showConfirm = (title, description, onConfirm) => {
+    setConfirmDialog({
+      open: true,
+      title,
+      description,
+      onConfirm
+    });
+  };
+  
+  const closeConfirm = () => {
+    setConfirmDialog({
+      open: false,
+      title: '',
+      description: '',
+      onConfirm: () => {}
+    });
+  };
+
     }
   };
 
