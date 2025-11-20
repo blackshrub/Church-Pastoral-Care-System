@@ -2268,6 +2268,31 @@ async def create_care_event(event: CareEventCreate, current_user: dict = Depends
             user_photo_url=current_user.get("photo_url")
         )
         
+        # Auto-generate grief support timeline if grief/loss event (use event_date as mourning date)
+        if event.event_type == EventType.GRIEF_LOSS:
+            timeline = generate_grief_timeline(
+                event.event_date,  # Use event_date as mourning date
+                care_event.id,
+                event.member_id
+            )
+            if timeline:
+                # Add campus_id to all timeline stages
+                for stage in timeline:
+                    stage['campus_id'] = campus_id
+                await db.grief_support.insert_many(timeline)
+                logger.info(f"Generated {len(timeline)} grief support stages for member {event.member_id}")
+        
+        # Auto-generate accident/illness follow-up timeline
+        if event.event_type == EventType.ACCIDENT_ILLNESS:
+            timeline = generate_accident_followup_timeline(
+                event.event_date,
+                care_event.id,
+                event.member_id,
+                campus_id
+            )
+            if timeline:
+                await db.accident_followup.insert_many(timeline)
+                logger.info(f"Generated {len(timeline)} accident follow-up stages for member {event.member_id}")
 
         # Update member's last contact date for completed one-time events or non-birthday events
         if is_one_time or (event.event_type != EventType.BIRTHDAY):
