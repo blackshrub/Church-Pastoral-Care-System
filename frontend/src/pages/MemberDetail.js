@@ -135,23 +135,29 @@ export const MemberDetail = () => {
     end_year: null
   });
 
-  const [additionalVisitModal, setAdditionalVisitModal] = useState(false);
-  const [selectedParentEvent, setSelectedParentEvent] = useState(null);
+  const [additionalVisitForm, setAdditionalVisitForm] = useState({});
   const [additionalVisit, setAdditionalVisit] = useState({
     visit_date: new Date().toISOString().split('T')[0],
     visit_type: 'Phone Call',
     notes: ''
   });
   
-  const logAdditionalVisit = async () => {
+  const toggleAdditionalForm = (eventId) => {
+    setAdditionalVisitForm(prev => ({
+      ...prev,
+      [eventId]: !prev[eventId]
+    }));
+  };
+  
+  const logAdditionalVisit = async (parentEvent) => {
     try {
-      await axios.post(`${API}/care-events/${selectedParentEvent.id}/additional-visit`, {
+      await axios.post(`${API}/care-events/${parentEvent.id}/additional-visit`, {
         visit_date: additionalVisit.visit_date,
         visit_type: additionalVisit.visit_type,
         notes: additionalVisit.notes
       });
       toast.success('Additional visit logged successfully');
-      setAdditionalVisitModal(false);
+      setAdditionalVisitForm({});
       setAdditionalVisit({
         visit_date: new Date().toISOString().split('T')[0],
         visit_type: 'Phone Call',
