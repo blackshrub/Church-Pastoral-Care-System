@@ -1,11 +1,11 @@
 [
   {
     "content": "Remove console.log debug statements from production code",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Replace native confirm() dialogs with custom Dialog component",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Add one-line comment at top of main files explaining purpose",
