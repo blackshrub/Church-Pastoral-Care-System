@@ -558,7 +558,7 @@ class User(BaseModel):
     name: str
     role: UserRole
     campus_id: Optional[str] = None
-    phone: str  # For receiving pastoral care task reminders
+    phone: Optional[str] = None  # For receiving pastoral care task reminders
     photo_url: Optional[str] = None
     hashed_password: str
     is_active: bool = True
