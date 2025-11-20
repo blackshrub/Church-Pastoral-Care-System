@@ -5907,6 +5907,14 @@ async def get_sync_logs(current_user: dict = Depends(get_current_user), limit: i
         
         logs = await db.sync_logs.find(
             {"campus_id": campus_id},
+            {"_id": 0}
+        ).sort("started_at", -1).limit(limit).to_list(limit)
+        
+        return logs
+    
+    except Exception as e:
+        logger.error(f"Error getting sync logs: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ==================== SETUP WIZARD ENDPOINTS ====================
