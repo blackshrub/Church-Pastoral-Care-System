@@ -5,30 +5,30 @@
   },
   {
     "content": "Replace native confirm() dialogs with custom Dialog component",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Add one-line comment at top of main files explaining purpose",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Implement encryption for sync credentials (cryptography library)",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Verify .env and .env.example have all required variables",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Update version number to 2.0.0 in package.json",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Add MIT LICENSE file",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Add screenshots section to README",
-    "status": "pending"
+    "status": "completed"
   }
 ]
