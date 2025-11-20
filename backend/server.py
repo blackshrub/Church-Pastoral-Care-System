@@ -5836,27 +5836,19 @@ async def receive_sync_webhook(request: Request):
                             "message": f"Member archived: {member_id}"
                         }
                     else:
-                        # Fetch specific member from core
-                        members_response = await client.get(
-                            f"{config['api_base_url']}/api/members/",
+                        # Fetch specific member directly from core
+                        member_response = await client.get(
+                            f"{config['api_base_url']}/api/members/{member_id}",
                             headers={"Authorization": f"Bearer {token}"}
                         )
                         
-                        if members_response.status_code != 200:
-                            raise Exception("Failed to fetch members")
-                        
-                        all_members = members_response.json()
-                        if isinstance(all_members, dict) and 'data' in all_members:
-                            all_members = all_members['data']
-                        
-                        # Find the specific member
-                        core_member = next((m for m in all_members if m.get("id") == member_id), None)
-                        
-                        if not core_member:
+                        if member_response.status_code != 200:
                             return {
                                 "success": False,
-                                "message": f"Member {member_id} not found in core system"
+                                "message": f"Member {member_id} not found in core system (status: {member_response.status_code})"
                             }
+                        
+                        core_member = member_response.json()
                         
                         # Prepare member data
                         member_data = {
