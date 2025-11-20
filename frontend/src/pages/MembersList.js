@@ -33,6 +33,22 @@ const API = `${BACKEND_URL}/api`;
 export const MembersList = () => {
   const { t } = useTranslation();
   const [members, setMembers] = useState([]);
+
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    title: '',
+    description: '',
+    onConfirm: () => {}
+  });
+  
+  const showConfirm = (title, description, onConfirm) => {
+    setConfirmDialog({ open: true, title, description, onConfirm });
+  };
+  
+  const closeConfirm = () => {
+    setConfirmDialog({ open: false, title: '', description: '', onConfirm: () => {} });
+  };
+
   const [allMembers, setAllMembers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
