@@ -1549,6 +1549,13 @@ export const MemberDetail = () => {
                           </div>
                         )}
                       </div>
+                      
+                      {/* Display additional visits for accident - Simplified */}
+                      <div className="mt-4">
+                        <h5 className="text-sm font-semibold mb-3 text-gray-700">📝 Additional Visits:</h5>
+                        {careEvents
+                          .filter(e => e.care_event_id === event.id && e.followup_type === "additional")
+                          .map((visit) => (
                             <div key={visit.id} className="flex items-start gap-3 p-2 bg-gray-50 rounded border border-gray-200 mb-2">
                               <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-300">
                                 <span className="text-white text-xs">✓</span>
