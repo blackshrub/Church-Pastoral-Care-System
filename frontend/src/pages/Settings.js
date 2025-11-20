@@ -1318,13 +1318,18 @@ export const Settings = () => {
                         variant="outline" 
                         size="sm"
                         className="text-red-600 border-red-300 hover:bg-red-50"
-                        onClick={async () => {
-                          if (confirm('Disable sync? This will stop automatic syncing but preserve all data.')) {
-                            const updated = {...syncConfig, is_enabled: false};
-                            await axios.post(`${API}/sync/config`, updated);
-                            toast.success('Sync disabled');
-                            loadSyncConfig();
-                          }
+                        onClick={() => {
+                          showConfirm(
+                            'Disable Sync',
+                            'Disable sync? This will stop automatic syncing but preserve all synced data. You can re-enable it anytime.',
+                            async () => {
+                              const updated = {...syncConfig, is_enabled: false};
+                              await axios.post(`${API}/sync/config`, updated);
+                              toast.success('Sync disabled');
+                              loadSyncConfig();
+                              closeConfirm();
+                            }
+                          );
                         }}
                       >
                         Disable Sync
@@ -1334,13 +1339,18 @@ export const Settings = () => {
                         variant="outline" 
                         size="sm"
                         className="text-green-600 border-green-300 hover:bg-green-50"
-                        onClick={async () => {
-                          if (confirm('Enable sync? This will start automatic syncing from core API.')) {
-                            const updated = {...syncConfig, is_enabled: true};
-                            await axios.post(`${API}/sync/config`, updated);
-                            toast.success('Sync enabled');
-                            loadSyncConfig();
-                          }
+                        onClick={() => {
+                          showConfirm(
+                            'Enable Sync',
+                            'Enable sync? This will start automatic syncing from core API. Members will be synced based on your configuration.',
+                            async () => {
+                              const updated = {...syncConfig, is_enabled: true};
+                              await axios.post(`${API}/sync/config`, updated);
+                              toast.success('Sync enabled');
+                              loadSyncConfig();
+                              closeConfirm();
+                            }
+                          );
                         }}
                       >
                         Enable Sync
@@ -1389,16 +1399,22 @@ export const Settings = () => {
                               navigator.clipboard.writeText(syncConfig.webhook_secret);
                               toast.success('Copied!');
                             }}>Copy</Button>
-                            <Button size="sm" variant="outline" className="text-orange-600 border-orange-300" onClick={async () => {
-                              if (confirm('Regenerate webhook secret? You must update the core system with the new secret.')) {
-                                try {
-                                  const response = await axios.post(`${API}/sync/regenerate-secret`);
-                                  toast.success('Secret regenerated. Update core system!');
-                                  await loadSyncConfig();
-                                } catch (error) {
-                                  toast.error('Failed to regenerate secret');
+                            <Button size="sm" variant="outline" className="text-orange-600 border-orange-300" onClick={() => {
+                              showConfirm(
+                                'Regenerate Webhook Secret',
+                                'Regenerate webhook secret? You must update the core system with the new secret after regeneration.',
+                                async () => {
+                                  try {
+                                    const response = await axios.post(`${API}/sync/regenerate-secret`);
+                                    toast.success('Secret regenerated. Update core system!');
+                                    await loadSyncConfig();
+                                    closeConfirm();
+                                  } catch (error) {
+                                    toast.error('Failed to regenerate secret');
+                                    closeConfirm();
+                                  }
                                 }
-                              }
+                              );
                             }}>Regenerate</Button>
                           </div>
                         ) : (
