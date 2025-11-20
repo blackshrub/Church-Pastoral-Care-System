@@ -1714,16 +1714,22 @@ export const Dashboard = () => {
                                 </DropdownMenuItem>
                                 <DropdownMenuItem 
                                   className="text-red-600"
-                                  onClick={async () => {
-                                    if (window.confirm(t('confirmations.stop_schedule', {name: schedule.member_name}))) {
-                                      try {
-                                        await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
-                                        toast.success(t('toasts.schedule_stopped'));
-                                        await queryClient.invalidateQueries(['dashboard']);
-                                      } catch (error) {
-                                        toast.error(t('toasts.failed_stop_schedule'));
+                                  onClick={() => {
+                                    showConfirm(
+                                      'Stop Aid Schedule',
+                                      t('confirmations.stop_schedule', {name: schedule.member_name}),
+                                      async () => {
+                                        try {
+                                          await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
+                                          toast.success(t('toasts.schedule_stopped'));
+                                          await queryClient.invalidateQueries(['dashboard']);
+                                          closeConfirm();
+                                        } catch (error) {
+                                          toast.error(t('toasts.failed_stop_schedule'));
+                                          closeConfirm();
+                                        }
                                       }
-                                    }
+                                    );
                                   }}
                                 >
                                 {t('stop_schedule')}
