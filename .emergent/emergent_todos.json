@@ -1,10 +1,14 @@
 [
   {
-    "content": "Debug additional visit modal not opening (check state initialization)",
-    "status": "completed"
+    "content": "Fix full admin profile edit (enable name, email, phone fields)",
+    "status": "in_progress"
   },
   {
-    "content": "Add delete button for grief parent event (like accident has)",
-    "status": "completed"
+    "content": "Fix PUT /api/campuses/{id} 422 error when saving timezone",
+    "status": "pending"
+  },
+  {
+    "content": "Make automation settings editable for full admin (schedule time, WhatsApp URL)",
+    "status": "pending"
   }
 ]
