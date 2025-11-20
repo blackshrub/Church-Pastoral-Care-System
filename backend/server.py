@@ -4987,8 +4987,24 @@ async def save_sync_config(config: SyncConfigCreate, current_user: dict = Depend
         # Check if config exists
         existing = await db.sync_configs.find_one({"campus_id": campus_id}, {"_id": 0})
         
+        # Get core church_id by logging in to core API
+        core_church_id = None
+        try:
+            import httpx
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                login_response = await client.post(
+                    f"{config.api_base_url.rstrip('/')}/api/auth/login",
+                    json={"email": config.api_email, "password": config.api_password}
+                )
+                if login_response.status_code == 200:
+                    login_data = login_response.json()
+                    core_church_id = login_data.get("user", {}).get("church_id") or login_data.get("church", {}).get("id")
+        except:
+            pass  # If we can't get church_id, continue without it
+        
         sync_config_data = {
             "campus_id": campus_id,
+            "core_church_id": core_church_id,
             "sync_method": config.sync_method,
             "api_base_url": config.api_base_url.rstrip('/'),
             "api_email": config.api_email,
