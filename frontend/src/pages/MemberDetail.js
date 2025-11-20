@@ -1240,16 +1240,22 @@ export const MemberDetail = () => {
                                 size="sm"
                                 variant="ghost"
                                 className="text-red-500 hover:text-red-700"
-                                onClick={async () => {
-                                  if (confirm('Delete this additional visit?')) {
-                                    try {
-                                      await axios.delete(`${API}/care-events/${visit.id}`);
-                                      toast.success('Visit deleted');
-                                      queryClient.invalidateQueries(['member', id]);
-                                    } catch (error) {
-                                      toast.error('Failed to delete');
+                                onClick={() => {
+                                  showConfirm(
+                                    'Delete Additional Visit',
+                                    'Are you sure you want to delete this additional visit? This action cannot be undone.',
+                                    async () => {
+                                      try {
+                                        await axios.delete(`${API}/care-events/${visit.id}`);
+                                        toast.success('Visit deleted');
+                                        queryClient.invalidateQueries(['member', id]);
+                                        closeConfirm();
+                                      } catch (error) {
+                                        toast.error('Failed to delete');
+                                        closeConfirm();
+                                      }
                                     }
-                                  }
+                                  );
                                 }}
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -1500,16 +1506,22 @@ export const MemberDetail = () => {
                                 size="sm"
                                 variant="ghost"
                                 className="text-red-500 hover:text-red-700"
-                                onClick={async () => {
-                                  if (confirm('Delete this additional visit?')) {
-                                    try {
-                                      await axios.delete(`${API}/care-events/${visit.id}`);
-                                      toast.success('Visit deleted');
-                                      queryClient.invalidateQueries(['member', id]);
-                                    } catch (error) {
-                                      toast.error('Failed to delete');
+                                onClick={() => {
+                                  showConfirm(
+                                    'Delete Additional Visit',
+                                    'Are you sure you want to delete this additional visit? This action cannot be undone.',
+                                    async () => {
+                                      try {
+                                        await axios.delete(`${API}/care-events/${visit.id}`);
+                                        toast.success('Visit deleted');
+                                        queryClient.invalidateQueries(['member', id]);
+                                        closeConfirm();
+                                      } catch (error) {
+                                        toast.error('Failed to delete');
+                                        closeConfirm();
+                                      }
                                     }
-                                  }
+                                  );
                                 }}
                               >
                                 <Trash2 className="w-4 h-4" />
