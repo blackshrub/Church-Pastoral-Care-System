@@ -1,18 +1,10 @@
 [
   {
-    "content": "Create database indexes for performance (campus_id, member_id, event_date, etc.)",
-    "status": "completed"
+    "content": "Fix sync history timezone to show Asia/Jakarta instead of UTC",
+    "status": "in_progress"
   },
   {
-    "content": "Add optimistic updates for mark complete action (instant UI feedback)",
-    "status": "completed"
-  },
-  {
-    "content": "Optimize dashboard query to reduce load time",
-    "status": "completed"
-  },
-  {
-    "content": "Test performance improvements",
-    "status": "completed"
+    "content": "Fix webhook church_id mismatch - store core church_id in sync config",
+    "status": "pending"
   }
 ]
