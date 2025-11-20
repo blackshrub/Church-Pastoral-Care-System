@@ -316,14 +316,21 @@ export const MemberDetail = () => {
   };
   
   const handleDeleteEvent = async (eventId) => {
-    if (!window.confirm('Delete this care event?')) return;
-    try {
-      await axios.delete(`${API}/care-events/${eventId}`);
-      toast.success(t('toasts.event_deleted'));
-      queryClient.invalidateQueries(['member', id]);
-    } catch (error) {
-      toast.error(t('toasts.failed_delete'));
-    }
+    showConfirm(
+      'Delete Care Event',
+      'Are you sure you want to delete this care event? This will also delete all related follow-up stages and activity logs.',
+      async () => {
+        try {
+          await axios.delete(`${API}/care-events/${eventId}`);
+          toast.success(t('toasts.event_deleted'));
+          queryClient.invalidateQueries(['member', id]);
+          closeConfirm();
+        } catch (error) {
+          toast.error(t('toasts.failed_delete'));
+          closeConfirm();
+        }
+      }
+    );
   };
   
   const sendReminder = async (eventId) => {
