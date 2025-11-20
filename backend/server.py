@@ -3389,11 +3389,12 @@ async def remove_ignored_occurrence(schedule_id: str, occurrence_date: str):
         )
         
         # Delete activity log for this ignore action
+        # Match activity log that has this date in the notes
         await db.activity_logs.delete_many({
             "member_id": schedule["member_id"],
             "event_type": "financial_aid",
             "action_type": "ignore_task",
-            "notes": {"$regex": f"{occurrence_date}.*{schedule.get('aid_type', 'financial aid')}", "$options": "i"}
+            "notes": {"$regex": occurrence_date, "$options": "i"}
         })
         
         # Invalidate dashboard cache
