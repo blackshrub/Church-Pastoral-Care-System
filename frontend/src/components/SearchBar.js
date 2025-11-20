@@ -1,3 +1,9 @@
+/**
+ * SearchBar Component - Global search across members and care events
+ * Provides live search with 300ms debounce and dropdown results
+ * Displays member photos and engagement status
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, User, Calendar, X } from 'lucide-react';
