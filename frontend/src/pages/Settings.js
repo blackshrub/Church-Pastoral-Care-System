@@ -174,6 +174,8 @@ export const Settings = () => {
       toast.error('Sync failed: ' + (error.response?.data?.detail || error.message));
     } finally {
       setSyncing(false);
+    }
+  };
 
   useEffect(() => {
     if (activeTab === 'sync') {
