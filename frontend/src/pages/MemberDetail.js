@@ -1,3 +1,9 @@
+/**
+ * Member Detail Page - Comprehensive member profile and care history
+ * Displays member information, care events timeline, grief/accident follow-ups
+ * Manages all care event operations with complete accountability tracking
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
