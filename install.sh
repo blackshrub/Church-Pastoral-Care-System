@@ -420,6 +420,21 @@ configure_environment() {
     echo -e "${CYAN}╚════════════════════════════════════════╝${NC}"
     echo ""
     
+
+    while [ -z "$ADMIN_NAME" ]; do
+        read -p "Admin full name: " ADMIN_NAME
+        if [ -z "$ADMIN_NAME" ]; then
+            print_error "Name cannot be empty"
+        fi
+    done
+    
+    while [ -z "$ADMIN_PHONE" ]; do
+        read -p "Admin phone number: " ADMIN_PHONE
+        if [ -z "$ADMIN_PHONE" ]; then
+            print_error "Phone cannot be empty"
+        fi
+    done
+
     while [ -z "$ADMIN_EMAIL" ]; do
         read -p "Admin email: " ADMIN_EMAIL
         if [ -z "$ADMIN_EMAIL" ]; then
