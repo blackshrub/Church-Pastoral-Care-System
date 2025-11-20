@@ -78,6 +78,23 @@ export const Settings = () => {
     { stage: '1_year', days: 365, name: 'Sixth Follow-up (1 Year Anniversary)' },
   ]);
 
+  // Confirmation dialog state
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    title: '',
+    description: '',
+    onConfirm: () => {}
+  });
+  
+  const showConfirm = (title, description, onConfirm) => {
+    setConfirmDialog({ open: true, title, description, onConfirm });
+  };
+  
+  const closeConfirm = () => {
+    setConfirmDialog({ open: false, title: '', description: '', onConfirm: () => {} });
+  };
+
+
   const [whatsappGateway, setWhatsappGateway] = useState('');
   const [digestTime, setDigestTime] = useState('08:00');
   
