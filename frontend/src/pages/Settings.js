@@ -522,9 +522,36 @@ export const Settings = () => {
               </div>
               <div>
                 <Label>WhatsApp Gateway URL</Label>
-                <Input value={process.env.REACT_APP_WHATSAPP_GATEWAY_URL || "http://dermapack.net:3001"} disabled className="h-12" />
-                <p className="text-xs text-muted-foreground mt-1">Change in backend .env file</p>
+                <Input 
+                  value={whatsappGateway || process.env.REACT_APP_WHATSAPP_GATEWAY_URL || "http://dermapack.net:3001"} 
+                  onChange={(e) => setWhatsappGateway(e.target.value)}
+                  disabled={user?.role !== 'full_admin'}
+                  className="h-12" 
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {user?.role === 'full_admin' ? 'Edit and save to update' : 'Only full admin can edit'}
+                </p>
               </div>
+              
+              <div>
+                <Label>Daily Digest Time</Label>
+                <Input 
+                  type="time"
+                  value={digestTime}
+                  onChange={(e) => setDigestTime(e.target.value)}
+                  disabled={user?.role !== 'full_admin'}
+                  className="h-12"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {user?.role === 'full_admin' ? 'Time to send daily pastoral care digest (Jakarta time)' : 'Only full admin can edit'}
+                </p>
+              </div>
+              
+              {user?.role === 'full_admin' && (
+                <Button onClick={saveAutomationSettings} className="bg-teal-500 hover:bg-teal-600">
+                  Save Automation Settings
+                </Button>
+              )}
               <div className="p-4 bg-blue-50 rounded-lg">
                 <p className="font-medium text-sm">📋 What Gets Sent:</p>
                 <ul className="text-sm mt-2 space-y-1">
