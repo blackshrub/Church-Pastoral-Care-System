@@ -389,6 +389,13 @@ class CareEvent(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+
+class AdditionalVisitRequest(BaseModel):
+    visit_date: str
+    visit_type: str
+    notes: str
+
+
 class GriefSupport(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
