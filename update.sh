@@ -2,7 +2,7 @@
 
 #################################################################################
 # FaithTracker Update Script
-# Run this after git pull to update backend and frontend
+# Run this from your git repository to update the deployed app
 #################################################################################
 
 set -e
@@ -19,21 +19,37 @@ echo -e "${BLUE}  FaithTracker Update Script${NC}"
 echo -e "${BLUE}=====================================${NC}"
 echo ""
 
-# Check if running from correct directory
-if [ ! -f "backend/server.py" ]; then
-    echo -e "${RED}Error: Must run from /opt/faithtracker directory${NC}"
+# Detect git repository location (where you pulled)
+GIT_DIR=$(pwd)
+APP_DIR="/opt/faithtracker"
+
+echo -e "${BLUE}[1/7]${NC} Detecting directories..."
+echo "  Git repository: $GIT_DIR"
+echo "  Application: $APP_DIR"
+
+# Check if git directory has the code
+if [ ! -f "$GIT_DIR/backend/server.py" ]; then
+    echo -e "${RED}Error: Not in FaithTracker git repository${NC}"
     exit 1
 fi
 
-# Pull latest code
-echo -e "${BLUE}[1/6]${NC} Pulling latest code from GitHub..."
-git pull origin main
+# Check if app directory exists
+if [ ! -d "$APP_DIR" ]; then
+    echo -e "${RED}Error: Application directory $APP_DIR not found${NC}"
+    echo "Run install.sh first"
+    exit 1
+fi
+
+# Copy updated files to app directory
+echo -e "${BLUE}[2/7]${NC} Copying updated files from git to app directory..."
+rsync -a --exclude='.git' --exclude='node_modules' --exclude='venv' --exclude='__pycache__' --exclude='build' "$GIT_DIR/" "$APP_DIR/"
+echo -e "${GREEN}✓ Files copied${NC}"
 
 # Update backend
-echo -e "${BLUE}[2/6]${NC} Updating backend..."
-cd /opt/faithtracker/backend
+echo -e "${BLUE}[3/7]${NC} Updating backend..."
+cd "$APP_DIR/backend"
 
-# Check if venv exists, create if not
+# Check if venv exists
 if [ ! -d "venv" ]; then
     echo "Creating virtual environment..."
     python3 -m venv venv
@@ -42,11 +58,10 @@ fi
 source venv/bin/activate
 pip install -r requirements.txt --quiet
 deactivate
-cd /opt/faithtracker
 
 # Update frontend
-echo -e "${BLUE}[3/6]${NC} Updating frontend..."
-cd /opt/faithtracker/frontend
+echo -e "${BLUE}[4/7]${NC} Updating frontend..."
+cd "$APP_DIR/frontend"
 yarn install --silent
 yarn build --silent
 
