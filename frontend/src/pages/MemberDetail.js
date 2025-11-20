@@ -1242,11 +1242,19 @@ export const MemberDetail = () => {
                       
                       {/* Display additional visits */}
                       {(() => {
+                        console.log('Parent event ID:', event.id);
+                        console.log('All careEvents:', careEvents.length);
+                        console.log('All careEvents with care_event_id:', careEvents.filter(e => e.care_event_id).map(e => ({
+                          title: e.title,
+                          care_event_id: e.care_event_id,
+                          followup_type: e.followup_type
+                        })));
                         const additionalVisits = careEvents.filter(e => 
                           e.care_event_id === event.id && 
                           e.followup_type === "additional"
                         );
                         console.log(`Additional visits for grief event ${event.id}:`, additionalVisits);
+                        console.log('Additional visits count:', additionalVisits.length);
                         return additionalVisits.length > 0 && (
                           <div className="mt-4">
                             <h5 className="text-sm font-semibold mb-3 text-gray-700">📝 Additional Visits:</h5>
