@@ -23,6 +23,22 @@ export const ImportExport = () => {
   const [apiKey, setApiKey] = useState('');
   const [syncInterval, setSyncInterval] = useState(60);
   const [selectedCampusId, setSelectedCampusId] = useState('');
+
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    title: '',
+    description: '',
+    onConfirm: () => {}
+  });
+  
+  const showConfirm = (title, description, onConfirm) => {
+    setConfirmDialog({ open: true, title, description, onConfirm });
+  };
+  
+  const closeConfirm = () => {
+    setConfirmDialog({ open: false, title: '', description: '', onConfirm: () => {} });
+  };
+
   const [campuses, setCampuses] = useState([]);
   const [fieldMapping, setFieldMapping] = useState({
     name: 'name',
