@@ -13,7 +13,7 @@
 #################################################################################
 
 # Exit on error but allow us to handle it gracefully
-set -euo pipefail
+set -eo pipefail  # Removed -u flag to allow unbound variables during prompts
 
 # Colors for output
 RED='\033[0;31m'
