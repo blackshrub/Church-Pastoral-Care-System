@@ -34,6 +34,25 @@ All notable changes to FaithTracker will be documented in this file.
   - Contact at-risk/disconnected members
   - Send WhatsApp reminders
 
+
+#### Hybrid Follow-up System (NEW)
+- **Scheduled follow-ups** - System-generated follow-up stages (6 for grief, 3 for accident)
+- **Additional visits** - Staff can log unscheduled visits anytime
+- **Features:**
+  - Log additional visits directly in grief/accident tabs
+  - Inline expandable form (date, type, notes)
+  - Visual distinction (pink/blue for scheduled, grey for additional)
+  - All visits count toward member engagement
+  - Complete activity logging
+  - Delete individual additional visits
+- **Benefits:**
+  - Accountability: Required follow-ups tracked
+  - Flexibility: Unlimited additional visits
+  - Reality: Captures all pastoral interactions
+  - Context: All visits grouped under parent event
+- **API Endpoint:** `POST /api/care-events/{parent_id}/additional-visit`
+
+
 #### Member Data Sync (FaithFlow Enterprise Integration)
 - **Two sync methods:**
   - **Polling**: Automatic sync every 1-24 hours (configurable)
