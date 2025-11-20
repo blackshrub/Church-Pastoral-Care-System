@@ -368,15 +368,20 @@ export const Reminders = () => {
                           size="sm" 
                           variant="outline" 
                           onClick={async () => {
-                            if (window.confirm(`Mark financial aid as distributed to ${schedule.member_name}?`)) {
-                              try {
-                                await axios.post(`${API}/financial-aid-schedules/${schedule.id}/mark-distributed`);
-                                toast.success(t('toasts.payment_distributed_advanced'));
-                                loadReminders();
-                              } catch (error) {
-                                toast.error(t('toasts.failed_mark_distributed'));
+                            showConfirm(
+                              'Mark Financial Aid Distributed',
+                              `Mark financial aid as distributed to ${schedule.member_name}?`,
+                              async () => {
+                                try {
+                                  await axios.post(`${API}/financial-aid-schedules/${schedule.id}/mark-distributed`);
+                                  toast.success(t('toasts.payment_distributed_advanced'));
+                                  loadReminders();
+                                  closeConfirm();
+                                } catch (error) {
+                                  toast.error(t('toasts.failed_mark_distributed'));
+                                }
                               }
-                            }
+                            );
                           }}
                         >
                           Mark Distributed
@@ -386,15 +391,20 @@ export const Reminders = () => {
                           variant="ghost" 
                           className="text-red-600"
                           onClick={async () => {
-                            if (window.confirm(`Stop financial aid schedule for ${schedule.member_name}?`)) {
-                              try {
-                                await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
-                                toast.success(t('toasts.schedule_stopped'));
-                                loadReminders();
-                              } catch (error) {
-                                toast.error(t('toasts.failed_stop_schedule'));
+                            showConfirm(
+                              'Stop Financial Aid Schedule',
+                              `Stop financial aid schedule for ${schedule.member_name}?`,
+                              async () => {
+                                try {
+                                  await axios.post(`${API}/financial-aid-schedules/${schedule.id}/stop`);
+                                  toast.success(t('toasts.schedule_stopped'));
+                                  loadReminders();
+                                  closeConfirm();
+                                } catch (error) {
+                                  toast.error(t('toasts.failed_stop_schedule'));
+                                }
                               }
-                            }
+                            );
                           }}
                         >
                           Stop Schedule
