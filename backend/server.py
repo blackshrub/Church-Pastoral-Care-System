@@ -5932,7 +5932,7 @@ async def get_sync_logs(current_user: dict = Depends(get_current_user), limit: i
 # ==================== SETUP WIZARD ENDPOINTS ====================
 
 @api_router.post("/setup/admin")
-async def setup_first_admin(email: EmailStr, password: str, name: str):
+async def setup_first_admin(request: SetupAdminRequest):
     """Create first admin account (only if no admin exists)"""
     try:
         # Check if any user exists
@@ -5942,12 +5942,12 @@ async def setup_first_admin(email: EmailStr, password: str, name: str):
         
         # Create first admin
         admin_user = User(
-            email=email,
-            name=name,
+            email=request.email,
+            name=request.name,
             role=UserRole.FULL_ADMIN,
             campus_id=None,
             phone="",
-            hashed_password=get_password_hash(password)
+            hashed_password=get_password_hash(request.password)
         )
         
         await db.users.insert_one(admin_user.model_dump())
