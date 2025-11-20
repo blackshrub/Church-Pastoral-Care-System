@@ -66,15 +66,15 @@ yarn install --silent
 yarn build --silent
 
 # Restart backend service
-echo -e "${BLUE}[4/6]${NC} Restarting backend service..."
+echo -e "${BLUE}[5/7]${NC} Restarting backend service..."
 sudo systemctl restart faithtracker-backend
 
 # Restart nginx
-echo -e "${BLUE}[5/6]${NC} Restarting nginx..."
+echo -e "${BLUE}[6/7]${NC} Restarting nginx..."
 sudo systemctl restart nginx
 
 # Verify services
-echo -e "${BLUE}[6/6]${NC} Verifying services..."
+echo -e "${BLUE}[7/7]${NC} Verifying services..."
 sleep 2
 
 BACKEND_STATUS=$(sudo systemctl is-active faithtracker-backend)
