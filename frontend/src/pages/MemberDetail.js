@@ -1036,7 +1036,7 @@ export const MemberDetail = () => {
               No grief/loss events recorded.
             </p>
           ) : (
-            careEvents.filter(e => e.event_type === 'grief_loss' && !e.grief_stage_id).map(event => (
+            careEvents.filter(e => e.event_type === 'grief_loss' && !e.grief_stage_id && e.followup_type !== 'additional').map(event => (
                   <div key={event.id} className="space-y-4 mb-6 p-4 border border-pink-200 bg-pink-50 rounded-lg shadow-sm">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
