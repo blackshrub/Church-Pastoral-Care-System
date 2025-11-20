@@ -374,6 +374,9 @@ class CareEvent(BaseModel):
     accident_stage_id: Optional[str] = None  # Link to accident_followup stage (for timeline entries)
     visitation_log: List[Dict[str, Any]] = Field(default_factory=list)
     
+    # Follow-up type marker
+    followup_type: Optional[str] = None  # "scheduled" or "additional" (for grief/accident follow-ups)
+    
     # Financial aid fields
     aid_type: Optional[AidType] = None
     aid_amount: Optional[float] = None
