@@ -3500,6 +3500,7 @@ async def stop_aid_schedule(schedule_id: str, current_user: dict = Depends(get_c
             action_type=ActivityActionType.STOP_SCHEDULE,
             member_id=schedule["member_id"],
             member_name=member_name,
+            event_type=EventType.FINANCIAL_AID,
             notes=f"Stopped {schedule.get('aid_type', 'financial aid')} schedule",
             user_photo_url=current_user.get("photo_url")
         )
