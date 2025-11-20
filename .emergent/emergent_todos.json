@@ -1,22 +1,30 @@
 [
   {
-    "content": "Update README.md with new features (search, accountability, sync)",
-    "status": "completed"
+    "content": "Backend: Add followup_type field to CareEvent model",
+    "status": "in_progress"
   },
   {
-    "content": "Update docs/FEATURES.md with activity log and sync features",
-    "status": "completed"
+    "content": "Backend: Create endpoint to log additional visit",
+    "status": "pending"
   },
   {
-    "content": "Update docs/API.md with new sync endpoints",
-    "status": "completed"
+    "content": "Frontend: Add 'Log Additional Visit' button in grief/accident tabs",
+    "status": "pending"
   },
   {
-    "content": "Create CHANGELOG.md documenting all updates",
-    "status": "completed"
+    "content": "Frontend: Create modal/form for logging visit details",
+    "status": "pending"
   },
   {
-    "content": "Create docs/WEBHOOK_INTEGRATION.md for core system team",
-    "status": "completed"
+    "content": "Frontend: Fetch and display additional visits with scheduled ones",
+    "status": "pending"
+  },
+  {
+    "content": "Frontend: Visual distinction (grey boxes for additional)",
+    "status": "pending"
+  },
+  {
+    "content": "Test complete workflow",
+    "status": "pending"
   }
 ]
