@@ -93,6 +93,36 @@ Empower your staff with profile management:
   - Activity Log
   - Search results
   - Member timelines
+
+
+### 🔄 Hybrid Follow-up System
+
+Bridge the gap between system requirements and real-world pastoral care:
+
+- **Scheduled Follow-ups:**
+  - System-generated stages (6 for grief, 3 for accident)
+  - Accountability: Must complete required follow-ups
+  - Clear timeline with due dates
+  
+- **Additional Visits:**
+  - Log unscheduled visits anytime
+  - Examples: Emergency calls, family-requested visits, spontaneous check-ins
+  - Inline expandable form (no popups)
+  - Fields: Date, Type (Phone Call, Home Visit, Hospital, Emergency, Other), Notes
+  
+- **Visual Design:**
+  - Scheduled: Pink/blue boxes with checkmarks
+  - Additional: Grey boxes with completion info
+  - All grouped under parent event
+  - "Created by" attribution for all visits
+  
+- **Benefits:**
+  - Nothing missed: Complete pastoral interaction record
+  - Flexible: Unlimited additional visits
+  - Contextual: All visits grouped by grief/accident event
+  - Accountable: Every visit logged and attributed
+  - Engagement: All visits count toward member status
+
 - **Phone column** in users table
 - Photo size: 400x400px (auto-resized)
 
