@@ -123,27 +123,6 @@ const MemberNameWithAvatar = ({ member, memberId }) => {
   );
 };
 
-const Dashboard = () => {
-  const { t } = useTranslation();
-  const queryClient = useQueryClient();
-
-  const [confirmDialog, setConfirmDialog] = useState({
-    open: false,
-    title: '',
-    description: '',
-    onConfirm: () => {}
-  });
-  
-  const showConfirm = (title, description, onConfirm) => {
-    setConfirmDialog({ open: true, title, description, onConfirm });
-  };
-  
-  const closeConfirm = () => {
-    setConfirmDialog({ open: false, title: '', description: '', onConfirm: () => {} });
-  };
-
-  // Data fetching with React Query
-
 const formatPhoneForWhatsApp = (phone) => {
   if (!phone) return '#';
   let formatted = phone;
