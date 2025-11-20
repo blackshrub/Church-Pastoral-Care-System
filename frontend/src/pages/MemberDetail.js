@@ -1596,10 +1596,10 @@ export const MemberDetail = () => {
                                   <span className="inline-flex items-center gap-1">
 
 
-      {/* Additional Visit Modal */}
+      {/* Additional Visit Modal - Force high z-index */}
       {console.log('additionalVisitModal state:', additionalVisitModal)}
       <Dialog open={additionalVisitModal} onOpenChange={setAdditionalVisitModal}>
-        <DialogContent>
+        <DialogContent className="z-[9999]">
           <DialogHeader>
             <DialogTitle>Log Additional Visit</DialogTitle>
           </DialogHeader>
