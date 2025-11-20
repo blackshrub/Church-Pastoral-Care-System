@@ -2389,7 +2389,7 @@ async def log_additional_visit(
             member_name=member_name,
             care_event_id=additional_visit["id"],
             event_type=EventType(parent["event_type"]),
-            notes=f"Logged additional visit: {visit_type}",
+            notes=f"Logged additional visit: {request.visit_type}",
             user_photo_url=current_user.get("photo_url")
         )
         
@@ -2405,7 +2405,7 @@ async def log_additional_visit(
         
         return {
             "success": True,
-            "message": f"Additional visit logged: {visit_type}",
+            "message": f"Additional visit logged: {request.visit_type}",
             "visit_id": additional_visit["id"]
         }
     
