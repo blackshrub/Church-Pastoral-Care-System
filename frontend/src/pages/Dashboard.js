@@ -117,7 +117,15 @@ const MemberNameWithAvatar = ({ member, memberId }) => {
           <span className="text-teal-700 font-semibold text-xs">
             {getInitials(member.name)}
           </span>
+        )}
+      </div>
+    </Link>
+  );
+};
 
+const Dashboard = () => {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
