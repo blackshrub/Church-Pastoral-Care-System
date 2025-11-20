@@ -1,18 +1,22 @@
 [
   {
-    "content": "Implement single-member sync when webhook received",
-    "status": "completed"
+    "content": "Update README.md with new features (search, accountability, sync)",
+    "status": "in_progress"
   },
   {
-    "content": "Add GET /api/members/{member_id} endpoint call to core API",
-    "status": "completed"
+    "content": "Update docs/FEATURES.md with activity log and sync features",
+    "status": "pending"
   },
   {
-    "content": "Update/create only the specific member, not all members",
-    "status": "completed"
+    "content": "Update docs/API.md with new sync endpoints",
+    "status": "pending"
   },
   {
-    "content": "Test webhook triggers targeted sync",
-    "status": "completed"
+    "content": "Create CHANGELOG.md documenting all updates",
+    "status": "pending"
+  },
+  {
+    "content": "Create docs/WEBHOOK_INTEGRATION.md for core system team",
+    "status": "pending"
   }
 ]
