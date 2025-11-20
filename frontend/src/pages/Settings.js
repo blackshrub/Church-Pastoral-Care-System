@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { Settings as SettingsIcon, Bell, Heart, Zap, Users, Clock, UserCircle, Upload, RefreshCw, Search } from 'lucide-react';
 import FilterRuleBuilder from '@/components/FilterRuleBuilder';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
