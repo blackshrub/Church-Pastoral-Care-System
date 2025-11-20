@@ -37,7 +37,8 @@ const SetupWizard = ({ onComplete }) => {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/setup/admin`, {
         email: adminData.email,
         password: adminData.password,
-        name: adminData.name
+        name: adminData.name,
+        phone: adminData.phone
       });
 
       toast.success('Admin account created');
