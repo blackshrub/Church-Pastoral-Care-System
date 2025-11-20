@@ -5560,7 +5560,7 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
             async with httpx.AsyncClient(timeout=60.0) as client:
                 login_response = await client.post(
                     f"{config['api_base_url']}/api/auth/login",
-                    json={"email": config["api_email"], "password": config["api_password"]}
+                    json={"email": config["api_email"], "password": decrypt_password(config["api_password"])}
                 )
                 
                 if login_response.status_code != 200:
@@ -6010,7 +6010,7 @@ async def receive_sync_webhook(request: Request):
                 async with httpx.AsyncClient(timeout=30.0) as client:
                     login_response = await client.post(
                         f"{config['api_base_url']}/api/auth/login",
-                        json={"email": config["api_email"], "password": config["api_password"]}
+                        json={"email": config["api_email"], "password": decrypt_password(config["api_password"])}
                     )
                     
                     if login_response.status_code != 200:
