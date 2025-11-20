@@ -344,6 +344,7 @@ class CareEvent(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     member_id: str
     campus_id: str
+    care_event_id: Optional[str] = None  # Parent event ID (for linking child events)
     event_type: EventType
     event_date: date
     title: str
