@@ -258,29 +258,33 @@ export const ImportExport = () => {
   };
   
   const handleApiSyncConfirm = async () => {
-    if (!window.confirm(`Create API sync job?\n\nThis will sync ${apiValidation.total} members every ${syncInterval} minutes from ${selectedCampusId ? campuses.find(c => c.id === selectedCampusId)?.campus_name : 'selected campus'}.`)) {
-      return;
-    }
-    
-    try {
-      setImporting(true);
-      const response = await axios.post(`${API}/sync/members/from-api`, null, {
-        params: { api_url: apiUrl, api_key: apiKey || undefined }
-      });
-      toast.success(t('import_export_page.api_sync_created', {count: response.data.synced_count}));
-      if (response.data.errors.length > 0) {
-        toast.warning(t('import_export_page.errors_occurred', {count: response.data.errors.length}));
+    const campusName = selectedCampusId ? campuses.find(c => c.id === selectedCampusId)?.campus_name : 'selected campus';
+    showConfirm(
+      'Create API Sync Job',
+      `Create API sync job?\n\nThis will sync ${apiValidation.total} members every ${syncInterval} minutes from ${campusName}.`,
+      async () => {
+        try {
+          setImporting(true);
+          const response = await axios.post(`${API}/sync/members/from-api`, null, {
+            params: { api_url: apiUrl, api_key: apiKey || undefined }
+          });
+          toast.success(t('import_export_page.api_sync_created', {count: response.data.synced_count}));
+          if (response.data.errors.length > 0) {
+            toast.warning(t('import_export_page.errors_occurred', {count: response.data.errors.length}));
+          }
+          closeConfirm();
+          setApiUrl('');
+          setApiKey('');
+          setShowApiPreview(false);
+          setApiPreview(null);
+          loadActiveSyncs();
+        } catch (error) {
+          toast.error(t('import_export_page.api_sync_failed'));
+        } finally {
+          setImporting(false);
+        }
       }
-      setApiUrl('');
-      setApiKey('');
-      setShowApiPreview(false);
-      setApiPreview(null);
-      loadActiveSyncs();
-    } catch (error) {
-      toast.error(t('import_export_page.api_sync_failed'));
-    } finally {
-      setImporting(false);
-    }
+    );
   };
   
   const handleExportMembers = async () => {
@@ -380,9 +384,14 @@ export const ImportExport = () => {
                     {validationResults?.hasRequired ? (
                       <Button 
                         onClick={async () => {
-                          if (window.confirm(`Import ${csvPreview.total} members? This will update existing and create new members.`)) {
-                            await handleCsvImport();
-                          }
+                          showConfirm(
+                            'Import Members',
+                            `Import ${csvPreview.total} members? This will update existing and create new members.`,
+                            async () => {
+                              await handleCsvImport();
+                              closeConfirm();
+                            }
+                          );
                         }}
                         className="bg-teal-500 hover:bg-teal-600 text-white"
                       >
