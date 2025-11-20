@@ -124,6 +124,21 @@ export const Reminders = () => {
     inactiveDays: 90
   });
   
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    title: '',
+    description: '',
+    onConfirm: () => {}
+  });
+  
+  const showConfirm = (title, description, onConfirm) => {
+    setConfirmDialog({ open: true, title, description, onConfirm });
+  };
+  
+  const closeConfirm = () => {
+    setConfirmDialog({ open: false, title: '', description: '', onConfirm: () => {} });
+  };
+  
   useEffect(() => {
     // Load engagement settings from localStorage (set in Settings page)
     const savedSettings = localStorage.getItem('engagement_settings');
