@@ -1833,15 +1833,21 @@ export const MemberDetail = () => {
                                       variant="ghost" 
                                       className="h-6 px-2"
                                       onClick={async () => {
-                                        if (window.confirm(`Remove this ignored occurrence (${formatDate(date, 'dd MMM yyyy')})?`)) {
-                                          try {
-                                            await axios.delete(`${API}/financial-aid-schedules/${schedule.id}/ignored-occurrence/${date}`);
-                                            toast.success('Ignored occurrence removed');
-                                            queryClient.invalidateQueries(['member', id]);
-                                          } catch (error) {
-                                            toast.error('Failed to remove');
+                                        showConfirm(
+                                          'Remove Ignored Occurrence',
+                                          `Remove this ignored occurrence (${formatDate(date, 'dd MMM yyyy')})? This payment will be marked as due again.`,
+                                          async () => {
+                                            try {
+                                              await axios.delete(`${API}/financial-aid-schedules/${schedule.id}/ignored-occurrence/${date}`);
+                                              toast.success('Ignored occurrence removed');
+                                              queryClient.invalidateQueries(['member', id]);
+                                              closeConfirm();
+                                            } catch (error) {
+                                              toast.error('Failed to remove');
+                                              closeConfirm();
+                                            }
                                           }
-                                        }
+                                        );
                                       }}
                                     >
                                       <Trash2 className="w-3 h-3 text-red-600" />
