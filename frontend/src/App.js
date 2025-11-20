@@ -61,6 +61,31 @@ const ProtectedRoute = ({ children }) => {
 
 function AppRoutes() {
   const { user } = useAuth();
+  const [needsSetup, setNeedsSetup] = useState(null);
+  
+  // Check if setup is needed
+  useEffect(() => {
+    const checkSetup = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/setup/status`);
+        setNeedsSetup(response.data.needs_setup);
+      } catch (error) {
+        console.error('Error checking setup status:', error);
+        setNeedsSetup(false);
+      }
+    };
+    checkSetup();
+  }, []);
+  
+  // Show loading while checking
+  if (needsSetup === null) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+  
+  // Show setup wizard if needed
+  if (needsSetup) {
+    return <SetupWizard onComplete={() => setNeedsSetup(false)} />;
+  }
   
   return (
     <Routes>
