@@ -303,7 +303,14 @@ export const Settings = () => {
         return;
       }
       
+      if (!campusData) {
+        toast.error('Campus data not loaded');
+        return;
+      }
+      
       await axios.put(`${API}/campuses/${user.campus_id}`, {
+        campus_name: campusData.campus_name,
+        location: campusData.location,
         timezone: campusTimezone
       });
       toast.success(t('toasts.timezone_saved'));
