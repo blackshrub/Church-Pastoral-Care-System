@@ -524,11 +524,13 @@ setup_backend() {
     print_info "Creating database indexes..."
     sudo -u faithtracker "$INSTALL_DIR/backend/venv/bin/python" create_indexes.py >> "$LOG_FILE" 2>&1 || true
     
-    print_info "Creating admin user..."
+    print_info "Creating admin user and first campus..."
     sudo -u faithtracker "$INSTALL_DIR/backend/venv/bin/python" - << PYTHON_SCRIPT >> "$LOG_FILE" 2>&1
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 from passlib.context import CryptContext
+from datetime import datetime, timezone
+import uuid
 
 mongo_url = "$MONGO_URL"
 db_name = "$DB_NAME"
