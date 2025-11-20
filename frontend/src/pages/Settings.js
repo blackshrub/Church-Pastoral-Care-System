@@ -1158,9 +1158,8 @@ export const Settings = () => {
               </CardContent>
             </Card>
 
-            {/* Current Sync Status Card - Always show if config exists */}
-            {(syncConfig.is_enabled || syncConfig.api_base_url) && (
-              <Card className="bg-gradient-to-r from-teal-50 to-blue-50 border-teal-200">
+            {/* Current Sync Status Card - Always show */}
+            <Card className="bg-gradient-to-r from-teal-50 to-blue-50 border-teal-200">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center justify-between">
                     <span>🔄 Active Sync Configuration</span>
