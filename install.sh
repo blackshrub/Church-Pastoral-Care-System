@@ -178,6 +178,10 @@ install_python() {
         apt install -y python3 python3-pip python3-venv python3-dev >> "$LOG_FILE" 2>&1
     fi
     
+    # Ensure python3-venv is installed (even if Python was already there)
+    print_info "Ensuring python3-venv is installed..."
+    apt install -y python3-venv >> "$LOG_FILE" 2>&1
+    
     # Verify Python version is 3.9+
     PYTHON_MAJOR=$(python3 -c 'import sys; print(sys.version_info.major)')
     PYTHON_MINOR=$(python3 -c 'import sys; print(sys.version_info.minor)')
