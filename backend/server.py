@@ -5983,14 +5983,6 @@ async def check_setup_status():
         logger.error(f"Error checking setup status: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-            {"_id": 0}
-        ).sort("started_at", -1).limit(limit).to_list(limit)
-        
-        return logs
-    
-    except Exception as e:
-        logger.error(f"Error getting sync logs: {str(e)}")
-
 
 @api_router.post("/sync/webhook")
 async def receive_sync_webhook(request: Request):
