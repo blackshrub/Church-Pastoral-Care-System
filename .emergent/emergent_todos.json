@@ -1,14 +1,14 @@
 [
   {
     "content": "Fix full admin profile edit (enable name, email, phone fields)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Fix PUT /api/campuses/{id} 422 error when saving timezone",
-    "status": "pending"
+    "status": "completed"
   },
   {
     "content": "Make automation settings editable for full admin (schedule time, WhatsApp URL)",
-    "status": "pending"
+    "status": "completed"
   }
 ]
