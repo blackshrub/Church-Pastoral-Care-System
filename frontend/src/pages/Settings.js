@@ -105,8 +105,11 @@ export const Settings = () => {
   
   const loadSyncLogs = async () => {
     try {
+      console.log('Loading sync logs...');
       const response = await axios.get(`${API}/sync/logs?limit=10`);
+      console.log('Sync logs response:', response.data);
       setSyncLogs(response.data);
+      console.log('Sync logs set to state:', response.data.length, 'logs');
     } catch (error) {
       console.error('Error loading sync logs:', error);
     }
