@@ -3369,9 +3369,9 @@ async def remove_ignored_occurrence(schedule_id: str, date: str, current_user: d
 
 @api_router.delete("/financial-aid-schedules/{schedule_id}/ignored-occurrence/{occurrence_date}")
 async def remove_ignored_occurrence(schedule_id: str, occurrence_date: str):
-    """Remove a specific ignored occurrence from the schedule"""
+    """Remove a specific ignored occurrence from the schedule and its activity log"""
     try:
-        schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0, "ignored_occurrences": 1, "campus_id": 1})
+        schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0})
         if not schedule:
             raise HTTPException(status_code=404, detail="Schedule not found")
         
@@ -3387,6 +3387,14 @@ async def remove_ignored_occurrence(schedule_id: str, occurrence_date: str):
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }}
         )
+        
+        # Delete activity log for this ignore action
+        await db.activity_logs.delete_many({
+            "member_id": schedule["member_id"],
+            "event_type": "financial_aid",
+            "action_type": "ignore_task",
+            "notes": {"$regex": f"{occurrence_date}.*{schedule.get('aid_type', 'financial aid')}", "$options": "i"}
+        })
         
         # Invalidate dashboard cache
         await invalidate_dashboard_cache(schedule["campus_id"])
