@@ -2268,6 +2268,93 @@ async def create_care_event(event: CareEventCreate, current_user: dict = Depends
             user_photo_url=current_user.get("photo_url")
         )
         
+
+
+@api_router.post("/care-events/{parent_event_id}/additional-visit")
+async def log_additional_visit(
+    parent_event_id: str,
+    visit_date: str,
+    visit_type: str,
+    notes: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Log an additional unscheduled visit for grief or accident/illness event
+    Creates a child care_event linked to parent
+    """
+    try:
+        # Get parent event
+        parent = await db.care_events.find_one({"id": parent_event_id}, {"_id": 0})
+        if not parent:
+            raise HTTPException(status_code=404, detail="Parent event not found")
+        
+        # Verify it's a grief or accident event
+        if parent["event_type"] not in [EventType.GRIEF_LOSS, EventType.ACCIDENT_ILLNESS]:
+            raise HTTPException(status_code=400, detail="Additional visits only for grief/accident events")
+        
+        # Get member name
+        member = await db.members.find_one({"id": parent["member_id"]}, {"_id": 0, "name": 1})
+        member_name = member["name"] if member else "Unknown"
+        
+        # Create additional visit event
+        additional_visit = {
+            "id": str(uuid.uuid4()),
+            "member_id": parent["member_id"],
+            "campus_id": parent["campus_id"],
+            "event_type": parent["event_type"],  # Same type as parent (grief_loss or accident_illness)
+            "care_event_id": parent_event_id,  # Link to parent
+            "followup_type": "additional",  # Marker for additional visit
+            "event_date": visit_date,
+            "title": f"Additional Visit - {visit_type}",
+            "description": notes,
+            "completed": True,  # Always completed (already happened)
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+            "completed_by_user_id": current_user["id"],
+            "completed_by_user_name": current_user["name"],
+            "created_by_user_id": current_user["id"],
+            "created_by_user_name": current_user["name"],
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.care_events.insert_one(additional_visit)
+        
+        # Log activity
+        await log_activity(
+            campus_id=parent["campus_id"],
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            action_type=ActivityActionType.COMPLETE_TASK,
+            member_id=parent["member_id"],
+            member_name=member_name,
+            care_event_id=additional_visit["id"],
+            event_type=EventType(parent["event_type"]),
+            notes=f"Logged additional visit: {visit_type}",
+            user_photo_url=current_user.get("photo_url")
+        )
+        
+        # Update member engagement
+        await db.members.update_one(
+            {"id": parent["member_id"]},
+            {"$set": {
+                "last_contact_date": datetime.now(timezone.utc).isoformat(),
+                "engagement_status": "active",
+                "days_since_last_contact": 0
+            }}
+        )
+        
+        return {
+            "success": True,
+            "message": f"Additional visit logged: {visit_type}",
+            "visit_id": additional_visit["id"]
+        }
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error logging additional visit: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
         # Update member's last contact date for completed one-time events or non-birthday events
         if is_one_time or (event.event_type != EventType.BIRTHDAY):
             now = datetime.now(timezone.utc)
