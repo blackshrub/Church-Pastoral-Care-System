@@ -21,7 +21,7 @@ const ActivityLog = () => {
   const [startDate, setStartDate] = useState(getDefaultStartDate());
   const [endDate, setEndDate] = useState(getDefaultEndDate());
 
-  // Format date/time using campus timezone
+  // Format date/time using campus timezone - Proper implementation
   const formatDateTime = (dateString) => {
     try {
       const date = new Date(dateString);
@@ -29,27 +29,32 @@ const ActivityLog = () => {
         return { date: 'Invalid date', time: '' };
       }
       
-      // For Asia/Jakarta (UTC+7), manually add offset
-      const jakartaOffset = 7 * 60; // 7 hours in minutes
-      const localDate = new Date(date.getTime() + jakartaOffset * 60 * 1000);
+      // Use Intl.DateTimeFormat for proper timezone handling
+      const dateFormatter = new Intl.DateTimeFormat('id-ID', {
+        timeZone: campusTimezone,
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+      
+      const timeFormatter = new Intl.DateTimeFormat('id-ID', {
+        timeZone: campusTimezone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
       
       return {
-        date: localDate.toLocaleDateString('id-ID', { 
-          year: 'numeric', 
-          month: 'short', 
-          day: 'numeric',
-          timeZone: 'UTC'  // Use UTC since we already adjusted
-        }),
-        time: localDate.toLocaleTimeString('id-ID', { 
-          hour: '2-digit', 
-          minute: '2-digit',
-          hour12: false,
-          timeZone: 'UTC'  // Use UTC since we already adjusted
-        })
+        date: dateFormatter.format(date),
+        time: timeFormatter.format(date)
       };
     } catch (error) {
-      console.error('Error formatting date:', dateString, error);
-      return { date: String(dateString), time: '' };
+      console.error('Error formatting date:', dateString, 'timezone:', campusTimezone, error);
+      // Fallback: show raw date
+      return { 
+        date: new Date(dateString).toLocaleDateString('id-ID'),
+        time: new Date(dateString).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit', hour12: false})
+      };
     }
   };
 
