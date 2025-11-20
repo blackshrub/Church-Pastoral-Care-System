@@ -41,6 +41,7 @@ const Calendar = lazy(() => import('@/pages/Calendar'));
 const BulkMessaging = lazy(() => import('@/pages/BulkMessaging'));
 const Reminders = lazy(() => import('@/pages/Reminders'));
 const ActivityLog = lazy(() => import('@/pages/ActivityLog'));
+const SetupWizard = lazy(() => import('@/pages/SetupWizard'));
 const IntegrationTest = lazy(() => import('@/components/IntegrationTest'));
 const Layout = lazy(() => import('@/components/Layout'));
 
