@@ -5961,13 +5961,13 @@ async def setup_first_admin(request: SetupAdminRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/setup/campus")
-async def setup_first_campus(campus_name: str, location: str, timezone: str):
+async def setup_first_campus(request: SetupCampusRequest):
     """Create first campus (setup wizard)"""
     try:
         campus = Campus(
-            campus_name=campus_name,
-            location=location,
-            timezone=timezone
+            campus_name=request.campus_name,
+            location=request.location,
+            timezone=request.timezone
         )
         
         await db.campuses.insert_one(campus.model_dump())
