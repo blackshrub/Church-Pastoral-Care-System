@@ -65,6 +65,9 @@ export const Settings = () => {
   const [griefStages, setGriefStages] = useState([
     { stage: '1_week', days: 7, name: 'First Follow-up' },
     { stage: '2_weeks', days: 14, name: 'Second Follow-up' },
+
+  const [campusData, setCampusData] = useState(null);
+
     { stage: '1_month', days: 30, name: 'Third Follow-up' },
     { stage: '3_months', days: 90, name: 'Fourth Follow-up' },
     { stage: '6_months', days: 180, name: 'Fifth Follow-up' },
