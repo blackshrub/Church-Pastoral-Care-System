@@ -29,9 +29,14 @@ uvicorn server:app --reload --host 0.0.0.0 --port 8001
 ./test_api.sh
 
 # Database utilities
-python create_indexes.py           # Create MongoDB indexes
-python import_data.py              # Bulk import members from CSV
-python recalculate_engagement.py   # Recalculate member engagement status
+python create_indexes.py                # Create MongoDB indexes
+python import_data.py                   # Bulk import members from CSV
+
+# Engagement status updates
+python bulk_engagement_update.py        # FAST: Bulk update (10-100x faster, RECOMMENDED)
+python bulk_engagement_update.py --dry-run  # Preview changes without updating
+python bulk_engagement_update.py --campus-id <ID>  # Update specific campus
+python recalculate_engagement.py        # SLOW: Legacy individual updates (deprecated)
 ```
 
 ### Frontend
