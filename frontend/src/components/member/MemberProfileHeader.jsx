@@ -1,0 +1,98 @@
+/**
+ * Member Profile Header Component
+ * Displays member photo, name, contact info, and engagement status
+ */
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import { MemberAvatar } from '@/components/MemberAvatar';
+import { EngagementBadge } from '@/components/EngagementBadge';
+import { ArrowLeft, Plus } from 'lucide-react';
+import { format } from 'date-fns/format';
+
+const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
+  try {
+    return format(new Date(dateStr), formatStr);
+  } catch (e) {
+    return dateStr;
+  }
+};
+
+export const MemberProfileHeader = ({
+  member,
+  onAddCareEvent,
+  backLink = '/members'
+}) => {
+  const { t } = useTranslation();
+
+  if (!member) return null;
+
+  return (
+    <div className="max-w-full">
+      {/* Back Button */}
+      <Link to={backLink}>
+        <Button variant="ghost" size="sm" className="mb-4 h-10">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Members
+        </Button>
+      </Link>
+
+      {/* Profile Section */}
+      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 max-w-full">
+        {/* Profile Photo */}
+        <div className="shrink-0">
+          <MemberAvatar member={member} size="xl" className="w-20 h-20 sm:w-32 sm:h-32" />
+        </div>
+
+        {/* Member Info */}
+        <div className="flex-1 min-w-0 w-full">
+          <div className="space-y-3">
+            {/* Name and Contact */}
+            <div className="min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-playfair font-bold text-foreground">
+                {member.name}
+              </h1>
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                {member.phone && (
+                  <a
+                    href={`tel:${member.phone}`}
+                    className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1"
+                  >
+                    📞 {member.phone}
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* Engagement Badge & Last Contact */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+              <EngagementBadge
+                status={member.engagement_status}
+                days={member.days_since_last_contact}
+              />
+              {member.last_contact_date && (
+                <span className="text-xs sm:text-sm text-muted-foreground">
+                  {t('last_contact')}: {formatDate(member.last_contact_date, 'dd MMM yyyy')}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Add Care Event Button */}
+          <Button
+            onClick={onAddCareEvent}
+            className="bg-teal-500 hover:bg-teal-600 text-white w-full sm:w-auto mt-4 h-12 min-w-0"
+            data-testid="add-care-event-button"
+          >
+            <Plus className="w-4 h-4 mr-2 flex-shrink-0" />
+            <span className="truncate">{t('add_care_event')}</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MemberProfileHeader;

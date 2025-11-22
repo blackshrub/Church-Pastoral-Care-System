@@ -27,6 +27,7 @@ import { ArrowLeft, Plus, Send, CheckCircle2, Calendar, Heart, Hospital, DollarS
 import { MemberAvatar } from '@/components/MemberAvatar';
 import { EngagementBadge } from '@/components/EngagementBadge';
 import { EventTypeBadge } from '@/components/EventTypeBadge';
+import { MemberProfileHeader, TimelineEventCard } from '@/components/member';
 import { format } from 'date-fns/format';
 import { format as formatDateFns } from 'date-fns';
 
@@ -381,54 +382,14 @@ export const MemberDetail = () => {
   return (
     <div className="space-y-6 max-w-full">
       {/* Header */}
-      <div className="max-w-full">
-        <Link to="/members">
-          <Button variant="ghost" size="sm" className="mb-4 h-10">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Members
-          </Button>
-        </Link>
-        
-        <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 max-w-full">
-          {/* Profile Photo - Larger on desktop */}
-          <div className="shrink-0">
-            <MemberAvatar member={member} size="xl" className="w-20 h-20 sm:w-32 sm:h-32" />
-          </div>
-          
-          {/* Member Info */}
-          <div className="flex-1 min-w-0 w-full">
-            <div className="space-y-3">
-              <div className="min-w-0">
-                <h1 className="text-2xl sm:text-3xl font-playfair font-bold text-foreground">{member.name}</h1>
-                <div className="flex flex-wrap items-center gap-2 mt-2">
-                  {member.phone && (
-                    <a href={`tel:${member.phone}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1">
-                      📞 {member.phone}
-                    </a>
-                  )}
-                </div>
-              </div>
-              
-              {/* Engagement Badge & Last Contact */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <EngagementBadge status={member.engagement_status} days={member.days_since_last_contact} />
-                {member.last_contact_date && (
-                  <span className="text-xs sm:text-sm text-muted-foreground">
-                    {t('last_contact')}: {formatDate(member.last_contact_date, 'dd MMM yyyy')}
-                  </span>
-                )}
-              </div>
-            </div>
-            
-            {/* Add Care Event button - mobile friendly */}
-            <Dialog open={eventModalOpen} onOpenChange={setEventModalOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-teal-500 hover:bg-teal-600 text-white w-full sm:w-auto mt-4 h-12 min-w-0" data-testid="add-care-event-button">
-                  <Plus className="w-4 h-4 mr-2 flex-shrink-0" />
-                  <span className="truncate">{t('add_care_event')}</span>
-                </Button>
-              </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="add-care-event-modal">
+      <MemberProfileHeader
+        member={member}
+        onAddCareEvent={() => setEventModalOpen(true)}
+      />
+
+      {/* Add Care Event Dialog */}
+      <Dialog open={eventModalOpen} onOpenChange={setEventModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" data-testid="add-care-event-modal">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-playfair">{t('add_care_event')}</DialogTitle>
               </DialogHeader>
@@ -952,119 +913,13 @@ export const MemberDetail = () => {
                   {/* Timeline vertical line */}
                   <div className="absolute left-6 sm:left-7 top-12 bottom-0 w-0.5 bg-border"></div>
                   
-                  {careEvents.filter(e => e.event_type !== 'birthday').map((event, idx) => {
-                    const isIgnored = event.ignored === true;
-                    const isCompleted = event.completed === true;
-                    
-                    // Determine dot color based on event type
-                    let dotColor = 'bg-teal-500'; // Default: regular contact, general
-                    if (event.event_type === 'birthday' || event.event_type === 'childbirth' || event.event_type === 'new_house') {
-                      dotColor = 'bg-amber-500'; // Celebrations
-                    } else if (event.event_type === 'grief_loss' || event.event_type === 'accident_illness' || event.event_type === 'hospital_visit') {
-                      dotColor = 'bg-pink-500'; // Care/follow-ups
-                    } else if (event.event_type === 'financial_aid') {
-                      dotColor = 'bg-purple-500'; // Special/aid
-                    }
-                    
-                    // Determine border color for card
-                    let borderClass = 'card-border-left-teal';
-                    if (event.event_type === 'birthday' || event.event_type === 'childbirth' || event.event_type === 'new_house') {
-                      borderClass = 'card-border-left-amber';
-                    } else if (event.event_type === 'grief_loss' || event.event_type === 'accident_illness' || event.event_type === 'hospital_visit') {
-                      borderClass = 'card-border-left-pink';
-                    } else if (event.event_type === 'financial_aid') {
-                      borderClass = 'card-border-left-purple';
-                    }
-                    
-                    return (
-                    <div key={event.id} className={`flex gap-3 sm:gap-4 pb-6 relative`} data-testid={`care-event-${event.id}`}>
-                      
-                      {/* Timeline date marker with colored dot - always full opacity */}
-                      <div className="flex flex-col items-center shrink-0 w-12 sm:w-16">
-                        {/* Date circle */}
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white border-2 border-gray-200 shadow-md flex flex-col items-center justify-center relative z-10">
-                          <div className="text-sm sm:text-base font-bold leading-none">{formatDate(event.event_date, 'dd')}</div>
-                          <div className="text-[9px] sm:text-[10px] leading-none uppercase opacity-70 mt-0.5">{formatDate(event.event_date, 'MMM')}</div>
-                        </div>
-                        {/* Colored dot indicator below date - always vibrant */}
-                        <div className={`w-3 h-3 sm:w-4 sm:h-4 rounded-full ${dotColor} border-2 border-background shadow-sm mt-1 relative z-10`}></div>
-                      </div>
-                      
-                      {/* Event content card - apply opacity here if completed/ignored */}
-                      <Card className={`flex-1 ${borderClass} shadow-sm hover:shadow-md transition-all min-w-0 card ${isIgnored || isCompleted ? 'opacity-60' : ''}`}>
-                        <CardContent className="p-3 sm:p-4">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex flex-wrap items-center gap-2 mb-2">
-                                <EventTypeBadge type={event.event_type} />
-                                {/* Status badges inline with event type */}
-                                {isCompleted && (
-                                  <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded flex items-center gap-1">
-                                    <CheckCircle2 className="w-3 h-3" />
-                                    Completed
-                                  </span>
-                                )}
-                                {isIgnored && !isCompleted && (
-                                  <span className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded">Ignored</span>
-                                )}
-                              </div>
-                              <h5 className="font-playfair font-semibold text-sm sm:text-base text-foreground mb-2">{event.title}</h5>
-                              {event.description && (
-                                <p className="text-sm whitespace-pre-line font-bold text-foreground mb-2">
-                                  {event.description}
-                                </p>
-                              )}
-                              {event.grief_relationship && (
-                                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                                  Relationship: {event.grief_relationship.charAt(0).toUpperCase() + event.grief_relationship.slice(1)}
-                                </p>
-                              )}
-                              {event.hospital_name && event.hospital_name !== 'N/A' && event.hospital_name !== 'null' && event.hospital_name !== 'NULL' && (
-                                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                                  Hospital: {event.hospital_name}
-                                </p>
-                              )}
-                              {event.aid_amount && (
-                                <p className="text-sm text-green-700 font-medium mt-2">
-                                  {event.aid_type && `${event.aid_type} - `}Rp {event.aid_amount.toLocaleString('id-ID')}
-                                </p>
-                              )}
-                              {event.created_by_user_name && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                  <span className="font-medium">Created by:</span> {event.created_by_user_name}
-                                </p>
-                              )}
-                              {event.completed && event.completed_by_user_name && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
-                                  <span className="font-medium">Completed by:</span> {event.completed_by_user_name}
-                                  {event.completed_at && ` on ${new Date(event.completed_at).toLocaleDateString()}`}
-                                </p>
-                              )}
-                              {event.ignored && event.ignored_by_name && (
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
-                                  <span className="font-medium">Ignored by:</span> {event.ignored_by_name}
-                                  {event.ignored_at && ` on ${new Date(event.ignored_at).toLocaleDateString()}`}
-                                </p>
-                              )}
-                            </div>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button size="sm" variant="ghost" className="min-h-[44px] min-w-[44px] shrink-0">
-                                  <MoreVertical className="w-5 h-5" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleDeleteEvent(event.id)} className="text-red-600">
-                                  <Trash2 className="w-4 h-4 mr-2" />Delete
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                    );
-                  })}
+                  {careEvents.filter(e => e.event_type !== 'birthday').map((event) => (
+                    <TimelineEventCard
+                      key={event.id}
+                      event={event}
+                      onDelete={handleDeleteEvent}
+                    />
+                  ))}
             </div>
           )}
         </TabsContent>

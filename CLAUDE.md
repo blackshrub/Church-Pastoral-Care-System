@@ -169,16 +169,22 @@ See `backend/TESTING_GUIDE.md` for details.
 
 **Most Critical Files:**
 1. `src/pages/Dashboard.js` (~1935 lines) - Main task-oriented dashboard with TanStack Query
-2. `src/pages/MemberDetail.js` (~2900 lines) - Member profile with care event timeline
+2. `src/pages/MemberDetail.js` (~1788 lines) - Member profile with care event timeline
 3. `src/context/AuthContext.js` - Authentication state & JWT storage
 4. `src/App.js` - Root component with routing and providers
 
 **Dashboard Component Structure:**
-Dashboard has been partially decomposed into smaller, reusable components:
+Dashboard has been decomposed into smaller, reusable components:
 - `src/components/dashboard/DashboardStats.jsx` - 4-card stats overview
 - `src/components/dashboard/BirthdaySection.jsx` - Birthday task cards (today/overdue)
 - `src/components/dashboard/TaskCard.jsx` - Reusable task card with avatar, contact, and complete actions
 - Main `Dashboard.js` orchestrates data fetching and layout
+
+**MemberDetail Component Structure:**
+MemberDetail has been decomposed into focused components:
+- `src/components/member/MemberProfileHeader.jsx` - Profile header with name, contact, engagement badge
+- `src/components/member/TimelineEventCard.jsx` - Reusable care event card for timeline display
+- Main `MemberDetail.js` handles data fetching, dialogs, and layout
 
 **Component Decomposition Pattern:**
 When breaking down large components (>500 lines):
