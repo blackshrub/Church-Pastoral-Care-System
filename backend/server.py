@@ -4149,26 +4149,55 @@ async def get_member_financial_aid(member_id: str):
 async def get_dashboard_stats():
     """Get overall dashboard statistics"""
     try:
-        total_members = await db.members.count_documents({})
-        
-        # Active grief support count
+        # Optimize: Use aggregation pipeline to get member stats in single query
+        member_stats_pipeline = [
+            {
+                "$facet": {
+                    "total_count": [
+                        {"$count": "count"}
+                    ],
+                    "at_risk_count": [
+                        {"$match": {"engagement_status": {"$in": ["at_risk", "disconnected"]}}},
+                        {"$count": "count"}
+                    ],
+                    "engagement_distribution": [
+                        {"$group": {"_id": "$engagement_status", "count": {"$sum": 1}}}
+                    ]
+                }
+            }
+        ]
+
+        member_stats_result = await db.members.aggregate(member_stats_pipeline).to_list(1)
+        member_stats = member_stats_result[0] if member_stats_result else {}
+
+        total_members = member_stats.get("total_count", [{}])[0].get("count", 0)
+        at_risk_count = member_stats.get("at_risk_count", [{}])[0].get("count", 0)
+
+        # Active grief support count (separate collection)
         active_grief = await db.grief_support.count_documents({"completed": False})
-        
-        # At-risk members - use stored engagement_status
-        at_risk_count = await db.members.count_documents({
-            "engagement_status": {"$in": ["at_risk", "disconnected"]}
-        })
-        
-        # This month's financial aid
+
+        # Optimize: Use aggregation to sum financial aid amounts directly in MongoDB
         today = date.today()
         month_start = today.replace(day=1).isoformat()
-        month_aid = await db.care_events.find({
-            "event_type": EventType.FINANCIAL_AID,
-            "event_date": {"$gte": month_start}
-        }, {"_id": 0, "aid_amount": 1}).to_list(1000)
-        
-        total_aid = sum(event.get('aid_amount', 0) or 0 for event in month_aid)
-        
+
+        financial_aid_pipeline = [
+            {
+                "$match": {
+                    "event_type": EventType.FINANCIAL_AID,
+                    "event_date": {"$gte": month_start}
+                }
+            },
+            {
+                "$group": {
+                    "_id": None,
+                    "total_aid": {"$sum": {"$ifNull": ["$aid_amount", 0]}}
+                }
+            }
+        ]
+
+        financial_aid_result = await db.care_events.aggregate(financial_aid_pipeline).to_list(1)
+        total_aid = financial_aid_result[0]["total_aid"] if financial_aid_result else 0
+
         return {
             "total_members": total_members,
             "active_grief_support": active_grief,
@@ -4185,21 +4214,43 @@ async def get_upcoming_events(days: int = 7):
     try:
         today = date.today()
         future_date = today + timedelta(days=days)
-        
-        events = await db.care_events.find({
-            "event_date": {
-                "$gte": today.isoformat(),
-                "$lte": future_date.isoformat()
+
+        # Optimize: Use aggregation with $lookup to join member data in single query
+        pipeline = [
+            {
+                "$match": {
+                    "event_date": {
+                        "$gte": today.isoformat(),
+                        "$lte": future_date.isoformat()
+                    },
+                    "completed": False
+                }
             },
-            "completed": False
-        }, {"_id": 0}).sort("event_date", 1).to_list(100)
-        
-        # Get member info for each event
-        for event in events:
-            member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0, "name": 1, "phone": 1})
-            if member:
-                event["member_name"] = member["name"]
-        
+            {
+                "$lookup": {
+                    "from": "members",
+                    "localField": "member_id",
+                    "foreignField": "id",
+                    "as": "member_info"
+                }
+            },
+            {
+                "$addFields": {
+                    "member_name": {"$arrayElemAt": ["$member_info.name", 0]},
+                    "member_phone": {"$arrayElemAt": ["$member_info.phone", 0]}
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "member_info": 0
+                }
+            },
+            {"$sort": {"event_date": 1}},
+            {"$limit": 100}
+        ]
+
+        events = await db.care_events.aggregate(pipeline).to_list(100)
         return events
     except Exception as e:
         logger.error(f"Error getting upcoming events: {str(e)}")
@@ -4209,27 +4260,47 @@ async def get_upcoming_events(days: int = 7):
 async def get_active_grief_support():
     """Get members currently in grief support timeline"""
     try:
-        # Get all incomplete grief stages
-        stages = await db.grief_support.find(
-            {"completed": False},
-            {"_id": 0}
-        ).sort("scheduled_date", 1).to_list(100)
-        
-        # Group by member
-        member_grief = {}
-        for stage in stages:
-            member_id = stage["member_id"]
-            if member_id not in member_grief:
-                member = await db.members.find_one({"id": member_id}, {"_id": 0, "name": 1, "phone": 1})
-                member_grief[member_id] = {
-                    "member_id": member_id,
-                    "member_name": member["name"] if member else "Unknown",
-                    "stages": []
+        # Optimize: Use aggregation with $lookup and $group to join and group in single query
+        pipeline = [
+            {"$match": {"completed": False}},
+            {"$sort": {"scheduled_date": 1}},
+            {
+                "$lookup": {
+                    "from": "members",
+                    "localField": "member_id",
+                    "foreignField": "id",
+                    "as": "member_info"
                 }
-            
-            member_grief[member_id]["stages"].append(stage)
-        
-        return list(member_grief.values())
+            },
+            {
+                "$addFields": {
+                    "member_name": {"$arrayElemAt": ["$member_info.name", 0]},
+                    "member_phone": {"$arrayElemAt": ["$member_info.phone", 0]}
+                }
+            },
+            {
+                "$group": {
+                    "_id": "$member_id",
+                    "member_id": {"$first": "$member_id"},
+                    "member_name": {"$first": {"$ifNull": ["$member_name", "Unknown"]}},
+                    "stages": {
+                        "$push": {
+                            "$arrayToObject": {
+                                "$filter": {
+                                    "input": {"$objectToArray": "$$ROOT"},
+                                    "cond": {"$not": [{"$in": ["$$this.k", ["_id", "member_info", "member_name", "member_phone"]]}]}
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            {"$project": {"_id": 0}},
+            {"$limit": 100}
+        ]
+
+        result = await db.grief_support.aggregate(pipeline).to_list(100)
+        return result
     except Exception as e:
         logger.error(f"Error getting active grief support: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -4238,17 +4309,32 @@ async def get_active_grief_support():
 async def get_recent_activity(limit: int = 20):
     """Get recent care events"""
     try:
-        events = await db.care_events.find(
-            {},
-            {"_id": 0}
-        ).sort("created_at", -1).limit(limit).to_list(limit)
-        
-        # Add member names
-        for event in events:
-            member = await db.members.find_one({"id": event["member_id"]}, {"_id": 0, "name": 1})
-            if member:
-                event["member_name"] = member["name"]
-        
+        # Optimize: Use aggregation with $lookup to join member data in single query
+        pipeline = [
+            {
+                "$lookup": {
+                    "from": "members",
+                    "localField": "member_id",
+                    "foreignField": "id",
+                    "as": "member_info"
+                }
+            },
+            {
+                "$addFields": {
+                    "member_name": {"$arrayElemAt": ["$member_info.name", 0]}
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "member_info": 0
+                }
+            },
+            {"$sort": {"created_at": -1}},
+            {"$limit": limit}
+        ]
+
+        events = await db.care_events.aggregate(pipeline).to_list(limit)
         return events
     except Exception as e:
         logger.error(f"Error getting recent activity: {str(e)}")
