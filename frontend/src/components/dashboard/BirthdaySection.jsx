@@ -1,0 +1,98 @@
+/**
+ * Birthday Section Component
+ * Displays today's birthdays or overdue birthdays
+ */
+
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { TaskCard } from './TaskCard';
+import axios from 'axios';
+import { toast } from 'sonner';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+const triggerHaptic = () => {
+  if ('vibrate' in navigator) {
+    navigator.vibrate(50);
+  }
+};
+
+const markBirthdayComplete = async (eventId, queryClient, t) => {
+  try {
+    // Optimistic update - remove from UI immediately
+    queryClient.setQueryData(['dashboard'], (old) => {
+      if (!old) return old;
+      return {
+        ...old,
+        today: old.today.filter(e => e.id !== eventId),
+        overdue: old.overdue.filter(e => e.id !== eventId)
+      };
+    });
+
+    await axios.post(`${API}/care-events/${eventId}/complete`);
+    toast.success(t('toasts.birthday_completed'));
+    // Refetch to get accurate data
+    await queryClient.invalidateQueries(['dashboard']);
+  } catch (error) {
+    toast.error(t('toasts.failed_complete'));
+    // Revert optimistic update on error
+    queryClient.invalidateQueries(['dashboard']);
+  }
+};
+
+export const BirthdaySection = ({
+  birthdays = [],
+  title = 'Birthdays Today',
+  icon = '🎂',
+  borderClass = 'card-border-left-amber'
+}) => {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+
+  if (birthdays.length === 0) return null;
+
+  const config = {
+    bgClass: 'bg-amber-50',
+    borderClass: 'border-amber-200',
+    btnClass: 'bg-amber-500 hover:bg-amber-600',
+    ringClass: 'ring-amber-400'
+  };
+
+  return (
+    <Card className={borderClass}>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-xl">
+          {icon} {title} ({birthdays.length})
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {birthdays.map(event => (
+            <TaskCard
+              key={event.id}
+              event={event}
+              config={config}
+              onComplete={(id) => markBirthdayComplete(id, queryClient, t)}
+              actionLabel={t('mark_complete')}
+              completedLabel={t('completed')}
+              contactLabel={t('contact_whatsapp')}
+              triggerHaptic={triggerHaptic}
+            >
+              {event.completed
+                ? "✅ Birthday contact completed"
+                : t('labels.call_wish_birthday')}
+              {event.member_age && (
+                <span className="ml-2 text-xs">• {event.member_age} years old</span>
+              )}
+            </TaskCard>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default BirthdaySection;

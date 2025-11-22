@@ -29,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Heart, Users, Hospital, Calendar, AlertTriangle, DollarSign, Bell, Plus, Check, MoreVertical, Phone, Cake, CalendarIcon } from 'lucide-react';
+import { DashboardStats, BirthdaySection } from '@/components/dashboard';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -457,66 +458,17 @@ export const Dashboard = () => {
         <p className="text-muted-foreground text-lg">{t('pastoral_overview')}</p>
       </div>
       
-      {/* Stats Cards with Colored Left Borders */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-full">
-        <Card className="card-border-left-teal shadow-sm hover:shadow-md transition-all min-w-0">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1">{t('total_members')}</p>
-                <p className="text-2xl sm:text-4xl font-playfair font-bold">805</p>
-              </div>
-              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5 sm:w-7 sm:h-7 text-teal-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="card-border-left-amber shadow-sm hover:shadow-md transition-all min-w-0">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Tasks Due Today</p>
-                <p className="text-2xl sm:text-4xl font-playfair font-bold">
-                  {birthdaysToday.filter(b => !b.completed).length + todayTasks.filter(t => !t.completed).length}
-                </p>
-              </div>
-              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                <Bell className="w-5 h-5 sm:w-7 sm:h-7 text-amber-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="card-border-left-pink shadow-sm hover:shadow-md transition-all min-w-0">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Overdue Follow-ups</p>
-                <p className="text-2xl sm:text-4xl font-playfair font-bold">{griefDue.length + accidentFollowUp.length + financialAidDue.length}</p>
-              </div>
-              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
-                <Heart className="w-5 h-5 sm:w-7 sm:h-7 text-pink-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="card-border-left-purple shadow-sm hover:shadow-md transition-all min-w-0">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm text-muted-foreground mb-1">Members Needing Care</p>
-                <p className="text-2xl sm:text-4xl font-playfair font-bold">{atRiskMembers.length + disconnectedMembers.length}</p>
-              </div>
-              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                <AlertTriangle className="w-5 h-5 sm:w-7 sm:h-7 text-purple-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Stats Cards */}
+      <DashboardStats
+        totalMembers={805}
+        birthdaysToday={birthdaysToday}
+        todayTasks={todayTasks}
+        griefDue={griefDue}
+        accidentFollowUp={accidentFollowUp}
+        financialAidDue={financialAidDue}
+        atRiskMembers={atRiskMembers}
+        disconnectedMembers={disconnectedMembers}
+      />
       
       {/* Quick Actions */}
       <div className="max-w-full">
@@ -964,78 +916,12 @@ export const Dashboard = () => {
           ) : (
             <>
               {/* Birthdays Today */}
-              {birthdaysToday.length > 0 && (
-                <Card className="card-border-left-amber">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-xl">
-                      🎂 {t('birthdays_today')} ({birthdaysToday.length})
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {birthdaysToday.map(event => (
-                        <div key={event.id} className="p-4 bg-amber-50 rounded-lg border border-amber-200 relative hover:shadow-lg transition-all">
-                          {/* Overdue Badge - Top Right */}
-                          {event.days_overdue > 0 && (
-                            <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
-                              {event.days_overdue}d overdue
-                            </span>
-                          )}
-                          
-                          <div className="flex items-start gap-3 mb-3">
-                            {/* Avatar with colored ring - Simplified */}
-                            <div className="flex-shrink-0 rounded-full ring-2 ring-amber-400">
-                              <MemberAvatar member={{name: event.member_name, photo_url: event.member_photo_url}} size="md" />
-                            </div>
-                            
-                            <div className="flex-1 min-w-0">
-                              <Link to={`/members/${event.member_id}`} className="font-semibold text-base hover:text-teal-600">
-                                {event.member_name}
-                              </Link>
-                              {event.member_phone && (
-                                <a href={`tel:${event.member_phone}`} className="text-sm text-teal-600 hover:text-teal-700 flex items-center gap-1 mt-1">
-                                  📞 {event.member_phone}
-                                </a>
-                              )}
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {event.completed ? "✅ Birthday contact completed" : t('labels.call_wish_birthday')}
-                                {event.member_age && <span className="ml-2 text-xs">• {event.member_age} years old</span>}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {/* Actions - Horizontal compact layout */}
-                          <div className="flex gap-2">
-                            <Button 
-                              size="default" 
-                              className="bg-amber-500 hover:bg-amber-600 text-white h-11 flex-1 min-w-0" 
-                              asChild
-                            >
-                              <a href={formatPhoneForWhatsApp(event.member_phone)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
-                                <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                                </svg>
-                                <span className="truncate">{t('contact_whatsapp')}</span>
-                              </a>
-                            </Button>
-                            {event.completed ? (
-                              <Button size="default" variant="outline" disabled className="bg-white text-green-700 border-green-300 h-11 flex-1 min-w-0">
-                                <Check className="w-4 h-4 mr-1" />
-                                <span className="truncate">{t('completed')}</span>
-                              </Button>
-                            ) : (
-                              <Button size="default" variant="outline" onClick={() => { triggerHaptic(); markBirthdayComplete(event.id, queryClient, t); }} className="h-11 flex-1 min-w-0 bg-white hover:bg-gray-50">
-                                <Check className="w-4 h-4 mr-1" />
-                                <span className="truncate">{t('mark_complete')}</span>
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              <BirthdaySection
+                birthdays={birthdaysToday}
+                title={t('birthdays_today')}
+                icon="🎂"
+                borderClass="card-border-left-amber"
+              />
               
               {/* All Other Tasks Due Today */}
               {todayTasks.length > 0 && (

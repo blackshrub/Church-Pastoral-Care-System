@@ -85,9 +85,17 @@ load_dotenv(ROOT_DIR / '.env')
 from config import validate_config
 validate_config(exit_on_error=False)  # Show warnings but don't exit
 
-# MongoDB connection
+# MongoDB connection with optimized pooling for production
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(
+    mongo_url,
+    maxPoolSize=50,  # Maximum number of connections in the pool
+    minPoolSize=10,  # Minimum number of connections to keep open
+    maxIdleTimeMS=45000,  # Close idle connections after 45 seconds
+    serverSelectionTimeoutMS=5000,  # Timeout for server selection
+    connectTimeoutMS=10000,  # Timeout for new connections
+    socketTimeoutMS=45000,  # Timeout for socket operations
+)
 db = client[os.environ.get('DB_NAME', 'pastoral_care_db')]
 
 # Create the main app without a prefix
@@ -726,40 +734,104 @@ class SyncLog(BaseModel):
 
 # ==================== UTILITY FUNCTIONS ====================
 
+# Simple in-memory cache for static data
+_cache = {}
+_cache_timestamps = {}
+
+def get_from_cache(key: str, ttl_seconds: int = 300) -> Optional[Any]:
+    """
+    Get value from cache if not expired
+
+    Args:
+        key: Cache key
+        ttl_seconds: Time to live in seconds (default 5 minutes)
+
+    Returns:
+        Cached value or None if expired/not found
+    """
+    if key in _cache:
+        age = (datetime.now(timezone.utc) - _cache_timestamps[key]).total_seconds()
+        if age < ttl_seconds:
+            return _cache[key]
+        else:
+            # Expired, remove from cache
+            del _cache[key]
+            del _cache_timestamps[key]
+    return None
+
+def set_in_cache(key: str, value: Any) -> None:
+    """
+    Store value in cache with current timestamp
+
+    Args:
+        key: Cache key
+        value: Value to cache
+    """
+    _cache[key] = value
+    _cache_timestamps[key] = datetime.now(timezone.utc)
+
+def invalidate_cache(pattern: Optional[str] = None) -> None:
+    """
+    Invalidate cache entries
+
+    Args:
+        pattern: If provided, only invalidate keys containing this pattern.
+                If None, clear entire cache.
+    """
+    global _cache, _cache_timestamps
+    if pattern is None:
+        _cache.clear()
+        _cache_timestamps.clear()
+    else:
+        keys_to_delete = [k for k in _cache.keys() if pattern in k]
+        for key in keys_to_delete:
+            del _cache[key]
+            del _cache_timestamps[key]
+
 async def get_engagement_settings():
-    """Get engagement threshold settings from database"""
+    """Get engagement threshold settings from database (cached for 10 minutes)"""
+    cache_key = "engagement_settings"
+    cached = get_from_cache(cache_key, ttl_seconds=600)
+    if cached is not None:
+        return cached
+
     try:
         settings = await db.settings.find_one({"key": "engagement_thresholds"}, {"_id": 0})
         if settings:
-            return settings.get("data", {"atRiskDays": 60, "disconnectedDays": 90})
-        return {"atRiskDays": 60, "disconnectedDays": 90}
+            result = settings.get("data", {"atRiskDays": ENGAGEMENT_AT_RISK_DAYS_DEFAULT, "disconnectedDays": ENGAGEMENT_DISCONNECTED_DAYS_DEFAULT})
+        else:
+            result = {"atRiskDays": ENGAGEMENT_AT_RISK_DAYS_DEFAULT, "disconnectedDays": ENGAGEMENT_DISCONNECTED_DAYS_DEFAULT}
+
+        set_in_cache(cache_key, result)
+        return result
     except:
-        return {"atRiskDays": 60, "disconnectedDays": 90}
+        return {"atRiskDays": ENGAGEMENT_AT_RISK_DAYS_DEFAULT, "disconnectedDays": ENGAGEMENT_DISCONNECTED_DAYS_DEFAULT}
 
 async def get_writeoff_settings():
-    """Get overdue write-off threshold settings from database"""
+    """Get overdue write-off threshold settings from database (cached for 10 minutes)"""
+    cache_key = "writeoff_settings"
+    cached = get_from_cache(cache_key, ttl_seconds=600)
+    if cached is not None:
+        return cached
+
+    default_settings = {
+        "birthday": DEFAULT_REMINDER_DAYS_BIRTHDAY,
+        "financial_aid": DEFAULT_REMINDER_DAYS_FINANCIAL_AID,
+        "accident_illness": DEFAULT_REMINDER_DAYS_ACCIDENT_ILLNESS,
+        "grief_support": DEFAULT_REMINDER_DAYS_GRIEF_SUPPORT
+    }
+
     try:
         settings = await db.settings.find_one({"key": "overdue_writeoff"}, {"_id": 0})
         if settings:
-            return settings.get("data", {
-                "birthday": 7,
-                "financial_aid": 0,
-                "accident_illness": 14,
-                "grief_support": 14
-            })
-        return {
-            "birthday": 7,
-            "financial_aid": 0,
-            "accident_illness": 14,
-            "grief_support": 14
-        }
+            result = settings.get("data", default_settings)
+        else:
+            result = default_settings
+
+        set_in_cache(cache_key, result)
+        return result
     except:
-        return {
-            "birthday": 7,
-            "financial_aid": 0,
-            "accident_illness": 14,
-            "grief_support": 14
-        }
+        return default_settings
 
 async def calculate_engagement_status_async(last_contact: Optional[datetime]) -> tuple[EngagementStatus, int]:
     """Calculate engagement status using configurable thresholds"""
@@ -1078,6 +1150,10 @@ async def create_campus(campus: CampusCreate, current_admin: dict = Depends(get_
             location=campus.location
         )
         await db.campuses.insert_one(campus_obj.model_dump())
+
+        # Invalidate campus cache
+        invalidate_cache("campuses:")
+
         return campus_obj
     except Exception as e:
         logger.error(f"Error creating campus: {str(e)}")
@@ -1085,9 +1161,15 @@ async def create_campus(campus: CampusCreate, current_admin: dict = Depends(get_
 
 @api_router.get("/campuses", response_model=List[Campus])
 async def list_campuses():
-    """List all campuses (public for login selection)"""
+    """List all campuses (public for login selection) - cached for 10 minutes"""
+    cache_key = "campuses:all"
+    cached = get_from_cache(cache_key, ttl_seconds=600)
+    if cached is not None:
+        return cached
+
     try:
         campuses = await db.campuses.find({"is_active": True}, {"_id": 0}).to_list(100)
+        set_in_cache(cache_key, campuses)
         return campuses
     except Exception as e:
         logger.error(f"Error listing campuses: {str(e)}")
@@ -1120,6 +1202,10 @@ async def update_campus(campus_id: str, update: CampusCreate, current_admin: dic
         )
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Campus not found")
+
+        # Invalidate campus cache
+        invalidate_cache("campuses:")
+
         return await get_campus(campus_id)
     except HTTPException:
         raise
@@ -5260,6 +5346,10 @@ async def update_engagement_settings(settings: dict, current_admin: dict = Depen
             }},
             upsert=True
         )
+
+        # Invalidate engagement settings cache
+        invalidate_cache("engagement_settings")
+
         return {"success": True, "message": "Engagement settings updated"}
     except Exception as e:
         logger.error(f"Error updating engagement settings: {str(e)}")
@@ -5288,7 +5378,7 @@ async def update_overdue_writeoff_settings(settings_data: dict, user: dict = Dep
     try:
         if user.get("role") not in [UserRole.FULL_ADMIN, UserRole.CAMPUS_ADMIN]:
             raise HTTPException(status_code=403, detail="Only admins can update settings")
-        
+
         await db.settings.update_one(
             {"key": "overdue_writeoff"},
             {"$set": {
@@ -5298,6 +5388,10 @@ async def update_overdue_writeoff_settings(settings_data: dict, user: dict = Dep
             }},
             upsert=True
         )
+
+        # Invalidate writeoff settings cache
+        invalidate_cache("writeoff_settings")
+
         return {"success": True, "message": "Write-off settings updated"}
     except HTTPException:
         raise
