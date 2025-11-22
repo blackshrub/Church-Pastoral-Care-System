@@ -1400,9 +1400,26 @@ async def list_members(
         
         # Get total count for pagination metadata
         total = await db.members.count_documents(query)
-        
-        # Get paginated members
-        members = await db.members.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+
+        # Define projection for list view (exclude heavy fields like notes, address)
+        projection = {
+            "_id": 0,
+            "id": 1,
+            "name": 1,
+            "phone": 1,
+            "campus_id": 1,
+            "photo_url": 1,
+            "family_group_id": 1,
+            "last_contact_date": 1,
+            "engagement_status": 1,
+            "days_since_last_contact": 1,
+            "is_archived": 1,
+            "external_member_id": 1
+            # Exclude: notes, address, birth_date, archived_at, archived_reason, category, etc.
+        }
+
+        # Get paginated members with projection
+        members = await db.members.find(query, projection).skip(skip).limit(limit).to_list(limit)
         
         # Update engagement status for each member
         for member in members:
@@ -1546,18 +1563,38 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         overdue_birthdays = []
         upcoming_tasks = []
         
-        # Grief support due (today and overdue)
+        # Grief support due (today and overdue) - with projection
         grief_stages = await db.grief_support.find(
             {"campus_id": campus_id, "completed": False, "ignored": {"$ne": True}},
-            {"_id": 0}
+            {
+                "_id": 0,
+                "id": 1,
+                "member_id": 1,
+                "campus_id": 1,
+                "care_event_id": 1,
+                "stage": 1,
+                "scheduled_date": 1,
+                "completed": 1,
+                "notes": 1
+            }
         ).to_list(None)
         
         logger.info(f"Found {len(grief_stages)} incomplete grief stages for campus")
         
-        # Accident follow-ups due
+        # Accident follow-ups due - with projection
         accident_followups = await db.accident_followup.find(
             {"campus_id": campus_id, "completed": False, "ignored": {"$ne": True}},
-            {"_id": 0}
+            {
+                "_id": 0,
+                "id": 1,
+                "member_id": 1,
+                "campus_id": 1,
+                "care_event_id": 1,
+                "stage": 1,
+                "scheduled_date": 1,
+                "completed": 1,
+                "notes": 1
+            }
         ).to_list(None)
         
         accident_today = []
@@ -1608,10 +1645,20 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         at_risk = [m for m in members if m.get("engagement_status") == "at_risk"]
         disconnected = [m for m in members if m.get("engagement_status") == "disconnected"]
         
-        # Financial aid - categorize by date
+        # Financial aid - categorize by date - with projection
         aid_schedules = await db.financial_aid_schedules.find(
             {"campus_id": campus_id, "is_active": True, "ignored": {"$ne": True}},
-            {"_id": 0}
+            {
+                "_id": 0,
+                "id": 1,
+                "member_id": 1,
+                "campus_id": 1,
+                "aid_amount": 1,
+                "frequency": 1,
+                "next_occurrence": 1,
+                "is_active": 1,
+                "notes": 1
+            }
         ).to_list(None)
         
         logger.info(f"Found {len(aid_schedules)} active financial aid schedules for campus")
@@ -1875,7 +1922,22 @@ async def ignore_care_event(event_id: str, user: dict = Depends(get_current_user
 async def list_at_risk_members():
     """Get members with no contact in 30+ days"""
     try:
-        members = await db.members.find({}, {"_id": 0}).to_list(1000)
+        # Projection for at-risk members list
+        projection = {
+            "_id": 0,
+            "id": 1,
+            "name": 1,
+            "phone": 1,
+            "campus_id": 1,
+            "photo_url": 1,
+            "family_group_id": 1,
+            "last_contact_date": 1,
+            "engagement_status": 1,
+            "days_since_last_contact": 1,
+            "external_member_id": 1
+        }
+
+        members = await db.members.find({}, projection).to_list(1000)
         
         at_risk_members = []
         for member in members:
