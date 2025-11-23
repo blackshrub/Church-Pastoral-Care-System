@@ -68,7 +68,48 @@ yarn test
 
 ### Testing
 
-Backend has comprehensive API tests in `backend/test_api.sh` covering:
+**Automated Test Suite (pytest)** - Phase 1 Complete ✅
+
+```bash
+# Run all backend tests
+cd backend
+pytest tests/ -v
+
+# Run with coverage report
+pytest tests/ -v --cov=. --cov-report=term-missing
+
+# Run specific test file
+pytest tests/test_scheduler.py -v
+
+# Run specific test
+pytest tests/test_scheduler.py::test_job_lock_acquisition -v
+
+# Run tests in parallel (faster)
+pytest tests/ -v -n auto
+```
+
+**Test Coverage:**
+- ✅ **Scheduler & Job Locks** (`test_scheduler.py`) - Critical for multi-worker environment
+  - Job lock acquisition/release
+  - Lock expiration handling
+  - Concurrent lock attempts
+  - Daily digest generation
+  - Multi-campus isolation
+
+- ✅ **Multi-Tenancy** (`test_multi_tenancy.py`) - Data isolation security
+  - Campus data isolation
+  - Cross-campus access prevention
+  - Full_admin permissions
+  - Dashboard cache separation
+
+- ✅ **Basic Functionality** (`test_basic_functionality.py`)
+  - Member CRUD operations
+  - Care event management
+  - Engagement status tracking
+  - User authentication
+
+**Legacy Integration Tests:**
+`backend/test_api.sh` - Bash script with curl commands covering:
 - Authentication & JWT
 - Member CRUD operations
 - Care events (birthdays, grief, hospital visits, financial aid)
@@ -77,7 +118,10 @@ Backend has comprehensive API tests in `backend/test_api.sh` covering:
 - WhatsApp integration
 - CSV import/export
 
-See `backend/TESTING_GUIDE.md` for details.
+**Test Database:**
+Tests use isolated `faithtracker_test` database (auto-cleanup after each test).
+
+See `backend/pytest.ini` for configuration.
 
 ## Architecture
 
