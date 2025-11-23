@@ -62,13 +62,19 @@ yarn build
 # Build with bundle analysis
 yarn build:analyze
 
-# Run tests
+# Run unit tests (Jest + React Testing Library)
 yarn test
+
+# Run E2E tests (Playwright)
+yarn test:e2e              # Headless mode
+yarn test:e2e:ui           # Interactive UI mode
+yarn test:e2e:headed       # See browser
+yarn test:e2e:debug        # Debug mode
 ```
 
 ### Testing
 
-**Automated Test Suite (pytest)** - Phase 1 Complete ✅
+**Phase 1: Backend Tests (pytest)** ✅ Complete
 
 ```bash
 # Run all backend tests
@@ -88,25 +94,126 @@ pytest tests/test_scheduler.py::test_job_lock_acquisition -v
 pytest tests/ -v -n auto
 ```
 
-**Test Coverage:**
+**Backend Test Coverage:**
 - ✅ **Scheduler & Job Locks** (`test_scheduler.py`) - Critical for multi-worker environment
   - Job lock acquisition/release
   - Lock expiration handling
-  - Concurrent lock attempts
+  - Concurrent lock attempts (simulates 4 workers)
   - Daily digest generation
   - Multi-campus isolation
 
 - ✅ **Multi-Tenancy** (`test_multi_tenancy.py`) - Data isolation security
-  - Campus data isolation
+  - Campus data isolation (members, events, logs)
   - Cross-campus access prevention
-  - Full_admin permissions
+  - Cannot modify/delete other campus data
+  - Full_admin multi-campus access
   - Dashboard cache separation
 
 - ✅ **Basic Functionality** (`test_basic_functionality.py`)
   - Member CRUD operations
   - Care event management
   - Engagement status tracking
-  - User authentication
+  - User password hashing
+  - Campus activation status
+
+**Phase 2: Frontend Tests** ✅ Complete
+
+**Unit Tests (Jest + React Testing Library)**
+
+```bash
+cd frontend
+
+# Run all unit tests
+yarn test
+
+# Run with coverage
+yarn test --coverage
+
+# Run specific test file
+yarn test useDebounce.test.js
+
+# Run in watch mode
+yarn test --watch
+```
+
+**Frontend Test Coverage:**
+- ✅ **Custom Hooks** (`src/__tests__/hooks/`)
+  - `useDebounce.test.js` - Debounce hook timing, cancellation, edge cases
+
+- ✅ **Components** (`src/__tests__/components/`)
+  - `TimelineEventCard.test.js` - Event card rendering, interactions, delete action
+  - `MemberProfileHeader.test.js` - Profile header display, engagement badges, responsive
+
+**E2E Tests (Playwright)**
+
+```bash
+cd frontend
+
+# Install Playwright browsers (first time only)
+npx playwright install
+
+# Run all E2E tests
+yarn test:e2e
+
+# Run in UI mode (recommended for development)
+yarn test:e2e:ui
+
+# Run specific test file
+yarn test:e2e auth.spec.js
+
+# Run with visible browser
+yarn test:e2e:headed
+
+# Debug tests
+yarn test:e2e:debug
+
+# View test report
+npx playwright show-report
+```
+
+**E2E Test Coverage:**
+- ✅ **Authentication** (`e2e/auth.spec.js`)
+  - Login with valid/invalid credentials
+  - Logout and session clearing
+  - Protected route access
+  - Session persistence on reload
+  - Form validation
+
+- ✅ **Member CRUD** (`e2e/member-crud.spec.js`)
+  - View members list
+  - Search members
+  - Create new member
+  - View member details
+  - Edit member information
+  - Delete member
+  - Filter by engagement status
+
+- ✅ **Care Events** (`e2e/care-events.spec.js`)
+  - Create birthday event
+  - Create grief/loss event with auto-timeline (6 stages)
+  - Create hospital visit event
+  - Create financial aid event
+  - Complete/ignore care events
+  - Delete care events
+  - Event type badges and colors
+
+- ✅ **Dashboard** (`e2e/dashboard.spec.js`)
+  - Display statistics and metrics
+  - Today's tasks and birthday reminders
+  - Navigate to member details
+  - Complete tasks from dashboard
+  - Filter tasks by status
+  - Search members
+  - Mobile responsive view (375x667)
+
+**Test Environment Setup:**
+
+Create `frontend/.env.test`:
+```bash
+TEST_USER_EMAIL=admin@test.com
+TEST_USER_PASSWORD=testpass123
+REACT_APP_BACKEND_URL=http://localhost:8001/api
+```
 
 **Legacy Integration Tests:**
 `backend/test_api.sh` - Bash script with curl commands covering:
@@ -118,10 +225,19 @@ pytest tests/ -v -n auto
 - WhatsApp integration
 - CSV import/export
 
-**Test Database:**
-Tests use isolated `faithtracker_test` database (auto-cleanup after each test).
+**Test Databases:**
+- Backend tests use isolated `faithtracker_test` database (auto-cleanup after each test)
+- E2E tests can use development database or separate test instance
 
-See `backend/pytest.ini` for configuration.
+**Test Configuration Files:**
+- `backend/pytest.ini` - Pytest configuration
+- `frontend/playwright.config.js` - Playwright E2E configuration
+- `frontend/e2e/README.md` - Detailed E2E testing guide
+
+**Coverage Goals:**
+- Backend: 80%+ (critical paths 100%)
+- Frontend: 70%+ (components and hooks)
+- E2E: All critical user flows
 
 ## Architecture
 
