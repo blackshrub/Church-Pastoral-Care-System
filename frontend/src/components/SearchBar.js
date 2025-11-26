@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, User, Calendar, X } from 'lucide-react';
-import axios from 'axios';
+import api from '@/lib/api';
 
 const SearchBar = () => {
   const [query, setQuery] = useState('');
@@ -47,13 +47,7 @@ const SearchBar = () => {
   const performSearch = async (searchQuery) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/search?q=${encodeURIComponent(searchQuery)}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.get(`/search?q=${encodeURIComponent(searchQuery)}`);
       setResults(response.data);
       setIsOpen(true);
     } catch (error) {

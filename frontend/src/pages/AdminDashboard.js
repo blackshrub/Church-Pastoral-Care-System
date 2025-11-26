@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,9 +15,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 import { Plus, Trash2, Building2, Users as UsersIcon, Shield, MoreVertical, Edit, Phone } from 'lucide-react';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 export const AdminDashboard = () => {
   const { t } = useTranslation();
@@ -55,7 +52,7 @@ export const AdminDashboard = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [c, u] = await Promise.all([axios.get(`${API}/campuses`), axios.get(`${API}/users`)]);
+      const [c, u] = await Promise.all([api.get('/campuses`), api.get('/users`)]);
       setCampuses(c.data);
       setUsers(u.data);
     } catch (error) {
@@ -70,11 +67,11 @@ export const AdminDashboard = () => {
     try {
       if (newCampus.id) {
         // Update existing campus
-        await axios.put(`${API}/campuses/${newCampus.id}`, { campus_name: newCampus.campus_name, location: newCampus.location });
+        await api.put('/campuses/${newCampus.id}`, { campus_name: newCampus.campus_name, location: newCampus.location });
         toast.success(t('toasts.campus_updated'));
       } else {
         // Create new campus
-        await axios.post(`${API}/campuses`, newCampus);
+        await api.post('/campuses`, newCampus);
         toast.success(t('toasts.campus_created'));
       }
       setCampusModalOpen(false);
@@ -88,7 +85,7 @@ export const AdminDashboard = () => {
   const handleAddUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/auth/register`, newUser);
+      await api.post('/auth/register`, newUser);
       toast.success(t('admin_dashboard_page.user_created'));
       setUserModalOpen(false);
       setNewUser({ email: '', password: '', name: '', phone: '', role: 'pastor', campus_id: '' });
@@ -104,7 +101,7 @@ export const AdminDashboard = () => {
       `Are you sure you want to delete ${name}? This action cannot be undone.`,
       async () => {
         try {
-          await axios.delete(`${API}/users/${id}`);
+          await api.delete('/users/${id}`);
           toast.success(t('toasts.deleted'));
           loadData();
           closeConfirm();
@@ -144,7 +141,7 @@ export const AdminDashboard = () => {
         updateData.password = newUser.password;
       }
       
-      await axios.put(`${API}/users/${editingUser.id}`, updateData);
+      await api.put('/users/${editingUser.id}`, updateData);
       toast.success(t('User updated successfully'));
       setUserModalOpen(false);
       setEditingUser(null);
@@ -231,7 +228,7 @@ export const AdminDashboard = () => {
                                 `Delete ${c.campus_name}? This will also delete all members and data for this campus.`,
                                 async () => {
                                   try {
-                                    await axios.delete(`${API}/campuses/${c.id}`);
+                                    await api.delete('/campuses/${c.id}`);
                                     toast.success(t('toasts.deleted'));
                                     loadData();
                                     closeConfirm();
@@ -294,7 +291,7 @@ export const AdminDashboard = () => {
                                     `Delete ${c.campus_name}? This will also delete all members and data for this campus.`,
                                     async () => {
                                       try {
-                                        await axios.delete(`${API}/campuses/${c.id}`);
+                                        await api.delete('/campuses/${c.id}`);
                                         toast.success(t('toasts.deleted'));
                                         loadData();
                                         closeConfirm();
@@ -480,7 +477,7 @@ export const AdminDashboard = () => {
                         async () => {
                           try {
                             // Fire the request (don't wait for response due to long processing time)
-                            axios.post(`${API}/admin/recalculate-engagement`, {}, {
+                            api.post('/admin/recalculate-engagement`, {}, {
                               timeout: 90000
                             }).catch(() => {
                               // Ignore timeout errors - backend still processing

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,6 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { RefreshCw, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns/format';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const formatDate = (dateStr, formatStr = 'dd MMM yyyy HH:mm') => {
   try {
@@ -34,7 +31,7 @@ export const WhatsAppLogs = () => {
   const loadLogs = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/notification-logs?limit=100`);
+      const response = await api.get('/notification-logs?limit=100');
       setLogs(response.data);
     } catch (error) {
       toast.error(t('whatsapp_logs_page.failed_load_logs'));
@@ -47,7 +44,7 @@ export const WhatsAppLogs = () => {
     try {
       setRetrying(log.id);
       // Retry by resending the same message
-      const response = await axios.post(`${API}/integrations/ping/whatsapp`, {
+      const response = await api.post('/integrations/ping/whatsapp', {
         phone: log.recipient.replace('@s.whatsapp.net', ''),
         message: log.message
       });

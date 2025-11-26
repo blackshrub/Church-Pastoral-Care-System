@@ -8,11 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TaskCard } from './TaskCard';
-import axios from 'axios';
+import api from '@/lib/api';
 import { toast } from 'sonner';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const triggerHaptic = () => {
   if ('vibrate' in navigator) {
@@ -32,7 +29,7 @@ const markBirthdayComplete = async (eventId, queryClient, t) => {
       };
     });
 
-    await axios.post(`${API}/care-events/${eventId}/complete`);
+    await api.post(`/care-events/${eventId}/complete`);
     toast.success(t('toasts.birthday_completed'));
     // Refetch to get accurate data
     await queryClient.invalidateQueries(['dashboard']);

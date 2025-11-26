@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Send, Users } from 'lucide-react';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 export const BulkMessaging = () => {
   const { t } = useTranslation();
@@ -24,7 +21,7 @@ export const BulkMessaging = () => {
   
   const loadUsers = async () => {
     try {
-      const response = await axios.get(`${API}/users`);
+      const response = await api.get('/users`);
       setUsers(response.data);
     } catch (error) {
       toast.error(t('bulk_messaging_page.failed_load_users'));
@@ -62,7 +59,7 @@ export const BulkMessaging = () => {
               phone = phone + '@s.whatsapp.net';
             }
             
-            const response = await axios.post(`${API}/integrations/ping/whatsapp`, {
+            const response = await api.post('/integrations/ping/whatsapp`, {
               phone: phone,
               message
             });

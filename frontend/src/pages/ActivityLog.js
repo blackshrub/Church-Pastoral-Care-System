@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Calendar, Download, Filter, User, Activity, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -79,18 +79,11 @@ const ActivityLog = () => {
   useEffect(() => {
     const loadCampusTimezone = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const userResponse = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/auth/me`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
+        const userResponse = await api.get('/auth/me');
+
         const campusId = userResponse.data.campus_id;
         if (campusId && campusId !== 'campus_id') {
-          const campusResponse = await axios.get(
-            `${process.env.REACT_APP_BACKEND_URL}/api/campuses/${campusId}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+          const campusResponse = await api.get(`/campuses/${campusId}`);
           setCampusTimezone(campusResponse.data.timezone || 'Asia/Jakarta');
         }
       } catch (error) {
@@ -98,7 +91,7 @@ const ActivityLog = () => {
         // Fallback to Asia/Jakarta
       }
     };
-    
+
     loadCampusTimezone();
   }, []);
 
@@ -127,9 +120,8 @@ const ActivityLog = () => {
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
       const params = new URLSearchParams();
-      
+
       if (selectedUser !== 'all') params.append('user_id', selectedUser);
       if (selectedAction !== 'all') params.append('action_type', selectedAction);
       if (startDate) params.append('start_date', new Date(startDate).toISOString());
@@ -140,12 +132,7 @@ const ActivityLog = () => {
       }
       params.append('limit', '200');
 
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/activity-logs?${params.toString()}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.get(`/activity-logs?${params.toString()}`);
       setLogs(response.data);
     } catch (error) {
       console.error('Error fetching logs:', error);
@@ -156,13 +143,7 @@ const ActivityLog = () => {
 
   const fetchSummary = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/activity-logs/summary`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.get('/activity-logs/summary');
       setSummary(response.data);
     } catch (error) {
       console.error('Error fetching summary:', error);
@@ -171,13 +152,7 @@ const ActivityLog = () => {
 
   const fetchAllUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/users`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.get('/users');
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);

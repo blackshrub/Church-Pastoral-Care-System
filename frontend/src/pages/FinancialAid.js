@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -21,7 +21,6 @@ const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
 };
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const COLORS = [
   '#14b8a6', // Teal
@@ -82,9 +81,9 @@ export const FinancialAid = () => {
     try {
       setLoading(true);
       const [summaryRes, eventsRes, membersRes] = await Promise.all([
-        axios.get(`${API}/financial-aid/summary`),
-        axios.get(`${API}/care-events?event_type=financial_aid`),
-        axios.get(`${API}/members?limit=1000`) // Get all members for photo mapping
+        api.get('/financial-aid/summary'),
+        api.get('/care-events?event_type=financial_aid'),
+        api.get('/members?limit=1000') // Get all members for photo mapping
       ]);
       
       setSummary(summaryRes.data);
@@ -112,7 +111,7 @@ export const FinancialAid = () => {
   const loadRecipients = async () => {
     try {
       setLoadingRecipients(true);
-      const response = await axios.get(`${API}/financial-aid/recipients`);
+      const response = await api.get('/financial-aid/recipients');
       setRecipients(response.data);
     } catch (error) {
       console.error('Error loading recipients:', error);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,9 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PieChart, BarChart, AreaChart } from '@/components/charts';
 import { TrendingUp, Users, DollarSign, Heart, Calendar, Target } from 'lucide-react';
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 const COLORS = {
   primary: ['#14b8a6', '#f59e0b', '#ec4899', '#a78bfa', '#06b6d4', '#84cc16', '#f97316'],
@@ -41,11 +38,11 @@ export const Analytics = () => {
     try {
       setLoading(true);
       const [membersRes, eventsRes, griefRes, aidSummaryRes, scheduleRes] = await Promise.all([
-        axios.get(`${API}/members?limit=1000`), // Get all members for analytics
-        axios.get(`${API}/care-events`),
-        axios.get(`${API}/analytics/grief-completion-rate`),
-        axios.get(`${API}/financial-aid/summary`),
-        axios.get(`${API}/financial-aid-schedules`)
+        api.get('/members?limit=1000'), // Get all members for analytics
+        api.get('/care-events'),
+        api.get('/analytics/grief-completion-rate'),
+        api.get('/financial-aid/summary'),
+        api.get('/financial-aid-schedules')
       ]);
       
       const members = membersRes.data;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
-import axios from 'axios';
+import api from '@/lib/api';
 import { format } from 'date-fns/format';
 
 // Safe date formatter
@@ -134,7 +134,7 @@ export const MembersList = () => {
         params.append('show_archived', 'true');
       }
       
-      const response = await axios.get(`${API}/members?${params.toString()}`);
+      const response = await api.get('/members?${params.toString()}`);
       setMembers(response.data || []);
       setSearchLoading(false); // Clear search loading
       
@@ -161,7 +161,7 @@ export const MembersList = () => {
   const handleAddMember = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/members`, {...newMember, campus_id: 'auto'});
+      await api.post('/members`, {...newMember, campus_id: 'auto'});
       toast.success(t('success_messages.member_created'));
       setAddModalOpen(false);
       setNewMember({ name: '', phone: '', notes: '' });
@@ -174,7 +174,7 @@ export const MembersList = () => {
   const handleEditMember = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${API}/members/${editingMember.id}`, editingMember);
+      await api.put('/members/${editingMember.id}`, editingMember);
       toast.success('Member updated!');
       setEditModalOpen(false);
       setEditingMember(null);
@@ -190,7 +190,7 @@ export const MembersList = () => {
       `Delete ${name}? This will also delete all care events and history for this member.`,
       async () => {
         try {
-          await axios.delete(`${API}/members/${id}`);
+          await api.delete('/members/${id}`);
           toast.success('Member deleted');
           loadMembers();
           closeConfirm();
@@ -209,7 +209,7 @@ export const MembersList = () => {
       `Delete ${selectedMembers.length} members? This will delete all their care events and history.`,
       async () => {
         try {
-          await Promise.all(selectedMembers.map(id => axios.delete(`${API}/members/${id}`)));
+          await Promise.all(selectedMembers.map(id => api.delete('/members/${id}`)));
           toast.success(`Deleted ${selectedMembers.length} members`);
           setSelectedMembers([]);
           loadMembers();

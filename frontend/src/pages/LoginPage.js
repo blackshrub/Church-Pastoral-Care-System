@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,7 +33,7 @@ export const LoginPage = () => {
   
   const loadCampuses = async () => {
     try {
-      const response = await axios.get(`${API}/campuses`);
+      const response = await api.get('/campuses');
       setCampuses(response.data);
     } catch (error) {
       console.error('Error loading campuses:', error);

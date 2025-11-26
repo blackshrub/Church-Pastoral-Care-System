@@ -7,7 +7,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,6 @@ import FilterRuleBuilder from '@/components/FilterRuleBuilder';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 export const Settings = () => {
   const { t } = useTranslation();
@@ -43,7 +42,7 @@ export const Settings = () => {
   
   const saveProfile = async () => {
     try {
-      await axios.put(`${API}/users/${user.id}`, {
+      await api.put('/users/${user.id}`, {
         name: profileData.name,
         email: profileData.email,
         phone: profileData.phone
@@ -127,7 +126,7 @@ export const Settings = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const response = await axios.post(`${API}/users/${user.id}/photo`, formData, {
+      const response = await api.post('/users/${user.id}/photo`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
@@ -166,7 +165,7 @@ export const Settings = () => {
   
   const loadSyncConfig = async () => {
     try {
-      const response = await axios.get(`${API}/sync/config`);
+      const response = await api.get('/sync/config`);
       // Debug: console.log('Sync config API response:', response.data);
       if (response.data) {
         // Debug: console.log('Setting sync config to:', response.data);
@@ -182,7 +181,7 @@ export const Settings = () => {
   const loadSyncLogs = async () => {
     try {
       // Debug: console.log('Loading sync logs...');
-      const response = await axios.get(`${API}/sync/logs?limit=10`);
+      const response = await api.get('/sync/logs?limit=10`);
       // Debug: console.log('Sync logs response:', response.data);
       setSyncLogs(response.data);
       // Debug: console.log('Sync logs set to state:', response.data.length, 'logs');
@@ -194,7 +193,7 @@ export const Settings = () => {
   const testConnection = async () => {
     setTesting(true);
     try {
-      const response = await axios.post(`${API}/sync/test-connection`, {
+      const response = await api.post('/sync/test-connection`, {
         api_base_url: syncConfig.api_base_url,
         api_email: syncConfig.api_email,
         api_password: syncConfig.api_password
@@ -214,7 +213,7 @@ export const Settings = () => {
   
   const saveSyncConfig = async () => {
     try {
-      await axios.post(`${API}/sync/config`, syncConfig);
+      await api.post('/sync/config`, syncConfig);
       toast.success('Sync configuration saved successfully');
       await loadSyncConfig();
       
@@ -224,7 +223,7 @@ export const Settings = () => {
           toast.info('Starting initial sync...');
           setSyncing(true);
           try {
-            const response = await axios.post(`${API}/sync/members/pull`);
+            const response = await api.post('/sync/members/pull`);
             toast.success(response.data.message + ` - ${response.data.stats.created} created, ${response.data.stats.updated} updated`);
             await loadSyncLogs();
             await loadSyncConfig();
@@ -243,7 +242,7 @@ export const Settings = () => {
   const syncNow = async () => {
     setSyncing(true);
     try {
-      const response = await axios.post(`${API}/sync/members/pull`);
+      const response = await api.post('/sync/members/pull`);
       toast.success(response.data.message + ` - ${response.data.stats.created} created, ${response.data.stats.updated} updated`);
       loadSyncLogs();
     } catch (error) {
@@ -265,7 +264,7 @@ export const Settings = () => {
   const discoverFields = async () => {
     setDiscovering(true);
     try {
-      const response = await axios.post(`${API}/sync/discover-fields`, {
+      const response = await api.post('/sync/discover-fields`, {
         sync_method: syncConfig.sync_method,
         api_base_url: syncConfig.api_base_url,
         api_email: syncConfig.api_email,
@@ -289,13 +288,13 @@ export const Settings = () => {
   
   const loadCampusCount = async () => {
     try {
-      const response = await axios.get(`${API}/campuses`);
+      const response = await api.get('/campuses`);
       setCampusCount(response.data.length);
       
       // Load timezone from user's campus
       if (user?.campus_id && user.campus_id !== 'campus_id') {
         try {
-          const campusRes = await axios.get(`${API}/campuses/${user.campus_id}`);
+          const campusRes = await api.get('/campuses/${user.campus_id}`);
           setCampusTimezone(campusRes.data.timezone || 'Asia/Jakarta');
           setCampusData(campusRes.data);  // Store full campus data
         } catch (error) {
@@ -305,7 +304,7 @@ export const Settings = () => {
       }
       
       // Load writeoff settings
-      const writeoffRes = await axios.get(`${API}/settings/overdue_writeoff`);
+      const writeoffRes = await api.get('/settings/overdue_writeoff`);
       if (writeoffRes.data?.data) {
         setWriteoffBirthday(writeoffRes.data.data.birthday || 7);
         setWriteoffFinancialAid(writeoffRes.data.data.financial_aid || 0);
@@ -319,7 +318,7 @@ export const Settings = () => {
   
   const saveWriteoffSettings = async () => {
     try {
-      await axios.put(`${API}/settings/overdue_writeoff`, {
+      await api.put('/settings/overdue_writeoff`, {
         data: {
           birthday: parseInt(writeoffBirthday),
           financial_aid: parseInt(writeoffFinancialAid),
@@ -346,7 +345,7 @@ export const Settings = () => {
         return;
       }
       
-      await axios.put(`${API}/campuses/${user.campus_id}`, {
+      await api.put('/campuses/${user.campus_id}`, {
         campus_name: campusData.campus_name,
         location: campusData.location,
         timezone: campusTimezone
@@ -1324,7 +1323,7 @@ export const Settings = () => {
                             'Disable sync? This will stop automatic syncing but preserve all synced data. You can re-enable it anytime.',
                             async () => {
                               const updated = {...syncConfig, is_enabled: false};
-                              await axios.post(`${API}/sync/config`, updated);
+                              await api.post('/sync/config`, updated);
                               toast.success('Sync disabled');
                               loadSyncConfig();
                               closeConfirm();
@@ -1345,7 +1344,7 @@ export const Settings = () => {
                             'Enable sync? This will start automatic syncing from core API. Members will be synced based on your configuration.',
                             async () => {
                               const updated = {...syncConfig, is_enabled: true};
-                              await axios.post(`${API}/sync/config`, updated);
+                              await api.post('/sync/config`, updated);
                               toast.success('Sync enabled');
                               loadSyncConfig();
                               closeConfirm();
@@ -1405,7 +1404,7 @@ export const Settings = () => {
                                 'Regenerate webhook secret? You must update the core system with the new secret after regeneration.',
                                 async () => {
                                   try {
-                                    const response = await axios.post(`${API}/sync/regenerate-secret`);
+                                    const response = await api.post('/sync/regenerate-secret`);
                                     toast.success('Secret regenerated. Update core system!');
                                     await loadSyncConfig();
                                     closeConfirm();
