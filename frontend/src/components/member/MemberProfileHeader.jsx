@@ -3,7 +3,7 @@
  * Displays member photo, name, contact info, and engagement status
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -21,7 +21,8 @@ const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
   }
 };
 
-export const MemberProfileHeader = ({
+// Memoized to prevent re-renders when member detail state changes
+export const MemberProfileHeader = memo(({
   member,
   onAddCareEvent,
   backLink = '/members'
@@ -94,7 +95,7 @@ export const MemberProfileHeader = ({
       </div>
     </div>
   );
-};
+});
 
 MemberProfileHeader.propTypes = {
   member: PropTypes.shape({

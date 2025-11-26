@@ -3,13 +3,14 @@
  * Displays 4 key metrics: Total Members, Tasks Due Today, Overdue Follow-ups, Members Needing Care
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Bell, Heart, AlertTriangle } from 'lucide-react';
 
-export const DashboardStats = ({
+// Memoized to prevent re-renders when dashboard state changes but stats don't
+export const DashboardStats = memo(({
   totalMembers = 805,
   birthdaysToday = [],
   todayTasks = [],
@@ -91,7 +92,7 @@ export const DashboardStats = ({
       </Card>
     </div>
   );
-};
+});
 
 DashboardStats.propTypes = {
   totalMembers: PropTypes.number,

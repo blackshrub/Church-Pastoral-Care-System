@@ -3,7 +3,7 @@
  * Used for birthdays, grief support, accidents, and financial aid tasks
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,8 @@ const formatPhoneForWhatsApp = (phone) => {
   return `https://wa.me/${formatted}`;
 };
 
-export const TaskCard = ({
+// Memoized to prevent unnecessary re-renders in list contexts
+export const TaskCard = memo(({
   event,
   config = {
     bgClass: 'bg-gray-50',
@@ -127,7 +128,7 @@ export const TaskCard = ({
       </div>
     </article>
   );
-};
+});
 
 TaskCard.propTypes = {
   event: PropTypes.shape({

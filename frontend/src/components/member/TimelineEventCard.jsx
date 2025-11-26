@@ -3,7 +3,7 @@
  * Reusable card for displaying care events in timeline format
  */
 
-import React from 'react';
+import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,7 +48,8 @@ const getEventColors = (eventType) => {
   };
 };
 
-export const TimelineEventCard = ({
+// Memoized to prevent re-renders in timeline list
+export const TimelineEventCard = memo(({
   event,
   onDelete,
   children  // For additional content like grief timelines
@@ -178,7 +179,7 @@ export const TimelineEventCard = ({
       </Card>
     </div>
   );
-};
+});
 
 TimelineEventCard.propTypes = {
   event: PropTypes.shape({

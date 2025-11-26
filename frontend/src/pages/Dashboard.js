@@ -462,6 +462,12 @@ export const Dashboard = () => {
     [incompleteBirthdaysCount, incompleteTodayTasksCount]
   );
 
+  // Memoize sorted overdue birthdays to prevent sort on every render
+  const sortedOverdueBirthdays = useMemo(() =>
+    [...overdueBirthdays].sort((a, b) => (b.days_overdue || 0) - (a.days_overdue || 0)),
+    [overdueBirthdays]
+  );
+
   if (isLoading) return <div>{t('loading')}</div>;
 
   const totalTasks = birthdaysToday.length + griefDue.length + hospitalFollowUp.length + Math.min(atRiskMembers.length, 10);
@@ -1182,9 +1188,7 @@ export const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {overdueBirthdays
-                        .sort((a, b) => (b.days_overdue || 0) - (a.days_overdue || 0))
-                        .map(event => (
+                      {sortedOverdueBirthdays.map(event => (
                         <div key={event.id} className="p-4 bg-amber-50 rounded-lg border border-amber-200 relative hover:shadow-lg transition-all">
                           {event.days_overdue > 0 && (
                             <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
