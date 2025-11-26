@@ -20,8 +20,10 @@ const RETRY_DELAY_BASE = 1000; // Base delay of 1 second
 const RETRYABLE_STATUS_CODES = [408, 429, 500, 502, 503, 504];
 
 // Create axios instance with defaults
+// Note: BACKEND_URL should be the full API URL (e.g., https://api.domain.com)
+// No /api suffix needed since we're using subdomain routing
 const api = axios.create({
-  baseURL: `${BACKEND_URL}/api`,
+  baseURL: BACKEND_URL,
   timeout: DEFAULT_TIMEOUT,
   headers: {
     'Content-Type': 'application/json',

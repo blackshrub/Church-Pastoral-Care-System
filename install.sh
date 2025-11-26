@@ -26,7 +26,7 @@ set -euo pipefail
 # CONSTANTS & CONFIGURATION
 #################################################################################
 
-readonly VERSION="2.5.0"
+readonly VERSION="3.0.0"
 readonly MIN_DISK_GB=5
 readonly MIN_RAM_MB=1024
 readonly RECOMMENDED_RAM_MB=2048
@@ -579,12 +579,17 @@ configure_environment() {
     # Domain name
     echo ""
     echo -e "  ${BULLET} ${BOLD}Domain Configuration${NC}"
-    echo -e "    Enter your domain (e.g., faithtracker.church.org)"
+    echo -e "    FaithTracker uses subdomain architecture:"
+    echo -e "    - Frontend: https://DOMAIN"
+    echo -e "    - API:      https://api.DOMAIN"
+    echo ""
     while true; do
-        read -p "    Domain: " DOMAIN_NAME
+        read -p "    Main domain (e.g., faithtracker.church.org): " DOMAIN_NAME
         if [ -n "$DOMAIN_NAME" ]; then break; fi
         print_error "Domain name is required"
     done
+    API_DOMAIN="api.${DOMAIN_NAME}"
+    print_info "API will be at: ${API_DOMAIN}"
 
     # Backend port
     echo ""
@@ -645,7 +650,8 @@ configure_environment() {
     echo -e "${GREEN}╚══════════════════════════════════════════════════════════════════╝${NC}"
     echo -e "  ${BULLET} MongoDB:      ${CYAN}$(echo $MONGO_URL | sed 's/:.*@/:***@/')${NC}"
     echo -e "  ${BULLET} Database:     ${CYAN}$DB_NAME${NC}"
-    echo -e "  ${BULLET} Domain:       ${CYAN}$DOMAIN_NAME${NC}"
+    echo -e "  ${BULLET} Frontend:     ${CYAN}${HTTP_PROTO}://$DOMAIN_NAME${NC}"
+    echo -e "  ${BULLET} API:          ${CYAN}${HTTP_PROTO}://$API_DOMAIN${NC}"
     echo -e "  ${BULLET} Backend Port: ${CYAN}$BACKEND_PORT${NC}"
     echo -e "  ${BULLET} SSL/HTTPS:    ${CYAN}$([ "$ENABLE_SSL" = true ] && echo "Enabled" || echo "Disabled")${NC}"
     echo -e "  ${BULLET} Church:       ${CYAN}$CHURCH_NAME${NC}"
@@ -665,7 +671,8 @@ configure_environment() {
 
 MONGO_URL="$MONGO_URL"
 DB_NAME="$DB_NAME"
-CORS_ORIGINS="${HTTP_PROTO}://$DOMAIN_NAME,${HTTP_PROTO}://www.$DOMAIN_NAME"
+ALLOWED_ORIGINS="${HTTP_PROTO}://$DOMAIN_NAME,${HTTP_PROTO}://www.$DOMAIN_NAME"
+FRONTEND_URL="${HTTP_PROTO}://$DOMAIN_NAME"
 JWT_SECRET_KEY="$JWT_SECRET"
 ENCRYPTION_KEY="$ENCRYPTION_KEY"
 CHURCH_NAME="$CHURCH_NAME"
@@ -677,7 +684,7 @@ EOF
 # FaithTracker Frontend Configuration
 # Generated: $(date '+%Y-%m-%d %H:%M:%S')
 
-REACT_APP_BACKEND_URL="${HTTP_PROTO}://$DOMAIN_NAME"
+REACT_APP_BACKEND_URL="${HTTP_PROTO}://$API_DOMAIN"
 WDS_SOCKET_PORT=$([ "$ENABLE_SSL" = true ] && echo "443" || echo "80")
 REACT_APP_ENABLE_VISUAL_EDITS=false
 EOF
@@ -841,10 +848,12 @@ LOGROTATE
 }
 
 configure_nginx() {
-    show_progress "Configuring web server"
+    show_progress "Configuring web server (dual-domain)"
 
-    cat > /etc/nginx/sites-available/faithtracker << EOF
-# FaithTracker Nginx Configuration
+    # Frontend configuration
+    cat > /etc/nginx/sites-available/faithtracker-frontend << EOF
+# FaithTracker Frontend Nginx Configuration
+# Domain: $DOMAIN_NAME
 # Generated: $(date '+%Y-%m-%d %H:%M:%S')
 
 server {
@@ -862,30 +871,6 @@ server {
     gzip_proxied expired no-cache no-store private auth;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript;
 
-    # API proxy
-    location /api/ {
-        proxy_pass http://127.0.0.1:$BACKEND_PORT;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-        proxy_cache_bypass \$http_upgrade;
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
-    }
-
-    # Health check endpoint (no auth required)
-    location /health {
-        proxy_pass http://127.0.0.1:$BACKEND_PORT;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        access_log off;
-    }
-
     # React SPA routing
     location / {
         try_files \$uri \$uri/ /index.html;
@@ -897,11 +882,11 @@ server {
         add_header Cache-Control "public, immutable";
     }
 
-    # Uploaded files
-    location /uploads/ {
-        alias /opt/faithtracker/backend/uploads/;
-        expires 30d;
-        add_header Cache-Control "public";
+    # Health check
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
     }
 
     # Security headers
@@ -909,13 +894,64 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "1; mode=block" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-
-    # File upload limit
-    client_max_body_size 10M;
 }
 EOF
 
-    ln -sf /etc/nginx/sites-available/faithtracker /etc/nginx/sites-enabled/
+    # API Backend configuration
+    cat > /etc/nginx/sites-available/faithtracker-api << EOF
+# FaithTracker API Backend Nginx Configuration
+# Domain: $API_DOMAIN
+# Generated: $(date '+%Y-%m-%d %H:%M:%S')
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name $API_DOMAIN;
+
+    # Proxy settings
+    proxy_http_version 1.1;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+    proxy_set_header Upgrade \$http_upgrade;
+    proxy_set_header Connection "upgrade";
+
+    # Timeouts
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 60s;
+    proxy_read_timeout 60s;
+
+    # File upload limit
+    client_max_body_size 20M;
+
+    # Proxy all requests to FastAPI backend
+    location / {
+        proxy_pass http://127.0.0.1:$BACKEND_PORT;
+    }
+
+    # Health check
+    location /health {
+        proxy_pass http://127.0.0.1:$BACKEND_PORT/health;
+        access_log off;
+    }
+
+    # Uploads directory
+    location /uploads/ {
+        alias /opt/faithtracker/backend/uploads/;
+        expires 7d;
+        add_header Cache-Control "public";
+    }
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+}
+EOF
+
+    ln -sf /etc/nginx/sites-available/faithtracker-frontend /etc/nginx/sites-enabled/
+    ln -sf /etc/nginx/sites-available/faithtracker-api /etc/nginx/sites-enabled/
     rm -f /etc/nginx/sites-enabled/default
 
     nginx -t >> "$LOG_FILE" 2>&1 || {
@@ -924,7 +960,7 @@ EOF
     }
 
     systemctl restart nginx
-    print_success "Nginx configured"
+    print_success "Nginx configured for dual-domain"
 }
 
 setup_firewall() {
@@ -946,11 +982,13 @@ setup_firewall() {
 }
 
 setup_ssl() {
-    show_progress "Setting up SSL certificate"
+    show_progress "Setting up SSL certificates (dual-domain)"
 
     if [ "$ENABLE_SSL" != true ]; then
         print_info "SSL not enabled during configuration"
-        print_info "Enable later: ${CYAN}sudo certbot --nginx -d $DOMAIN_NAME${NC}"
+        print_info "Enable later:"
+        print_info "  Frontend: ${CYAN}sudo certbot --nginx -d $DOMAIN_NAME -d www.$DOMAIN_NAME${NC}"
+        print_info "  API:      ${CYAN}sudo certbot --nginx -d $API_DOMAIN${NC}"
         return
     fi
 
@@ -959,13 +997,23 @@ setup_ssl() {
         apt-get install -y certbot python3-certbot-nginx >> "$LOG_FILE" 2>&1
     fi
 
-    print_step "Obtaining SSL certificate"
+    # Certificate for frontend (main domain)
+    print_step "Obtaining SSL certificate for frontend ($DOMAIN_NAME)"
     certbot --nginx -d "$DOMAIN_NAME" -d "www.$DOMAIN_NAME" \
         --non-interactive --agree-tos --email "$ADMIN_EMAIL" \
         --redirect >> "$LOG_FILE" 2>&1 && \
-    print_success "SSL certificate installed" || {
-        print_warning "SSL setup failed - verify domain DNS settings"
-        print_info "Retry manually: ${CYAN}sudo certbot --nginx -d $DOMAIN_NAME${NC}"
+    print_success "Frontend SSL certificate installed" || {
+        print_warning "Frontend SSL setup failed - verify DNS for $DOMAIN_NAME"
+    }
+
+    # Certificate for API (api subdomain)
+    print_step "Obtaining SSL certificate for API ($API_DOMAIN)"
+    certbot --nginx -d "$API_DOMAIN" \
+        --non-interactive --agree-tos --email "$ADMIN_EMAIL" \
+        --redirect >> "$LOG_FILE" 2>&1 && \
+    print_success "API SSL certificate installed" || {
+        print_warning "API SSL setup failed - verify DNS for $API_DOMAIN"
+        print_info "Make sure api.$DOMAIN_NAME points to this server's IP"
     }
 }
 
@@ -1018,7 +1066,8 @@ EOF
     echo -e "${BOLD}Installation completed in ${minutes}m ${seconds}s${NC}"
     echo ""
     echo -e "${CYAN}${BOLD}🌐 Access Your Application:${NC}"
-    echo -e "   ${HTTP_PROTO}://$DOMAIN_NAME"
+    echo -e "   Frontend: ${HTTP_PROTO}://$DOMAIN_NAME"
+    echo -e "   API:      ${HTTP_PROTO}://$API_DOMAIN"
     echo ""
     echo -e "${CYAN}${BOLD}👤 Admin Login:${NC}"
     echo -e "   Email:    $ADMIN_EMAIL"

@@ -14,11 +14,16 @@
 #   - Beautiful progress indicators
 #   - Reads configuration from installed app
 #
-# Usage:
+# Usage (Manual Installation):
 #   cd /path/to/git/repo
 #   sudo bash update.sh
 #   sudo bash update.sh --rollback    # Rollback to previous version
 #   sudo bash update.sh --force       # Force update without prompts
+#
+# Usage (Docker Installation):
+#   cd /path/to/git/repo
+#   docker compose build --no-cache
+#   docker compose up -d
 #
 #################################################################################
 
@@ -28,7 +33,7 @@ set -e
 # CONSTANTS & CONFIGURATION
 #################################################################################
 
-readonly VERSION="2.5.0"
+readonly VERSION="3.0.0"
 readonly GIT_DIR=$(pwd)
 readonly APP_DIR="/opt/faithtracker"
 readonly BACKUP_DIR="/var/backups/faithtracker"

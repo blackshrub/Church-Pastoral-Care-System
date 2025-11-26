@@ -1142,7 +1142,7 @@ export const Settings = () => {
                       <Label className="text-blue-900">Webhook URL</Label>
                       <div className="flex gap-2">
                         <Input 
-                          value={`${window.location.origin}/api/sync/webhook`}
+                          value={`${BACKEND_URL}/sync/webhook`}
                           readOnly
                           className="font-mono text-xs bg-white"
                         />
@@ -1150,7 +1150,7 @@ export const Settings = () => {
                           size="sm" 
                           variant="outline"
                           onClick={() => {
-                            navigator.clipboard.writeText(`${window.location.origin}/api/sync/webhook`);
+                            navigator.clipboard.writeText(`${BACKEND_URL}/sync/webhook`);
                             toast.success('Webhook URL copied to clipboard');
                           }}
                         >
@@ -1382,9 +1382,9 @@ export const Settings = () => {
                       <div className="md:col-span-2">
                         <p className="text-gray-600 text-xs uppercase mb-1">Webhook URL for Core System</p>
                         <div className="flex gap-2">
-                          <code className="flex-1 text-xs bg-white p-2 rounded border">{window.location.origin}/api/sync/webhook</code>
+                          <code className="flex-1 text-xs bg-white p-2 rounded border">{BACKEND_URL}/sync/webhook</code>
                           <Button size="sm" variant="outline" onClick={() => {
-                            navigator.clipboard.writeText(`${window.location.origin}/api/sync/webhook`);
+                            navigator.clipboard.writeText(`${BACKEND_URL}/sync/webhook`);
                             toast.success('Copied!');
                           }}>Copy</Button>
                         </div>

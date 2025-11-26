@@ -124,7 +124,7 @@ const SearchBar = () => {
                   <div className="flex-shrink-0">
                     {member.photo_url ? (
                       <img 
-                        src={`${process.env.REACT_APP_BACKEND_URL}/api${member.photo_url}`}
+                        src={`${process.env.REACT_APP_BACKEND_URL}${member.photo_url}`}
                         alt={member.name}
                         className="h-10 w-10 rounded-full object-cover"
                       />

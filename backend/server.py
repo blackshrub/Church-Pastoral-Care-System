@@ -110,8 +110,8 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
+# Create a router (no prefix - using subdomain api.domain.com)
+api_router = APIRouter()
 
 # Configure logging
 logging.basicConfig(
@@ -6955,12 +6955,18 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(SecurityHeadersMiddleware)
 
+# CORS Configuration for subdomain architecture
+# ALLOWED_ORIGINS should be set to frontend URL (e.g., https://faithtracker.example.com)
+cors_origins = os.environ.get('ALLOWED_ORIGINS', os.environ.get('FRONTEND_URL', '*'))
+cors_origins_list = [origin.strip() for origin in cors_origins.split(',') if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
-    allow_methods=["*"],
+    allow_origins=cors_origins_list if cors_origins_list and cors_origins_list[0] != '*' else ["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["X-Total-Count"],
 )
 
 
