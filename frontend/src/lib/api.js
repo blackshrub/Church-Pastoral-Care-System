@@ -102,8 +102,9 @@ api.interceptors.response.use(
       return api(config);
     }
 
-    // Handle 401 Unauthorized - clear auth and redirect
-    if (error.response?.status === 401) {
+    // Handle 401 Unauthorized or 403 Forbidden - clear auth and redirect
+    // Note: FastAPI's HTTPBearer returns 403 when no valid token is provided
+    if (error.response?.status === 401 || error.response?.status === 403) {
       localStorage.removeItem('token');
       delete api.defaults.headers.common['Authorization'];
       // Don't redirect if already on login page
