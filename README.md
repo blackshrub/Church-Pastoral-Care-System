@@ -166,9 +166,10 @@ Docker deployment is the easiest way to get FaithTracker running with automatic 
 #### Prerequisites
 - A Linux server (Ubuntu 20.04+, Debian 11+, or any Docker-compatible OS)
 - Docker and Docker Compose installed
-- A domain with **two DNS records** pointing to your server:
+- A domain with DNS records pointing to your server:
   - `yourdomain.com` → your server IP (for frontend)
   - `api.yourdomain.com` → your server IP (for API)
+  - `traefik.yourdomain.com` → your server IP (optional, for Traefik dashboard)
 - Ports 80 and 443 open
 
 > See [Domain & DNS Configuration](#domain--dns-configuration) for detailed DNS setup instructions.
@@ -267,6 +268,49 @@ docker compose build --no-cache
 docker compose up -d
 ```
 
+#### Traefik Dashboard (Optional)
+
+The Traefik dashboard provides real-time monitoring of your services, routes, and SSL certificates.
+
+**Enable during installation:**
+When running `docker-install.sh`, answer "Y" when prompted:
+```
+Enable Traefik dashboard at traefik.yourdomain.com? (y/N): y
+Dashboard password: ********
+```
+
+**Access the dashboard:**
+- URL: `https://traefik.yourdomain.com`
+- Username: `admin`
+- Password: (the password you set during installation)
+
+**Dashboard features:**
+- View all active routers and services
+- Monitor SSL certificate status and expiry
+- Check service health and load balancing
+- Debug routing issues
+
+**Enable after installation:**
+If you skipped enabling the dashboard, you can add it later:
+
+1. Generate a password hash:
+   ```bash
+   # Using htpasswd (install: apt-get install apache2-utils)
+   htpasswd -nb admin your-password | sed -e 's/\$/\$\$/g'
+   ```
+
+2. Edit `.env` file and update:
+   ```bash
+   TRAEFIK_DASHBOARD_AUTH=admin:$$apr1$$xxxxx$$hashedpassword
+   ```
+
+3. Add DNS record for `traefik.yourdomain.com` pointing to your server
+
+4. Restart Traefik:
+   ```bash
+   docker compose restart traefik
+   ```
+
 ---
 
 ### Manual Installation
@@ -339,14 +383,15 @@ REACT_APP_BACKEND_URL=https://api.yourdomain.com
 
 ## Domain & DNS Configuration
 
-FaithTracker requires **two DNS records** pointing to your server:
+FaithTracker requires DNS records pointing to your server:
 
 ### Required DNS Records
 
-| Type | Name | Value | TTL |
-|------|------|-------|-----|
-| A | `@` (or `yourdomain.com`) | `YOUR_SERVER_IP` | 300 |
-| A | `api` | `YOUR_SERVER_IP` | 300 |
+| Type | Name | Value | TTL | Purpose |
+|------|------|-------|-----|---------|
+| A | `@` (or `yourdomain.com`) | `YOUR_SERVER_IP` | 300 | Frontend |
+| A | `api` | `YOUR_SERVER_IP` | 300 | API Backend |
+| A | `traefik` | `YOUR_SERVER_IP` | 300 | Dashboard (optional) |
 
 ### Step-by-Step DNS Setup
 

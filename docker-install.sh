@@ -213,10 +213,12 @@ configure_environment() {
 
     # Traefik dashboard auth (optional)
     TRAEFIK_AUTH=""
+    DASHBOARD_ENABLED=false
     echo ""
     read -p "    Enable Traefik dashboard at traefik.${DOMAIN}? (y/N): " -n 1 -r
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
+        DASHBOARD_ENABLED=true
         read -s -p "    Dashboard password: " DASHBOARD_PASS
         echo ""
         # Generate htpasswd format (requires apache2-utils)
@@ -225,6 +227,7 @@ configure_environment() {
         else
             TRAEFIK_AUTH="admin:$(openssl passwd -apr1 "$DASHBOARD_PASS" | sed -e 's/\$/\$\$/g')"
         fi
+        print_success "Dashboard enabled (user: admin)"
     fi
 
     # Summary
@@ -234,6 +237,9 @@ configure_environment() {
     echo -e "${GREEN}╚══════════════════════════════════════════════════════════════════╝${NC}"
     echo -e "  ${BULLET} Domain:      ${CYAN}${DOMAIN}${NC}"
     echo -e "  ${BULLET} API URL:     ${CYAN}https://api.${DOMAIN}${NC}"
+    if [ "$DASHBOARD_ENABLED" = true ]; then
+        echo -e "  ${BULLET} Dashboard:   ${CYAN}https://traefik.${DOMAIN}${NC}"
+    fi
     echo -e "  ${BULLET} SSL Email:   ${CYAN}${ACME_EMAIL}${NC}"
     echo -e "  ${BULLET} Admin:       ${CYAN}${ADMIN_EMAIL}${NC}"
     echo -e "  ${BULLET} Church:      ${CYAN}${CHURCH_NAME}${NC}"
@@ -358,8 +364,12 @@ EOF
     echo -e "${NC}"
 
     echo -e "${CYAN}${BOLD}🌐 Access Your Application:${NC}"
-    echo -e "   Frontend: ${WHITE}https://${DOMAIN}${NC}"
-    echo -e "   API:      ${WHITE}https://api.${DOMAIN}${NC}"
+    echo -e "   Frontend:  ${WHITE}https://${DOMAIN}${NC}"
+    echo -e "   API:       ${WHITE}https://api.${DOMAIN}${NC}"
+    echo -e "   API Docs:  ${WHITE}https://api.${DOMAIN}/docs${NC}"
+    if [ "$DASHBOARD_ENABLED" = true ]; then
+        echo -e "   Dashboard: ${WHITE}https://traefik.${DOMAIN}${NC} (user: admin)"
+    fi
     echo ""
     echo -e "${CYAN}${BOLD}👤 Admin Login:${NC}"
     echo -e "   Email:    ${ADMIN_EMAIL}"
@@ -379,6 +389,10 @@ EOF
     echo ""
     echo -e "${YELLOW}Note: SSL certificates may take 1-2 minutes to be issued.${NC}"
     echo -e "${YELLOW}If you see certificate errors, wait and refresh.${NC}"
+    if [ "$DASHBOARD_ENABLED" = true ]; then
+        echo ""
+        echo -e "${YELLOW}Dashboard requires DNS: traefik.${DOMAIN} → your server IP${NC}"
+    fi
     echo ""
     echo -e "${GREEN}${BOLD}Thank you for using FaithTracker! 🙏${NC}"
     echo ""
