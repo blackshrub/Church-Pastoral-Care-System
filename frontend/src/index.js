@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "@/index.css";
 import App from "@/App";
+import reportWebVitals, { sendToAnalytics } from "@/lib/reportWebVitals";
 
 // Comprehensive ResizeObserver error suppression
 // Method 1: Window error event
@@ -37,3 +38,6 @@ root.render(
     <App />
   </React.StrictMode>,
 );
+
+// Track Web Vitals for performance monitoring
+reportWebVitals(sendToAnalytics);

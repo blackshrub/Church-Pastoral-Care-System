@@ -12,7 +12,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import './i18n';
 import '@/App.css';
 import LoginPage from '@/pages/LoginPage';
-import axios from 'axios';
+import api from '@/lib/api';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -69,7 +69,7 @@ function AppRoutes() {
   useEffect(() => {
     const checkSetup = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/setup/status`);
+        const response = await api.get('/setup/status');
         setNeedsSetup(response.data.needs_setup);
       } catch (error) {
         console.error('Error checking setup status:', error);

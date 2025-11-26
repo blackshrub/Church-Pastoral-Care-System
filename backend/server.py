@@ -6,7 +6,7 @@ Handles all API endpoints, authentication, database operations, and business log
 
 from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Query, Depends, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -1146,18 +1146,25 @@ async def create_campus(campus: CampusCreate, current_admin: dict = Depends(get_
         logger.error(f"Error creating campus: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@api_router.get("/campuses", response_model=List[Campus])
+@api_router.get("/campuses")
 async def list_campuses():
     """List all campuses (public for login selection) - cached for 10 minutes"""
     cache_key = "campuses:all"
     cached = get_from_cache(cache_key, ttl_seconds=600)
+
+    # HTTP Cache headers for client-side caching (5 minutes public cache)
+    cache_headers = {
+        "Cache-Control": "public, max-age=300, stale-while-revalidate=600",
+        "Vary": "Accept-Encoding"
+    }
+
     if cached is not None:
-        return cached
+        return JSONResponse(content=cached, headers=cache_headers)
 
     try:
         campuses = await db.campuses.find({"is_active": True}, {"_id": 0}).to_list(100)
         set_in_cache(cache_key, campuses)
-        return campuses
+        return JSONResponse(content=campuses, headers=cache_headers)
     except Exception as e:
         logger.error(f"Error listing campuses: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -3680,7 +3687,7 @@ async def list_aid_schedules(
         schedules = await db.financial_aid_schedules.find(query, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
         return schedules
     except Exception as e:
-        logger.error(f"Error listing aid schedules: {str(e})")
+        logger.error(f"Error listing aid schedules: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.delete("/financial-aid-schedules/{schedule_id}/ignored-occurrence/{date}")
@@ -5219,35 +5226,47 @@ _CACHED_ENGAGEMENT_STATUSES = [
     {"value": "disconnected", "label": "Disconnected", "color": "red", "description": "90+ days no contact"}
 ]
 
+
+def static_config_response(data: list) -> JSONResponse:
+    """Return static config data with aggressive HTTP cache headers (1 hour)"""
+    return JSONResponse(
+        content=data,
+        headers={
+            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+            "Vary": "Accept-Encoding"
+        }
+    )
+
+
 @api_router.get("/config/aid-types")
 async def get_aid_types():
-    """Get all financial aid types (cached - instant response)"""
-    return _CACHED_AID_TYPES
+    """Get all financial aid types (cached - instant response with HTTP cache headers)"""
+    return static_config_response(_CACHED_AID_TYPES)
 
 @api_router.get("/config/event-types")
 async def get_event_types():
-    """Get all care event types (cached - instant response)"""
-    return _CACHED_EVENT_TYPES
+    """Get all care event types (cached - instant response with HTTP cache headers)"""
+    return static_config_response(_CACHED_EVENT_TYPES)
 
 @api_router.get("/config/relationship-types")
 async def get_relationship_types():
-    """Get grief relationship types (cached - instant response)"""
-    return _CACHED_RELATIONSHIP_TYPES
+    """Get grief relationship types (cached - instant response with HTTP cache headers)"""
+    return static_config_response(_CACHED_RELATIONSHIP_TYPES)
 
 @api_router.get("/config/user-roles")
 async def get_user_roles():
-    """Get user role types (cached - instant response)"""
-    return _CACHED_USER_ROLES
+    """Get user role types (cached - instant response with HTTP cache headers)"""
+    return static_config_response(_CACHED_USER_ROLES)
 
 @api_router.get("/config/engagement-statuses")
 async def get_engagement_statuses():
-    """Get engagement status types (cached - instant response)"""
-    return _CACHED_ENGAGEMENT_STATUSES
+    """Get engagement status types (cached - instant response with HTTP cache headers)"""
+    return static_config_response(_CACHED_ENGAGEMENT_STATUSES)
 
 @api_router.get("/config/weekdays")
 async def get_weekdays():
-    """Get weekday options"""
-    return [
+    """Get weekday options (cached with HTTP cache headers)"""
+    return static_config_response([
         {"value": "monday", "label": "Monday", "short": "Mon"},
         {"value": "tuesday", "label": "Tuesday", "short": "Tue"},
         {"value": "wednesday", "label": "Wednesday", "short": "Wed"},
@@ -5255,12 +5274,12 @@ async def get_weekdays():
         {"value": "friday", "label": "Friday", "short": "Fri"},
         {"value": "saturday", "label": "Saturday", "short": "Sat"},
         {"value": "sunday", "label": "Sunday", "short": "Sun"}
-    ]
+    ])
 
 @api_router.get("/config/months")
 async def get_months():
-    """Get month options"""
-    return [
+    """Get month options (cached with HTTP cache headers)"""
+    return static_config_response([
         {"value": 1, "label": "January", "short": "Jan"},
         {"value": 2, "label": "February", "short": "Feb"},
         {"value": 3, "label": "March", "short": "Mar"},
@@ -5273,28 +5292,28 @@ async def get_months():
         {"value": 10, "label": "October", "short": "Oct"},
         {"value": 11, "label": "November", "short": "Nov"},
         {"value": 12, "label": "December", "short": "Dec"}
-    ]
+    ])
 
 @api_router.get("/config/frequency-types")
 async def get_frequency_types():
-    """Get financial aid frequency types"""
-    return [
+    """Get financial aid frequency types (cached with HTTP cache headers)"""
+    return static_config_response([
         {"value": "one_time", "label": "One-time Payment", "description": "Single payment (already given)"},
         {"value": "weekly", "label": "Weekly Schedule", "description": "Future weekly payments"},
         {"value": "monthly", "label": "Monthly Schedule", "description": "Future monthly payments"},
         {"value": "annually", "label": "Annual Schedule", "description": "Future annual payments"}
-    ]
+    ])
 
 @api_router.get("/config/membership-statuses")
 async def get_membership_statuses():
-    """Get membership status types"""
-    return [
+    """Get membership status types (cached with HTTP cache headers)"""
+    return static_config_response([
         {"value": "Member", "label": "Member", "active": True},
         {"value": "Non Member", "label": "Non Member", "active": False},
         {"value": "Visitor", "label": "Visitor", "active": False},
         {"value": "Sympathizer", "label": "Sympathizer", "active": False},
         {"value": "Member (Inactive)", "label": "Member (Inactive)", "active": False}
-    ]
+    ])
 
 @api_router.get("/config/all")
 async def get_all_config():
@@ -6874,8 +6893,61 @@ async def get_activity_summary(current_user: dict = Depends(get_current_user)):
     except Exception as e:
         logger.error(f"Error fetching activity summary: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+# ==================== HEALTH CHECK ENDPOINTS ====================
+
+@app.get("/health")
+async def health_check():
+    """Liveness probe - is the API process running?"""
+    return {
+        "status": "healthy",
+        "service": "faithtracker-api",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+@app.get("/ready")
+async def readiness_check():
+    """Readiness probe - can the API handle requests? Checks database connectivity."""
+    try:
+        # Verify database connectivity with ping
+        await client.admin.command('ping')
+        return {
+            "status": "ready",
+            "database": "connected",
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Readiness check failed: {str(e)}")
+        raise HTTPException(
+            status_code=503,
+            detail={"status": "not_ready", "database": "disconnected", "error": str(e)}
+        )
+
 # Include the router in the main app
 app.include_router(api_router)
+
+# Security Headers Middleware (OWASP recommended)
+from starlette.middleware.base import BaseHTTPMiddleware
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Add security headers to all responses (HSTS, X-Frame-Options, etc.)"""
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        # Prevent clickjacking
+        response.headers["X-Frame-Options"] = "DENY"
+        # Prevent MIME-sniffing
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        # XSS protection (legacy browsers)
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        # Referrer policy
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        # Permissions policy (disable unnecessary browser features)
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        # HSTS - only in production (when not localhost)
+        if "localhost" not in str(request.url) and "127.0.0.1" not in str(request.url):
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

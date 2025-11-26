@@ -1,52 +1,49 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api, { setAuthToken, clearAuthToken } from '@/lib/api';
 
 const AuthContext = createContext(null);
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
     checkAuth();
   }, []);
-  
+
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        const response = await axios.get(`${API}/auth/me`);
+        setAuthToken(token);
+        const response = await api.get('/auth/me');
         setUser(response.data);
       } catch (error) {
         localStorage.removeItem('token');
-        delete axios.defaults.headers.common['Authorization'];
+        clearAuthToken();
       }
     }
     setLoading(false);
   };
-  
+
   const login = async (email, password, campusId = null) => {
-    const response = await axios.post(`${API}/auth/login`, { 
-      email, 
+    const response = await api.post('/auth/login', {
+      email,
       password,
       campus_id: campusId
     });
     const { access_token, user: userData } = response.data;
-    
+
     localStorage.setItem('token', access_token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+    setAuthToken(access_token);
     setUser(userData);
-    
+
     return userData;
   };
-  
+
   const logout = () => {
     localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
+    clearAuthToken();
     setUser(null);
   };
   

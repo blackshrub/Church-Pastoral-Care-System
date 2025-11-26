@@ -20,8 +20,10 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
+# Exception: keep frontend lib directory (api config, utils)
+!frontend/src/lib/
 parts/
 sdist/
 var/
