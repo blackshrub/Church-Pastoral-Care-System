@@ -393,7 +393,7 @@ show_changelog() {
     if git rev-parse --git-dir > /dev/null 2>&1; then
         echo -e "  ${BOLD}Recent commits:${NC}"
         echo ""
-        git log --oneline -10 --pretty=format:"    ${CYAN}%h${NC} %s" 2>/dev/null || true
+        git --no-pager log --oneline -10 --pretty=format:"    ${CYAN}%h${NC} %s" 2>/dev/null || true
         echo ""
     fi
 }
