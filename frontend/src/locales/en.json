@@ -41,7 +41,6 @@
   "_comment_fields": "Form Fields",
   "member_name": "Member Name",
   "phone_number": "Phone Number/WhatsApp",
-  "family_group": "Family Group",
   "notes": "Notes",
   "description": "Description",
   "date": "Date",
@@ -666,7 +665,8 @@
     "select_campus_placeholder": "Select your campus",
     "email_placeholder": "admin@gkbj.church",
     "password_placeholder": "Enter your password",
-    "select_campus_required": "Select your campus (required for all users)"
+    "select_campus_required": "Select your campus (required for all users)",
+    "campus_management_hint": "Select campus to manage specific location"
   },
   
   "_comment_bulk_messaging": "Bulk Messaging Page",

@@ -53,7 +53,6 @@ export const MembersList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [pageSize] = useState(25); // Industry standard: 25 items per page
-  const [familyGroups, setFamilyGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tableLoading, setTableLoading] = useState(false); // Separate table loading
   const [search, setSearch] = useState('');
@@ -81,7 +80,6 @@ export const MembersList = () => {
     marital: true,
     category: true,
     blood_type: true,
-    family: true,
     last_contact: true,
     engagement: true
   });
@@ -89,13 +87,11 @@ export const MembersList = () => {
   const [newMember, setNewMember] = useState({
     name: '',
     phone: '',
-    family_group_name: '',
     notes: ''
   });
-  
+
   useEffect(() => {
     loadMembers(currentPage);
-    loadFamilyGroups();
   }, [currentPage, debouncedSearch, filterStatus, showArchived]);
 
   useEffect(() => {
@@ -162,24 +158,14 @@ export const MembersList = () => {
     }
   };
   
-  const loadFamilyGroups = async () => {
-    try {
-      const response = await axios.get(`${API}/family-groups`);
-      setFamilyGroups(response.data);
-    } catch (error) {
-      console.error('Error loading family groups:', error);
-    }
-  };
-  
   const handleAddMember = async (e) => {
     e.preventDefault();
     try {
       await axios.post(`${API}/members`, {...newMember, campus_id: 'auto'});
       toast.success(t('success_messages.member_created'));
       setAddModalOpen(false);
-      setNewMember({ name: '', phone: '', family_group_name: '', notes: '' });
+      setNewMember({ name: '', phone: '', notes: '' });
       loadMembers();
-      loadFamilyGroups();
     } catch (error) {
       toast.error(t('error_messages.failed_to_save'));
     }
@@ -305,16 +291,6 @@ export const MembersList = () => {
                   placeholder="628123456789"
                   required
                   data-testid="member-phone-input"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="family_group">{t('family_group')}</Label>
-                <Input
-                  id="family_group"
-                  value={newMember.family_group_name}
-                  onChange={(e) => setNewMember({...newMember, family_group_name: e.target.value})}
-                  placeholder="Enter new family group name"
-                  data-testid="family-group-input"
                 />
               </div>
               <div className="space-y-2">
@@ -445,7 +421,7 @@ export const MembersList = () => {
                 {Object.entries({
                   phone: 'Phone', age: 'Age', gender: 'Gender', membership: 'Membership',
                   marital: 'Marital', category: 'Category', blood_type: 'Blood Type',
-                  family: 'Family', last_contact: 'Last Contact', engagement: 'Engagement'
+                  last_contact: 'Last Contact', engagement: 'Engagement'
                 }).map(([key, label]) => (
                   <label key={key} className="flex items-center gap-2 cursor-pointer min-w-0">
                     <input

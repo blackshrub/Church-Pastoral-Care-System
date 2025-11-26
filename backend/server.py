@@ -320,25 +320,10 @@ class Campus(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class FamilyGroupCreate(BaseModel):
-    group_name: str
-    campus_id: str
-
-class FamilyGroup(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    group_name: str
-    campus_id: str
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
 class MemberCreate(BaseModel):
     name: str
     phone: Optional[str] = None
     campus_id: str
-    family_group_id: Optional[str] = None
-    family_group_name: Optional[str] = None
     external_member_id: Optional[str] = None
     notes: Optional[str] = None
     birth_date: Optional[date] = None
@@ -353,7 +338,6 @@ class MemberCreate(BaseModel):
 class MemberUpdate(BaseModel):
     name: Optional[str] = None
     phone: Optional[str] = None
-    family_group_id: Optional[str] = None
     external_member_id: Optional[str] = None
     notes: Optional[str] = None
     birth_date: Optional[date] = None
@@ -366,13 +350,12 @@ class MemberUpdate(BaseModel):
 
 class Member(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
+
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     phone: Optional[str] = None  # Some members may not have phone numbers
     campus_id: str
     photo_url: Optional[str] = None
-    family_group_id: Optional[str] = None
     last_contact_date: Optional[datetime] = None
     engagement_status: EngagementStatus = EngagementStatus.ACTIVE
     days_since_last_contact: int = 0
@@ -1515,32 +1498,27 @@ async def create_member(member: MemberCreate, current_user: dict = Depends(get_c
         campus_id = member.campus_id
         if current_user.get("role") in [UserRole.CAMPUS_ADMIN, UserRole.PASTOR]:
             campus_id = current_user["campus_id"]
-        
-        # Handle family group
-        family_group_id = member.family_group_id
-        
-        if member.family_group_name and not family_group_id:
-            # Create new family group
-            family_group = FamilyGroup(group_name=member.family_group_name, campus_id=campus_id)
-            await db.family_groups.insert_one(family_group.model_dump())
-            family_group_id = family_group.id
-        
+
         member_obj = Member(
             name=member.name,
             phone=normalize_phone_number(member.phone),
             campus_id=campus_id,
-            family_group_id=family_group_id,
             external_member_id=member.external_member_id,
             notes=member.notes,
             birth_date=member.birth_date,
-            email=member.email,
-            address=member.address
+            address=member.address,
+            category=member.category,
+            gender=member.gender,
+            blood_type=member.blood_type,
+            marital_status=member.marital_status,
+            membership_status=member.membership_status,
+            age=member.age
         )
-        
+
         member_dict = member_obj.model_dump()
         if member_dict.get('birth_date'):
             member_dict['birth_date'] = member_dict['birth_date'].isoformat() if isinstance(member_dict['birth_date'], date) else member_dict['birth_date']
-        
+
         await db.members.insert_one(member_dict)
         return member_obj
     except Exception as e:
@@ -1552,7 +1530,6 @@ async def list_members(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=1000),
     engagement_status: Optional[EngagementStatus] = None,
-    family_group_id: Optional[str] = None,
     search: Optional[str] = None,
     show_archived: bool = False,
     current_user: dict = Depends(get_current_user)
@@ -1560,19 +1537,16 @@ async def list_members(
     """List all members with pagination"""
     try:
         query = get_campus_filter(current_user)
-        
+
         # Exclude archived members by default (unless show_archived=true)
         if not show_archived:
             query["is_archived"] = {"$ne": True}
         else:
             query["is_archived"] = True
-        
+
         if engagement_status:
             query["engagement_status"] = engagement_status
-        
-        if family_group_id:
-            query["family_group_id"] = family_group_id
-        
+
         if search:
             query["$or"] = [
                 {"name": {"$regex": search, "$options": "i"}},  # Partial name match
@@ -1593,13 +1567,15 @@ async def list_members(
             "phone": 1,
             "campus_id": 1,
             "photo_url": 1,
-            "family_group_id": 1,
             "last_contact_date": 1,
             "engagement_status": 1,
             "days_since_last_contact": 1,
             "is_archived": 1,
-            "external_member_id": 1
-            # Exclude: notes, address, birth_date, archived_at, archived_reason, category, etc.
+            "external_member_id": 1,
+            "age": 1,
+            "gender": 1,
+            "category": 1
+            # Exclude: notes, address, birth_date, archived_at, archived_reason, etc.
         }
 
         # Get paginated members with projection
@@ -2103,9 +2079,12 @@ async def ignore_care_event(event_id: str, user: dict = Depends(get_current_user
 
 
 @api_router.get("/members/at-risk", response_model=List[Member])
-async def list_at_risk_members():
+async def list_at_risk_members(current_user: dict = Depends(get_current_user)):
     """Get members with no contact in 30+ days"""
     try:
+        # Apply campus filter for multi-tenancy
+        query = get_campus_filter(current_user)
+
         # Projection for at-risk members list
         projection = {
             "_id": 0,
@@ -2114,52 +2093,57 @@ async def list_at_risk_members():
             "phone": 1,
             "campus_id": 1,
             "photo_url": 1,
-            "family_group_id": 1,
             "last_contact_date": 1,
             "engagement_status": 1,
             "days_since_last_contact": 1,
             "external_member_id": 1
         }
 
-        members = await db.members.find({}, projection).to_list(1000)
-        
+        members = await db.members.find(query, projection).to_list(1000)
+
         at_risk_members = []
         for member in members:
             if member.get('last_contact_date'):
                 if isinstance(member['last_contact_date'], str):
                     member['last_contact_date'] = datetime.fromisoformat(member['last_contact_date'])
-            
+
             status, days = calculate_engagement_status(member.get('last_contact_date'))
             member['engagement_status'] = status
             member['days_since_last_contact'] = days
-            
+
             if status in [EngagementStatus.AT_RISK, EngagementStatus.DISCONNECTED]:
                 at_risk_members.append(member)
-        
+
         # Sort by days descending
         at_risk_members.sort(key=lambda x: x['days_since_last_contact'], reverse=True)
-        
+
         return at_risk_members
     except Exception as e:
         logger.error(f"Error getting at-risk members: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/members/{member_id}", response_model=Member)
-async def get_member(member_id: str):
+async def get_member(member_id: str, current_user: dict = Depends(get_current_user)):
     """Get member by ID"""
     try:
-        member = await db.members.find_one({"id": member_id}, {"_id": 0})
+        # Build query with campus filter for multi-tenancy
+        query = {"id": member_id}
+        campus_filter = get_campus_filter(current_user)
+        if campus_filter:
+            query.update(campus_filter)
+
+        member = await db.members.find_one(query, {"_id": 0})
         if not member:
             raise HTTPException(status_code=404, detail="Member not found")
-        
+
         if member.get('last_contact_date'):
             if isinstance(member['last_contact_date'], str):
                 member['last_contact_date'] = datetime.fromisoformat(member['last_contact_date'])
-        
+
         status, days = calculate_engagement_status(member.get('last_contact_date'))
         member['engagement_status'] = status
         member['days_since_last_contact'] = days
-        
+
         return member
     except HTTPException:
         raise
@@ -2168,26 +2152,36 @@ async def get_member(member_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.put("/members/{member_id}", response_model=Member)
-async def update_member(member_id: str, update: MemberUpdate):
+async def update_member(member_id: str, update: MemberUpdate, current_user: dict = Depends(get_current_user)):
     """Update member"""
     try:
+        # Verify member belongs to user's campus
+        query = {"id": member_id}
+        campus_filter = get_campus_filter(current_user)
+        if campus_filter:
+            query.update(campus_filter)
+
+        member = await db.members.find_one(query, {"_id": 0})
+        if not member:
+            raise HTTPException(status_code=404, detail="Member not found")
+
         update_data = {k: v for k, v in update.model_dump().items() if v is not None}
-        
+
         # Normalize phone number if provided
         if 'phone' in update_data and update_data['phone']:
             update_data['phone'] = normalize_phone_number(update_data['phone'])
-        
+
         update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
-        
+
         result = await db.members.update_one(
             {"id": member_id},
             {"$set": update_data}
         )
-        
+
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Member not found")
-        
-        return await get_member(member_id)
+
+        return await get_member(member_id, current_user)
     except HTTPException:
         raise
     except Exception as e:
@@ -2195,17 +2189,40 @@ async def update_member(member_id: str, update: MemberUpdate):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.delete("/members/{member_id}")
-async def delete_member(member_id: str):
+async def delete_member(member_id: str, current_user: dict = Depends(get_current_user)):
     """Delete member"""
     try:
+        # Verify member belongs to user's campus
+        query = {"id": member_id}
+        campus_filter = get_campus_filter(current_user)
+        if campus_filter:
+            query.update(campus_filter)
+
+        member = await db.members.find_one(query, {"_id": 0})
+        if not member:
+            raise HTTPException(status_code=404, detail="Member not found")
+
         result = await db.members.delete_one({"id": member_id})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Member not found")
-        
+
         # Also delete related care events and grief support
         await db.care_events.delete_many({"member_id": member_id})
         await db.grief_support.delete_many({"member_id": member_id})
-        
+
+        # Log activity
+        await log_activity(
+            db=db,
+            user_id=current_user["id"],
+            user_name=current_user["name"],
+            campus_id=current_user.get("campus_id"),
+            action="delete_member",
+            target_type="member",
+            target_id=member_id,
+            target_name=member.get("name", "Unknown"),
+            description=f"Deleted member {member.get('name', 'Unknown')}"
+        )
+
         return {"success": True, "message": "Member deleted successfully"}
     except HTTPException:
         raise
@@ -2214,11 +2231,17 @@ async def delete_member(member_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.delete("/care-events/{event_id}")
-async def delete_care_event(event_id: str):
+async def delete_care_event(event_id: str, current_user: dict = Depends(get_current_user)):
     """Delete care event and recalculate member engagement"""
     try:
+        # Build query with campus filter for multi-tenancy
+        query = {"id": event_id}
+        campus_filter = get_campus_filter(current_user)
+        if campus_filter:
+            query.update(campus_filter)
+
         # Get the care event first to know which member and type
-        event = await db.care_events.find_one({"id": event_id}, {"_id": 0})
+        event = await db.care_events.find_one(query, {"_id": 0})
         if not event:
             raise HTTPException(status_code=404, detail="Care event not found")
         
@@ -2389,11 +2412,17 @@ async def delete_care_event(event_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/members/{member_id}/photo")
-async def upload_member_photo(member_id: str, file: UploadFile = File(...)):
+async def upload_member_photo(member_id: str, file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
     """Upload member profile photo with optimization"""
     try:
-        # Check member exists
-        member = await db.members.find_one({"id": member_id}, {"_id": 0})
+        # Build query with campus filter for multi-tenancy
+        query = {"id": member_id}
+        campus_filter = get_campus_filter(current_user)
+        if campus_filter:
+            query.update(campus_filter)
+
+        # Check member exists and belongs to user's campus
+        member = await db.members.find_one(query, {"_id": 0})
         if not member:
             raise HTTPException(status_code=404, detail="Member not found")
         
@@ -2449,49 +2478,6 @@ async def upload_member_photo(member_id: str, file: UploadFile = File(...)):
         raise
     except Exception as e:
         logger.error(f"Error uploading photo: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-# ==================== FAMILY GROUP ENDPOINTS ====================
-
-@api_router.post("/family-groups", response_model=FamilyGroup)
-async def create_family_group(group: FamilyGroupCreate):
-    """Create a new family group"""
-    try:
-        family_group = FamilyGroup(group_name=group.group_name)
-        await db.family_groups.insert_one(family_group.model_dump())
-        return family_group
-    except Exception as e:
-        logger.error(f"Error creating family group: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.get("/family-groups", response_model=List[FamilyGroup])
-async def list_family_groups():
-    """List all family groups"""
-    try:
-        groups = await db.family_groups.find({}, {"_id": 0}).to_list(1000)
-        return groups
-    except Exception as e:
-        logger.error(f"Error listing family groups: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-@api_router.get("/family-groups/{group_id}")
-async def get_family_group(group_id: str):
-    """Get family group with its members"""
-    try:
-        group = await db.family_groups.find_one({"id": group_id}, {"_id": 0})
-        if not group:
-            raise HTTPException(status_code=404, detail="Family group not found")
-        
-        members = await db.members.find({"family_group_id": group_id}, {"_id": 0}).to_list(100)
-        
-        return {
-            **group,
-            "members": members
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting family group: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # ==================== CARE EVENT ENDPOINTS ====================
@@ -2771,28 +2757,30 @@ async def log_additional_visit(
 async def list_care_events(
     event_type: Optional[EventType] = None,
     member_id: Optional[str] = None,
-    completed: Optional[bool] = None
+    completed: Optional[bool] = None,
+    current_user: dict = Depends(get_current_user)
 ):
     """List care events with optional filters"""
     try:
-        query = {}
-        
+        # Apply campus filter for multi-tenancy
+        query = get_campus_filter(current_user)
+
         if event_type:
             query["event_type"] = event_type
-        
+
         if member_id:
             query["member_id"] = member_id
-        
+
         if completed is not None:
             query["completed"] = completed
-        
+
         events = await db.care_events.find(query, {"_id": 0}).sort("event_date", -1).to_list(1000)
-        
+
         # Enrich events with member names
         for event in events:
             if event.get("member_id"):
                 member = await db.members.find_one(
-                    {"member_id": event["member_id"]}, 
+                    {"id": event["member_id"]},  # Fixed: was "member_id", should be "id"
                     {"_id": 0, "name": 1}
                 )
                 if member:
@@ -2803,17 +2791,23 @@ async def list_care_events(
                     title = event.get("title", "")
                     if " - " in title:
                         event["member_name"] = title.split(" - ", 1)[1].strip()
-        
+
         return events
     except Exception as e:
         logger.error(f"Error listing care events: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.get("/care-events/{event_id}", response_model=CareEvent)
-async def get_care_event(event_id: str):
+async def get_care_event(event_id: str, current_user: dict = Depends(get_current_user)):
     """Get care event by ID"""
     try:
-        event = await db.care_events.find_one({"id": event_id}, {"_id": 0})
+        # Build query with campus filter for multi-tenancy
+        query = {"id": event_id}
+        campus_filter = get_campus_filter(current_user)
+        if campus_filter:
+            query.update(campus_filter)
+
+        event = await db.care_events.find_one(query, {"_id": 0})
         if not event:
             raise HTTPException(status_code=404, detail="Care event not found")
         return event
@@ -2824,21 +2818,31 @@ async def get_care_event(event_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.put("/care-events/{event_id}", response_model=CareEvent)
-async def update_care_event(event_id: str, update: CareEventUpdate):
+async def update_care_event(event_id: str, update: CareEventUpdate, current_user: dict = Depends(get_current_user)):
     """Update care event"""
     try:
+        # Build query with campus filter for multi-tenancy
+        query = {"id": event_id}
+        campus_filter = get_campus_filter(current_user)
+        if campus_filter:
+            query.update(campus_filter)
+
+        event = await db.care_events.find_one(query, {"_id": 0})
+        if not event:
+            raise HTTPException(status_code=404, detail="Care event not found")
+
         update_data = {k: v for k, v in update.model_dump().items() if v is not None}
         update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
-        
+
         result = await db.care_events.update_one(
             {"id": event_id},
             {"$set": update_data}
         )
-        
+
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="Care event not found")
-        
-        return await get_care_event(event_id)
+
+        return await get_care_event(event_id, current_user)
     except HTTPException:
         raise
     except Exception as e:
@@ -4801,7 +4805,7 @@ async def export_members_csv():
         
         output = io.StringIO()
         if members:
-            fieldnames = ['id', 'name', 'phone', 'family_group_id', 'external_member_id', 
+            fieldnames = ['id', 'name', 'phone', 'external_member_id',
                          'last_contact_date', 'engagement_status', 'days_since_last_contact', 'notes']
             writer = csv.DictWriter(output, fieldnames=fieldnames)
             writer.writeheader()

@@ -144,8 +144,7 @@ export const LoginPage = () => {
             </Button>
             
             <div className="text-center text-sm text-muted-foreground mt-4">
-              <p>Full Admin: admin@gkbj.church / admin123</p>
-              <p className="text-xs mt-1">Select campus to manage specific location</p>
+              <p className="text-xs">{t('login_page.campus_management_hint')}</p>
             </div>
           </form>
         </CardContent>

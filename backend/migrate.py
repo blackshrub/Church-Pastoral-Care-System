@@ -132,7 +132,7 @@ async def migration_004_normalize_phone_numbers(db):
 
 async def migration_005_add_deleted_fields(db):
     """Add soft delete fields to all documents that don't have them"""
-    collections = ["members", "care_events", "campuses", "family_groups", "users"]
+    collections = ["members", "care_events", "campuses", "users"]
     total_updated = 0
 
     for collection_name in collections:

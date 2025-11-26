@@ -34,21 +34,20 @@ async def import_campuses_and_data():
     # Step 2: Import members
     print(f"\n2. Importing members to {campus_name}...")
     
-    family_groups_map = {}  # kk_name -> family_group_id
     members_imported = 0
     members_skipped = 0
-    
+
     with open('/app/backend/core_jemaat.csv', 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
             try:
                 name = row.get('name_full', '').strip()
                 phone = row.get('number_hp', '').strip()
-                
+
                 if not name:
                     members_skipped += 1
                     continue
-                
+
                 # Format phone number properly
                 if phone:
                     if phone.startswith('0'):
@@ -57,7 +56,7 @@ async def import_campuses_and_data():
                         phone = phone[1:]
                 else:
                     phone = ''  # Empty for children without phone
-                
+
                 # Parse membership status
                 membership_map = {
                     '1': 'Member',
@@ -68,27 +67,7 @@ async def import_campuses_and_data():
                 }
                 membership_id = row.get('membership_status', '').strip()
                 membership_status = membership_map.get(membership_id, 'Unknown')
-                
-                # Handle family grouping
-                kk_name = row.get('kk_name', '').strip()
-                family_group_id = None
-                
-                if kk_name:
-                    if kk_name not in family_groups_map:
-                        # Create new family group
-                        fg_id = str(uuid.uuid4())
-                        family_group = {
-                            "id": fg_id,
-                            "group_name": kk_name,
-                            "campus_id": campus_id,
-                            "created_at": datetime.now(timezone.utc).isoformat(),
-                            "updated_at": datetime.now(timezone.utc).isoformat()
-                        }
-                        await db.family_groups.insert_one(family_group)
-                        family_groups_map[kk_name] = fg_id
-                    
-                    family_group_id = family_groups_map[kk_name]
-                
+
                 # Parse birth date and calculate age
                 birth_date = None
                 age = None
@@ -101,14 +80,13 @@ async def import_campuses_and_data():
                         age = today.year - birth_dt.year - ((today.month, today.day) < (birth_dt.month, birth_dt.day))
                     except:
                         pass
-                
+
                 # Create member with all fields
                 member = {
                     "id": str(uuid.uuid4()),
                     "name": name,
                     "phone": phone,
                     "campus_id": campus_id,
-                    "family_group_id": family_group_id,
                     "external_member_id": row.get('identity_jemaat', '').strip(),
                     "birth_date": birth_date,
                     "age": age,
@@ -127,20 +105,19 @@ async def import_campuses_and_data():
                     "created_at": datetime.now(timezone.utc).isoformat(),
                     "updated_at": datetime.now(timezone.utc).isoformat()
                 }
-                
+
                 await db.members.insert_one(member)
                 members_imported += 1
-                
+
                 if members_imported % 100 == 0:
                     print(f"  Imported {members_imported} members...")
-                    
+
             except Exception as e:
                 print(f"  Error importing member {row.get('name_full')}: {str(e)}")
                 members_skipped += 1
-    
+
     print(f"\n✅ Imported {members_imported} members")
     print(f"⚠️  Skipped {members_skipped} members (missing data)")
-    print(f"✅ Created {len(family_groups_map)} family groups")
     
     # Step 3: Generate realistic pastoral care data
     print("\n3. Generating realistic pastoral care data...")
@@ -388,7 +365,6 @@ async def import_campuses_and_data():
     print("="*60)
     print(f"✅ Campus: {campus_name}")
     print(f"✅ Members imported: {members_imported}")
-    print(f"✅ Family groups created: {len(family_groups_map)}")
     print(f"✅ Birthday events: {birthday_count}")
     print(f"✅ Grief events: {grief_count} (with {grief_timeline_count} timeline stages)")
     print(f"✅ Hospital events: {hospital_count}")

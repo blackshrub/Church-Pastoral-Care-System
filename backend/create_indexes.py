@@ -16,7 +16,6 @@ async def create_database_indexes():
     
     # Members collection indexes
     await db.members.create_index("campus_id")
-    await db.members.create_index("family_group_id") 
     await db.members.create_index("last_contact_date")
     await db.members.create_index("engagement_status")
     await db.members.create_index("external_member_id")
@@ -60,10 +59,6 @@ async def create_database_indexes():
     await db.users.create_index("role")
     print("✅ Users indexes created")
     
-    # Family groups indexes
-    await db.family_groups.create_index("campus_id")
-    print("✅ Family groups indexes created")
-
     # Job locks indexes (for distributed scheduler locking)
     await db.job_locks.create_index("lock_id", unique=True)
     await db.job_locks.create_index("expires_at")
