@@ -4,7 +4,7 @@ Multi-tenant pastoral care management with complete accountability
 Handles all API endpoints, authentication, database operations, and business logic
 """
 
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Query, Depends, status, Request
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Query, Depends, status, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 from dotenv import load_dotenv
@@ -1538,6 +1538,7 @@ async def create_member(member: MemberCreate, current_user: dict = Depends(get_c
 
 @api_router.get("/members", response_model=List[Member])
 async def list_members(
+    response: Response,
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=1000),
     engagement_status: Optional[EngagementStatus] = None,
@@ -1604,7 +1605,9 @@ async def list_members(
         
         # Add pagination metadata as headers (keep response as array)
         # This maintains compatibility while providing pagination info
-        
+        response.headers["X-Total-Count"] = str(total)
+        response.headers["Access-Control-Expose-Headers"] = "X-Total-Count"
+
         return members
         
     except Exception as e:
@@ -1653,7 +1656,8 @@ async def get_dashboard_reminders(user: dict = Depends(get_current_user)):
                     "disconnected_members": [],
                     "financial_aid_due": [],
                     "ai_suggestions": [],
-                    "total_tasks": 0
+                    "total_tasks": 0,
+                    "total_members": 0
                 }
         
         campus_tz = await get_campus_timezone(campus_id)
@@ -2015,7 +2019,8 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
             "financial_aid_due": aid_due,
             "ai_suggestions": suggestions_list,
             "upcoming_tasks": upcoming_tasks,
-            "total_tasks": len(birthdays_today) + len(grief_today) + len(accident_today) + len(at_risk) + len(disconnected)
+            "total_tasks": len(birthdays_today) + len(grief_today) + len(accident_today) + len(at_risk) + len(disconnected),
+            "total_members": len(members)
         }
         
     except Exception as e:

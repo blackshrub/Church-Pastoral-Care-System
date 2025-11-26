@@ -648,7 +648,7 @@
     "recalculate_engagement": "Hitung Ulang Status Keterlibatan",
     "recalculate_button": "Hitung Ulang Semua Jemaat",
     "recalculate_description": "Hitung ulang status keterlibatan untuk semua jemaat menggunakan pengaturan ambang batas saat ini (Berisiko: 60 hari, Terputus: 90 hari). Ini berguna setelah mengubah ambang batas keterlibatan atau saat deploy ke produksi.",
-    "recalculate_confirm": "Hitung ulang status keterlibatan untuk semua 805 jemaat? Proses ini berjalan di latar belakang dan mungkin memakan waktu 10-15 detik.",
+    "recalculate_confirm": "Hitung ulang status keterlibatan untuk semua jemaat? Proses ini berjalan di latar belakang dan mungkin memakan waktu 10-15 detik.",
     "daily_digest_system": "Sistem Ringkasan Harian",
     "digest_how_it_works": "📋 Cara Kerjanya:",
     "digest_explanation": "Setiap hari pukul 8 pagi waktu Jakarta, tim pastoral menerima WhatsApp dengan daftar tugas: ulang tahun, dukungan dukacita, tindak lanjut rumah sakit, jemaat berisiko. Tim kemudian secara pribadi menghubungi setiap jemaat.",

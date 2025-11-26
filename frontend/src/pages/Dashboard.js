@@ -484,7 +484,7 @@ export const Dashboard = () => {
       
       {/* Stats Cards */}
       <DashboardStats
-        totalMembers={805}
+        totalMembers={dashboardData?.total_members || 0}
         birthdaysToday={birthdaysToday}
         todayTasks={todayTasks}
         griefDue={griefDue}

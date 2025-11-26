@@ -52,6 +52,7 @@ export const MembersList = () => {
   const [allMembers, setAllMembers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [totalMembers, setTotalMembers] = useState(0);
   const [pageSize] = useState(25); // Industry standard: 25 items per page
   const [loading, setLoading] = useState(true);
   const [tableLoading, setTableLoading] = useState(false); // Separate table loading
@@ -137,10 +138,11 @@ export const MembersList = () => {
       const response = await api.get(`/members?${params.toString()}`);
       setMembers(response.data || []);
       setSearchLoading(false); // Clear search loading
-      
-      // Calculate total pages
-      const totalMembers = 805;
-      setTotalPages(Math.ceil(totalMembers / pageSize));
+
+      // Get total count from header and calculate pages
+      const total = parseInt(response.headers['x-total-count'] || '0', 10);
+      setTotalMembers(total);
+      setTotalPages(Math.ceil(total / pageSize));
       setCurrentPage(page);
     } catch (error) {
       setSearchLoading(false); // Clear loading on error too
@@ -529,7 +531,7 @@ export const MembersList = () => {
       {/* Industry-Standard Pagination Controls */}
       <div className="flex items-center justify-between mt-6">
         <div className="text-sm text-muted-foreground">
-          Showing {((currentPage - 1) * pageSize) + 1}-{Math.min(currentPage * pageSize, 805)} of 805 members
+          Showing {totalMembers > 0 ? ((currentPage - 1) * pageSize) + 1 : 0}-{Math.min(currentPage * pageSize, totalMembers)} of {totalMembers} members
         </div>
         <div className="flex items-center gap-2">
           <Button 

@@ -11,7 +11,7 @@ import { Users, Bell, Heart, AlertTriangle } from 'lucide-react';
 
 // Memoized to prevent re-renders when dashboard state changes but stats don't
 export const DashboardStats = memo(({
-  totalMembers = 805,
+  totalMembers = 0,
   birthdaysToday = [],
   todayTasks = [],
   griefDue = [],

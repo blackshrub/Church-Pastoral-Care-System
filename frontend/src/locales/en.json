@@ -650,7 +650,7 @@
     "recalculate_engagement": "Recalculate Engagement Status",
     "recalculate_button": "Recalculate All Members",
     "recalculate_description": "Recalculate engagement status for all members using current threshold settings (At-Risk: 60 days, Disconnected: 90 days). This is useful after changing engagement thresholds or when deploying to production.",
-    "recalculate_confirm": "Recalculate engagement status for all 805 members? This process runs in the background and may take 10-15 seconds.",
+    "recalculate_confirm": "Recalculate engagement status for all members? This process runs in the background and may take 10-15 seconds.",
     "daily_digest_system": "Daily Digest System",
     "digest_how_it_works": "📋 How It Works:",
     "digest_explanation": "Every day at 8 AM Jakarta time, pastoral team receives WhatsApp with task list: birthdays, grief support, hospital follow-ups, at-risk members. Team then personally contacts each member.",
