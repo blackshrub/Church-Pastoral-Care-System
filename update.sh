@@ -143,6 +143,25 @@ print_error() {
     echo -e "  ${CROSSMARK} ${RED}$1${NC}"
 }
 
+show_build_error() {
+    local context="${1:-Build}"
+    echo ""
+    echo -e "  ${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "  ${RED}${BOLD}$context Error Details:${NC}"
+    echo -e "  ${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    # Show last 40 lines of log file with proper formatting
+    if [ -f "$LOG_FILE" ]; then
+        tail -40 "$LOG_FILE" | while IFS= read -r line; do
+            echo -e "  ${DIM}│${NC} $line"
+        done
+    fi
+    echo ""
+    echo -e "  ${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "  ${YELLOW}Full log: ${LOG_FILE}${NC}"
+    echo ""
+}
+
 show_spinner() {
     local pid=$1
     local message=$2
@@ -543,8 +562,13 @@ update_backend() {
     # Update dependencies
     print_step "Updating Python dependencies"
     pip install -r requirements.txt --quiet >> "$LOG_FILE" 2>&1 &
-    show_spinner $! "Installing packages"
-    wait
+    local pip_pid=$!
+    show_spinner $pip_pid "Installing packages"
+    if ! wait $pip_pid; then
+        print_error "Python dependencies installation failed"
+        show_build_error "Python pip install"
+        return 1
+    fi
 
     # Run migrations
     print_step "Running database migrations"
@@ -576,8 +600,13 @@ update_frontend() {
     # Install dependencies
     print_step "Installing Node.js dependencies"
     sudo -u faithtracker yarn install --silent >> "$LOG_FILE" 2>&1 &
-    show_spinner $! "Installing packages"
-    wait
+    local yarn_pid=$!
+    show_spinner $yarn_pid "Installing packages"
+    if ! wait $yarn_pid; then
+        print_error "Node.js dependencies installation failed"
+        show_build_error "yarn install"
+        return 1
+    fi
 
     # Build production bundle
     print_step "Building production bundle"
@@ -602,6 +631,7 @@ update_frontend() {
 
     wait $build_pid || {
         print_error "Frontend build failed"
+        show_build_error "yarn build"
         return 1
     }
 

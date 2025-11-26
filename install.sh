@@ -151,6 +151,25 @@ print_error() {
     echo -e "  ${CROSSMARK} ${RED}$1${NC}" | tee -a "$LOG_FILE"
 }
 
+show_build_error() {
+    local context="${1:-Build}"
+    echo ""
+    echo -e "  ${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "  ${RED}${BOLD}$context Error Details:${NC}"
+    echo -e "  ${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    # Show last 40 lines of log file with proper formatting
+    if [ -f "$LOG_FILE" ]; then
+        tail -40 "$LOG_FILE" | while IFS= read -r line; do
+            echo -e "  ${DIM}│${NC} $line"
+        done
+    fi
+    echo ""
+    echo -e "  ${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "  ${YELLOW}Full log: ${LOG_FILE}${NC}"
+    echo ""
+}
+
 print_step() {
     echo -e "  ${ARROW} $1"
 }
@@ -684,8 +703,13 @@ setup_backend() {
     print_step "Installing Python dependencies"
     sudo -u faithtracker "$INSTALL_DIR/backend/venv/bin/pip" install --upgrade pip >> "$LOG_FILE" 2>&1
     sudo -u faithtracker "$INSTALL_DIR/backend/venv/bin/pip" install -r requirements.txt >> "$LOG_FILE" 2>&1 &
-    show_spinner $! "Installing Python packages"
-    wait
+    local pip_pid=$!
+    show_spinner $pip_pid "Installing Python packages"
+    if ! wait $pip_pid; then
+        print_error "Python dependencies installation failed"
+        show_build_error "Python pip install"
+        exit 1
+    fi
 
     print_step "Initializing database"
     sudo -u faithtracker "$INSTALL_DIR/backend/venv/bin/python" init_db.py \
@@ -709,8 +733,13 @@ setup_frontend() {
 
     print_step "Installing Node.js dependencies"
     sudo -u faithtracker yarn install >> "$LOG_FILE" 2>&1 &
-    show_spinner $! "Installing packages"
-    wait
+    local yarn_pid=$!
+    show_spinner $yarn_pid "Installing packages"
+    if ! wait $yarn_pid; then
+        print_error "Node.js dependencies installation failed"
+        show_build_error "yarn install"
+        exit 1
+    fi
 
     print_step "Building production bundle"
     # Increase Node.js memory for build
@@ -734,6 +763,7 @@ setup_frontend() {
 
     wait $build_pid || {
         print_error "Frontend build failed"
+        show_build_error "yarn build"
         exit 1
     }
 
