@@ -141,10 +141,11 @@ async def create_admin_user(db, email, password, name="Administrator"):
 
     user = {
         "email": email,
-        "password_hash": pwd_context.hash(password),
+        "hashed_password": pwd_context.hash(password),  # Must match server.py field name
         "name": name,
         "role": "full_admin",
         "campus_id": None,  # Full admin has no specific campus
+        "is_active": True,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat()
     }

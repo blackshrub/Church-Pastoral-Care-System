@@ -155,6 +155,23 @@ async def migration_006_ensure_campus_is_active(db):
     return f"Set is_active=True on {result.modified_count} campus(es)"
 
 
+async def migration_007_fix_user_password_field(db):
+    """Rename password_hash to hashed_password for consistency with server.py"""
+    # Find users with old field name
+    result = await db.users.update_many(
+        {"password_hash": {"$exists": True}, "hashed_password": {"$exists": False}},
+        [{"$set": {"hashed_password": "$password_hash"}}, {"$unset": "password_hash"}]
+    )
+
+    # Also ensure is_active exists
+    await db.users.update_many(
+        {"is_active": {"$exists": False}},
+        {"$set": {"is_active": True}}
+    )
+
+    return f"Fixed password field on {result.modified_count} user(s)"
+
+
 # ==================== MIGRATION REGISTRY ====================
 
 # List of all migrations in order
@@ -166,6 +183,7 @@ MIGRATIONS: List[tuple[int, str, Callable]] = [
     (4, "Normalize phone numbers", migration_004_normalize_phone_numbers),
     (5, "Add soft delete fields", migration_005_add_deleted_fields),
     (6, "Ensure campus is_active field", migration_006_ensure_campus_is_active),
+    (7, "Fix user password field name", migration_007_fix_user_password_field),
 ]
 
 
