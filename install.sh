@@ -773,6 +773,12 @@ setup_frontend() {
 create_systemd_service() {
     show_progress "Creating system service"
 
+    # Create log directory
+    mkdir -p /var/log/faithtracker
+    chown faithtracker:faithtracker /var/log/faithtracker
+    touch /var/log/faithtracker/backend.out.log /var/log/faithtracker/backend.err.log
+    chown faithtracker:faithtracker /var/log/faithtracker/backend.out.log /var/log/faithtracker/backend.err.log
+
     cat > /etc/systemd/system/faithtracker-backend.service << EOF
 [Unit]
 Description=FaithTracker FastAPI Backend
@@ -788,20 +794,36 @@ Environment="PATH=/opt/faithtracker/backend/venv/bin"
 ExecStart=/opt/faithtracker/backend/venv/bin/uvicorn server:app --host 0.0.0.0 --port $BACKEND_PORT --workers 4
 Restart=always
 RestartSec=10
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=faithtracker-backend
+StandardOutput=append:/var/log/faithtracker/backend.out.log
+StandardError=append:/var/log/faithtracker/backend.err.log
 
 # Security hardening
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/faithtracker/backend/uploads
+ReadWritePaths=/opt/faithtracker/backend/uploads /var/log/faithtracker
 PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target
 EOF
+
+    # Create logrotate config for backend logs
+    cat > /etc/logrotate.d/faithtracker << 'LOGROTATE'
+/var/log/faithtracker/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 faithtracker faithtracker
+    sharedscripts
+    postrotate
+        systemctl reload faithtracker-backend > /dev/null 2>&1 || true
+    endscript
+}
+LOGROTATE
 
     systemctl daemon-reload
     systemctl enable faithtracker-backend >> "$LOG_FILE" 2>&1
@@ -813,7 +835,7 @@ EOF
         print_success "Backend service started"
     else
         print_error "Backend service failed to start"
-        echo "  ${ARROW} Check logs: ${CYAN}sudo journalctl -u faithtracker-backend -n 50${NC}"
+        echo "  ${ARROW} Check logs: ${CYAN}tail -f /var/log/faithtracker/backend.err.log${NC}"
         exit 1
     fi
 }
@@ -1004,8 +1026,12 @@ EOF
     echo ""
     echo -e "${CYAN}${BOLD}📁 Important Locations:${NC}"
     echo -e "   Application:  /opt/faithtracker"
-    echo -e "   Logs:         $LOG_FILE"
-    echo -e "   Backend Logs: sudo journalctl -u faithtracker-backend -f"
+    echo -e "   Install Log:  $LOG_FILE"
+    echo -e "   Backend Logs: /var/log/faithtracker/"
+    echo ""
+    echo -e "${CYAN}${BOLD}📋 View Logs:${NC}"
+    echo -e "   ${DIM}tail -f /var/log/faithtracker/backend.out.log${NC}  # stdout"
+    echo -e "   ${DIM}tail -f /var/log/faithtracker/backend.err.log${NC}  # stderr"
     echo ""
     echo -e "${CYAN}${BOLD}🔧 Service Management:${NC}"
     echo -e "   sudo systemctl status faithtracker-backend"

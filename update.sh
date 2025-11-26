@@ -334,7 +334,7 @@ perform_rollback() {
         print_info "Restored to: $selected_backup"
     else
         print_error "Services failed to start after rollback"
-        print_info "Check logs: sudo journalctl -u faithtracker-backend -n 50"
+        print_info "Check logs: tail -50 /var/log/faithtracker/backend.err.log"
     fi
 
     exit 0
@@ -750,9 +750,10 @@ EOF
     echo -e "     • Forms work as expected"
     echo ""
 
-    if [ "$BACKEND_CHANGED" = true ]; then
+    if [ "$BACKEND_CHANGED" = true ] || [ "$FORCE_UPDATE" = true ]; then
         echo -e "${CYAN}${BOLD}🔍 Backend Logs:${NC}"
-        echo -e "  ${DIM}sudo journalctl -u faithtracker-backend -f${NC}"
+        echo -e "  ${DIM}tail -f /var/log/faithtracker/backend.out.log${NC}  # stdout"
+        echo -e "  ${DIM}tail -f /var/log/faithtracker/backend.err.log${NC}  # stderr"
         echo ""
     fi
 
