@@ -48,7 +48,7 @@ def decrypt_password(encrypted: str) -> str:
     """Decrypt password for use"""
     try:
         return cipher_suite.decrypt(encrypted.encode()).decode()
-    except:
+    except Exception:
         # If decryption fails, assume it's already plain text (backward compatibility)
         return encrypted
 
@@ -235,6 +235,10 @@ MAX_PAGE_SIZE = 1000
 # Dashboard Lookback (days)
 DEFAULT_ANALYTICS_DAYS = 30
 DEFAULT_UPCOMING_DAYS = 7
+
+# File Upload Limits (bytes)
+MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10 MB for images
+MAX_CSV_SIZE = 5 * 1024 * 1024      # 5 MB for CSV imports
 
 # ==================== AUTH CONFIGURATION ====================
 
@@ -791,7 +795,7 @@ async def get_engagement_settings():
 
         set_in_cache(cache_key, result)
         return result
-    except:
+    except Exception:
         return {"atRiskDays": ENGAGEMENT_AT_RISK_DAYS_DEFAULT, "disconnectedDays": ENGAGEMENT_DISCONNECTED_DAYS_DEFAULT}
 
 async def get_writeoff_settings():
@@ -817,7 +821,7 @@ async def get_writeoff_settings():
 
         set_in_cache(cache_key, result)
         return result
-    except:
+    except Exception:
         return default_settings
 
 async def calculate_engagement_status_async(last_contact: Optional[datetime]) -> tuple[EngagementStatus, int]:
@@ -833,16 +837,16 @@ async def calculate_engagement_status_async(last_contact: Optional[datetime]) ->
     if isinstance(last_contact, str):
         try:
             last_contact = datetime.fromisoformat(last_contact)
-        except:
+        except ValueError:
             return EngagementStatus.DISCONNECTED, ENGAGEMENT_NO_CONTACT_DAYS
-    
+
     # Make timezone-aware if needed
     if last_contact.tzinfo is None:
         last_contact = last_contact.replace(tzinfo=timezone.utc)
-    
+
     now = datetime.now(timezone.utc)
     days_since = (now - last_contact).days
-    
+
     if days_since < at_risk_days:
         return EngagementStatus.ACTIVE, days_since
     elif days_since < disconnected_days:
@@ -854,12 +858,12 @@ def calculate_engagement_status(last_contact: Optional[datetime], at_risk_days: 
     """Calculate engagement status and days since last contact (with configurable thresholds)"""
     if not last_contact:
         return EngagementStatus.DISCONNECTED, ENGAGEMENT_NO_CONTACT_DAYS
-    
+
     # Handle string dates
     if isinstance(last_contact, str):
         try:
             last_contact = datetime.fromisoformat(last_contact)
-        except:
+        except ValueError:
             return EngagementStatus.DISCONNECTED, ENGAGEMENT_NO_CONTACT_DAYS
     
     # Make timezone-aware if needed
@@ -1439,24 +1443,26 @@ async def upload_user_photo(user_id: str, file: UploadFile = File(...), current_
     # Users can upload their own photo or full admin can upload for others
     if current_user["id"] != user_id and current_user["role"] != "full_admin":
         raise HTTPException(status_code=403, detail="Not authorized")
-    
+
     try:
         # Validate file type
         allowed_types = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/heic", "image/heif"]
         if file.content_type not in allowed_types:
             raise HTTPException(status_code=400, detail="Invalid file type. Only images allowed.")
-        
+
+        # Validate file size
+        contents = await file.read()
+        if len(contents) > MAX_IMAGE_SIZE:
+            raise HTTPException(status_code=400, detail=f"File too large. Maximum size is {MAX_IMAGE_SIZE // (1024*1024)} MB.")
+
         # Create uploads directory if not exists
         upload_dir = Path(ROOT_DIR) / "user_photos"
         upload_dir.mkdir(exist_ok=True)
-        
+
         # Generate filename
         file_ext = file.filename.split('.')[-1] if '.' in file.filename else 'jpg'
         filename = f"USER-{user_id[:8]}.{file_ext}"
         filepath = upload_dir / filename
-        
-        # Save file
-        contents = await file.read()
         
         # Resize image to 400x400 and optimize
         img = Image.open(BytesIO(contents))
@@ -1727,7 +1733,7 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                 try:
                     birth_date = datetime.strptime(m["birth_date"], '%Y-%m-%d').date()
                     age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-                except:
+                except ValueError:
                     pass
             m["age"] = age
             member_map[m["id"]] = m
@@ -2033,7 +2039,7 @@ async def get_campus_timezone(campus_id: str) -> str:
     try:
         campus = await db.campuses.find_one({"id": campus_id}, {"_id": 0, "timezone": 1})
         return campus.get("timezone", "Asia/Jakarta") if campus else "Asia/Jakarta"
-    except:
+    except Exception:
         return "Asia/Jakarta"
 
 def get_date_in_timezone(timezone_str: str) -> str:
@@ -2041,7 +2047,7 @@ def get_date_in_timezone(timezone_str: str) -> str:
     try:
         tz = ZoneInfo(timezone_str)
         return datetime.now(tz).strftime('%Y-%m-%d')
-    except:
+    except Exception:
         return datetime.now(ZoneInfo("Asia/Jakarta")).strftime('%Y-%m-%d')
 
 
@@ -2446,9 +2452,13 @@ async def upload_member_photo(member_id: str, file: UploadFile = File(...), curr
         # Validate file type
         if not file.content_type.startswith('image/'):
             raise HTTPException(status_code=400, detail="File must be an image")
-        
-        # Read and process image
+
+        # Read and validate file size
         contents = await file.read()
+        if len(contents) > MAX_IMAGE_SIZE:
+            raise HTTPException(status_code=400, detail=f"File too large. Maximum size is {MAX_IMAGE_SIZE // (1024*1024)} MB.")
+
+        # Process image
         image = Image.open(io.BytesIO(contents))
         
         # Optimize image: resize and compress
@@ -4787,7 +4797,11 @@ async def member_sync_webhook(current_admin: dict = Depends(get_current_admin)):
 async def import_members_csv(file: UploadFile = File(...)):
     """Import members from CSV file"""
     try:
+        # Read and validate file size
         contents = await file.read()
+        if len(contents) > MAX_CSV_SIZE:
+            raise HTTPException(status_code=400, detail=f"File too large. Maximum size is {MAX_CSV_SIZE // (1024*1024)} MB.")
+
         decoded = contents.decode('utf-8')
         reader = csv.DictReader(io.StringIO(decoded))
         
@@ -5652,7 +5666,7 @@ async def save_sync_config(config: SyncConfigCreate, current_user: dict = Depend
                 if login_response.status_code == 200:
                     login_data = login_response.json()
                     core_church_id = login_data.get("user", {}).get("church_id") or login_data.get("church", {}).get("id")
-        except:
+        except Exception:
             pass  # If we can't get church_id, continue without it
         
         sync_config_data = {
@@ -5895,7 +5909,7 @@ async def test_sync_connection(config: SyncConfigCreate, current_user: dict = De
                 try:
                     error_json = login_response.json()
                     error_detail = error_json.get("detail", error_detail)
-                except:
+                except ValueError:
                     pass
                 
                 return {
@@ -6141,7 +6155,7 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                                 elif operator == "between":
                                     if isinstance(filter_value, list) and len(filter_value) == 2:
                                         rule_matches = float(filter_value[0]) <= float(member_value) <= float(filter_value[1])
-                            except:
+                            except (ValueError, TypeError):
                                 rule_matches = False
                         
                         elif operator == "is_true":
@@ -6191,11 +6205,11 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                             birth_date = date.fromisoformat(dob) if isinstance(dob, str) else dob
                             age = (date.today() - birth_date).days // 365
                             member_data["age"] = age
-                        except:
+                        except (ValueError, TypeError):
                             member_data["age"] = None
                     else:
                         member_data["age"] = None
-                    
+
                     # Handle photo if exists
                     photo_base64 = core_member.get("photo_base64")
                     if photo_base64 and photo_base64.startswith("data:image"):
@@ -6462,7 +6476,7 @@ async def receive_sync_webhook(request: Request):
         # Parse JSON body
         try:
             payload = await request.json()
-        except:
+        except Exception:
             raise HTTPException(status_code=400, detail="Invalid JSON payload")
         
         # Get campus_id from payload
@@ -6594,9 +6608,9 @@ async def receive_sync_webhook(request: Request):
                                 birth_date = date.fromisoformat(dob) if isinstance(dob, str) else dob
                                 age = (date.today() - birth_date).days // 365
                                 member_data["age"] = age
-                            except:
+                            except (ValueError, TypeError):
                                 member_data["age"] = None
-                        
+
                         # Handle photo if exists
                         photo_base64 = core_member.get("photo_base64")
                         if photo_base64 and photo_base64.startswith("data:image"):
@@ -6948,6 +6962,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         # Permissions policy (disable unnecessary browser features)
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        # Content Security Policy - restrictive for API
+        response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
         # HSTS - only in production (when not localhost)
         if "localhost" not in str(request.url) and "127.0.0.1" not in str(request.url):
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
