@@ -34,9 +34,12 @@ export const LoginPage = () => {
   const loadCampuses = async () => {
     try {
       const response = await api.get('/campuses');
-      setCampuses(response.data);
+      // Ensure we always set an array
+      const data = response.data;
+      setCampuses(Array.isArray(data) ? data : (data?.campuses || []));
     } catch (error) {
       console.error('Error loading campuses:', error);
+      setCampuses([]);
     } finally {
       setLoadingCampuses(false);
     }
