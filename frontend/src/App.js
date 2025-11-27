@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import PageLoader from '@/components/PageLoader';
 import './i18n';
 import '@/App.css';
 import LoginPage from '@/pages/LoginPage';
@@ -51,7 +52,7 @@ const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return <PageLoader />;
   }
   
   if (!user) {
@@ -81,7 +82,7 @@ function AppRoutes() {
   
   // Show loading while checking
   if (needsSetup === null) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return <PageLoader />;
   }
   
   // Show setup wizard if needed
@@ -115,7 +116,7 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Loading GKBJ Care...</div>}>
+        <Suspense fallback={<PageLoader />}>
           <BrowserRouter>
             <AuthProvider>
               <AppRoutes />
