@@ -6390,12 +6390,23 @@ async def get_sync_logs(current_user: dict = Depends(get_current_user), limit: i
 
 @api_router.post("/setup/admin")
 async def setup_first_admin(request: SetupAdminRequest):
-    """Create first admin account (only if no admin exists)"""
+    """Create church admin account (allows one church admin even if default system admin exists)"""
     try:
-        # Check if any user exists
-        user_count = await db.users.count_documents({})
-        if user_count > 0:
-            raise HTTPException(status_code=400, detail="Admin already exists")
+        # Default system admin email (auto-created at startup for system provider)
+        DEFAULT_SYSTEM_ADMIN_EMAIL = "admin@gkbj.church"
+
+        # Check if a non-default (church) admin already exists
+        church_admin_count = await db.users.count_documents({
+            "role": UserRole.FULL_ADMIN,
+            "email": {"$ne": DEFAULT_SYSTEM_ADMIN_EMAIL}
+        })
+
+        if church_admin_count > 0:
+            raise HTTPException(status_code=400, detail="Church admin already exists")
+
+        # Prevent creating another account with the default system admin email
+        if request.email.lower() == DEFAULT_SYSTEM_ADMIN_EMAIL.lower():
+            raise HTTPException(status_code=400, detail="Cannot use system admin email. Please use a different email.")
         
         # Create first admin
         admin_user = User(
@@ -6444,15 +6455,22 @@ async def setup_first_campus(request: SetupCampusRequest):
 async def check_setup_status():
     """Check if initial setup is needed"""
     try:
-        user_count = await db.users.count_documents({})
+        # Default system admin email (auto-created at startup for system provider)
+        DEFAULT_SYSTEM_ADMIN_EMAIL = "admin@gkbj.church"
+
+        # Check for church admin (non-default admin)
+        church_admin_count = await db.users.count_documents({
+            "role": UserRole.FULL_ADMIN,
+            "email": {"$ne": DEFAULT_SYSTEM_ADMIN_EMAIL}
+        })
         campus_count = await db.campuses.count_documents({})
-        
+
         return {
-            "needs_setup": user_count == 0 or campus_count == 0,
-            "has_admin": user_count > 0,
+            "needs_setup": church_admin_count == 0 or campus_count == 0,
+            "has_admin": church_admin_count > 0,
             "has_campus": campus_count > 0
         }
-    
+
     except Exception as e:
         logger.error(f"Error checking setup status: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
