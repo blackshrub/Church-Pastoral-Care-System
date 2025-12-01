@@ -1167,8 +1167,19 @@ async def list_campuses():
 
     try:
         campuses = await db.campuses.find({"is_active": True}, {"_id": 0}).to_list(100)
-        set_in_cache(cache_key, campuses)
-        return JSONResponse(content=campuses, headers=cache_headers)
+
+        # Serialize datetime fields for JSON response
+        serialized_campuses = []
+        for campus in campuses:
+            campus_copy = dict(campus)
+            if isinstance(campus_copy.get('created_at'), datetime):
+                campus_copy['created_at'] = campus_copy['created_at'].isoformat()
+            if isinstance(campus_copy.get('updated_at'), datetime):
+                campus_copy['updated_at'] = campus_copy['updated_at'].isoformat()
+            serialized_campuses.append(campus_copy)
+
+        set_in_cache(cache_key, serialized_campuses)
+        return JSONResponse(content=serialized_campuses, headers=cache_headers)
     except Exception as e:
         logger.error(f"Error listing campuses: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -6442,11 +6453,19 @@ async def setup_first_campus(request: SetupCampusRequest):
             location=request.location,
             timezone=request.timezone
         )
-        
-        await db.campuses.insert_one(campus.model_dump())
-        
+
+        # Convert to dict and ensure proper datetime serialization
+        campus_dict = campus.model_dump()
+        campus_dict['created_at'] = campus_dict['created_at'].isoformat() if isinstance(campus_dict['created_at'], datetime) else campus_dict['created_at']
+        campus_dict['updated_at'] = campus_dict['updated_at'].isoformat() if isinstance(campus_dict['updated_at'], datetime) else campus_dict['updated_at']
+
+        await db.campuses.insert_one(campus_dict)
+
+        # Invalidate campuses cache so new campus appears immediately
+        invalidate_cache("campuses")
+
         return {"success": True, "message": "Campus created", "campus_id": campus.id}
-    
+
     except Exception as e:
         logger.error(f"Error creating first campus: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
