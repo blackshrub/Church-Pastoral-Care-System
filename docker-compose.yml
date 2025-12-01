@@ -1,8 +1,6 @@
 # FaithTracker Docker Compose
 # Production deployment with Traefik SSL/Let's Encrypt
 
-version: "3.8"
-
 services:
   # ===================
   # Traefik - Reverse Proxy & SSL
