@@ -13,7 +13,11 @@
       "Bash(git mv:*)",
       "Bash(mongo:*)",
       "Bash(yarn add:*)",
-      "Bash(npm --version:*)"
+      "Bash(npm --version:*)",
+      "Bash(docker compose build:*)",
+      "Bash(docker compose:*)",
+      "Bash(bash:*)",
+      "Bash(tee:*)"
     ],
     "deny": [],
     "ask": []

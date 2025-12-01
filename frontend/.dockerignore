@@ -14,6 +14,12 @@ coverage
 test-results
 playwright-report
 playwright/.cache
+e2e/
+src/__tests__/
+*.test.js
+*.test.jsx
+*.spec.js
+*.spec.jsx
 
 # IDE
 .vscode/
@@ -39,3 +45,16 @@ yarn-error.log*
 .cache
 *.tmp
 *.temp
+
+# Documentation and config files not needed in build
+README.md
+CLAUDE.md
+*.md
+.eslintrc*
+.prettierrc*
+.husky/
+eslint.config.mjs
+playwright.config.js
+
+# Bundle analyzer output
+bundle-report.html
