@@ -6221,33 +6221,18 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                     else:
                         member_data["age"] = None
 
-                    # Handle photo if exists
-                    photo_base64 = core_member.get("photo_base64")
-                    if photo_base64 and photo_base64.startswith("data:image"):
-                        try:
-                            # Extract base64 data
-                            image_data = photo_base64.split(",")[1] if "," in photo_base64 else photo_base64
-                            image_bytes = base64.b64decode(image_data)
-                            
-                            # Save photo
-                            upload_dir = Path(ROOT_DIR) / "uploads"
-                            upload_dir.mkdir(exist_ok=True)
-                            
-                            ext = "jpg"
-                            if "png" in photo_base64:
-                                ext = "png"
-                            filename = f"JEMAAT-{core_id[:5]}.{ext}"
-                            filepath = upload_dir / filename
-                            
-                            # Resize and save
-                            img = Image.open(BytesIO(image_bytes))
-                            img = img.convert('RGB')
-                            img.thumbnail((800, 800), Image.Resampling.LANCZOS)
-                            img.save(filepath, 'JPEG', quality=85)
-                            
-                            member_data["photo_url"] = f"/uploads/{filename}"
-                        except Exception as e:
-                            logger.error(f"Error processing photo for {core_id}: {str(e)}")
+                    # Handle photo URL from external API (CDN approach - no local storage)
+                    # Check common field names for photo URL
+                    external_photo_url = (
+                        core_member.get("photo_url") or
+                        core_member.get("photo") or
+                        core_member.get("image_url") or
+                        core_member.get("avatar_url") or
+                        core_member.get("profile_photo")
+                    )
+                    if external_photo_url and isinstance(external_photo_url, str) and external_photo_url.startswith("http"):
+                        # Store external URL directly - photos served from API provider (CDN approach)
+                        member_data["photo_url"] = external_photo_url
                     
                     # Check if member is active
                     is_active = core_member.get("is_active", True)
