@@ -87,6 +87,7 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - FRONTEND_URL=https://${DOMAIN}
       - ALLOWED_ORIGINS=https://${DOMAIN},https://api.${DOMAIN}
+      - WHATSAPP_GATEWAY_URL=${WHATSAPP_GATEWAY_URL:-}
     volumes:
       - backend-uploads:/app/uploads
     networks:
