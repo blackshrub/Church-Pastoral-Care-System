@@ -9,6 +9,8 @@ services:
     image: traefik:v3.2
     container_name: faithtracker-traefik
     restart: unless-stopped
+    environment:
+      - DOCKER_API_VERSION=1.45
     command:
       # API and Dashboard
       - "--api.dashboard=true"
