@@ -6,11 +6,9 @@ services:
   # Traefik - Reverse Proxy & SSL
   # ===================
   traefik:
-    image: traefik:v3.2
+    image: traefik:v2.11
     container_name: faithtracker-traefik
     restart: unless-stopped
-    environment:
-      - DOCKER_API_VERSION=1.45
     command:
       # API and Dashboard
       - "--api.dashboard=true"
