@@ -1,0 +1,345 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "today": "Today",
+    "upcoming": "Upcoming",
+    "overdue": "Overdue",
+    "completed": "Completed",
+    "pending": "Pending",
+    "seeAll": "See All",
+    "noData": "No data available",
+    "pullToRefresh": "Pull to refresh",
+    "success": "Success",
+    "tryAgain": "Try Again",
+    "enable": "Enable",
+    "disable": "Disable"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "loginButton": "Sign In",
+    "loggingIn": "Signing in...",
+    "loginError": "Login failed. Please check your credentials.",
+    "welcome": "Welcome to FaithTracker",
+    "subtitle": "Pastoral Care Management",
+    "biometricLogin": "Login with {{type}}",
+    "biometricError": "Biometric authentication failed",
+    "biometricFailed": "Biometric login failed. Please use email and password.",
+    "faceId": "Face ID",
+    "touchId": "Touch ID",
+    "loginWith": "Login with"
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good Morning",
+      "afternoon": "Good Afternoon",
+      "evening": "Good Evening",
+      "night": "Good Night"
+    },
+    "stats": {
+      "todayTasks": "Today's Tasks",
+      "overdueTasks": "Overdue",
+      "totalMembers": "Members"
+    },
+    "sections": {
+      "todayTasks": "Today's Tasks",
+      "overdueTasks": "Overdue Tasks",
+      "quickActions": "Quick Actions"
+    },
+    "quickActions": {
+      "members": "Members",
+      "membersDesc": "View all members",
+      "tasks": "All Tasks",
+      "tasksDesc": "View all tasks",
+      "addMember": "Add Member",
+      "addMemberDesc": "Create a new member"
+    },
+    "emptyState": {
+      "noTasks": "No tasks for today",
+      "allCaughtUp": "You're all caught up!"
+    }
+  },
+  "members": {
+    "title": "Members",
+    "searchPlaceholder": "Search by name or phone...",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "at_risk": "At Risk",
+      "disconnected": "Disconnected"
+    },
+    "engagement": {
+      "active": "Active",
+      "at_risk": "At Risk",
+      "disconnected": "Disconnected"
+    },
+    "daysSinceContact": "{{days}} days ago",
+    "noMembers": "No members found",
+    "addMember": "Add Member"
+  },
+  "memberDetail": {
+    "contact": "Contact",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "profile": "Profile",
+    "timeline": "Care Timeline",
+    "addCareEvent": "Add Care Event",
+    "noCareEvents": "No care events yet",
+    "edit": "Edit",
+    "fields": {
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "birthDate": "Birth Date",
+      "age": "Age",
+      "gender": "Gender",
+      "maritalStatus": "Marital Status",
+      "memberSince": "Member Since",
+      "notes": "Notes"
+    }
+  },
+  "addMember": {
+    "title": "Add Member",
+    "photo": "Profile Photo",
+    "photoOptions": "Choose an option",
+    "takePhoto": "Take Photo",
+    "choosePhoto": "Choose from Library",
+    "addPhoto": "Add Photo",
+    "submit": "Create Member",
+    "errorCreating": "Failed to create member. Please try again.",
+    "fields": {
+      "name": "Full Name",
+      "phone": "Phone Number",
+      "email": "Email",
+      "address": "Address",
+      "birthDate": "Birth Date",
+      "gender": "Gender",
+      "maritalStatus": "Marital Status",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "name": "Enter full name",
+      "phone": "+62 812 3456 7890",
+      "email": "email@example.com",
+      "address": "Enter address",
+      "gender": "Select gender",
+      "maritalStatus": "Select status",
+      "notes": "Additional notes..."
+    },
+    "genderOptions": {
+      "male": "Male",
+      "female": "Female"
+    },
+    "maritalOptions": {
+      "single": "Single",
+      "married": "Married",
+      "widowed": "Widowed",
+      "divorced": "Divorced"
+    }
+  },
+  "editMember": {
+    "title": "Edit Member",
+    "photo": "Profile Photo",
+    "photoOptions": "Choose an option",
+    "takePhoto": "Take Photo",
+    "choosePhoto": "Choose from Library",
+    "addPhoto": "Change Photo",
+    "submit": "Save Changes",
+    "errorUpdating": "Failed to update member. Please try again.",
+    "deleteTitle": "Delete Member",
+    "deleteConfirm": "Are you sure you want to delete this member? This action cannot be undone.",
+    "fields": {
+      "name": "Full Name",
+      "phone": "Phone Number",
+      "email": "Email",
+      "address": "Address",
+      "birthDate": "Birth Date",
+      "gender": "Gender",
+      "maritalStatus": "Marital Status",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "name": "Enter full name",
+      "phone": "+62 812 3456 7890",
+      "email": "email@example.com",
+      "address": "Enter address",
+      "gender": "Select gender",
+      "maritalStatus": "Select status",
+      "notes": "Additional notes..."
+    },
+    "genderOptions": {
+      "male": "Male",
+      "female": "Female"
+    },
+    "maritalOptions": {
+      "single": "Single",
+      "married": "Married",
+      "widowed": "Widowed",
+      "divorced": "Divorced"
+    }
+  },
+  "careEvents": {
+    "title": "Care Event",
+    "create": "Create Care Event",
+    "edit": "Edit Care Event",
+    "complete": "Complete",
+    "ignore": "Ignore",
+    "selectType": "Select Event Type",
+    "completedBy": "Completed by {{name}}",
+    "ignoredBy": "Ignored by {{name}}",
+    "types": {
+      "birthday": "Birthday",
+      "grief_loss": "Grief & Loss",
+      "grief_stage": "Grief Support",
+      "accident_illness": "Accident/Illness",
+      "accident_followup": "Accident Follow-up",
+      "financial_aid": "Financial Aid",
+      "regular_contact": "Regular Contact",
+      "childbirth": "Childbirth",
+      "new_house": "New House"
+    },
+    "relationships": {
+      "spouse": "Spouse",
+      "child": "Child",
+      "parent": "Parent",
+      "sibling": "Sibling",
+      "other": "Other"
+    },
+    "aidTypes": {
+      "education": "Education",
+      "medical": "Medical",
+      "emergency": "Emergency",
+      "housing": "Housing",
+      "food": "Food",
+      "funeral_costs": "Funeral Costs",
+      "other": "Other"
+    },
+    "form": {
+      "eventType": "Event Type",
+      "eventDate": "Event Date",
+      "title": "Title",
+      "titlePlaceholder": "Event title",
+      "description": "Description",
+      "descriptionPlaceholder": "Add notes...",
+      "relationship": "Relationship",
+      "hospitalName": "Hospital Name",
+      "hospitalPlaceholder": "Hospital name (optional)",
+      "aidType": "Aid Type",
+      "aidAmount": "Amount",
+      "aidNotes": "Notes",
+      "aidNotesPlaceholder": "Additional notes..."
+    },
+    "griefStages": {
+      "mourning": "Mourning Service",
+      "1_week": "1 Week Check-in",
+      "2_weeks": "2 Weeks Check-in",
+      "1_month": "1 Month Check-in",
+      "3_months": "3 Months Check-in",
+      "6_months": "6 Months Check-in",
+      "1_year": "1 Year Memorial",
+      "first_followup": "First Follow-up",
+      "second_followup": "Second Follow-up",
+      "final_followup": "Final Follow-up"
+    },
+    "accidentStages": {
+      "first_followup": "First Follow-up (3 days)",
+      "second_followup": "Second Follow-up (7 days)",
+      "final_followup": "Final Follow-up (14 days)"
+    }
+  },
+  "tasks": {
+    "title": "Tasks",
+    "tabs": {
+      "today": "Today",
+      "upcoming": "Upcoming",
+      "overdue": "Overdue",
+      "completed": "Completed"
+    },
+    "types": {
+      "birthday": "Birthday",
+      "grief_stage": "Grief Support",
+      "accident_followup": "Accident Follow-up",
+      "financial_aid": "Financial Aid",
+      "at_risk": "At Risk Member",
+      "disconnected": "Disconnected Member"
+    },
+    "actions": {
+      "complete": "Complete",
+      "ignore": "Ignore",
+      "view": "View Member"
+    },
+    "emptyState": {
+      "noTasks": "No tasks",
+      "noTasksDesc": "You have no tasks in this category"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "settings": "Settings",
+    "security": "Security",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "notifications": "Notifications",
+    "biometricLogin": "Biometric Login",
+    "biometricLoginDesc": "Use Face ID or fingerprint to login",
+    "faceId": "Face ID",
+    "touchId": "Touch ID",
+    "setupBiometric": "Biometric Setup",
+    "setupBiometricHint": "Enter your password to enable biometric login",
+    "enterPassword": "Please enter your password",
+    "biometricEnabled": "Biometric Enabled",
+    "biometricEnabledMessage": "You can now login with biometrics",
+    "biometricDisabled": "Biometric Disabled",
+    "biometricDisabledMessage": "You can enable it again anytime",
+    "disableBiometric": "Disable Biometric Login",
+    "disableBiometricConfirm": "Are you sure you want to disable biometric login?",
+    "biometricSetupFailed": "Failed to setup biometric login",
+    "about": "About",
+    "version": "Version",
+    "logoutConfirm": "Are you sure you want to logout?",
+    "disableNotificationsHint": "To disable notifications, please go to your device settings.",
+    "notificationsDenied": "Notification permissions were denied. Please enable in settings.",
+    "openSettings": "Open Settings"
+  },
+  "notifications": {
+    "taskCompleted": "Task completed successfully",
+    "taskIgnored": "Task ignored",
+    "eventCreated": "Care event created",
+    "eventUpdated": "Care event updated",
+    "eventDeleted": "Care event deleted",
+    "memberCreated": "Member created successfully",
+    "memberUpdated": "Member updated successfully",
+    "memberDeleted": "Member deleted",
+    "loginSuccess": "Welcome back!",
+    "loginError": "Login failed",
+    "networkError": "Network error. Please check your connection.",
+    "offlineMode": "You are offline. Changes will sync when connected."
+  },
+  "emptyState": {
+    "noMembers": "No members found",
+    "noMembersDesc": "Add your first church member to get started with pastoral care management.",
+    "noResults": "No results found",
+    "noResultsDesc": "Try adjusting your search or filters to find what you're looking for.",
+    "noTasks": "All caught up!",
+    "noTasksDesc": "You have no pending tasks. Great job staying on top of your pastoral care duties.",
+    "noCareEvents": "No care events yet",
+    "noCareEventsDesc": "Create a care event to track birthdays, grief support, hospital visits, and more.",
+    "offline": "You're offline",
+    "offlineDesc": "Please check your internet connection to load the latest data.",
+    "error": "Something went wrong",
+    "errorDesc": "We couldn't load the data. Please try again or contact support if the problem persists."
+  }
+}

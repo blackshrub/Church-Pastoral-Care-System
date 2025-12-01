@@ -488,6 +488,57 @@ frontend/
 └── craco.config.js              # Create React App overrides
 ```
 
+### Mobile (Expo/React Native)
+```
+mobile/
+├── app/                         # Expo Router file-based routing
+│   ├── _layout.tsx             # Root layout with providers
+│   ├── index.tsx               # Entry point with auth redirect
+│   ├── (auth)/                 # Auth screens (login)
+│   └── (tabs)/                 # Main app tabs (authenticated)
+├── components/                  # Reusable components
+├── services/                    # API and mock services
+├── stores/                      # Zustand state management
+├── hooks/                       # Custom React hooks
+├── lib/                         # Utilities (i18n, storage, etc.)
+├── constants/                   # Theme, API endpoints, etc.
+├── types/                       # TypeScript types
+├── tailwind.config.js          # NativeWind Tailwind config
+├── babel.config.js             # Babel configuration
+└── app.json                    # Expo configuration
+```
+
+## Mobile App Styling Guidelines
+
+**Use NativeWind as the Primary Styling System**
+
+The mobile app uses a unified styling approach:
+- NativeWind (Tailwind CSS for React Native) for all styling
+- Unified `tailwind.config.js` design tokens (colors, spacing, typography)
+- Gluestack UI for specific interactive components only
+
+**Gluestack UI Components (use sparingly):**
+- ✅ Buttons (`Button`, `ButtonText`, `ButtonIcon`)
+- ✅ Modals / Sheets
+- ✅ Form elements (inputs, selects, checkboxes)
+- ✅ Toast / Alert notifications
+- ✅ Select / Dropdown menus
+
+**React Native + NativeWind for:**
+- ✅ Animated headers
+- ✅ PremiumMotion transitions
+- ✅ Shared Axis transitions
+- ✅ Cards
+- ✅ Lists (`FlashList` or `FlatList`)
+- ✅ Collapsible screens
+- ✅ All other UI elements
+
+**Important:**
+- Always wrap app with `GluestackUIProvider` in root layout
+- Use `SafeAreaProvider` for safe area handling
+- Use `GestureHandlerRootView` for gesture support
+- Mock data mode (`USE_MOCK_DATA`) uses in-memory storage for Expo Go
+
 ## Backend Utility Scripts
 
 ### Automated (Run by install.sh/update.sh)

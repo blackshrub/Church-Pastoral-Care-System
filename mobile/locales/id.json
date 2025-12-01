@@ -1,0 +1,345 @@
+{
+  "common": {
+    "loading": "Memuat...",
+    "error": "Error",
+    "retry": "Coba Lagi",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "delete": "Hapus",
+    "confirm": "Konfirmasi",
+    "search": "Cari",
+    "filter": "Filter",
+    "all": "Semua",
+    "today": "Hari Ini",
+    "upcoming": "Mendatang",
+    "overdue": "Terlambat",
+    "completed": "Selesai",
+    "pending": "Tertunda",
+    "seeAll": "Lihat Semua",
+    "noData": "Tidak ada data",
+    "pullToRefresh": "Tarik untuk memuat ulang",
+    "success": "Berhasil",
+    "tryAgain": "Coba Lagi",
+    "enable": "Aktifkan",
+    "disable": "Nonaktifkan"
+  },
+  "auth": {
+    "login": "Masuk",
+    "logout": "Keluar",
+    "email": "Email",
+    "password": "Kata Sandi",
+    "emailPlaceholder": "Masukkan email Anda",
+    "passwordPlaceholder": "Masukkan kata sandi Anda",
+    "loginButton": "Masuk",
+    "loggingIn": "Sedang masuk...",
+    "loginError": "Login gagal. Silakan periksa kredensial Anda.",
+    "welcome": "Selamat Datang di FaithTracker",
+    "subtitle": "Sistem Pengelolaan Pastoral",
+    "biometricLogin": "Masuk dengan {{type}}",
+    "biometricError": "Autentikasi biometrik gagal",
+    "biometricFailed": "Login biometrik gagal. Silakan gunakan email dan kata sandi.",
+    "faceId": "Face ID",
+    "touchId": "Touch ID",
+    "loginWith": "Masuk dengan"
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Selamat Pagi",
+      "afternoon": "Selamat Siang",
+      "evening": "Selamat Sore",
+      "night": "Selamat Malam"
+    },
+    "stats": {
+      "todayTasks": "Tugas Hari Ini",
+      "overdueTasks": "Terlambat",
+      "totalMembers": "Jemaat"
+    },
+    "sections": {
+      "todayTasks": "Tugas Hari Ini",
+      "overdueTasks": "Tugas Terlambat",
+      "quickActions": "Aksi Cepat"
+    },
+    "quickActions": {
+      "members": "Jemaat",
+      "membersDesc": "Lihat semua jemaat",
+      "tasks": "Semua Tugas",
+      "tasksDesc": "Lihat semua tugas",
+      "addMember": "Tambah Jemaat",
+      "addMemberDesc": "Buat jemaat baru"
+    },
+    "emptyState": {
+      "noTasks": "Tidak ada tugas hari ini",
+      "allCaughtUp": "Semua tugas selesai!"
+    }
+  },
+  "members": {
+    "title": "Jemaat",
+    "searchPlaceholder": "Cari nama atau telepon...",
+    "filters": {
+      "all": "Semua",
+      "active": "Aktif",
+      "at_risk": "Berisiko",
+      "disconnected": "Tidak Aktif"
+    },
+    "engagement": {
+      "active": "Aktif",
+      "at_risk": "Berisiko",
+      "disconnected": "Tidak Aktif"
+    },
+    "daysSinceContact": "{{days}} hari lalu",
+    "noMembers": "Tidak ada jemaat",
+    "addMember": "Tambah Jemaat"
+  },
+  "memberDetail": {
+    "contact": "Kontak",
+    "call": "Telepon",
+    "whatsapp": "WhatsApp",
+    "profile": "Profil",
+    "timeline": "Riwayat Pelayanan",
+    "addCareEvent": "Tambah Pelayanan",
+    "noCareEvents": "Belum ada pelayanan",
+    "edit": "Ubah",
+    "fields": {
+      "phone": "Telepon",
+      "email": "Email",
+      "address": "Alamat",
+      "birthDate": "Tanggal Lahir",
+      "age": "Usia",
+      "gender": "Jenis Kelamin",
+      "maritalStatus": "Status Pernikahan",
+      "memberSince": "Jemaat Sejak",
+      "notes": "Catatan"
+    }
+  },
+  "addMember": {
+    "title": "Tambah Jemaat",
+    "photo": "Foto Profil",
+    "photoOptions": "Pilih opsi",
+    "takePhoto": "Ambil Foto",
+    "choosePhoto": "Pilih dari Galeri",
+    "addPhoto": "Tambah Foto",
+    "submit": "Buat Jemaat",
+    "errorCreating": "Gagal membuat jemaat. Silakan coba lagi.",
+    "fields": {
+      "name": "Nama Lengkap",
+      "phone": "Nomor Telepon",
+      "email": "Email",
+      "address": "Alamat",
+      "birthDate": "Tanggal Lahir",
+      "gender": "Jenis Kelamin",
+      "maritalStatus": "Status Pernikahan",
+      "notes": "Catatan"
+    },
+    "placeholders": {
+      "name": "Masukkan nama lengkap",
+      "phone": "+62 812 3456 7890",
+      "email": "email@contoh.com",
+      "address": "Masukkan alamat",
+      "gender": "Pilih jenis kelamin",
+      "maritalStatus": "Pilih status",
+      "notes": "Catatan tambahan..."
+    },
+    "genderOptions": {
+      "male": "Laki-laki",
+      "female": "Perempuan"
+    },
+    "maritalOptions": {
+      "single": "Belum Menikah",
+      "married": "Menikah",
+      "widowed": "Janda/Duda",
+      "divorced": "Cerai"
+    }
+  },
+  "editMember": {
+    "title": "Ubah Jemaat",
+    "photo": "Foto Profil",
+    "photoOptions": "Pilih opsi",
+    "takePhoto": "Ambil Foto",
+    "choosePhoto": "Pilih dari Galeri",
+    "addPhoto": "Ubah Foto",
+    "submit": "Simpan Perubahan",
+    "errorUpdating": "Gagal mengubah jemaat. Silakan coba lagi.",
+    "deleteTitle": "Hapus Jemaat",
+    "deleteConfirm": "Apakah Anda yakin ingin menghapus jemaat ini? Tindakan ini tidak dapat dibatalkan.",
+    "fields": {
+      "name": "Nama Lengkap",
+      "phone": "Nomor Telepon",
+      "email": "Email",
+      "address": "Alamat",
+      "birthDate": "Tanggal Lahir",
+      "gender": "Jenis Kelamin",
+      "maritalStatus": "Status Pernikahan",
+      "notes": "Catatan"
+    },
+    "placeholders": {
+      "name": "Masukkan nama lengkap",
+      "phone": "+62 812 3456 7890",
+      "email": "email@contoh.com",
+      "address": "Masukkan alamat",
+      "gender": "Pilih jenis kelamin",
+      "maritalStatus": "Pilih status",
+      "notes": "Catatan tambahan..."
+    },
+    "genderOptions": {
+      "male": "Laki-laki",
+      "female": "Perempuan"
+    },
+    "maritalOptions": {
+      "single": "Belum Menikah",
+      "married": "Menikah",
+      "widowed": "Janda/Duda",
+      "divorced": "Cerai"
+    }
+  },
+  "careEvents": {
+    "title": "Pelayanan",
+    "create": "Buat Pelayanan",
+    "edit": "Ubah Pelayanan",
+    "complete": "Selesai",
+    "ignore": "Abaikan",
+    "selectType": "Pilih Jenis Pelayanan",
+    "completedBy": "Diselesaikan oleh {{name}}",
+    "ignoredBy": "Diabaikan oleh {{name}}",
+    "types": {
+      "birthday": "Ulang Tahun",
+      "grief_loss": "Kedukaan",
+      "grief_stage": "Dukungan Kedukaan",
+      "accident_illness": "Kecelakaan/Sakit",
+      "accident_followup": "Kunjungan Sakit",
+      "financial_aid": "Bantuan Dana",
+      "regular_contact": "Kunjungan Rutin",
+      "childbirth": "Kelahiran",
+      "new_house": "Rumah Baru"
+    },
+    "relationships": {
+      "spouse": "Pasangan",
+      "child": "Anak",
+      "parent": "Orang Tua",
+      "sibling": "Saudara",
+      "other": "Lainnya"
+    },
+    "aidTypes": {
+      "education": "Pendidikan",
+      "medical": "Kesehatan",
+      "emergency": "Darurat",
+      "housing": "Perumahan",
+      "food": "Makanan",
+      "funeral_costs": "Biaya Pemakaman",
+      "other": "Lainnya"
+    },
+    "form": {
+      "eventType": "Jenis Pelayanan",
+      "eventDate": "Tanggal",
+      "title": "Judul",
+      "titlePlaceholder": "Judul pelayanan",
+      "description": "Deskripsi",
+      "descriptionPlaceholder": "Tambahkan catatan...",
+      "relationship": "Hubungan",
+      "hospitalName": "Nama Rumah Sakit",
+      "hospitalPlaceholder": "Nama RS (opsional)",
+      "aidType": "Jenis Bantuan",
+      "aidAmount": "Jumlah",
+      "aidNotes": "Catatan",
+      "aidNotesPlaceholder": "Catatan tambahan..."
+    },
+    "griefStages": {
+      "mourning": "Ibadah Penghiburan",
+      "1_week": "Kunjungan 1 Minggu",
+      "2_weeks": "Kunjungan 2 Minggu",
+      "1_month": "Kunjungan 1 Bulan",
+      "3_months": "Kunjungan 3 Bulan",
+      "6_months": "Kunjungan 6 Bulan",
+      "1_year": "Peringatan 1 Tahun",
+      "first_followup": "Kunjungan Pertama",
+      "second_followup": "Kunjungan Kedua",
+      "final_followup": "Kunjungan Terakhir"
+    },
+    "accidentStages": {
+      "first_followup": "Kunjungan Pertama (3 hari)",
+      "second_followup": "Kunjungan Kedua (7 hari)",
+      "final_followup": "Kunjungan Terakhir (14 hari)"
+    }
+  },
+  "tasks": {
+    "title": "Tugas",
+    "tabs": {
+      "today": "Hari Ini",
+      "upcoming": "Mendatang",
+      "overdue": "Terlambat",
+      "completed": "Selesai"
+    },
+    "types": {
+      "birthday": "Ulang Tahun",
+      "grief_stage": "Kedukaan",
+      "accident_followup": "Kunjungan Sakit",
+      "financial_aid": "Bantuan Dana",
+      "at_risk": "Jemaat Berisiko",
+      "disconnected": "Jemaat Tidak Aktif"
+    },
+    "actions": {
+      "complete": "Selesai",
+      "ignore": "Abaikan",
+      "view": "Lihat Jemaat"
+    },
+    "emptyState": {
+      "noTasks": "Tidak ada tugas",
+      "noTasksDesc": "Tidak ada tugas dalam kategori ini"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "settings": "Pengaturan",
+    "security": "Keamanan",
+    "language": "Bahasa",
+    "darkMode": "Mode Gelap",
+    "notifications": "Notifikasi",
+    "biometricLogin": "Login Biometrik",
+    "biometricLoginDesc": "Gunakan Face ID atau sidik jari untuk login",
+    "about": "Tentang",
+    "version": "Versi",
+    "logoutConfirm": "Apakah Anda yakin ingin keluar?",
+    "disableNotificationsHint": "Untuk menonaktifkan notifikasi, silakan buka pengaturan perangkat.",
+    "notificationsDenied": "Izin notifikasi ditolak. Silakan aktifkan di pengaturan.",
+    "openSettings": "Buka Pengaturan",
+    "faceId": "Face ID",
+    "touchId": "Touch ID",
+    "setupBiometric": "Pengaturan Biometrik",
+    "setupBiometricHint": "Masukkan kata sandi untuk mengaktifkan login biometrik",
+    "enterPassword": "Silakan masukkan kata sandi Anda",
+    "biometricEnabled": "Biometrik Diaktifkan",
+    "biometricEnabledMessage": "Anda sekarang dapat login dengan biometrik",
+    "biometricDisabled": "Biometrik Dinonaktifkan",
+    "biometricDisabledMessage": "Anda dapat mengaktifkannya lagi kapan saja",
+    "disableBiometric": "Nonaktifkan Login Biometrik",
+    "disableBiometricConfirm": "Apakah Anda yakin ingin menonaktifkan login biometrik?",
+    "biometricSetupFailed": "Gagal mengatur login biometrik"
+  },
+  "notifications": {
+    "taskCompleted": "Tugas selesai",
+    "taskIgnored": "Tugas diabaikan",
+    "eventCreated": "Pelayanan dibuat",
+    "eventUpdated": "Pelayanan diperbarui",
+    "eventDeleted": "Pelayanan dihapus",
+    "memberCreated": "Jemaat berhasil dibuat",
+    "memberUpdated": "Jemaat berhasil diperbarui",
+    "memberDeleted": "Jemaat dihapus",
+    "loginSuccess": "Selamat datang kembali!",
+    "loginError": "Login gagal",
+    "networkError": "Kesalahan jaringan. Periksa koneksi Anda.",
+    "offlineMode": "Anda sedang offline. Perubahan akan disinkronkan saat terhubung."
+  },
+  "emptyState": {
+    "noMembers": "Tidak ada jemaat",
+    "noMembersDesc": "Tambahkan jemaat pertama untuk memulai pengelolaan pastoral.",
+    "noResults": "Tidak ada hasil",
+    "noResultsDesc": "Coba sesuaikan pencarian atau filter Anda.",
+    "noTasks": "Semua selesai!",
+    "noTasksDesc": "Tidak ada tugas tertunda. Kerja bagus!",
+    "noCareEvents": "Belum ada pelayanan",
+    "noCareEventsDesc": "Buat pelayanan untuk mencatat ulang tahun, kedukaan, kunjungan rumah sakit, dan lainnya.",
+    "offline": "Anda sedang offline",
+    "offlineDesc": "Periksa koneksi internet untuk memuat data terbaru.",
+    "error": "Terjadi kesalahan",
+    "errorDesc": "Tidak dapat memuat data. Silakan coba lagi atau hubungi dukungan."
+  }
+}
