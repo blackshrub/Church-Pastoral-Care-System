@@ -1454,6 +1454,97 @@ async def update_user(user_id: str, update: UserUpdate, current_user: dict = Dep
         logger.error(f"Error updating user: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+class ProfileUpdate(BaseModel):
+    """Model for self-profile update (excludes role and campus)"""
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+
+class PasswordChange(BaseModel):
+    """Model for password change"""
+    current_password: str
+    new_password: str
+
+@api_router.put("/auth/profile")
+async def update_own_profile(update: ProfileUpdate, current_user: dict = Depends(get_current_user)):
+    """Update own profile (all users can update their own name, email, phone)"""
+    try:
+        update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+
+        # Normalize phone number if provided
+        if 'phone' in update_data and update_data['phone']:
+            update_data['phone'] = normalize_phone_number(update_data['phone'])
+
+        # Check if email is being changed and if it's already taken
+        if 'email' in update_data and update_data['email'] != current_user.get('email'):
+            existing = await db.users.find_one({"email": update_data['email'], "id": {"$ne": current_user["id"]}})
+            if existing:
+                raise HTTPException(status_code=400, detail="Email already in use")
+
+        update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+
+        result = await db.users.update_one(
+            {"id": current_user["id"]},
+            {"$set": update_data}
+        )
+
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        updated_user = await db.users.find_one({"id": current_user["id"]}, {"_id": 0, "hashed_password": 0})
+
+        # Get campus name if campus_id exists
+        if updated_user.get("campus_id"):
+            campus = await db.campuses.find_one({"id": updated_user["campus_id"]}, {"_id": 0})
+            updated_user["campus_name"] = campus["campus_name"] if campus else None
+
+        return updated_user
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating profile: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/auth/change-password")
+async def change_password(password_data: PasswordChange, current_user: dict = Depends(get_current_user)):
+    """Change own password (all users)"""
+    try:
+        # Get user with hashed password
+        user = await db.users.find_one({"id": current_user["id"]})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Verify current password
+        if not verify_password(password_data.current_password, user["hashed_password"]):
+            raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+        # Validate new password
+        if len(password_data.new_password) < 6:
+            raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+
+        # Hash and update password
+        new_hashed = get_password_hash(password_data.new_password)
+
+        await db.users.update_one(
+            {"id": current_user["id"]},
+            {"$set": {
+                "hashed_password": new_hashed,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+
+        return {"message": "Password changed successfully"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error changing password: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/users/{user_id}/photo")
 async def upload_user_photo(user_id: str, file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
     """Upload user profile photo"""

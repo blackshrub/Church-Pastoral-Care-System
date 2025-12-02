@@ -43,20 +43,62 @@ export const Settings = () => {
     email: '',
     phone: ''
   });
-  
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Password change state
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [savingPassword, setSavingPassword] = useState(false);
+
   const saveProfile = async () => {
     try {
-      await api.put(`/users/${user.id}`, {
+      setSavingProfile(true);
+      await api.put('/auth/profile', {
         name: profileData.name,
         email: profileData.email,
         phone: profileData.phone
       });
-      toast.success('Profile updated successfully');
+      toast.success(t('profile_updated_successfully'));
       setEditingProfile(false);
       // Reload user data
       window.location.reload();
     } catch (error) {
-      toast.error('Failed to update profile: ' + (error.response?.data?.detail || error.message));
+      toast.error(t('failed_update_profile') + ': ' + (error.response?.data?.detail || error.message));
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const changePassword = async () => {
+    // Validate passwords match
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error(t('passwords_do_not_match'));
+      return;
+    }
+
+    // Validate minimum length
+    if (passwordData.newPassword.length < 6) {
+      toast.error(t('password_min_length'));
+      return;
+    }
+
+    try {
+      setSavingPassword(true);
+      await api.post('/auth/change-password', {
+        current_password: passwordData.currentPassword,
+        new_password: passwordData.newPassword
+      });
+      toast.success(t('password_changed_successfully'));
+      setChangingPassword(false);
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || t('failed_change_password'));
+    } finally {
+      setSavingPassword(false);
     }
   };
   
@@ -523,26 +565,85 @@ export const Settings = () => {
                 <div className="flex gap-2">
                   {!editingProfile ? (
                     <Button onClick={() => setEditingProfile(true)} variant="outline">
-                      Edit Profile
+                      {t('edit_profile')}
                     </Button>
                   ) : (
                     <>
                       <Button onClick={() => {
                         setEditingProfile(false);
                         setProfileData({name: user.name, email: user.email, phone: user.phone});
-                      }} variant="outline">
-                        Cancel
+                      }} variant="outline" disabled={savingProfile}>
+                        {t('cancel')}
                       </Button>
-                      <Button onClick={saveProfile} className="bg-teal-500 hover:bg-teal-600">
-                        Save Changes
+                      <Button onClick={saveProfile} className="bg-teal-500 hover:bg-teal-600" disabled={savingProfile}>
+                        {savingProfile ? t('saving') : t('save_changes')}
                       </Button>
                     </>
                   )}
                 </div>
               </div>
-              
+
+              {/* Password Change Section */}
+              <div className="space-y-4 pt-6 border-t">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t('change_password')}</h3>
+                {!changingPassword ? (
+                  <Button onClick={() => setChangingPassword(true)} variant="outline">
+                    {t('change_password')}
+                  </Button>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-gray-700">{t('current_password')}</Label>
+                      <Input
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                        placeholder={t('enter_current_password')}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-gray-700">{t('new_password')}</Label>
+                      <Input
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                        placeholder={t('enter_new_password')}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-gray-700">{t('confirm_new_password')}</Label>
+                      <Input
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                        placeholder={t('confirm_new_password')}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => {
+                          setChangingPassword(false);
+                          setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                        }}
+                        variant="outline"
+                        disabled={savingPassword}
+                      >
+                        {t('cancel')}
+                      </Button>
+                      <Button
+                        onClick={changePassword}
+                        className="bg-teal-500 hover:bg-teal-600"
+                        disabled={savingPassword || !passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                      >
+                        {savingPassword ? t('saving') : t('update_password')}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <p className="text-xs text-gray-500 pt-4 border-t">
-                To update your name, email, phone, or role, please contact a Full Administrator.
+                {t('role_change_note')}
               </p>
             </CardContent>
           </Card>
