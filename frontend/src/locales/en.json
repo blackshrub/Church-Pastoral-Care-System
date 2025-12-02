@@ -327,6 +327,7 @@
   "day_view": "Day View",
   "events_this_month": "Events This Month",
   "no_events_scheduled": "No events scheduled",
+  "events_on": "Events on",
   
   "_comment_grief": "Grief Support",
   "grief_stages": {
@@ -496,6 +497,7 @@
     "deleted": "Deleted",
     "failed_load": "Failed to load",
     "failed_load_events": "Failed to load events",
+    "event_marked_completed": "Event marked as completed!",
     "financial_aid_recorded": "Financial aid recorded as given!",
     "financial_aid_schedule_created": "Financial aid schedule created!",
     "failed_mark_birthday": "Failed to mark birthday complete"

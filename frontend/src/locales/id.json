@@ -325,6 +325,7 @@
   "day_view": "Tampilan Hari",
   "events_this_month": "Kejadian Bulan Ini",
   "no_events_scheduled": "Tidak ada kejadian terjadwal",
+  "events_on": "Kejadian pada",
   
   "_comment_grief": "Grief Support",
   "grief_stages": {
@@ -494,6 +495,7 @@
     "deleted": "Dihapus",
     "failed_load": "Gagal memuat",
     "failed_load_events": "Gagal memuat kejadian",
+    "event_marked_completed": "Kejadian ditandai selesai!",
     "financial_aid_recorded": "Bantuan keuangan dicatat sebagai diberikan!",
     "financial_aid_schedule_created": "Jadwal bantuan keuangan dibuat!",
     "failed_mark_birthday": "Gagal menandai ulang tahun selesai"
