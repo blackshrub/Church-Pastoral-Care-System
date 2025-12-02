@@ -1943,6 +1943,7 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                 # Birthday today
                 birthdays_today.append({
                     **event,
+                    "event_date": this_year_birthday.isoformat(),  # Override with this year's birthday
                     "member_name": member["name"],
                     "member_phone": member["phone"],
                     "member_photo_url": member.get("photo_url"),
@@ -1956,6 +1957,7 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                 if birthday_writeoff == 0 or days_overdue <= birthday_writeoff:
                     overdue_birthdays.append({
                         **event,
+                        "event_date": this_year_birthday.isoformat(),  # Override with this year's birthday
                         "member_name": member["name"],
                         "member_phone": member["phone"],
                         "member_photo_url": member.get("photo_url"),
@@ -1978,6 +1980,7 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                 })
                 upcoming_birthdays.append({
                     **event,
+                    "event_date": this_year_birthday.isoformat(),  # Override with this year's birthday
                     "member_name": member["name"],
                     "member_phone": member["phone"],
                     "member_photo_url": member.get("photo_url")
