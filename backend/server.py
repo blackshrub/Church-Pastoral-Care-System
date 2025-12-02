@@ -5753,14 +5753,44 @@ async def get_monthly_management_report(
         member_reach_rate = round(members_contacted_this_month / total_members * 100, 1) if total_members > 0 else 0
 
         # === GRIEF SUPPORT ANALYSIS ===
+        # When a grief/loss event is recorded, it means the initial visit has been done
+        # The 6 followup stages are additional visits on top of the initial one
         grief_events = [e for e in events_this_month if e.get("event_type") == "grief_loss"]
-        grief_completed = len([e for e in grief_events if e.get("completed")])
         grief_families_supported = len(set(e.get("member_id") for e in grief_events))
 
+        # Count touchpoints: initial visits (1 per grief event) + completed followup stages
+        grief_initial_visits = len(grief_events)  # Each recorded event = 1 initial visit done
+        grief_event_ids = [e.get("id") for e in grief_events if e.get("id")]
+
+        # Get completed followup stages for these grief events
+        grief_followup_completed = 0
+        if grief_event_ids:
+            grief_followup_completed = await db.grief_support.count_documents({
+                "care_event_id": {"$in": grief_event_ids},
+                "completed": True
+            })
+
+        grief_total_touchpoints = grief_initial_visits + grief_followup_completed
+
         # === HOSPITAL/ILLNESS SUPPORT ===
+        # When an accident/illness event is recorded, it means the initial hospital visit has been done
+        # The 3 followup stages are additional visits on top of the initial one
         hospital_events = [e for e in events_this_month if e.get("event_type") == "accident_illness"]
-        hospital_visits = len([e for e in hospital_events if e.get("completed")])
         hospital_patients = len(set(e.get("member_id") for e in hospital_events))
+
+        # Count visits: initial visits (1 per hospital event) + completed followup stages
+        hospital_initial_visits = len(hospital_events)  # Each recorded event = 1 initial visit done
+        hospital_event_ids = [e.get("id") for e in hospital_events if e.get("id")]
+
+        # Get completed followup stages for these hospital events
+        hospital_followup_completed = 0
+        if hospital_event_ids:
+            hospital_followup_completed = await db.accident_followup.count_documents({
+                "care_event_id": {"$in": hospital_event_ids},
+                "completed": True
+            })
+
+        hospital_visits = hospital_initial_visits + hospital_followup_completed
 
         # === BIRTHDAY MINISTRY ===
         # Birthday events store the original birth date (e.g., "1980-05-15"), not current year's date
@@ -5997,12 +6027,15 @@ async def get_monthly_management_report(
             "ministry_highlights": {
                 "grief_support": {
                     "families_supported": grief_families_supported,
-                    "total_touchpoints": len(grief_events),
-                    "completed": grief_completed
+                    "total_touchpoints": grief_total_touchpoints,
+                    "initial_visits": grief_initial_visits,
+                    "followups_completed": grief_followup_completed
                 },
                 "hospital_visits": {
                     "patients_visited": hospital_patients,
-                    "total_visits": hospital_visits
+                    "total_visits": hospital_visits,
+                    "initial_visits": hospital_initial_visits,
+                    "followups_completed": hospital_followup_completed
                 },
                 "birthday_ministry": {
                     "total_birthdays": len(birthday_events),
