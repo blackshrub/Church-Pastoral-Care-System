@@ -238,6 +238,64 @@ async def migration_009_ensure_user_required_fields(db):
     return f"Fixed {users_fixed} user(s) with missing required fields"
 
 
+async def migration_010_fix_corrupted_uuids(db):
+    """
+    Fix corrupted UUIDs in care_events, members, and other collections.
+    Some IDs were stored as binary data instead of valid UUID strings,
+    causing 404 errors when trying to access them via API.
+    """
+    import uuid
+    import re
+
+    # UUID v4 pattern for validation
+    UUID_PATTERN = re.compile(r'^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$', re.IGNORECASE)
+
+    def is_valid_uuid(value):
+        """Check if a string is a valid UUID format."""
+        if not isinstance(value, str):
+            return False
+        return bool(UUID_PATTERN.match(value))
+
+    # Collections to check for corrupted IDs
+    collections_to_fix = [
+        "care_events",
+        "members",
+        "grief_support",
+        "accident_followups",
+        "financial_aid_schedules",
+        "notification_logs",
+        "activity_logs",
+        "campuses",
+        "users",
+        "api_sync_configs",
+        "api_sync_history"
+    ]
+
+    total_fixed = 0
+
+    for collection_name in collections_to_fix:
+        collection = db[collection_name]
+        fixed_count = 0
+
+        # Get all documents with 'id' field
+        cursor = collection.find({"id": {"$exists": True}})
+        async for doc in cursor:
+            doc_id = doc.get("id")
+            if not is_valid_uuid(doc_id):
+                # Generate new valid UUID
+                new_id = str(uuid.uuid4())
+                await collection.update_one(
+                    {"_id": doc["_id"]},
+                    {"$set": {"id": new_id}}
+                )
+                fixed_count += 1
+
+        if fixed_count > 0:
+            total_fixed += fixed_count
+
+    return f"Fixed {total_fixed} corrupted UUID(s) across all collections"
+
+
 # ==================== MIGRATION REGISTRY ====================
 
 # List of all migrations in order
@@ -252,6 +310,7 @@ MIGRATIONS: List[tuple[int, str, Callable]] = [
     (7, "Fix user password field name", migration_007_fix_user_password_field),
     (8, "Ensure campus id field", migration_008_ensure_campus_id_field),
     (9, "Ensure user required fields", migration_009_ensure_user_required_fields),
+    (10, "Fix corrupted UUIDs", migration_010_fix_corrupted_uuids),
 ]
 
 

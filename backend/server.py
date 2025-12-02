@@ -240,6 +240,29 @@ DEFAULT_UPCOMING_DAYS = 7
 MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10 MB for images
 MAX_CSV_SIZE = 5 * 1024 * 1024      # 5 MB for CSV imports
 
+# ==================== UUID VALIDATION ====================
+
+import re
+
+# UUID v4 pattern for validation
+UUID_PATTERN = re.compile(r'^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$', re.IGNORECASE)
+
+def is_valid_uuid(value: str) -> bool:
+    """Check if a string is a valid UUID format."""
+    if not isinstance(value, str):
+        return False
+    return bool(UUID_PATTERN.match(value))
+
+def generate_uuid() -> str:
+    """Generate a valid UUID string with validation."""
+    new_uuid = str(uuid.uuid4())
+    # Double-check the generated UUID is valid (defensive programming)
+    if not is_valid_uuid(new_uuid):
+        logger.error(f"Generated invalid UUID: {new_uuid}")
+        # Retry once
+        new_uuid = str(uuid.uuid4())
+    return new_uuid
+
 # ==================== AUTH CONFIGURATION ====================
 
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
@@ -319,8 +342,8 @@ class CampusCreate(BaseModel):
 
 class Campus(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+    id: str = Field(default_factory=generate_uuid)
     campus_name: str
     location: Optional[str] = None
     timezone: str = "Asia/Jakarta"  # Campus timezone (default UTC+7)
@@ -359,7 +382,7 @@ class MemberUpdate(BaseModel):
 class Member(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default_factory=generate_uuid)
     name: str
     phone: Optional[str] = None  # Some members may not have phone numbers
     campus_id: str
@@ -421,8 +444,8 @@ class CareEventUpdate(BaseModel):
 
 class CareEvent(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+    id: str = Field(default_factory=generate_uuid)
     member_id: str
     campus_id: str
     care_event_id: Optional[str] = None  # Parent event ID (for linking child events)
@@ -494,8 +517,8 @@ class AdditionalVisitRequest(BaseModel):
 
 class GriefSupport(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+    id: str = Field(default_factory=generate_uuid)
     care_event_id: str
     member_id: str
     campus_id: str
@@ -513,8 +536,8 @@ class GriefSupport(BaseModel):
 
 class AccidentFollowup(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+    id: str = Field(default_factory=generate_uuid)
     care_event_id: str
     member_id: str
     campus_id: str
@@ -532,8 +555,8 @@ class AccidentFollowup(BaseModel):
 
 class NotificationLog(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+    id: str = Field(default_factory=generate_uuid)
     care_event_id: Optional[str] = None
     grief_support_id: Optional[str] = None
     member_id: Optional[str] = None
@@ -548,8 +571,8 @@ class NotificationLog(BaseModel):
 
 class FinancialAidSchedule(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+    id: str = Field(default_factory=generate_uuid)
     member_id: str
     campus_id: str
     title: str
@@ -603,8 +626,8 @@ class UserLogin(BaseModel):
 
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+    id: str = Field(default_factory=generate_uuid)
     email: EmailStr
     name: str
     role: UserRole
@@ -636,8 +659,8 @@ class TokenResponse(BaseModel):
 
 class ActivityLog(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+    id: str = Field(default_factory=generate_uuid)
     campus_id: str
     user_id: str
     user_name: str
@@ -670,7 +693,7 @@ class ActivityLogResponse(BaseModel):
 class SyncConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default_factory=generate_uuid)
     campus_id: str  # FaithTracker campus ID
     core_church_id: Optional[str] = None  # Core system's church_id (for webhook matching)
     sync_method: str = "polling"  # "polling" or "webhook"
@@ -714,8 +737,8 @@ class SyncConfigCreate(BaseModel):
 
 class SyncLog(BaseModel):
     model_config = ConfigDict(extra="ignore")
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+
+    id: str = Field(default_factory=generate_uuid)
     campus_id: str
     sync_type: str  # manual, scheduled, webhook
     status: str  # success, error, partial
@@ -1026,7 +1049,7 @@ def generate_accident_followup_timeline(event_date: date, care_event_id: str, me
     for stage, days_offset in stages:
         scheduled_date = event_date + timedelta(days=days_offset)
         followup_stage = {
-            "id": str(uuid.uuid4()),
+            "id": generate_uuid(),
             "care_event_id": care_event_id,
             "member_id": member_id,
             "campus_id": campus_id,
@@ -1058,7 +1081,7 @@ def generate_grief_timeline(mourning_date: date, care_event_id: str, member_id: 
     for stage, days_offset in stages:
         scheduled_date = mourning_date + timedelta(days=days_offset)
         grief_support = {
-            "id": str(uuid.uuid4()),
+            "id": generate_uuid(),
             "care_event_id": care_event_id,
             "member_id": member_id,
             "stage": stage,
@@ -2792,7 +2815,7 @@ async def log_additional_visit(
         
         # Create additional visit event
         additional_visit = {
-            "id": str(uuid.uuid4()),
+            "id": generate_uuid(),
             "member_id": parent["member_id"],
             "campus_id": parent["campus_id"],
             "event_type": parent["event_type"],  # Same type as parent (grief_loss or accident_illness)
@@ -3083,7 +3106,7 @@ async def complete_care_event(event_id: str, current_user: dict = Depends(get_cu
             today_date = get_date_in_timezone(campus_tz)
             
             contact_event = {
-                "id": str(uuid.uuid4()),
+                "id": generate_uuid(),
                 "member_id": event["member_id"],
                 "campus_id": event["campus_id"],
                 "event_type": "regular_contact",
@@ -3305,7 +3328,7 @@ async def complete_grief_stage(stage_id: str, notes: Optional[str] = None, curre
         campus_tz = await get_campus_timezone(stage["campus_id"])
         today_date = get_date_in_timezone(campus_tz)
         
-        timeline_event_id = str(uuid.uuid4())
+        timeline_event_id = generate_uuid()
         await db.care_events.insert_one({
             "id": timeline_event_id,
             "member_id": stage["member_id"],
@@ -3381,7 +3404,7 @@ async def ignore_grief_stage(stage_id: str, user: dict = Depends(get_current_use
         campus_tz = await get_campus_timezone(stage["campus_id"])
         today_date = get_date_in_timezone(campus_tz)
         
-        timeline_event_id = str(uuid.uuid4())
+        timeline_event_id = generate_uuid()
         await db.care_events.insert_one({
             "id": timeline_event_id,
             "member_id": stage["member_id"],
@@ -3585,7 +3608,7 @@ async def complete_accident_stage(stage_id: str, notes: Optional[str] = None, cu
         campus_tz = await get_campus_timezone(stage["campus_id"])
         today_date = get_date_in_timezone(campus_tz)
         
-        timeline_event_id = str(uuid.uuid4())
+        timeline_event_id = generate_uuid()
         await db.care_events.insert_one({
             "id": timeline_event_id,
             "member_id": stage["member_id"],
@@ -4104,7 +4127,7 @@ async def mark_aid_distributed(schedule_id: str, current_user: dict = Depends(ge
         member_name = member["name"] if member else "Unknown"
         
         # Create care event for this payment
-        payment_event_id = str(uuid.uuid4())
+        payment_event_id = generate_uuid()
         await db.care_events.insert_one({
             "id": payment_event_id,
             "member_id": schedule["member_id"],
@@ -4354,7 +4377,7 @@ async def ignore_accident_stage(stage_id: str, user: dict = Depends(get_current_
         campus_tz = await get_campus_timezone(stage["campus_id"])
         today_date = get_date_in_timezone(campus_tz)
         
-        timeline_event_id = str(uuid.uuid4())
+        timeline_event_id = generate_uuid()
         await db.care_events.insert_one({
             "id": timeline_event_id,
             "member_id": stage["member_id"],
@@ -7129,7 +7152,7 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                     else:
                         # Create new member
                         new_member = {
-                            "id": str(uuid.uuid4()),
+                            "id": generate_uuid(),
                             "campus_id": campus_id,
                             **member_data,
                             "is_archived": not is_active,
@@ -7144,7 +7167,7 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                         # Create birthday event if member has birth_date
                         if new_member.get("birth_date"):
                             birthday_event = {
-                                "id": str(uuid.uuid4()),
+                                "id": generate_uuid(),
                                 "member_id": new_member["id"],
                                 "campus_id": campus_id,
                                 "church_id": campus_id,
@@ -7420,7 +7443,7 @@ async def receive_sync_webhook(request: Request):
         
         # Log webhook delivery
         await db.webhook_logs.insert_one({
-            "id": str(uuid.uuid4()),
+            "id": generate_uuid(),
             "campus_id": campus_id,
             "event_type": payload.get("event_type"),
             "member_id": payload.get("member_id"),
@@ -7560,7 +7583,7 @@ async def receive_sync_webhook(request: Request):
                         else:
                             # Create new
                             new_member = {
-                                "id": str(uuid.uuid4()),
+                                "id": generate_uuid(),
                                 "campus_id": config["campus_id"],
                                 **member_data,
                                 "is_archived": not core_member.get("is_active", True),
