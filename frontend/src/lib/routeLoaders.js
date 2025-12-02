@@ -88,20 +88,25 @@ export const membersLoader = async () => {
  * Member detail loader - prefetches member and care events
  */
 export const memberDetailLoader = async ({ params }) => {
-  if (!isAuthenticated() || !params.id) return null;
+  // Always return null - never throw, never block
+  try {
+    if (!isAuthenticated() || !params?.id) return null;
 
-  await Promise.allSettled([
-    safePrefetch(
-      ['member', params.id],
-      () => api.get(`/members/${params.id}`).then(res => res.data),
-      { staleTime: 1000 * 30 }
-    ),
-    safePrefetch(
-      ['member-care-events', params.id],
-      () => api.get(`/care-events?member_id=${params.id}`).then(res => res.data),
-      { staleTime: 1000 * 30 }
-    ),
-  ]);
+    await Promise.allSettled([
+      safePrefetch(
+        ['member', params.id],
+        () => api.get(`/members/${params.id}`).then(res => res.data),
+        { staleTime: 1000 * 30 }
+      ),
+      safePrefetch(
+        ['member-care-events', params.id],
+        () => api.get(`/care-events?member_id=${params.id}`).then(res => res.data),
+        { staleTime: 1000 * 30 }
+      ),
+    ]);
+  } catch (error) {
+    console.debug('Member detail loader error:', error);
+  }
 
   return null;
 };
