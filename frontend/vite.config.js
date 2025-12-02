@@ -20,7 +20,8 @@ export default defineConfig({
     // PWA Plugin - only caches static assets, NOT API calls
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon-192x192.svg', 'icon-512x512.svg'],
+      // Don't precache icons - they get 403 from reverse proxy, use runtime caching instead
+      includeAssets: [],
       manifest: {
         name: 'FaithTracker - Pastoral Care System',
         short_name: 'FaithTracker',
