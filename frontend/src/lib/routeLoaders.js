@@ -85,21 +85,24 @@ export const membersLoader = async () => {
 };
 
 /**
- * Member detail loader - prefetches member and care events
+ * Member detail loader - prefetches member data
+ * NOTE: Using different query keys to avoid conflicting with component's combined query
  */
 export const memberDetailLoader = async ({ params }) => {
   // Always return null - never throw, never block
   try {
     if (!isAuthenticated() || !params?.id) return null;
 
+    // Prefetch individual data that the component might use
+    // Use unique query keys that don't conflict with the component's main query
     await Promise.allSettled([
       safePrefetch(
-        ['member', params.id],
+        ['member-prefetch', params.id],
         () => api.get(`/members/${params.id}`).then(res => res.data),
         { staleTime: 1000 * 30 }
       ),
       safePrefetch(
-        ['member-care-events', params.id],
+        ['care-events-prefetch', params.id],
         () => api.get(`/care-events?member_id=${params.id}`).then(res => res.data),
         { staleTime: 1000 * 30 }
       ),
