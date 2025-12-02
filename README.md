@@ -216,10 +216,12 @@ Both should show your server's IP.
 
 | Layer | Technology |
 |-------|------------|
-| Backend | FastAPI (Python), MongoDB |
-| Frontend | React 19, Tailwind CSS, Shadcn/UI |
-| Mobile | React Native, Expo, NativeWind |
-| Infrastructure | Docker, Traefik, Nginx, Let's Encrypt |
+| **Backend** | FastAPI (Python 3.11), MongoDB 7.0, Granian (Rust ASGI server) |
+| **Performance** | orjson (fast JSON), Brotli compression, HTTP/3 (QUIC) |
+| **Frontend** | React 19 + React Compiler, Vite, TanStack Query, Tailwind CSS, Shadcn/UI |
+| **Mobile** | React Native, Expo, NativeWind |
+| **Infrastructure** | Docker, Traefik v3.6, Let's Encrypt |
+| **Caching** | In-memory TTL cache, PWA service worker, MongoDB connection pooling |
 
 ---
 
@@ -327,14 +329,35 @@ Translation files are in `frontend/src/locales/`.
 
 ---
 
+## Performance Features
+
+FaithTracker is optimized for speed and efficiency:
+
+| Optimization | Benefit |
+|-------------|---------|
+| **Granian ASGI Server** | Rust-based, 10-15% faster than Uvicorn |
+| **orjson Serialization** | 2-5x faster JSON encoding/decoding |
+| **Brotli Compression** | 15-25% smaller responses than gzip |
+| **HTTP/3 (QUIC)** | Lower latency, especially on mobile networks |
+| **React Compiler** | Automatic memoization, no manual optimization |
+| **Route Loaders** | Parallel data prefetching during navigation |
+| **PWA Caching** | Offline-capable, instant repeat loads |
+| **MongoDB Pooling** | 50 connections, optimized for concurrent users |
+| **Aggregation Pipelines** | Single queries instead of N+1 patterns |
+
+---
+
 ## Security Features
 
 - **Encrypted Passwords** - bcrypt hashing
 - **Secure Tokens** - JWT authentication
-- **HTTPS** - Free SSL certificates
+- **HTTPS** - Free SSL certificates with Let's Encrypt
+- **HTTP/3** - Modern secure transport protocol
+- **Brotli/Gzip** - Response compression
 - **Rate Limiting** - Prevents brute-force attacks
 - **Data Isolation** - Each campus only sees their data
-- **Audit Trail** - All actions are logged
+- **Audit Trail** - All actions are logged with timestamps
+- **Fernet Encryption** - API credentials encrypted at rest
 
 ---
 

@@ -7,9 +7,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **FaithTracker** is a multi-tenant pastoral care management system for GKBJ church. It's a monorepo with FastAPI backend and React frontend designed for managing pastoral care across multiple campuses with complete accountability tracking.
 
 **Tech Stack:**
-- Backend: FastAPI (Python 3.9+), MongoDB (Motor async driver), APScheduler
-- Frontend: React 19, TanStack React Query, Shadcn/UI, Tailwind CSS
-- Infrastructure: Nginx, Supervisord
+- Backend: FastAPI (Python 3.11), MongoDB 7.0 (Motor async driver), APScheduler
+- ASGI Server: Granian (Rust-based, faster than Uvicorn)
+- JSON: orjson (2-5x faster serialization)
+- Frontend: React 19 + React Compiler, Vite, TanStack React Query, Shadcn/UI, Tailwind CSS
+- Infrastructure: Docker, Traefik v3.6 (HTTP/3, Brotli compression), Let's Encrypt
 
 ## Development Commands
 
@@ -24,6 +26,9 @@ pip install -r requirements.txt
 
 # Run development server (with auto-reload)
 uvicorn server:app --reload --host 0.0.0.0 --port 8001
+
+# Run with Granian (production-like, faster)
+granian --interface asgi --host 0.0.0.0 --port 8001 --workers 2 --http auto server:app
 
 # Run tests
 ./test_api.sh
@@ -839,6 +844,57 @@ git diff <commit1> <commit2>
 - Photos served directly from filesystem via `/api/uploads/` endpoint
 - Dashboard uses pagination and filtering to handle large datasets
 - Engagement status is recalculated periodically (not on every request)
+
+### Backend Performance Optimizations
+
+**Granian ASGI Server:**
+- Rust-based ASGI server (10-15% faster than Uvicorn)
+- Configured with 2 workers and HTTP auto-negotiation
+- Supports HTTP/1.1 and HTTP/2 (H2C upgrade)
+- Production command: `granian --interface asgi --host 0.0.0.0 --port 8001 --workers 2 --http auto server:app`
+
+**orjson Fast JSON Serialization:**
+- 2-5x faster than standard Python json module
+- Custom `CustomORJSONResponse` class handles MongoDB datetime serialization
+- Used as default response class for all FastAPI endpoints
+- Handles `datetime`, `date`, and other Python types automatically
+
+**Response Compression (Traefik):**
+- Brotli compression enabled (15-25% smaller than gzip)
+- Minimum response size: 256 bytes
+- Applied to both frontend and backend responses
+- Configured via Traefik middleware labels
+
+**HTTP/3 (QUIC) Support:**
+- Enabled in Traefik for lower latency
+- UDP port 443 exposed for QUIC protocol
+- Automatic protocol negotiation (HTTP/1.1, HTTP/2, HTTP/3)
+- Benefits mobile users with unstable connections
+
+### Frontend Performance Optimizations
+
+**React Compiler:**
+- Automatic memoization of components and hooks
+- No manual `useMemo`, `useCallback`, or `React.memo` needed
+- Configured via `babel-plugin-react-compiler` in Vite
+- Target: React 19
+
+**Route Loaders (React Router v7):**
+- Data prefetching during navigation (parallel with component loading)
+- Located in `frontend/src/lib/routeLoaders.js`
+- Primes TanStack Query cache before component renders
+- Uses unique query keys to avoid cache conflicts
+
+**PWA Service Worker:**
+- Caches static assets (JS, CSS, HTML) for offline use
+- Does NOT cache API responses (ensures data freshness)
+- Uses Workbox via `vite-plugin-pwa`
+- Auto-updates on new deployments
+
+**Code Splitting:**
+- Vendor chunks: react, router, ui, charts, query, utils, i18n
+- Lazy-loaded pages via `React.lazy()`
+- Charts loaded on demand (not in initial bundle)
 
 ## API Documentation
 

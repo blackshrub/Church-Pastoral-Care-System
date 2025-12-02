@@ -2,6 +2,81 @@
 
 All notable changes to FaithTracker will be documented in this file.
 
+## [2.1.0] - 2025-12-02
+
+### ⚡ Major Performance Optimizations
+
+#### Backend Performance
+- **Granian ASGI Server** - Replaced Uvicorn with Rust-based Granian (10-15% faster)
+  - 2 workers with HTTP auto-negotiation
+  - Supports HTTP/1.1 and HTTP/2 (H2C upgrade)
+- **orjson Serialization** - 2-5x faster JSON encoding/decoding
+  - Custom `CustomORJSONResponse` for MongoDB datetime handling
+  - Set as default response class for all endpoints
+- **Brotli Compression** - 15-25% smaller responses than gzip
+  - Configured via Traefik middleware
+  - Minimum response size: 256 bytes
+- **HTTP/3 (QUIC) Support** - Lower latency for mobile users
+  - UDP port 443 exposed
+  - Automatic protocol negotiation
+- **Query Optimization** - `list_users` endpoint uses `$lookup` (eliminates N+1)
+- **Security Fix** - `hashed_password` excluded from user queries
+
+#### Frontend Performance
+- **React Compiler** - Automatic memoization (no manual optimization needed)
+  - Configured via `babel-plugin-react-compiler`
+  - Target: React 19
+- **Route Loaders** - Parallel data prefetching during navigation
+  - New file: `frontend/src/lib/routeLoaders.js`
+  - Primes TanStack Query cache before component renders
+- **PWA Service Worker** - Offline-capable with Workbox
+  - Caches static assets (JS, CSS, HTML)
+  - Does NOT cache API responses (ensures data freshness)
+- **Code Splitting** - Optimized vendor chunks
+  - Separate chunks: react, router, ui, charts, query, utils, i18n
+  - Lazy-loaded charts (not in initial bundle)
+
+### 🔧 Technical Changes
+
+#### Dependencies Added
+- `granian==1.7.6` - Rust ASGI server
+- `orjson==3.10.18` - Fast JSON library
+- `babel-plugin-react-compiler` - React Compiler
+- `vite-plugin-pwa` - PWA support
+- `eslint-plugin-react-compiler` - Linting for React Compiler
+
+#### Infrastructure
+- **docker-compose.yml**:
+  - HTTP/3 enabled: `--entrypoints.websecure.http3`
+  - UDP port 443 exposed for QUIC
+  - Brotli compression middleware for backend and frontend
+- **backend/Dockerfile**:
+  - Changed from Uvicorn to Granian CMD
+- **frontend/vite.config.js**:
+  - React Compiler plugin
+  - PWA plugin with Workbox
+  - Optimized manual chunks
+
+#### Files Modified
+- `backend/server.py` - Added CustomORJSONResponse, orjson imports
+- `backend/requirements.txt` - Added granian, orjson
+- `backend/Dockerfile` - Granian CMD
+- `docker-compose.yml` - HTTP/3, Brotli compression
+- `frontend/vite.config.js` - React Compiler, PWA
+- `frontend/src/App.jsx` - Route loaders, createBrowserRouter
+- `frontend/src/lib/routeLoaders.js` - New file for data prefetching
+- `frontend/package.json` - New dependencies
+
+### 🐛 Bug Fixes
+- Fixed Analytics page "data.reduce is not a function" error
+  - Root cause: orjson couldn't serialize MongoDB datetime objects
+  - Fix: CustomORJSONResponse with `orjson_default` handler
+- Fixed route loader query key conflicts
+  - Changed prefetch keys to unique names (e.g., `member-prefetch`)
+  - Prevents cache pollution between loader and component
+
+---
+
 ## [2.0.0] - 2025-11-20
 
 ### 🎉 Major Features Added
