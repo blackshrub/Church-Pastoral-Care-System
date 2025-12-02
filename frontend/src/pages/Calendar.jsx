@@ -23,7 +23,8 @@ export const Calendar = () => {
   
   const loadEvents = async () => {
     try {
-      const response = await api.get('/care-events');
+      // Fetch all events for calendar view (birthdays need all for month-day matching)
+      const response = await api.get('/care-events?limit=2000');
       setEvents(response.data);
     } catch (error) {
       toast.error(t('toasts.failed_load_events'));

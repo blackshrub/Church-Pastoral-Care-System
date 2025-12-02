@@ -2897,7 +2897,7 @@ async def list_care_events(
     member_id: Optional[str] = None,
     completed: Optional[bool] = None,
     page: int = Query(1, ge=1),
-    limit: int = Query(50, ge=1, le=500),
+    limit: int = Query(50, ge=1, le=2000),
     current_user: dict = Depends(get_current_user)
 ):
     """List care events with optional filters and pagination - optimized with $lookup"""
