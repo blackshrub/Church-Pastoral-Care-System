@@ -1,6 +1,7 @@
 {
   "app_title": "FaithTracker Pastoral Care System",
-  
+  "pastoral_care": "Pastoral Care System",
+
   "_comment_navigation": "Navigation",
   "dashboard": "Dashboard",
   "members": "Members",

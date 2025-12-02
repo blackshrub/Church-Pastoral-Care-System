@@ -1,6 +1,7 @@
 {
   "app_title": "FaithTracker Sistem Pelayanan Pastoral",
-  
+  "pastoral_care": "Sistem Pelayanan Pastoral",
+
   "_comment_navigation": "Navigation",
   "dashboard": "Dasbor",
   "members": "Jemaat",
