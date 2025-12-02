@@ -2448,6 +2448,8 @@ async def delete_care_event(event_id: str, current_user: dict = Depends(get_curr
                     {"id": birthday_event["id"]},
                     {"$set": {"completed": False, "updated_at": datetime.now(timezone.utc).isoformat()}}
                 )
+                # Also delete the activity log associated with the original birthday event completion
+                await db.activity_logs.delete_many({"care_event_id": birthday_event["id"]})
         
         # Delete the care event
         result = await db.care_events.delete_one({"id": event_id})
@@ -2464,19 +2466,24 @@ async def delete_care_event(event_id: str, current_user: dict = Depends(get_curr
                 {"care_event_id": event_id},
                 {"_id": 0, "id": 1, "member_id": 1, "stage": 1}
             ).to_list(None)
-            
-            # Delete timeline entries created from these stages
+
+            # Get timeline entries created from these stages (to delete their activity logs)
             stage_ids = [s["id"] for s in grief_stages]
             if stage_ids:
+                # Get IDs of timeline entries before deleting them
+                timeline_entries = await db.care_events.find(
+                    {"grief_stage_id": {"$in": stage_ids}},
+                    {"_id": 0, "id": 1}
+                ).to_list(None)
+                timeline_entry_ids = [e["id"] for e in timeline_entries]
+
+                # Delete activity logs for these timeline entries
+                if timeline_entry_ids:
+                    await db.activity_logs.delete_many({"care_event_id": {"$in": timeline_entry_ids}})
+
+                # Delete the timeline entries
                 await db.care_events.delete_many({"grief_stage_id": {"$in": stage_ids}})
-            
-            # Delete activity logs for each grief stage
-            for stage in grief_stages:
-                await db.activity_logs.delete_many({
-                    "member_id": stage["member_id"],
-                    "notes": {"$regex": f"{stage['stage'].replace('_', ' ')}", "$options": "i"}
-                })
-            
+
             # Delete grief support stages
             await db.grief_support.delete_many({"care_event_id": event_id})
             
@@ -2486,19 +2493,24 @@ async def delete_care_event(event_id: str, current_user: dict = Depends(get_curr
                 {"care_event_id": event_id},
                 {"_id": 0, "id": 1, "member_id": 1, "stage": 1}
             ).to_list(None)
-            
-            # Delete timeline entries created from these stages
+
+            # Get timeline entries created from these stages (to delete their activity logs)
             stage_ids = [s["id"] for s in accident_stages]
             if stage_ids:
+                # Get IDs of timeline entries before deleting them
+                timeline_entries = await db.care_events.find(
+                    {"accident_stage_id": {"$in": stage_ids}},
+                    {"_id": 0, "id": 1}
+                ).to_list(None)
+                timeline_entry_ids = [e["id"] for e in timeline_entries]
+
+                # Delete activity logs for these timeline entries
+                if timeline_entry_ids:
+                    await db.activity_logs.delete_many({"care_event_id": {"$in": timeline_entry_ids}})
+
+                # Delete the timeline entries
                 await db.care_events.delete_many({"accident_stage_id": {"$in": stage_ids}})
-            
-            # Delete activity logs for each accident stage
-            for stage in accident_stages:
-                await db.activity_logs.delete_many({
-                    "member_id": stage["member_id"],
-                    "notes": {"$regex": f"{stage['stage'].replace('_', ' ')}", "$options": "i"}
-                })
-            
+
             # Delete accident followup stages
             await db.accident_followup.delete_many({"care_event_id": event_id})
         
