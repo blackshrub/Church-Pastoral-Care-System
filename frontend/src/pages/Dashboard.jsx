@@ -12,6 +12,7 @@ import LazyImage from '@/components/LazyImage';
 import { MemberAvatar } from '@/components/MemberAvatar';
 import { Link } from 'react-router-dom';
 import api from '@/lib/api';
+import { formatDateToJakarta, formatRelativeTime } from '@/lib/dateUtils';
 import { toast } from 'sonner';
 import { format as formatDateFns } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -37,13 +38,10 @@ import { EmptyTasks } from '@/components/EmptyState';
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const formatDate = (dateStr, format = 'short') => {
-  try {
-    if (format === 'dd MMM yyyy') {
-      return new Date(dateStr).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-    return new Date(dateStr).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-  } catch { return dateStr; }
+// Use centralized date formatting with Jakarta timezone
+const formatDate = (dateStr, style = 'short') => {
+  const styleMap = { 'dd MMM yyyy': 'medium', 'short': 'short' };
+  return formatDateToJakarta(dateStr, styleMap[style] || style);
 };
 
 const getRelativeDate = (dateStr) => {

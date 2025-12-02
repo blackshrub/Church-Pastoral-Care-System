@@ -24,7 +24,10 @@
       "Bash(time docker build:*)",
       "Bash(time ./scripts/build-frontend.sh:*)",
       "Bash(./scripts/build-frontend.sh:*)",
-      "Bash(source /root/FaithTracker_Church-Pastoral-Care-System/.env)"
+      "Bash(source /root/FaithTracker_Church-Pastoral-Care-System/.env)",
+      "Bash(source backend/.env)",
+      "Bash(mongosh:*)",
+      "Bash(docker exec:*)"
     ],
     "deny": [],
     "ask": []

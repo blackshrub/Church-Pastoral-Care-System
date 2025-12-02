@@ -28,7 +28,7 @@ import { MemberAvatar } from '@/components/MemberAvatar';
 import { EngagementBadge } from '@/components/EngagementBadge';
 import { EventTypeBadge } from '@/components/EventTypeBadge';
 import { MemberProfileHeader, TimelineEventCard } from '@/components/member';
-import { format } from 'date-fns/format';
+import { formatDate } from '@/lib/dateUtils';
 import { format as formatDateFns } from 'date-fns';
 
 // Aid type icon helper
@@ -45,14 +45,7 @@ const getAidTypeIcon = (aidType) => {
   return icons[aidType?.toLowerCase()] || '💰';
 };
 
-// Safe date formatter
-const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
-  try {
-    return format(new Date(dateStr), formatStr);
-  } catch (e) {
-    return dateStr;
-  }
-};
+// formatDate is imported from @/lib/dateUtils
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;

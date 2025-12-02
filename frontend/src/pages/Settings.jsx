@@ -19,32 +19,9 @@ import { Settings as SettingsIcon, Bell, Heart, Zap, Users, Clock, UserCircle, U
 import FilterRuleBuilder from '@/components/FilterRuleBuilder';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 
+import { formatToJakarta } from '@/lib/dateUtils';
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
-// Helper to parse UTC timestamps that may not have timezone indicator
-const parseUTCTimestamp = (timestamp) => {
-  if (!timestamp) return null;
-  // If timestamp doesn't end with Z or timezone offset, assume UTC and append Z
-  if (!timestamp.endsWith('Z') && !timestamp.match(/[+-]\d{2}:\d{2}$/)) {
-    timestamp = timestamp + 'Z';
-  }
-  return new Date(timestamp);
-};
-
-// Format date to Jakarta timezone
-const formatToJakarta = (timestamp) => {
-  const date = parseUTCTimestamp(timestamp);
-  if (!date || isNaN(date.getTime())) return '-';
-  return date.toLocaleString('id-ID', {
-    timeZone: 'Asia/Jakarta',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-};
 
 export const Settings = () => {
   const { t } = useTranslation();
@@ -52,7 +29,9 @@ export const Settings = () => {
   const [atRiskDays, setAtRiskDays] = useState(60);
   const [inactiveDays, setInactiveDays] = useState(90);
   const [campusCount, setCampusCount] = useState(0);
-  const [campusTimezone, setCampusTimezone] = useState('Asia/Jakarta');
+  const [campusTimezone, setCampusTimezone] = useState(
+    import.meta.env.VITE_TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
+  );
   const [writeoffBirthday, setWriteoffBirthday] = useState(7);
   const [writeoffFinancialAid, setWriteoffFinancialAid] = useState(0);
   const [writeoffAccident, setWriteoffAccident] = useState(14);
@@ -329,14 +308,15 @@ export const Settings = () => {
       setCampusCount(response.data.length);
       
       // Load timezone from user's campus
+      const defaultTimezone = import.meta.env.VITE_TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone;
       if (user?.campus_id && user.campus_id !== 'campus_id') {
         try {
           const campusRes = await api.get(`/campuses/${user.campus_id}`);
-          setCampusTimezone(campusRes.data.timezone || 'Asia/Jakarta');
+          setCampusTimezone(campusRes.data.timezone || defaultTimezone);
           setCampusData(campusRes.data);  // Store full campus data
         } catch (error) {
           console.error('Error loading campus timezone:', error);
-          setCampusTimezone('Asia/Jakarta');
+          setCampusTimezone(defaultTimezone);
         }
       }
       

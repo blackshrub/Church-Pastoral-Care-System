@@ -8,6 +8,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, User, Calendar, X } from 'lucide-react';
 import api from '@/lib/api';
+import { formatDateToJakarta } from '@/lib/dateUtils';
 
 const SearchBar = () => {
   const [query, setQuery] = useState('');
@@ -181,7 +182,7 @@ const SearchBar = () => {
                       {event.title}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {event.member_name} • {new Date(event.event_date).toLocaleDateString()}
+                      {event.member_name} • {formatDateToJakarta(event.event_date)}
                     </p>
                   </div>
                   <div className="flex-shrink-0">

@@ -11,15 +11,7 @@ import { Button } from '@/components/ui/button';
 import { MemberAvatar } from '@/components/MemberAvatar';
 import { EngagementBadge } from '@/components/EngagementBadge';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { format } from 'date-fns/format';
-
-const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
-  try {
-    return format(new Date(dateStr), formatStr);
-  } catch (e) {
-    return dateStr;
-  }
-};
+import { formatDate } from '@/lib/dateUtils';
 
 // Memoized to prevent re-renders when member detail state changes
 export const MemberProfileHeader = memo(({

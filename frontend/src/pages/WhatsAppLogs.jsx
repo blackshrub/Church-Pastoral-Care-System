@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
+import { formatToJakarta } from '@/lib/dateUtils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,15 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { RefreshCw, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { format } from 'date-fns/format';
 
-const formatDate = (dateStr, formatStr = 'dd MMM yyyy HH:mm') => {
-  try {
-    return format(new Date(dateStr), formatStr);
-  } catch (e) {
-    return dateStr;
-  }
-};
+// Use centralized date formatting with Jakarta timezone
+const formatDate = (dateStr) => formatToJakarta(dateStr);
 
 export const WhatsAppLogs = () => {
   const { t } = useTranslation();

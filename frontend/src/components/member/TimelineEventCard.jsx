@@ -10,15 +10,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EventTypeBadge } from '@/components/EventTypeBadge';
 import { CheckCircle2, MoreVertical, Trash2 } from 'lucide-react';
-import { format } from 'date-fns/format';
-
-const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
-  try {
-    return format(new Date(dateStr), formatStr);
-  } catch (e) {
-    return dateStr;
-  }
-};
+import { formatDate, formatDateToJakarta } from '@/lib/dateUtils';
 
 const getEventColors = (eventType) => {
   const celebrationTypes = ['birthday', 'childbirth', 'new_house'];
@@ -141,7 +133,7 @@ export const TimelineEventCard = memo(({
               {event.completed && event.completed_by_user_name && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                   <span className="font-medium">Completed by:</span> {event.completed_by_user_name}
-                  {event.completed_at && ` on ${new Date(event.completed_at).toLocaleDateString()}`}
+                  {event.completed_at && ` on ${formatDateToJakarta(event.completed_at)}`}
                 </p>
               )}
 
@@ -149,7 +141,7 @@ export const TimelineEventCard = memo(({
               {event.ignored && event.ignored_by_name && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
                   <span className="font-medium">Ignored by:</span> {event.ignored_by_name}
-                  {event.ignored_at && ` on ${new Date(event.ignored_at).toLocaleDateString()}`}
+                  {event.ignored_at && ` on ${formatDateToJakarta(event.ignored_at)}`}
                 </p>
               )}
 

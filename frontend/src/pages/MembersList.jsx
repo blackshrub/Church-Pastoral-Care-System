@@ -3,16 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useDebounce } from 'use-debounce';
 import api from '@/lib/api';
-import { format } from 'date-fns/format';
-
-// Safe date formatter
-const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
-  try {
-    return format(new Date(dateStr), formatStr);
-  } catch (e) {
-    return dateStr;
-  }
-};
+import { formatDate } from '@/lib/dateUtils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

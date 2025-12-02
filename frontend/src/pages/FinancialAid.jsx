@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import api from '@/lib/api';
+import { formatDate } from '@/lib/dateUtils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -9,16 +10,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { DollarSign, Users } from 'lucide-react';
 import LazyImage from '@/components/LazyImage';
 import PieChart from '@/components/charts/PieChart';
-import { format } from 'date-fns/format';
-
-// Safe date formatter
-const formatDate = (dateStr, formatStr = 'dd MMM yyyy') => {
-  try {
-    return format(new Date(dateStr), formatStr);
-  } catch (e) {
-    return dateStr;
-  }
-};
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 

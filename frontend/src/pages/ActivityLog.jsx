@@ -19,7 +19,9 @@ const ActivityLog = () => {
   const [summary, setSummary] = useState(null);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [campusTimezone, setCampusTimezone] = useState('Asia/Jakarta');  // Default, will load from API
+  const [campusTimezone, setCampusTimezone] = useState(
+    import.meta.env.VITE_TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
+  );  // Default to env var or browser timezone, will load from API
   
   // Filters
   const [selectedUser, setSelectedUser] = useState('all');
@@ -84,11 +86,15 @@ const ActivityLog = () => {
         const campusId = userResponse.data.campus_id;
         if (campusId && campusId !== 'campus_id') {
           const campusResponse = await api.get(`/campuses/${campusId}`);
-          setCampusTimezone(campusResponse.data.timezone || 'Asia/Jakarta');
+          // Use campus timezone if available, else env var, else browser timezone
+          const timezone = campusResponse.data.timezone ||
+            import.meta.env.VITE_TIMEZONE ||
+            Intl.DateTimeFormat().resolvedOptions().timeZone;
+          setCampusTimezone(timezone);
         }
       } catch (error) {
         console.error('Error loading campus timezone:', error);
-        // Fallback to Asia/Jakarta
+        // Fallback to initial default (env var or browser timezone)
       }
     };
 

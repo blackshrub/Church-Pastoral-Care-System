@@ -6315,7 +6315,24 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
                         
                         await db.members.insert_one(new_member)
                         stats["created"] += 1
-                
+
+                        # Create birthday event if member has birth_date
+                        if new_member.get("birth_date"):
+                            birthday_event = {
+                                "id": str(uuid.uuid4()),
+                                "member_id": new_member["id"],
+                                "campus_id": campus_id,
+                                "church_id": campus_id,
+                                "event_type": EventType.BIRTHDAY.value,
+                                "event_date": new_member["birth_date"],
+                                "title": "Birthday Celebration",
+                                "description": "Annual birthday reminder",
+                                "completed": False,
+                                "ignored": False,
+                                "created_at": datetime.now(timezone.utc).isoformat(),
+                                "updated_at": datetime.now(timezone.utc).isoformat()
+                            }
+                            await db.care_events.insert_one(birthday_event)
 
                 # Archive members that no longer match filter (Option A)
                 # Get all core member IDs that passed filter
