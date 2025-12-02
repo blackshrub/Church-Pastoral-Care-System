@@ -32,19 +32,20 @@ export default defineConfig({
         start_url: '/',
         orientation: 'portrait-primary',
         categories: ['productivity', 'lifestyle'],
+        // Use inline data URIs to avoid precaching issues with reverse proxy
         icons: [
           {
-            src: '/icon-192x192.svg',
+            src: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMxNGI4YTYiLz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDgsIDQwKSI+CiAgPHBhdGggZD0iTTQ4IDIwQzQ4IDkgNDAgMiAzMCAyQzIzIDIgMTcgNiAxNCAxMkMxMSA2IDUgMiAtMiAyQy0xMiAyIC0yMCA5IC0yMCAyMEMtMjAgNDAgMTQgNTUgNDggODVDODIgNTUgMTE2IDQwIDExNiAyMEMxMTYgOSAxMDggMiA5OCAyQzkxIDIgODUgNiA4MiAxMkM3OSA2IDczIDIgNjYgMkM1NiAyIDQ4IDkgNDggMjBaIgogICAgICAgIGZpbGw9IndoaXRlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwLCA1KSBzY2FsZSgwLjkpIi8+CiAgPHJlY3QgeD0iNDIiIHk9IjYwIiB3aWR0aD0iMTIiIGhlaWdodD0iNDUiIGZpbGw9IndoaXRlIiByeD0iMiIvPgogIDxyZWN0IHg9IjMwIiB5PSI3MiIgd2lkdGg9IjM2IiBoZWlnaHQ9IjEyIiBmaWxsPSJ3aGl0ZSIgcng9IjIiLz4KPC9nPgo8L3N2Zz4=',
             sizes: '192x192',
             type: 'image/svg+xml',
           },
           {
-            src: '/icon-512x512.svg',
+            src: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiMxNGI4YTYiLz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTI4LCAxMDYpIj4KICA8cGF0aCBkPSJNMTI4IDUzQzEyOCAyNCAxMDcgNSA4MCA1QzYxIDUgNDUgMTYgMzcgMzJDMjkgMTYgMTMgNSAtNiA1Qy0zMyA1IC01NCAyNCAtNTQgNTNDLTU0IDEwNyAzNyAxNDcgMTI4IDIyN0MyMTkgMTQ3IDMxMCAxMDcgMzEwIDUzQzMxMCAyNCAyODkgNSAyNjIgNUMyNDMgNSAyMjcgMTYgMjE5IDMyQzIxMSAxNiAxOTUgNSAxNzYgNUMxNDkgNSAxMjggMjQgMTI4IDUzWiIKICAgICAgICBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwgMTMpIHNjYWxlKDAuOSkiLz4KICA8cmVjdCB4PSIxMTIiIHk9IjE2MCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjEyMCIgZmlsbD0id2hpdGUiIHJ4PSI0Ii8+CiAgPHJlY3QgeD0iODAiIHk9IjE5MiIgd2lkdGg9Ijk2IiBoZWlnaHQ9IjMyIiBmaWxsPSJ3aGl0ZSIgcng9IjQiLz4KPC9nPgo8L3N2Zz4=',
             sizes: '512x512',
             type: 'image/svg+xml',
           },
           {
-            src: '/icon-512x512.svg',
+            src: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiMxNGI4YTYiLz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTI4LCAxMDYpIj4KICA8cGF0aCBkPSJNMTI4IDUzQzEyOCAyNCAxMDcgNSA4MCA1QzYxIDUgNDUgMTYgMzcgMzJDMjkgMTYgMTMgNSAtNiA1Qy0zMyA1IC01NCAyNCAtNTQgNTNDLTU0IDEwNyAzNyAxNDcgMTI4IDIyN0MyMTkgMTQ3IDMxMCAxMDcgMzEwIDUzQzMxMCAyNCAyODkgNSAyNjIgNUMyNDMgNSAyMjcgMTYgMjE5IDMyQzIxMSAxNiAxOTUgNSAxNzYgNUMxNDkgNSAxMjggMjQgMTI4IDUzWiIKICAgICAgICBmaWxsPSJ3aGl0ZSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMCwgMTMpIHNjYWxlKDAuOSkiLz4KICA8cmVjdCB4PSIxMTIiIHk9IjE2MCIgd2lkdGg9IjMyIiBoZWlnaHQ9IjEyMCIgZmlsbD0id2hpdGUiIHJ4PSI0Ii8+CiAgPHJlY3QgeD0iODAiIHk9IjE5MiIgd2lkdGg9Ijk2IiBoZWlnaHQ9IjMyIiBmaWxsPSJ3aGl0ZSIgcng9IjQiLz4KPC9nPgo8L3N2Zz4=',
             sizes: '512x512',
             type: 'image/svg+xml',
             purpose: 'maskable',
