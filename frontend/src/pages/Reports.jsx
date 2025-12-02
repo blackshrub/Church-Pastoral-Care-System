@@ -356,7 +356,7 @@ export const Reports = () => {
               target={kpis.member_engagement_rate?.target}
               status={kpis.member_engagement_rate?.status}
               icon={UserCheck}
-              subtitle={`${kpis.member_engagement_rate?.at_risk_percentage || 0}% at risk`}
+              subtitle={`${kpis.member_engagement_rate?.at_risk_percentage || 0}% at risk · ${kpis.member_engagement_rate?.disconnected_percentage || 0}% disconnected`}
             />
             <KPICard
               title="Member Reach Rate"
@@ -372,7 +372,7 @@ export const Reports = () => {
               target={kpis.birthday_completion_rate?.target}
               status={kpis.birthday_completion_rate?.status}
               icon={Gift}
-              subtitle={`${kpis.birthday_completion_rate?.celebrated || 0} of ${kpis.birthday_completion_rate?.total || 0}`}
+              subtitle={`${kpis.birthday_completion_rate?.celebrated || 0} celebrated${kpis.birthday_completion_rate?.ignored ? ` · ${kpis.birthday_completion_rate.ignored} skipped` : ''} of ${kpis.birthday_completion_rate?.total || 0}`}
             />
           </div>
 
@@ -415,7 +415,10 @@ export const Reports = () => {
                   <div>
                     <p className="text-sm text-muted-foreground">Birthdays</p>
                     <p className="text-lg font-bold">{ministry.birthday_ministry?.celebrated || 0} celebrated</p>
-                    <p className="text-xs text-muted-foreground">of {ministry.birthday_ministry?.total_birthdays || 0} total</p>
+                    <p className="text-xs text-muted-foreground">
+                      {ministry.birthday_ministry?.ignored ? `${ministry.birthday_ministry.ignored} skipped · ` : ''}
+                      {ministry.birthday_ministry?.total_birthdays || 0} total
+                    </p>
                   </div>
                 </div>
               </CardContent>

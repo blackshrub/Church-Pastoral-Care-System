@@ -5673,7 +5673,8 @@ async def get_monthly_management_report(
         total_members = len(members)
         active_members = len([m for m in members if m.get("engagement_status") == "active"])
         at_risk_members = len([m for m in members if m.get("engagement_status") == "at_risk"])
-        inactive_members = len([m for m in members if m.get("engagement_status") in ["inactive", "disconnected"]])
+        inactive_members = len([m for m in members if m.get("engagement_status") == "inactive"])
+        disconnected_members = len([m for m in members if m.get("engagement_status") == "disconnected"])
 
         # Care delivery metrics
         total_events = len(events_this_month)
@@ -5796,34 +5797,48 @@ async def get_monthly_management_report(
         # Birthday events store the original birth date (e.g., "1980-05-15"), not current year's date
         # We need to find members whose birth month matches the report month
         # and check if their birthday events were completed during the report period
+        #
+        # IMPORTANT: For the current month, only count birthdays up to today's date
+        # (not future birthdays that haven't occurred yet)
 
         # Get all birthday events for members in this campus
         all_birthday_events = await db.care_events.find({
             **campus_filter,
             "event_type": "birthday"
-        }, {"_id": 0, "member_id": 1, "event_date": 1, "completed": 1, "completed_at": 1}).to_list(5000)
+        }, {"_id": 0, "member_id": 1, "event_date": 1, "completed": 1, "completed_at": 1, "ignored": 1}).to_list(5000)
+
+        # Determine cutoff day for birthdays
+        # For current month: only count birthdays up to today
+        # For past months: count all birthdays in that month
+        is_current_month = (report_year == today.year and report_month == today.month)
+        cutoff_day = today.day if is_current_month else 31  # 31 means include all days
 
         # Filter to birthdays that fall in the report month (by month only, regardless of year)
+        # and up to the cutoff day
         birthday_events = []
         for be in all_birthday_events:
             event_date = be.get("event_date", "")
             if event_date:
                 try:
-                    # Parse the birth date and check if month matches report month
-                    birth_month = int(event_date.split("-")[1])
-                    if birth_month == report_month:
+                    # Parse the birth date (YYYY-MM-DD format)
+                    parts = event_date.split("-")
+                    birth_month = int(parts[1])
+                    birth_day = int(parts[2])
+                    # Include if month matches AND day is <= cutoff
+                    if birth_month == report_month and birth_day <= cutoff_day:
                         birthday_events.append(be)
                 except (ValueError, IndexError):
                     pass
 
-        # Count birthdays celebrated - either completed with completed_at in this month,
-        # or completed during this report period
+        # Count birthdays celebrated and ignored
         birthdays_celebrated = 0
+        birthdays_ignored = 0
+        birthdays_pending = 0
         for be in birthday_events:
             if be.get("completed"):
                 completed_at = be.get("completed_at")
                 if completed_at:
-                    # Check if completed_at falls within the report month
+                    # Check if completed_at falls within the report period
                     try:
                         if isinstance(completed_at, str):
                             completed_date = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
@@ -5837,6 +5852,10 @@ async def get_monthly_management_report(
                 else:
                     # Completed but no completed_at timestamp - count it
                     birthdays_celebrated += 1
+            elif be.get("ignored"):
+                birthdays_ignored += 1
+            else:
+                birthdays_pending += 1
 
         birthday_completion_rate = round(birthdays_celebrated / len(birthday_events) * 100, 1) if birthday_events else 0
 
@@ -5853,6 +5872,10 @@ async def get_monthly_management_report(
                 "current": round(active_members / total_members * 100, 1) if total_members > 0 else 0,
                 "at_risk_percentage": round(at_risk_members / total_members * 100, 1) if total_members > 0 else 0,
                 "inactive_percentage": round(inactive_members / total_members * 100, 1) if total_members > 0 else 0,
+                "disconnected_percentage": round(disconnected_members / total_members * 100, 1) if total_members > 0 else 0,
+                "at_risk_count": at_risk_members,
+                "inactive_count": inactive_members,
+                "disconnected_count": disconnected_members,
                 "target": 80,
                 "status": "good" if active_members / total_members >= 0.8 else "warning" if active_members / total_members >= 0.6 else "critical"
             },
@@ -5866,6 +5889,8 @@ async def get_monthly_management_report(
             "birthday_completion_rate": {
                 "current": birthday_completion_rate,
                 "celebrated": birthdays_celebrated,
+                "ignored": birthdays_ignored,
+                "pending": birthdays_pending,
                 "total": len(birthday_events),
                 "target": 95,
                 "status": "good" if birthday_completion_rate >= 95 else "warning" if birthday_completion_rate >= 80 else "critical"
@@ -5927,14 +5952,29 @@ async def get_monthly_management_report(
                 })
                 recommendations.append("Review task assignment process to ensure equitable distribution")
 
-        # Birthday ministry
-        if birthday_completion_rate < 80:
+        # Birthday ministry - only show warning if there are pending or if completion rate is low
+        if birthdays_pending > 0:
             insights.append({
                 "type": "warning",
                 "category": "Birthday Ministry",
-                "message": f"Only {birthdays_celebrated} of {len(birthday_events)} birthdays were celebrated ({birthday_completion_rate}%)"
+                "message": f"{birthdays_pending} birthday(s) still pending action"
             })
-            recommendations.append("Improve birthday reminder system and assign dedicated birthday outreach volunteers")
+            recommendations.append("Follow up on pending birthday celebrations")
+        elif birthday_completion_rate < 80 and len(birthday_events) > 0:
+            # Only warn about low completion rate if some were ignored (not just pending)
+            if birthdays_ignored > 0:
+                insights.append({
+                    "type": "info",
+                    "category": "Birthday Ministry",
+                    "message": f"{birthdays_celebrated} celebrated, {birthdays_ignored} skipped out of {len(birthday_events)} birthdays ({birthday_completion_rate}% celebrated)"
+                })
+            else:
+                insights.append({
+                    "type": "warning",
+                    "category": "Birthday Ministry",
+                    "message": f"Only {birthdays_celebrated} of {len(birthday_events)} birthdays were celebrated ({birthday_completion_rate}%)"
+                })
+                recommendations.append("Improve birthday reminder system and assign dedicated birthday outreach volunteers")
 
         # Financial aid
         if financial_total > 0:
@@ -6006,6 +6046,7 @@ async def get_monthly_management_report(
                 "active_members": active_members,
                 "at_risk_members": at_risk_members,
                 "inactive_members": inactive_members,
+                "disconnected_members": disconnected_members,
                 "total_care_events": total_events,
                 "completed_events": completed_events,
                 "pending_events": pending_events,
@@ -6040,6 +6081,8 @@ async def get_monthly_management_report(
                 "birthday_ministry": {
                     "total_birthdays": len(birthday_events),
                     "celebrated": birthdays_celebrated,
+                    "ignored": birthdays_ignored,
+                    "pending": birthdays_pending,
                     "completion_rate": birthday_completion_rate
                 },
                 "financial_aid": {

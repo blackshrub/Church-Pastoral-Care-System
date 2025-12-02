@@ -20,8 +20,9 @@ REQUIRED_ENV_VARS = [
 ]
 
 # Production-critical environment variables
+# Note: ALLOWED_ORIGINS or FRONTEND_URL should be set (docker-compose uses ALLOWED_ORIGINS)
 PRODUCTION_ENV_VARS = [
-    ("CORS_ORIGINS", lambda v: v != '*', "CORS_ORIGINS should not be '*' in production"),
+    ("ALLOWED_ORIGINS", lambda v: v != '*', "ALLOWED_ORIGINS should not be '*' in production"),
     ("ENCRYPTION_KEY", lambda v: v and len(v) > 32, "ENCRYPTION_KEY must be set and strong"),
 ]
 
@@ -83,7 +84,7 @@ def get_config():
         "db_name": os.getenv("DB_NAME", "pastoral_care_db"),
         "jwt_secret": os.getenv("JWT_SECRET_KEY"),
         "encryption_key": os.getenv("ENCRYPTION_KEY"),
-        "cors_origins": os.getenv("CORS_ORIGINS", "*").split(","),
+        "cors_origins": os.getenv("ALLOWED_ORIGINS", os.getenv("FRONTEND_URL", "*")).split(","),
         "church_name": os.getenv("CHURCH_NAME", "GKBJ"),
         "whatsapp_gateway_url": os.getenv("WHATSAPP_GATEWAY_URL"),
         "backend_port": int(os.getenv("BACKEND_PORT", "8001")),
