@@ -6,7 +6,7 @@ Handles all API endpoints, authentication, database operations, and business log
 
 from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Query, Depends, status, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import FileResponse, StreamingResponse, JSONResponse, ORJSONResponse
+from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 import orjson
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -23,6 +23,29 @@ from enum import Enum
 import uuid
 from datetime import datetime, timezone, timedelta, date
 from zoneinfo import ZoneInfo
+
+
+# Custom orjson response class for proper datetime serialization from MongoDB
+def orjson_default(obj):
+    """Custom serializer for orjson to handle datetime and other types from MongoDB"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, date):
+        return obj.isoformat()
+    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
+
+class CustomORJSONResponse(Response):
+    """Custom ORJSONResponse that handles datetime serialization from MongoDB documents"""
+    media_type = "application/json"
+
+    def render(self, content) -> bytes:
+        return orjson.dumps(
+            content,
+            default=orjson_default,
+            option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY
+        )
+
 
 # Jakarta timezone (UTC+7)
 JAKARTA_TZ = ZoneInfo("Asia/Jakarta")
@@ -146,7 +169,7 @@ client = AsyncIOMotorClient(
 db = client[os.environ.get('DB_NAME', 'pastoral_care_db')]
 
 # Create the main app with orjson for faster JSON serialization (2-5x faster)
-app = FastAPI(default_response_class=ORJSONResponse)
+app = FastAPI(default_response_class=CustomORJSONResponse)
 
 # GZIP compression for responses > 500 bytes (reduces bandwidth by 70-90%)
 from starlette.middleware.gzip import GZipMiddleware
