@@ -8,6 +8,9 @@ from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Query, 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 import orjson
+from bson import ObjectId, Decimal128, Binary, Regex
+from bson.errors import InvalidId
+import base64
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -25,18 +28,40 @@ from datetime import datetime, timezone, timedelta, date
 from zoneinfo import ZoneInfo
 
 
-# Custom orjson response class for proper datetime serialization from MongoDB
+# Custom orjson response class for proper BSON/MongoDB type serialization
 def orjson_default(obj):
-    """Custom serializer for orjson to handle datetime and other types from MongoDB"""
+    """Custom serializer for orjson to handle BSON/MongoDB types.
+
+    Handles:
+    - datetime/date: ISO 8601 format
+    - ObjectId: string representation (24-char hex)
+    - Decimal128: float (or string for precision-critical)
+    - Binary: base64-encoded string
+    - Regex: pattern string
+    - UUID: string representation
+    """
     if isinstance(obj, datetime):
         return obj.isoformat()
     if isinstance(obj, date):
         return obj.isoformat()
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    if isinstance(obj, Decimal128):
+        # Convert to float for JSON; use str(obj.to_decimal()) if precision is critical
+        return float(obj.to_decimal())
+    if isinstance(obj, Binary):
+        return base64.b64encode(obj).decode('utf-8')
+    if isinstance(obj, Regex):
+        return obj.pattern
+    if isinstance(obj, uuid.UUID):
+        return str(obj)
+    if isinstance(obj, bytes):
+        return base64.b64encode(obj).decode('utf-8')
     raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 
 class CustomORJSONResponse(Response):
-    """Custom ORJSONResponse that handles datetime serialization from MongoDB documents"""
+    """Custom ORJSONResponse that handles all BSON/MongoDB types serialization."""
     media_type = "application/json"
 
     def render(self, content) -> bytes:
