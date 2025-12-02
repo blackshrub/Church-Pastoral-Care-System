@@ -33,7 +33,7 @@ set -e
 # CONSTANTS & CONFIGURATION
 #################################################################################
 
-readonly VERSION="3.0.0"
+readonly VERSION="2.1.0"
 readonly GIT_DIR=$(pwd)
 readonly APP_DIR="/opt/faithtracker"
 readonly BACKUP_DIR="/var/backups/faithtracker"

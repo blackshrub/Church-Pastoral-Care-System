@@ -22,7 +22,7 @@ set -euo pipefail
 # CONSTANTS & STYLING
 #################################################################################
 
-readonly VERSION="1.0.0"
+readonly VERSION="2.1.0"
 readonly INSTALL_DIR="/opt/faithtracker"
 
 # Colors
@@ -59,7 +59,7 @@ print_banner() {
     ║   ██║     ██║  ██║██║   ██║   ██║  ██║   ██║   ██║  ██║██║  ██║      ║
     ║   ╚═╝     ╚═╝  ╚═╝╚═╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝      ║
     ║                                                                       ║
-    ║              Docker Installation - v1.0.0                             ║
+    ║              Docker Installation - v2.1.0                             ║
     ║                                                                       ║
     ╚═══════════════════════════════════════════════════════════════════════╝
 EOF
@@ -533,10 +533,10 @@ main() {
     echo -e "${BOLD}Welcome to FaithTracker Docker Installer${NC}"
     echo ""
     echo "This will deploy FaithTracker using Docker Compose with:"
-    echo -e "  ${BULLET} Traefik reverse proxy with automatic SSL"
-    echo -e "  ${BULLET} MongoDB database"
-    echo -e "  ${BULLET} FastAPI backend"
-    echo -e "  ${BULLET} React frontend"
+    echo -e "  ${BULLET} Traefik v3.6 reverse proxy (SSL, HTTP/3, Brotli)"
+    echo -e "  ${BULLET} MongoDB 7.0 database"
+    echo -e "  ${BULLET} FastAPI backend (Granian + orjson)"
+    echo -e "  ${BULLET} React 19 frontend (React Compiler, PWA)"
     echo ""
     read -p "Press Enter to continue..."
 

@@ -26,7 +26,7 @@ set -euo pipefail
 # CONSTANTS & CONFIGURATION
 #################################################################################
 
-readonly VERSION="3.0.0"
+readonly VERSION="2.1.0"
 readonly MIN_DISK_GB=5
 readonly MIN_RAM_MB=1024
 readonly RECOMMENDED_RAM_MB=2048
@@ -340,7 +340,8 @@ show_preflight_summary() {
     echo -e "${GREEN}╚════════════════════════════════════════════════════════════════════╝${NC}"
     echo ""
     echo -e "${BOLD}Installation will:${NC}"
-    echo -e "  ${BULLET} Install Python 3.9+, Node.js ${NODE_VERSION}, MongoDB 7.0, Nginx"
+    echo -e "  ${BULLET} Install Python 3.11, Node.js ${NODE_VERSION}, MongoDB 7.0, Nginx"
+    echo -e "  ${BULLET} Install Granian (Rust ASGI server) + orjson (fast JSON)"
     echo -e "  ${BULLET} Configure firewall (UFW) and SSL certificates"
     echo -e "  ${BULLET} Create 'faithtracker' system user"
     echo -e "  ${BULLET} Set up automatic service management"
@@ -788,7 +789,7 @@ create_systemd_service() {
 
     cat > /etc/systemd/system/faithtracker-backend.service << EOF
 [Unit]
-Description=FaithTracker FastAPI Backend
+Description=FaithTracker FastAPI Backend (Granian)
 After=network.target mongod.service
 Wants=mongod.service
 
@@ -798,7 +799,9 @@ User=faithtracker
 Group=faithtracker
 WorkingDirectory=/opt/faithtracker/backend
 Environment="PATH=/opt/faithtracker/backend/venv/bin"
-ExecStart=/opt/faithtracker/backend/venv/bin/uvicorn server:app --host 0.0.0.0 --port $BACKEND_PORT --workers 4
+# Granian: Rust-based ASGI server (faster than Uvicorn)
+# --http auto: Auto-negotiate HTTP/1.1 or HTTP/2
+ExecStart=/opt/faithtracker/backend/venv/bin/granian --interface asgi --host 0.0.0.0 --port $BACKEND_PORT --workers 2 --http auto server:app
 Restart=always
 RestartSec=10
 StandardOutput=append:/var/log/faithtracker/backend.out.log
