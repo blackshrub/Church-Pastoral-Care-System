@@ -1490,7 +1490,7 @@ export const Settings = () => {
               <CardContent className="space-y-4">
                 {syncConfig.last_sync_at && (
                   <div className="text-sm text-gray-600">
-                    <p><span className="font-medium">Last Sync:</span> {new Date(syncConfig.last_sync_at).toLocaleString()}</p>
+                    <p><span className="font-medium">Last Sync:</span> {new Date(syncConfig.last_sync_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}</p>
                     <p><span className="font-medium">Status:</span> <span className={syncConfig.last_sync_status === 'success' ? 'text-green-600' : 'text-red-600'}>
                       {syncConfig.last_sync_status}
                     </span></p>
@@ -1544,7 +1544,7 @@ export const Settings = () => {
                               {log.sync_type.charAt(0).toUpperCase() + log.sync_type.slice(1)} Sync
                             </p>
                             <p className="text-xs text-gray-600">
-                              {new Date(log.started_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} 
+                              {new Date(log.started_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })} 
                               {log.duration_seconds && ` • ${log.duration_seconds.toFixed(1)}s`}
                             </p>
                           </div>
