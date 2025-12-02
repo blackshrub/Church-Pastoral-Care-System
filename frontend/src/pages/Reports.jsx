@@ -197,7 +197,9 @@ export const Reports = () => {
     const response = await api.get(`/reports/monthly/pdf?year=${selectedYear}&month=${selectedMonth}`, {
       responseType: 'blob'
     });
-    return new Blob([response.data], { type: 'application/pdf' });
+    // response.data is already a Blob when responseType is 'blob'
+    // Just ensure it has the correct MIME type
+    return response.data;
   };
 
   const handlePrint = async () => {
@@ -236,7 +238,8 @@ export const Reports = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      // Delay URL revocation to ensure download completes
+      setTimeout(() => window.URL.revokeObjectURL(url), 5000);
     } catch (error) {
       console.error('Error exporting PDF:', error);
       alert('Failed to export PDF. Please try again.');
