@@ -72,6 +72,20 @@ services:
       - ./docker/mongo-init.js:/docker-entrypoint-initdb.d/init.js:ro
     networks:
       - faithtracker-network
+    # Resource limits to prevent runaway memory/CPU usage
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 30s
@@ -125,12 +139,26 @@ services:
       - "traefik.http.middlewares.backend-cors.headers.addvaryheader=true"
       # Apply compression + CORS middlewares
       - "traefik.http.routers.backend.middlewares=backend-compress,backend-cors"
+    # Resource limits to prevent runaway memory/CPU usage
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 15s
 
   # ===================
   # Frontend - React (Nginx)
@@ -158,6 +186,20 @@ services:
       - "traefik.http.middlewares.frontend-compress.compress=true"
       - "traefik.http.middlewares.frontend-compress.compress.minresponsebodybytes=256"
       - "traefik.http.routers.frontend.middlewares=frontend-compress"
+    # Resource limits to prevent runaway memory/CPU usage
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
       interval: 30s
