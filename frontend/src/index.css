@@ -282,13 +282,13 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   border-color: hsl(174, 94%, 39%) !important;
 }
 
-/* Force date inputs to match standard input sizing */
+/* Force date inputs to match standard input sizing (44px HIG minimum) */
 input[type="date"], input[type="month"], input[type="time"] {
   line-height: normal !important;
   padding: 0.5rem 0.75rem !important;
-  height: 3rem !important;
-  max-height: 3rem !important;
-  min-height: 3rem !important;
+  height: 2.75rem !important;  /* 44px - HIG compliant */
+  max-height: 2.75rem !important;
+  min-height: 2.75rem !important;
 }
 
 /* Mobile fixes */
@@ -334,6 +334,17 @@ input[type="date"], input[type="month"], input[type="time"] {
   }
 }
 
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes slideInRight {
   from {
     transform: translateX(100%);
@@ -341,6 +352,22 @@ input[type="date"], input[type="month"], input[type="time"] {
   to {
     transform: translateX(0);
   }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 @keyframes pulse {
@@ -364,10 +391,40 @@ input[type="date"], input[type="month"], input[type="time"] {
   animation: pulse 1s ease-in-out infinite;
 }
 
+.animate-slide-in-up {
+  animation: slideInUp 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
 /* Page transition */
 .page-enter {
-  animation: fadeIn 0.3s ease-out;
+  animation: slideInUp 0.3s ease-out;
 }
+
+/* Card/Modal enter animations */
+.modal-enter {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* List item stagger animation */
+.list-item-enter {
+  animation: fadeIn 0.3s ease-out backwards;
+}
+
+.list-item-enter:nth-child(1) { animation-delay: 0ms; }
+.list-item-enter:nth-child(2) { animation-delay: 50ms; }
+.list-item-enter:nth-child(3) { animation-delay: 100ms; }
+.list-item-enter:nth-child(4) { animation-delay: 150ms; }
+.list-item-enter:nth-child(5) { animation-delay: 200ms; }
 
 /* Respect user's motion preferences - WCAG 2.1 Level AA */
 @media (prefers-reduced-motion: reduce) {
@@ -388,10 +445,34 @@ input[type="date"], input[type="month"], input[type="time"] {
   }
 }
 
+/* Safe area insets for modern devices (notches, home indicators) */
+@supports (padding: max(0px)) {
+  body {
+    /* Handle notch and home indicator on all sides */
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+  }
+
+  /* Ensure content doesn't go behind status bar */
+  .safe-area-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+}
+
 /* Mobile bottom navigation spacing */
 @media (max-width: 640px) {
   body {
-    padding-bottom: 64px;
+    /* Account for bottom nav + safe area (home indicator) */
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Pull-to-refresh visual indicator */
+  .pull-to-refresh-indicator {
+    position: fixed;
+    top: env(safe-area-inset-top, 0);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
   }
   
   /* Compact table cells on mobile for Admin Dashboard */

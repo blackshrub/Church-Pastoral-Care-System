@@ -70,9 +70,13 @@ export const MobileBottomNav = () => {
     <>
       <nav
         className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border sm:hidden"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         data-testid="mobile-bottom-nav"
+        role="navigation"
+        aria-label="Main navigation"
       >
-        <div className="grid grid-cols-5 h-16">
+        {/* min-h-[64px] ensures 44px touch targets + padding */}
+        <div className="grid grid-cols-5 min-h-[64px]">
           {navigation.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.href);
@@ -89,7 +93,7 @@ export const MobileBottomNav = () => {
                 to={item.href}
                 {...(usePrefetch ? { prefetchType } : {})}
                 className={
-                  `flex flex-col items-center justify-center gap-1 transition-colors duration-200 ${
+                  `flex flex-col items-center justify-center gap-1 min-h-[44px] px-1 transition-all duration-200 active:scale-95 ${
                     active
                       ? 'text-teal-600 dark:text-teal-400'
                       : 'text-muted-foreground hover:text-teal-500 dark:hover:text-teal-400'
@@ -97,9 +101,10 @@ export const MobileBottomNav = () => {
                 }
                 data-testid={item.testId}
                 aria-label={item.name}
+                aria-current={active ? 'page' : undefined}
               >
-                <Icon className="h-5 w-5" aria-hidden="true" />
-                <span className="text-xs font-medium">{item.name}</span>
+                <Icon className={`h-6 w-6 transition-transform ${active ? 'scale-110' : ''}`} aria-hidden="true" />
+                <span className={`text-xs font-medium ${active ? 'font-semibold' : ''}`}>{item.name}</span>
               </LinkComponent>
             );
           })}
@@ -108,11 +113,13 @@ export const MobileBottomNav = () => {
           <Sheet open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
             <SheetTrigger asChild>
               <button
-                className="flex flex-col items-center justify-center gap-1 transition-colors duration-200 text-muted-foreground hover:text-teal-500 dark:hover:text-teal-400"
+                className="flex flex-col items-center justify-center gap-1 min-h-[44px] px-1 transition-all duration-200 active:scale-95 text-muted-foreground hover:text-teal-500 dark:hover:text-teal-400"
                 data-testid="nav-more"
                 aria-label={t('more_menu')}
+                aria-haspopup="dialog"
+                aria-expanded={moreMenuOpen}
               >
-                <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
+                <MoreHorizontal className="h-6 w-6" aria-hidden="true" />
                 <span className="text-xs font-medium">{t('more')}</span>
               </button>
             </SheetTrigger>
