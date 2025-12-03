@@ -9,3 +9,4 @@ export {
   useUpdateMemberOptimistic,
   useCreateEventOptimistic,
 } from './useOptimisticMutation';
+export { useConfirmDialog } from './useConfirmDialog';

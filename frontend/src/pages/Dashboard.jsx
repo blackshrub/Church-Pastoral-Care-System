@@ -8,12 +8,16 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
+import { useConfirmDialog } from '@/hooks';
 import LazyImage from '@/components/LazyImage';
 import { MemberAvatar } from '@/components/MemberAvatar';
 import { Link } from 'react-router-dom';
 import { MemberLink } from '@/components/LinkWithPrefetch';
 import api from '@/lib/api';
 import { formatDateToJakarta, formatRelativeTime } from '@/lib/dateUtils';
+import { getGriefStageBadge, getAccidentStageBadge } from '@/lib/utils/badges';
+import { getInitials, formatPhoneForWhatsApp } from '@/lib/utils/formatting';
+import { handleApiError } from '@/lib/utils/errorHandling';
 import { toast } from 'sonner';
 import { format as formatDateFns } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -230,21 +234,8 @@ const markMemberContacted = async (memberId, memberName, user, queryClient, t) =
 export const Dashboard = () => {
   const { t } = useTranslation();
 
-
-  const [confirmDialog, setConfirmDialog] = useState({
-    open: false,
-    title: '',
-    description: '',
-    onConfirm: () => {}
-  });
-  
-  const showConfirm = (title, description, onConfirm) => {
-    setConfirmDialog({ open: true, title, description, onConfirm });
-  };
-  
-  const closeConfirm = () => {
-    setConfirmDialog({ open: false, title: '', description: '', onConfirm: () => {} });
-  };
+  // Use shared confirm dialog hook (eliminates duplicate pattern)
+  const { confirmDialog, showConfirm, closeConfirm } = useConfirmDialog();
 
   const { user } = useAuth();
   const queryClient = useQueryClient();
