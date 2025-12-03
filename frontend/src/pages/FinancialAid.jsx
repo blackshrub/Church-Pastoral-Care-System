@@ -188,7 +188,7 @@ export const FinancialAid = () => {
                         </p>
                       </div>
                       <p className="font-semibold text-green-700">
-                        Rp {recipient.total_amount?.toLocaleString('id-ID')}
+                        Rp {(recipient.total_amount || 0).toLocaleString('id-ID')}
                       </p>
                     </div>
                   </div>
@@ -252,11 +252,11 @@ export const FinancialAid = () => {
                           <p className="font-medium text-sm text-muted-foreground">Unknown Member</p>
                         )}
                         <p className="text-xs text-muted-foreground mt-1 ml-11">
-                          {t(`aid_types.${event.aid_type}`)} - {formatDate(event.event_date, 'dd MMM yyyy')}
+                          {t(`aid_types.${event.aid_type || 'other'}`)} - {formatDate(event.event_date, 'dd MMM yyyy')}
                         </p>
                       </div>
                       <p className="font-semibold text-green-700">
-                        Rp {event.aid_amount?.toLocaleString('id-ID')}
+                        Rp {(event.aid_amount || 0).toLocaleString('id-ID')}
                       </p>
                     </div>
                     {event.aid_notes && (
