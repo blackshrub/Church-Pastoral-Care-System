@@ -515,10 +515,32 @@ UUID_PATTERN = re.compile(r'^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-
 
 # Email validation pattern (RFC 5322 simplified)
 EMAIL_PATTERN = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+# Phone validation: digits only after stripping, reasonable length
+PHONE_PATTERN = re.compile(r'^\+?[0-9]{7,15}$')
 
 def validate_email(email: str) -> bool:
-    """Validate email format using regex"""
+    """Validate email format with additional security checks"""
+    if not email:
+        return False
+    # RFC 5321 length limit
+    if len(email) > 254:
+        return False
+    # Check for consecutive dots (invalid per RFC)
+    if ".." in email:
+        return False
+    # Check for leading/trailing dots in local part
+    local_part = email.split("@")[0] if "@" in email else ""
+    if local_part.startswith(".") or local_part.endswith("."):
+        return False
     return bool(EMAIL_PATTERN.match(email))
+
+def validate_phone(phone: str) -> bool:
+    """Validate phone number format"""
+    if not phone:
+        return True  # Empty phone is allowed (optional field)
+    # Strip common separators for validation
+    cleaned = phone.strip().replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    return bool(PHONE_PATTERN.match(cleaned))
 
 def is_valid_uuid(value: str) -> bool:
     """Check if a string is a valid UUID format."""
@@ -586,6 +608,15 @@ async def get_current_user(request: Request) -> dict:
         )
 
     token = auth_header[7:]  # Remove "Bearer " prefix
+
+    # Validate token is not empty (security: prevents auth bypass with "Bearer " header)
+    if not token or not token.strip():
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED,
+            detail="Token is empty or invalid",
+            extra={"headers": {"WWW-Authenticate": "Bearer"}},
+        )
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
@@ -1091,7 +1122,8 @@ async def get_engagement_settings():
 
         set_in_cache(cache_key, result)
         return result
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to get engagement settings: {str(e)}, using defaults")
         return {"atRiskDays": ENGAGEMENT_AT_RISK_DAYS_DEFAULT, "disconnectedDays": ENGAGEMENT_DISCONNECTED_DAYS_DEFAULT}
 
 async def get_writeoff_settings():
@@ -1117,7 +1149,8 @@ async def get_writeoff_settings():
 
         set_in_cache(cache_key, result)
         return result
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to get writeoff settings: {str(e)}, using defaults")
         return default_settings
 
 async def calculate_engagement_status_async(last_contact: Optional[datetime]) -> tuple[EngagementStatus, int]:
@@ -1911,7 +1944,11 @@ async def upload_user_photo(user_id: str, request: Request, data: UploadFile) ->
             raise HTTPException(status_code=400, detail="Invalid or corrupted image file")
         img = img.convert('RGB')
         img.thumbnail((400, 400), Image.Resampling.LANCZOS)
-        img.save(filepath, 'JPEG', quality=85, optimize=True, progressive=True)
+        try:
+            img.save(filepath, 'JPEG', quality=85, optimize=True, progressive=True)
+        except OSError as e:
+            logger.error(f"Failed to save user photo: {str(e)}")
+            raise HTTPException(status_code=507, detail="Failed to save photo. Disk may be full.")
         
         # Update user record
         photo_url = f"/api/user-photos/{filename}"
@@ -2176,32 +2213,36 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         # Parallel fetch: writeoff settings + all main data sources
         # This reduces 5 sequential DB calls to 1 effective round-trip (100-200ms savings)
         writeoff_task = get_writeoff_settings()
+        # Memory safety: limit to_list() to prevent OOM with large datasets
+        MAX_MEMBERS_LIST = 10000
+        MAX_TASKS_LIST = 5000
+
         members_task = db.members.find(
             {"campus_id": campus_id, "is_archived": {"$ne": True}},
             {"_id": 0, "id": 1, "name": 1, "phone": 1, "photo_url": 1, "birth_date": 1,
              "engagement_status": 1, "days_since_last_contact": 1}
-        ).to_list(None)
+        ).to_list(MAX_MEMBERS_LIST)
         grief_task = db.grief_support.find(
             {"campus_id": campus_id, "completed": False, "ignored": {"$ne": True}},
             {
                 "_id": 0, "id": 1, "member_id": 1, "campus_id": 1, "care_event_id": 1,
                 "stage": 1, "scheduled_date": 1, "completed": 1, "notes": 1
             }
-        ).to_list(None)
+        ).to_list(MAX_TASKS_LIST)
         accident_task = db.accident_followup.find(
             {"campus_id": campus_id, "completed": False, "ignored": {"$ne": True}},
             {
                 "_id": 0, "id": 1, "member_id": 1, "campus_id": 1, "care_event_id": 1,
                 "stage": 1, "scheduled_date": 1, "completed": 1, "notes": 1
             }
-        ).to_list(None)
+        ).to_list(MAX_TASKS_LIST)
         aid_task = db.financial_aid_schedules.find(
             {"campus_id": campus_id, "is_active": True, "ignored": {"$ne": True}},
             {
                 "_id": 0, "id": 1, "member_id": 1, "campus_id": 1, "aid_amount": 1,
                 "frequency": 1, "next_occurrence": 1, "is_active": 1, "notes": 1
             }
-        ).to_list(None)
+        ).to_list(MAX_TASKS_LIST)
 
         # Execute all queries in parallel
         writeoff_settings, members, grief_stages, accident_followups, aid_schedules = await asyncio.gather(
@@ -2483,20 +2524,55 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         logger.error(f"Error calculating dashboard reminders: {str(e)}")
         raise
 
+# Timezone cache to avoid repeated DB lookups
+_timezone_cache: dict[str, tuple[str, float]] = {}
+TIMEZONE_CACHE_TTL = 600  # 10 minutes
+
+# Valid timezones set for validation
+try:
+    from zoneinfo import available_timezones
+    VALID_TIMEZONES = available_timezones()
+except ImportError:
+    VALID_TIMEZONES = {"Asia/Jakarta", "UTC", "America/New_York", "Europe/London"}
+
+def is_valid_timezone(tz_str: str) -> bool:
+    """Validate timezone string"""
+    return tz_str in VALID_TIMEZONES
+
 async def get_campus_timezone(campus_id: str) -> str:
-    """Get campus timezone setting"""
+    """Get campus timezone setting (cached for 10 minutes)"""
+    import time
+
+    # Check cache first
+    if campus_id in _timezone_cache:
+        cached_tz, cached_time = _timezone_cache[campus_id]
+        if time.time() - cached_time < TIMEZONE_CACHE_TTL:
+            return cached_tz
+
     try:
         campus = await db.campuses.find_one({"id": campus_id}, {"_id": 0, "timezone": 1})
-        return campus.get("timezone", "Asia/Jakarta") if campus else "Asia/Jakarta"
-    except Exception:
+        tz = campus.get("timezone", "Asia/Jakarta") if campus else "Asia/Jakarta"
+        # Validate timezone before caching
+        if not is_valid_timezone(tz):
+            logger.warning(f"Invalid timezone '{tz}' for campus {campus_id}, using default")
+            tz = "Asia/Jakarta"
+        _timezone_cache[campus_id] = (tz, time.time())
+        return tz
+    except Exception as e:
+        logger.warning(f"Failed to get campus timezone: {str(e)}, using default")
         return "Asia/Jakarta"
 
 def get_date_in_timezone(timezone_str: str) -> str:
     """Get current date in specified timezone as YYYY-MM-DD string"""
     try:
+        # Validate timezone before use
+        if not is_valid_timezone(timezone_str):
+            logger.warning(f"Invalid timezone '{timezone_str}', using Asia/Jakarta")
+            timezone_str = "Asia/Jakarta"
         tz = ZoneInfo(timezone_str)
         return datetime.now(tz).strftime('%Y-%m-%d')
-    except Exception:
+    except Exception as e:
+        logger.warning(f"Failed to get date in timezone: {str(e)}, using Jakarta")
         return datetime.now(ZoneInfo("Asia/Jakarta")).strftime('%Y-%m-%d')
 
 
@@ -2636,36 +2712,42 @@ async def update_member(member_id: str, data: MemberUpdate, request: Request) ->
     """Update member"""
     current_user = await get_current_user(request)
     try:
+        # Validate UUID format
+        if not is_valid_uuid(member_id):
+            raise HTTPException(status_code=400, detail="Invalid member ID format")
+
         # Verify member belongs to user's campus
         query = {"id": member_id}
         campus_filter = get_campus_filter(current_user)
         if campus_filter:
             query.update(campus_filter)
 
-        member = await db.members.find_one(query, {"_id": 0})
-        if not member:
-            raise HTTPException(status_code=404, detail="Member not found")
-
         update_data = {k: v for k, v in to_mongo_doc(data).items() if v is not None}
 
-        # Normalize phone number if provided
+        # Validate and normalize phone number if provided
         if 'phone' in update_data and update_data['phone']:
+            if not validate_phone(update_data['phone']):
+                raise HTTPException(status_code=400, detail="Invalid phone number format")
             update_data['phone'] = normalize_phone_number(update_data['phone'])
 
         update_data["updated_at"] = datetime.now(timezone.utc)
 
-        result = await db.members.update_one(
-            {"id": member_id},
-            {"$set": update_data}
+        # Use find_one_and_update for single roundtrip (optimized from 3 queries to 1)
+        from pymongo import ReturnDocument
+        updated_member = await db.members.find_one_and_update(
+            query,
+            {"$set": update_data},
+            return_document=ReturnDocument.AFTER,
+            projection={"_id": 0}
         )
 
-        if result.matched_count == 0:
+        if not updated_member:
             raise HTTPException(status_code=404, detail="Member not found")
 
         # Invalidate dashboard cache since member data changed
-        await invalidate_dashboard_cache(member.get("campus_id"))
+        await invalidate_dashboard_cache(updated_member.get("campus_id"))
 
-        return await get_member(member_id, request)
+        return updated_member
     except HTTPException:
         raise
     except Exception as e:
