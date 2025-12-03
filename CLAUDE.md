@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Tech Stack:**
 - Backend: FastAPI (Python 3.11), MongoDB 7.0 (Motor async driver), APScheduler
 - ASGI Server: Granian (Rust-based, faster than Uvicorn)
-- JSON: orjson (2-5x faster serialization)
+- JSON: msgspec (faster than orjson, lower memory)
 - Frontend: React 19 + React Compiler, Vite, TanStack React Query, Shadcn/UI, Tailwind CSS
 - Infrastructure: Docker, Traefik v3.6 (HTTP/3, Brotli compression), Let's Encrypt
 
@@ -853,11 +853,12 @@ git diff <commit1> <commit2>
 - Supports HTTP/1.1 and HTTP/2 (H2C upgrade)
 - Production command: `granian --interface asgi --host 0.0.0.0 --port 8001 --workers 2 --http auto server:app`
 
-**orjson Fast JSON Serialization:**
-- 2-5x faster than standard Python json module
-- Custom `CustomORJSONResponse` class handles MongoDB datetime serialization
+**msgspec Fast JSON Serialization:**
+- Faster than orjson with ~30-50% lower memory usage
+- Custom `CustomMsgspecResponse` class handles MongoDB/BSON type serialization
+- Uses reusable encoder instance for efficiency (`_msgspec_encoder`)
 - Used as default response class for all FastAPI endpoints
-- Handles `datetime`, `date`, and other Python types automatically
+- Handles `datetime`, `date`, `ObjectId`, `Decimal128`, and other types automatically
 
 **Response Compression (Traefik):**
 - Brotli compression enabled (15-25% smaller than gzip)

@@ -7,7 +7,7 @@ Handles all API endpoints, authentication, database operations, and business log
 from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Query, Depends, status, Request, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
-import orjson
+import msgspec.json
 from bson import ObjectId, Decimal128, Binary, Regex
 from bson.errors import InvalidId
 import base64
@@ -29,9 +29,9 @@ from zoneinfo import ZoneInfo
 import asyncio
 
 
-# Custom orjson response class for proper BSON/MongoDB type serialization
-def orjson_default(obj):
-    """Custom serializer for orjson to handle BSON/MongoDB types.
+# Custom msgspec response class for proper BSON/MongoDB type serialization
+def msgspec_enc_hook(obj):
+    """Custom encoder hook for msgspec to handle BSON/MongoDB types.
 
     Handles:
     - datetime/date: ISO 8601 format
@@ -58,19 +58,19 @@ def orjson_default(obj):
         return str(obj)
     if isinstance(obj, bytes):
         return base64.b64encode(obj).decode('utf-8')
-    raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+    raise NotImplementedError(f"Object of type {type(obj)} is not JSON serializable")
 
 
-class CustomORJSONResponse(Response):
-    """Custom ORJSONResponse that handles all BSON/MongoDB types serialization."""
+# Create a reusable encoder instance (more efficient than creating per-request)
+_msgspec_encoder = msgspec.json.Encoder(enc_hook=msgspec_enc_hook)
+
+
+class CustomMsgspecResponse(Response):
+    """Custom Response using msgspec for fast JSON serialization with BSON type support."""
     media_type = "application/json"
 
     def render(self, content) -> bytes:
-        return orjson.dumps(
-            content,
-            default=orjson_default,
-            option=orjson.OPT_NON_STR_KEYS | orjson.OPT_SERIALIZE_NUMPY
-        )
+        return _msgspec_encoder.encode(content)
 
 
 # Jakarta timezone (UTC+7)
@@ -194,8 +194,8 @@ client = AsyncIOMotorClient(
 )
 db = client[os.environ.get('DB_NAME', 'pastoral_care_db')]
 
-# Create the main app with orjson for faster JSON serialization (2-5x faster)
-app = FastAPI(default_response_class=CustomORJSONResponse)
+# Create the main app with msgspec for faster JSON serialization (faster than orjson, lower memory)
+app = FastAPI(default_response_class=CustomMsgspecResponse)
 
 # GZIP compression for responses > 500 bytes (reduces bandwidth by 70-90%)
 from starlette.middleware.gzip import GZipMiddleware
