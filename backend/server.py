@@ -6009,10 +6009,16 @@ async def _compute_monthly_report_data(current_user: dict, year: int = None, mon
             def get_activity_datetime(a):
                 created_at = a.get("created_at")
                 if isinstance(created_at, datetime):
+                    # Ensure timezone-aware (MongoDB stores as UTC)
+                    if created_at.tzinfo is None:
+                        created_at = created_at.replace(tzinfo=timezone.utc)
                     return created_at
                 if isinstance(created_at, str) and created_at:
                     try:
-                        return datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+                        dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+                        if dt.tzinfo is None:
+                            dt = dt.replace(tzinfo=timezone.utc)
+                        return dt
                     except ValueError:
                         return None
                 return None
