@@ -8603,12 +8603,13 @@ async def get_user_photo(filename: str) -> dict:
 # ==================== SEARCH ENDPOINT ====================
 
 @get("/search")
-async def global_search(q: str, request: Request) -> list:
+async def global_search(q: str, request: Request) -> dict:
     """
     Global search across members and care events
     Returns members matching name, phone, email and care events matching title, description
     """
     try:
+        current_user = await get_current_user(request)
         if not q or len(q) < 2:
             return {"members": [], "care_events": []}
 
