@@ -5271,13 +5271,31 @@ async def get_analytics_dashboard(
             {"$group": {"_id": {"$ifNull": ["$engagement_status", "inactive"]}, "count": {"$sum": 1}}}
         ]).to_list(10)
 
+        # Membership aggregation: prefer category (where FaithFlow sync stores data),
+        # fallback to membership_status, then "Unknown"
         membership_agg = await db.members.aggregate([
             {"$match": member_filter},
+            {"$addFields": {
+                "effective_membership": {
+                    "$switch": {
+                        "branches": [
+                            # First try category (FaithFlow stores member_status here)
+                            {"case": {"$and": [
+                                {"$ne": ["$category", None]},
+                                {"$ne": ["$category", ""]}
+                            ]}, "then": "$category"},
+                            # Then try membership_status
+                            {"case": {"$and": [
+                                {"$ne": ["$membership_status", None]},
+                                {"$ne": ["$membership_status", ""]}
+                            ]}, "then": "$membership_status"}
+                        ],
+                        "default": "Unknown"
+                    }
+                }
+            }},
             {"$group": {
-                "_id": {"$ifNull": [
-                    {"$cond": [{"$in": ["$membership_status", [None, ""]]}, "$category", "$membership_status"]},
-                    "Unknown"
-                ]},
+                "_id": "$effective_membership",
                 "count": {"$sum": 1},
                 "total_eng": {"$sum": {"$subtract": [100, {"$min": [{"$ifNull": ["$days_since_last_contact", 100]}, 100]}]}}
             }}
@@ -8125,14 +8143,33 @@ async def sync_members_from_core(request: Request) -> dict:
                     core_id = core_member.get("id")
                     existing = existing_map.get(core_id)
                     
-                    # Prepare member data
+                    # Prepare member data - try multiple common field names for better compatibility
+                    # Membership status: try various common field names from external APIs
+                    membership_status = (
+                        core_member.get("membership_status") or
+                        core_member.get("membershipStatus") or
+                        core_member.get("member_type") or
+                        core_member.get("memberType") or
+                        core_member.get("type") or
+                        core_member.get("status")
+                    )
+                    # Category: try member_status first, then category field
+                    category = (
+                        core_member.get("member_status") or
+                        core_member.get("memberStatus") or
+                        core_member.get("category") or
+                        core_member.get("group") or
+                        core_member.get("classification")
+                    )
+
                     member_data = {
                         "external_member_id": core_id,
-                        "name": core_member.get("full_name"),
-                        "phone": normalize_phone_number(core_member.get("phone_whatsapp", "")) if core_member.get("phone_whatsapp") else None,
-                        "birth_date": core_member.get("date_of_birth"),
+                        "name": core_member.get("full_name") or core_member.get("name"),
+                        "phone": normalize_phone_number(core_member.get("phone_whatsapp", "")) if core_member.get("phone_whatsapp") else (normalize_phone_number(core_member.get("phone", "")) if core_member.get("phone") else None),
+                        "birth_date": core_member.get("date_of_birth") or core_member.get("birthDate") or core_member.get("birth_date"),
                         "gender": core_member.get("gender"),
-                        "category": core_member.get("member_status"),
+                        "membership_status": membership_status,
+                        "category": category,
                         "updated_at": datetime.now(timezone.utc)
                     }
                     
