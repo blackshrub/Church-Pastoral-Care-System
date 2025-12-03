@@ -55,30 +55,24 @@ export const MemberDetail = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   
-  // React Query for member data
+  // React Query for member data with caching
   const { data: memberData, isLoading } = useQuery({
     queryKey: ['member', id],
     queryFn: async () => {
-      const timestamp = Date.now();
-      const cacheHeaders = {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      };
-      
       const [memberRes, eventsRes, griefRes, accidentRes, aidSchedulesRes] = await Promise.all([
-        api.get(`/members/${id}?t=${timestamp}`, { headers: cacheHeaders }),
-        api.get(`/care-events?member_id=${id}&t=${timestamp}`, { headers: cacheHeaders }),
-        api.get(`/grief-support/member/${id}?t=${timestamp}`, { headers: cacheHeaders }),
-        api.get(`/accident-followup/member/${id}?t=${timestamp}`, { headers: cacheHeaders }),
-        api.get(`/financial-aid-schedules/member/${id}?t=${timestamp}`, { headers: cacheHeaders })
+        api.get(`/members/${id}`),
+        api.get(`/care-events?member_id=${id}`),
+        api.get(`/grief-support/member/${id}`),
+        api.get(`/accident-followup/member/${id}`),
+        api.get(`/financial-aid-schedules/member/${id}`)
       ]);
-      
+
       const sortedEvents = (eventsRes.data || []).sort((a, b) => {
         const dateCompare = new Date(b.event_date) - new Date(a.event_date);
         if (dateCompare !== 0) return dateCompare;
         return new Date(b.created_at) - new Date(a.created_at);
       });
-      
+
       return {
         member: memberRes.data,
         careEvents: sortedEvents,
@@ -88,11 +82,8 @@ export const MemberDetail = () => {
       };
     },
     enabled: !!id,
-    onError: (error) => {
-      if (error.response?.status === 404) {
-        toast.error(t('error_messages.member_not_found'));
-      }
-    }
+    staleTime: 1000 * 30, // Data fresh for 30 seconds
+    gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
   });
   
   // Extract data with defaults
