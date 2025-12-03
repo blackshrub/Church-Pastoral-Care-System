@@ -2985,10 +2985,10 @@ async def create_care_event(data: CareEventCreate, request: Request) -> dict:
         
         # Add initial visitation log if hospital visit
         if event.initial_visitation:
-            care_event.visitation_log = [event.msgspec.to_builtins(initial_visitation)]
-        
-        # Serialize for MongoDB (mode='json' ensures enums are serialized as strings)
-        event_dict = care_event.model_dump(mode='json')
+            care_event.visitation_log = [msgspec.to_builtins(event.initial_visitation)]
+
+        # Serialize for MongoDB using msgspec
+        event_dict = msgspec.to_builtins(care_event)
 
         # Log what we're about to save for financial aid events
         if event.event_type == EventType.FINANCIAL_AID:
@@ -4079,8 +4079,8 @@ async def create_aid_schedule(schedule: dict, request: Request) -> dict:
             notes=schedule.get('notes')
         )
         
-        # Serialize for MongoDB (mode='json' ensures enums and dates are serialized properly)
-        schedule_dict = aid_schedule.model_dump(mode='json')
+        # Serialize for MongoDB using msgspec
+        schedule_dict = msgspec.to_builtins(aid_schedule)
         
         await db.financial_aid_schedules.insert_one(schedule_dict)
         
