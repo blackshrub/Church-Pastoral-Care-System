@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { Navigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,14 +20,29 @@ import { Plus, Trash2, Building2, Users as UsersIcon, Shield, MoreVertical, Edit
 export const AdminDashboard = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [campuses, setCampuses] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [campusModalOpen, setCampusModalOpen] = useState(false);
   const [newCampus, setNewCampus] = useState({ id: null, campus_name: '', location: '' });
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
 
+  // Use TanStack Query for data fetching
+  const { data: adminData, isLoading: loading } = useQuery({
+    queryKey: ['admin-data'],
+    queryFn: async () => {
+      const [c, u] = await Promise.all([api.get('/campuses'), api.get('/users')]);
+      return { campuses: c.data, users: u.data };
+    },
+    staleTime: 1000 * 60,
+    enabled: user?.role === 'full_admin',
+  });
+
+  const campuses = adminData?.campuses || [];
+  const users = adminData?.users || [];
+
+  const loadData = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-data'] });
+  };
 
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
@@ -34,33 +50,16 @@ export const AdminDashboard = () => {
     description: '',
     onConfirm: () => {}
   });
-  
+
   const showConfirm = (title, description, onConfirm) => {
     setConfirmDialog({ open: true, title, description, onConfirm });
   };
-  
+
   const closeConfirm = () => {
     setConfirmDialog({ open: false, title: '', description: '', onConfirm: () => {} });
   };
 
   const [newUser, setNewUser] = useState({ email: '', password: '', name: '', phone: '', role: 'pastor', campus_id: '' });
-  
-  useEffect(() => {
-    if (user?.role === 'full_admin') loadData();
-  }, [user]);
-  
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [c, u] = await Promise.all([api.get(`/campuses`), api.get(`/users`)]);
-      setCampuses(c.data);
-      setUsers(u.data);
-    } catch (error) {
-      toast.error(t('toasts.failed_load'));
-    } finally {
-      setLoading(false);
-    }
-  };
   
   const handleAddCampus = async (e) => {
     e.preventDefault();

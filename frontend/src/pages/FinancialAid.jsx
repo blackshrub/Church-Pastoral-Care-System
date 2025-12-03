@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { formatDate } from '@/lib/dateUtils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,47 +62,42 @@ const MemberNameWithPhoto = ({ member, memberId }) => {
 
 export const FinancialAid = () => {
   const { t } = useTranslation();
-  const [summary, setSummary] = useState(null);
-  const [aidEvents, setAidEvents] = useState([]);
   const [recipients, setRecipients] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
-  
-  useEffect(() => {
-    loadFinancialAidData();
-  }, []);
-  
-  const loadFinancialAidData = async () => {
-    try {
-      setLoading(true);
+
+  // Use TanStack Query for data fetching - leverages prefetched cache from route loader
+  const { data: financialData, isLoading: loading } = useQuery({
+    queryKey: ['financial-aid-data'],
+    queryFn: async () => {
       const [summaryRes, eventsRes, membersRes] = await Promise.all([
         api.get('/financial-aid/summary'),
         api.get('/care-events?event_type=financial_aid'),
-        api.get('/members?limit=1000') // Get all members for photo mapping
+        api.get('/members?limit=1000')
       ]);
-      
-      setSummary(summaryRes.data);
-      
+
       // Add member photos to events
       const memberMap = {};
-      membersRes.data.forEach(m => memberMap[m.id] = { 
-        name: m.name, 
-        photo_url: m.photo_url 
+      membersRes.data.forEach(m => memberMap[m.id] = {
+        name: m.name,
+        photo_url: m.photo_url
       });
-      
+
       const eventsWithPhotos = eventsRes.data.map(event => ({
         ...event,
         member_photo_url: memberMap[event.member_id]?.photo_url
       }));
-      
-      setAidEvents(eventsWithPhotos);
-    } catch (error) {
-      console.error('Error loading financial aid:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  
+
+      return {
+        summary: summaryRes.data,
+        aidEvents: eventsWithPhotos
+      };
+    },
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+
+  const summary = financialData?.summary;
+  const aidEvents = financialData?.aidEvents || [];
+
   const loadRecipients = async () => {
     try {
       setLoadingRecipients(true);
@@ -113,7 +109,7 @@ export const FinancialAid = () => {
       setLoadingRecipients(false);
     }
   };
-  
+
   if (loading) {
     return <div className="space-y-6 max-w-full"><Skeleton className="h-96 w-full" /></div>;
   }

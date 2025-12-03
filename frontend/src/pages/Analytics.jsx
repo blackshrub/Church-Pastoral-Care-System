@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,37 +18,25 @@ const COLORS = {
 
 export const Analytics = () => {
   const { t } = useTranslation();
-  const [data, setData] = useState(null);
   const [timeRange, setTimeRange] = useState('all');
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('demographics');
 
-  useEffect(() => {
-    loadAnalytics();
-  }, [timeRange]);
-
-  const loadAnalytics = async () => {
-    try {
-      setLoading(true);
-
-      // Build query params
+  // Use TanStack Query for data fetching - leverages prefetched cache from route loader
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['analytics-dashboard', timeRange, customStartDate, customEndDate],
+    queryFn: async () => {
       const params = new URLSearchParams({ time_range: timeRange });
       if (timeRange === 'custom' && customStartDate && customEndDate) {
         params.append('start_date', customStartDate);
         params.append('end_date', customEndDate);
       }
-
-      // Single optimized API call - all aggregation done server-side
       const response = await api.get(`/analytics/dashboard?${params}`);
-      setData(response.data);
-    } catch (error) {
-      console.error('Error loading analytics:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return response.data;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
   if (loading || !data) {
     return <div className="space-y-6 max-w-full"><Skeleton className="h-96 w-full" /></div>;

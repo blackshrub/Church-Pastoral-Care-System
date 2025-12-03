@@ -115,92 +115,112 @@ export const memberDetailLoader = async ({ params }) => {
 };
 
 /**
- * Analytics loader - prefetches analytics data
+ * Analytics loader - prefetches analytics dashboard data
  */
 export const analyticsLoader = async () => {
   if (!isAuthenticated()) return null;
 
-  await Promise.allSettled([
-    safePrefetch(
-      ['analytics-demographics'],
-      () => api.get('/analytics/demographic-trends').then(res => res.data),
-      { staleTime: 1000 * 60 * 5 }
-    ),
-    safePrefetch(
-      ['analytics-grief'],
-      () => api.get('/analytics/grief-completion-rate').then(res => res.data),
-      { staleTime: 1000 * 60 * 5 }
-    ),
-    safePrefetch(
-      ['financial-aid-summary'],
-      () => api.get('/financial-aid/summary').then(res => res.data),
-      { staleTime: 1000 * 60 * 5 }
-    ),
-  ]);
+  // Prefetch with default time_range='all' to match component's initial state
+  await safePrefetch(
+    ['analytics-dashboard', 'all', '', ''],
+    () => api.get('/analytics/dashboard?time_range=all').then(res => res.data),
+    { staleTime: 1000 * 60 * 5 }
+  );
 
   return null;
 };
 
 /**
- * Financial aid loader
+ * Financial aid loader - prefetches all financial aid data in parallel
  */
 export const financialAidLoader = async () => {
   if (!isAuthenticated()) return null;
 
-  await Promise.allSettled([
-    safePrefetch(
-      ['financial-aid-summary'],
-      () => api.get('/financial-aid/summary').then(res => res.data),
-      { staleTime: 1000 * 60 }
-    ),
-    safePrefetch(
-      ['financial-aid-schedules'],
-      () => api.get('/financial-aid-schedules').then(res => res.data),
-      { staleTime: 1000 * 60 }
-    ),
-  ]);
+  await safePrefetch(
+    ['financial-aid-data'],
+    async () => {
+      const [summaryRes, eventsRes, membersRes] = await Promise.all([
+        api.get('/financial-aid/summary'),
+        api.get('/care-events?event_type=financial_aid'),
+        api.get('/members?limit=1000')
+      ]);
+
+      const memberMap = {};
+      membersRes.data.forEach(m => memberMap[m.id] = {
+        name: m.name,
+        photo_url: m.photo_url
+      });
+
+      const eventsWithPhotos = eventsRes.data.map(event => ({
+        ...event,
+        member_photo_url: memberMap[event.member_id]?.photo_url
+      }));
+
+      return {
+        summary: summaryRes.data,
+        aidEvents: eventsWithPhotos
+      };
+    },
+    { staleTime: 1000 * 60 * 2 }
+  );
 
   return null;
 };
 
 /**
- * Admin loader - prefetches users and campuses
+ * Admin loader - prefetches users and campuses together
  */
 export const adminLoader = async () => {
   if (!isAuthenticated()) return null;
 
-  await Promise.allSettled([
-    safePrefetch(
-      ['admin-users'],
-      () => api.get('/users').then(res => res.data),
-      { staleTime: 1000 * 60 }
-    ),
-    safePrefetch(
-      ['campuses'],
-      () => api.get('/campuses').then(res => res.data),
-      { staleTime: 1000 * 60 * 5 }
-    ),
-  ]);
+  await safePrefetch(
+    ['admin-data'],
+    async () => {
+      const [c, u] = await Promise.all([api.get('/campuses'), api.get('/users')]);
+      return { campuses: c.data, users: u.data };
+    },
+    { staleTime: 1000 * 60 }
+  );
 
   return null;
 };
 
 /**
- * Activity log loader
+ * Activity log loader - prefetches with default filter values
  */
 export const activityLogLoader = async () => {
   if (!isAuthenticated()) return null;
 
+  // Calculate default date range (30 days ago to today)
+  const endDate = new Date().toISOString().split('T')[0];
+  const startDateObj = new Date();
+  startDateObj.setDate(startDateObj.getDate() - 30);
+  const startDate = startDateObj.toISOString().split('T')[0];
+
   await Promise.allSettled([
     safePrefetch(
-      ['activity-logs', { page: 1 }],
-      () => api.get('/activity-logs?page=1&limit=50').then(res => res.data),
+      ['activity-logs', 'all', 'all', startDate, endDate],
+      async () => {
+        const params = new URLSearchParams();
+        params.append('start_date', new Date(startDate).toISOString());
+        const endDateTime = new Date(endDate);
+        endDateTime.setHours(23, 59, 59, 999);
+        params.append('end_date', endDateTime.toISOString());
+        params.append('limit', '200');
+        const response = await api.get(`/activity-logs?${params.toString()}`);
+        return response.data;
+      },
       { staleTime: 1000 * 30 }
     ),
     safePrefetch(
       ['activity-logs-summary'],
       () => api.get('/activity-logs/summary').then(res => res.data),
       { staleTime: 1000 * 60 }
+    ),
+    safePrefetch(
+      ['users-list'],
+      () => api.get('/users').then(res => res.data),
+      { staleTime: 1000 * 60 * 5 }
     ),
   ]);
 

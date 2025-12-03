@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { Calendar, Download, Filter, User, Activity, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,19 +16,47 @@ import { Input } from '@/components/ui/input';
 
 const ActivityLog = () => {
   const { t } = useTranslation();
-  const [logs, setLogs] = useState([]);
-  const [summary, setSummary] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [campusTimezone, setCampusTimezone] = useState(
     import.meta.env.VITE_TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
-  );  // Default to env var or browser timezone, will load from API
-  
+  );
+
   // Filters
   const [selectedUser, setSelectedUser] = useState('all');
   const [selectedAction, setSelectedAction] = useState('all');
   const [startDate, setStartDate] = useState(getDefaultStartDate());
   const [endDate, setEndDate] = useState(getDefaultEndDate());
+
+  // Use TanStack Query for data fetching
+  const { data: logs = [], isLoading: loading } = useQuery({
+    queryKey: ['activity-logs', selectedUser, selectedAction, startDate, endDate],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (selectedUser !== 'all') params.append('user_id', selectedUser);
+      if (selectedAction !== 'all') params.append('action_type', selectedAction);
+      if (startDate) params.append('start_date', new Date(startDate).toISOString());
+      if (endDate) {
+        const endDateTime = new Date(endDate);
+        endDateTime.setHours(23, 59, 59, 999);
+        params.append('end_date', endDateTime.toISOString());
+      }
+      params.append('limit', '200');
+      const response = await api.get(`/activity-logs?${params.toString()}`);
+      return response.data;
+    },
+    staleTime: 1000 * 30,
+  });
+
+  const { data: summary } = useQuery({
+    queryKey: ['activity-logs-summary'],
+    queryFn: () => api.get('/activity-logs/summary').then(res => res.data),
+    staleTime: 1000 * 60,
+  });
+
+  const { data: users = [] } = useQuery({
+    queryKey: ['users-list'],
+    queryFn: () => api.get('/users').then(res => res.data),
+    staleTime: 1000 * 60 * 5,
+  });
 
   // Format date/time using campus timezone - Fix UTC timestamp handling
   const formatDateTime = (dateString) => {
@@ -114,56 +143,6 @@ const ActivityLog = () => {
     return new Date().toISOString().split('T')[0];
   }
 
-  useEffect(() => {
-    fetchSummary();
-    fetchAllUsers();
-  }, []);
-
-  useEffect(() => {
-    fetchLogs();
-  }, [selectedUser, selectedAction, startDate, endDate]);
-
-  const fetchLogs = async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams();
-
-      if (selectedUser !== 'all') params.append('user_id', selectedUser);
-      if (selectedAction !== 'all') params.append('action_type', selectedAction);
-      if (startDate) params.append('start_date', new Date(startDate).toISOString());
-      if (endDate) {
-        const endDateTime = new Date(endDate);
-        endDateTime.setHours(23, 59, 59, 999);
-        params.append('end_date', endDateTime.toISOString());
-      }
-      params.append('limit', '200');
-
-      const response = await api.get(`/activity-logs?${params.toString()}`);
-      setLogs(response.data);
-    } catch (error) {
-      console.error('Error fetching logs:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchSummary = async () => {
-    try {
-      const response = await api.get('/activity-logs/summary');
-      setSummary(response.data);
-    } catch (error) {
-      console.error('Error fetching summary:', error);
-    }
-  };
-
-  const fetchAllUsers = async () => {
-    try {
-      const response = await api.get('/users');
-      setUsers(response.data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
 
   const exportToCSV = () => {
     // CSV headers
