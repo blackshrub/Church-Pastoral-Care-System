@@ -8841,7 +8841,7 @@ cors_config = CORSConfig(
     allow_credentials=True,
     allow_origins=cors_origins_list,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    allow_headers=["Authorization", "Content-Type", "X-Requested-With"],
+    allow_headers=["Authorization", "Content-Type", "X-Requested-With", "Cache-Control", "Pragma"],
     expose_headers=["X-Total-Count"],
 )
 
