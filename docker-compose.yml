@@ -119,7 +119,7 @@ services:
       - "traefik.http.middlewares.backend-compress.compress.minresponsebodybytes=256"
       # CORS headers middleware
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,POST,PUT,DELETE,OPTIONS,PATCH"
-      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=Authorization,Content-Type,X-Requested-With"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=https://${DOMAIN}"
       - "traefik.http.middlewares.backend-cors.headers.accesscontrolmaxage=86400"
       - "traefik.http.middlewares.backend-cors.headers.addvaryheader=true"
