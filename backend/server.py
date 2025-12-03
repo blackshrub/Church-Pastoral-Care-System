@@ -8096,20 +8096,32 @@ async def sync_members_from_core(current_user: dict = Depends(get_current_user))
         raise HTTPException(status_code=500, detail=safe_error_detail(e))
 
 @api_router.get("/sync/logs")
-async def get_sync_logs(current_user: dict = Depends(get_current_user), limit: int = 20):
-    """Get sync history logs"""
+async def get_sync_logs(
+    current_user: dict = Depends(get_current_user),
+    limit: int = 5,
+    skip: int = 0
+):
+    """Get sync history logs with pagination"""
     try:
         campus_id = current_user.get("campus_id")
         if not campus_id:
-            return []
-        
+            return {"logs": [], "total": 0, "has_more": False}
+
+        # Get total count
+        total = await db.sync_logs.count_documents({"campus_id": campus_id})
+
+        # Get paginated logs
         logs = await db.sync_logs.find(
             {"campus_id": campus_id},
             {"_id": 0}
-        ).sort("started_at", -1).limit(limit).to_list(limit)
-        
-        return logs
-    
+        ).sort("started_at", -1).skip(skip).limit(limit).to_list(limit)
+
+        return {
+            "logs": logs,
+            "total": total,
+            "has_more": skip + len(logs) < total
+        }
+
     except Exception as e:
         logger.error(f"Error getting sync logs: {str(e)}")
         raise HTTPException(status_code=500, detail=safe_error_detail(e))

@@ -229,6 +229,10 @@ export const Settings = () => {
     is_enabled: false
   });
   const [syncLogs, setSyncLogs] = useState([]);
+  const [syncLogsTotal, setSyncLogsTotal] = useState(0);
+  const [syncLogsPage, setSyncLogsPage] = useState(0);
+  const [syncLogsHasMore, setSyncLogsHasMore] = useState(false);
+  const SYNC_LOGS_PER_PAGE = 5;
   const [availableFields, setAvailableFields] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [discovering, setDiscovering] = useState(false);
@@ -256,13 +260,14 @@ export const Settings = () => {
     }
   };
   
-  const loadSyncLogs = async () => {
+  const loadSyncLogs = async (page = 0) => {
     try {
-      // Debug: console.log('Loading sync logs...');
-      const response = await api.get(`/sync/logs?limit=10`);
-      // Debug: console.log('Sync logs response:', response.data);
-      setSyncLogs(response.data);
-      // Debug: console.log('Sync logs set to state:', response.data.length, 'logs');
+      const skip = page * SYNC_LOGS_PER_PAGE;
+      const response = await api.get(`/sync/logs?limit=${SYNC_LOGS_PER_PAGE}&skip=${skip}`);
+      setSyncLogs(response.data.logs || []);
+      setSyncLogsTotal(response.data.total || 0);
+      setSyncLogsHasMore(response.data.has_more || false);
+      setSyncLogsPage(page);
     } catch (error) {
       console.error('Error loading sync logs:', error);
     }
@@ -1659,48 +1664,83 @@ export const Settings = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle>Sync History</CardTitle>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Sync History</span>
+                  {syncLogsTotal > 0 && (
+                    <span className="text-sm font-normal text-muted-foreground">
+                      {syncLogsTotal} total
+                    </span>
+                  )}
+                </CardTitle>
                 <CardDescription>Recent sync operations and their results</CardDescription>
               </CardHeader>
               <CardContent>
                 {syncLogs.length === 0 ? (
                   <p className="text-sm text-gray-500 text-center py-4">No sync history yet</p>
                 ) : (
-                  <div className="space-y-2">
-                    {syncLogs.map((log) => (
-                      <div key={log.id} className={`p-3 rounded border ${
-                        log.status === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-                      }`}>
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">
-                              {log.sync_type.charAt(0).toUpperCase() + log.sync_type.slice(1)} Sync
-                            </p>
-                            <p className="text-xs text-gray-600">
-                              {formatToJakarta(log.started_at)} 
-                              {log.duration_seconds && ` • ${log.duration_seconds.toFixed(1)}s`}
-                            </p>
-                          </div>
-                          <div className="text-right text-xs">
-                            {log.status === 'success' ? (
-                              <>
-                                <p className="text-green-700">✓ Success</p>
-                                <p className="text-gray-600">
-                                  {log.members_created} created, {log.members_updated} updated
-                                  {log.members_archived > 0 && `, ${log.members_archived} archived`}
-                                </p>
-                              </>
-                            ) : (
-                              <>
-                                <p className="text-red-700">✗ Failed</p>
-                                <p className="text-gray-600">{log.error_message}</p>
-                              </>
-                            )}
+                  <>
+                    <div className="space-y-2">
+                      {syncLogs.map((log) => (
+                        <div key={log.id} className={`p-3 rounded border ${
+                          log.status === 'success' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                        }`}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">
+                                {log.sync_type.charAt(0).toUpperCase() + log.sync_type.slice(1)} Sync
+                              </p>
+                              <p className="text-xs text-gray-600">
+                                {formatToJakarta(log.started_at)}
+                                {log.duration_seconds && ` • ${log.duration_seconds.toFixed(1)}s`}
+                              </p>
+                            </div>
+                            <div className="text-right text-xs">
+                              {log.status === 'success' ? (
+                                <>
+                                  <p className="text-green-700">✓ Success</p>
+                                  <p className="text-gray-600">
+                                    {log.members_created} created, {log.members_updated} updated
+                                    {log.members_archived > 0 && `, ${log.members_archived} archived`}
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="text-red-700">✗ Failed</p>
+                                  <p className="text-gray-600">{log.error_message}</p>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
+                      ))}
+                    </div>
+                    {/* Pagination controls */}
+                    {syncLogsTotal > SYNC_LOGS_PER_PAGE && (
+                      <div className="flex items-center justify-between mt-4 pt-3 border-t">
+                        <p className="text-xs text-muted-foreground">
+                          Showing {syncLogsPage * SYNC_LOGS_PER_PAGE + 1}-{Math.min((syncLogsPage + 1) * SYNC_LOGS_PER_PAGE, syncLogsTotal)} of {syncLogsTotal}
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => loadSyncLogs(syncLogsPage - 1)}
+                            disabled={syncLogsPage === 0}
+                          >
+                            Previous
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => loadSyncLogs(syncLogsPage + 1)}
+                            disabled={!syncLogsHasMore}
+                          >
+                            Next
+                          </Button>
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
                 )}
               </CardContent>
             </Card>
