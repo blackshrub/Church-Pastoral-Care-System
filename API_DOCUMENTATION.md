@@ -14,6 +14,7 @@
 - [Members](#members)
 - [Care Events](#care-events)
 - [Dashboard](#dashboard)
+- [Real-Time Activity Stream (SSE)](#real-time-activity-stream-sse)
 - [Activity Logs](#activity-logs)
 - [Campuses](#campuses)
 - [Users](#users)
@@ -380,6 +381,87 @@ Authorization: Bearer {token}
   "total_members": 150
 }
 ```
+
+---
+
+## Real-Time Activity Stream (SSE)
+
+FaithTracker supports real-time team activity updates via Server-Sent Events (SSE).
+
+### Connect to Activity Stream
+```http
+GET /stream/activity?token={jwt_token}
+Accept: text/event-stream
+```
+
+**Note:** EventSource doesn't support custom headers, so JWT token is passed via query parameter.
+
+**Event Types:**
+
+| Event | Description |
+|-------|-------------|
+| `heartbeat` | Keep-alive ping (every 30 seconds) |
+| `activity` | New activity from a team member |
+
+**Activity Event Data:**
+```json
+{
+  "id": "log-001",
+  "campus_id": "campus-001",
+  "user_id": "user-001",
+  "user_name": "Pastor John",
+  "user_photo_url": "/api/uploads/users/john.jpg",
+  "action_type": "complete",
+  "member_id": "member-001",
+  "member_name": "Jane Doe",
+  "care_event_id": "event-001",
+  "event_type": "birthday",
+  "notes": "Called and wished happy birthday",
+  "timestamp": "2024-01-15T10:30:00+07:00"
+}
+```
+
+**Action Types:**
+| Action | Description |
+|--------|-------------|
+| `complete` | Task marked as done |
+| `ignore` | Task skipped |
+| `create_event` | New care event created |
+| `update_event` | Care event modified |
+| `delete_event` | Care event removed |
+| `create_member` | New member added |
+| `update_member` | Member profile updated |
+| `delete_member` | Member removed |
+| `complete_stage` | Grief/accident stage completed |
+| `ignore_stage` | Grief/accident stage skipped |
+| `undo_stage` | Grief/accident stage undone |
+| `send_reminder` | WhatsApp reminder sent |
+| `distribute_aid` | Financial aid distributed |
+
+**JavaScript Example:**
+```javascript
+const token = 'your-jwt-token';
+const eventSource = new EventSource(`/stream/activity?token=${encodeURIComponent(token)}`);
+
+eventSource.addEventListener('activity', (event) => {
+  const activity = JSON.parse(event.data);
+  console.log(`${activity.user_name} completed a task for ${activity.member_name}`);
+});
+
+eventSource.addEventListener('heartbeat', () => {
+  console.log('Connection alive');
+});
+
+eventSource.onerror = () => {
+  console.log('Connection lost, will auto-reconnect');
+};
+```
+
+**Notes:**
+- Activities are filtered to exclude the connected user's own actions
+- Stream only shows activities from the same campus
+- Connection auto-reconnects on failure (browser handles this)
+- Traefik must have compression disabled for SSE endpoints
 
 ---
 

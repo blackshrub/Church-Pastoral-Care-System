@@ -409,6 +409,81 @@ All queries automatically filter by `church_id` to ensure data isolation between
 
 ### Key Features
 
+**Real-Time Activity Stream (SSE):**
+Live team collaboration via Server-Sent Events:
+- **Backend:** `stream_activity` endpoint in `server.py` broadcasts activities
+- **Frontend:** `useActivityStream.js` hook manages SSE connection
+- **Component:** `LiveActivityFeed.jsx` displays real-time updates
+- **Features:**
+  - Auto-reconnect with exponential backoff
+  - JWT auth via query parameter (EventSource doesn't support headers)
+  - Activity types: complete, ignore, create_event, delete_event, etc.
+  - Filters out own user's activities in real-time stream
+  - Loads recent activities from REST API on mount
+- **Traefik config:** SSE router has compression disabled (required for streaming)
+
+```javascript
+// Frontend usage
+const { isConnected, activities } = useActivityStream({
+  onActivity: (activity) => toast(`${activity.user_name} completed a task`)
+});
+```
+
+**View Transitions API:**
+Native-like page transitions for smooth UX:
+- **Hook:** `src/hooks/useViewTransition.js` - Programmatic navigation with transitions
+- **Component:** `src/components/LinkWithPrefetch.jsx` - Links with auto-transitions
+- **Features:**
+  - Fade and slide animations between pages
+  - Respects `prefers-reduced-motion`
+  - Automatic fallback on unsupported browsers
+  - `withViewTransition()` utility for non-navigation DOM updates
+
+```javascript
+// Programmatic navigation with transition
+const { navigate, isTransitioning } = useViewTransition();
+navigate('/members/123');
+```
+
+**Smart Link Prefetching:**
+Data loads before user clicks for instant navigation:
+- **Hook:** `src/hooks/usePrefetch.js` - TanStack Query prefetch functions
+- **Component:** `LinkWithPrefetch.jsx` - Auto-prefetch on hover/focus
+- **Features:**
+  - Hover-to-prefetch (100ms delay before cancel)
+  - Route-aware prefetching (knows data needs per route)
+  - Cancels prefetch on mouse leave
+  - Convenience wrappers: `MemberLink`, `DashboardLink`
+
+```jsx
+<LinkWithPrefetch to={`/members/${id}`} prefetchType="member" prefetchId={id}>
+  View Member
+</LinkWithPrefetch>
+```
+
+**Offline-First Sync Queue:**
+Work without internet, sync when connected:
+- **Library:** `src/lib/offlineQueue.js` - IndexedDB-backed operation queue
+- **Hook:** `src/hooks/useOfflineSync.js` - React integration with TanStack Query
+- **Component:** `src/components/SyncStatusIndicator.jsx` - Visual pending count
+- **Features:**
+  - Operations persist through page refresh and browser restart
+  - Auto-sync when coming back online
+  - Retry with exponential backoff (max 3 retries)
+  - Visual indicator showing pending operations
+  - Conflict resolution
+
+```javascript
+const { isOnline, pendingCount, queueOperation } = useOfflineSync();
+
+// Queue operation for later sync
+await queueOperation({
+  type: 'COMPLETE_EVENT',
+  endpoint: '/care-events/123/complete',
+  method: 'POST'
+});
+```
+
 **Grief Support Auto-Timeline:**
 When creating a grief/loss event, the system automatically generates 6 follow-up events:
 1. Mourning service (immediate)
@@ -477,12 +552,28 @@ frontend/
 │   │   └── ...
 │   ├── components/
 │   │   ├── ui/                  # Shadcn/UI components (button, card, etc.)
+│   │   ├── dashboard/           # Dashboard-specific components
+│   │   │   ├── LiveActivityFeed.jsx    # Real-time SSE activity stream
+│   │   │   ├── DashboardStats.jsx      # Stats cards
+│   │   │   └── TaskCard.jsx            # Reusable task card
+│   │   ├── LinkWithPrefetch.jsx        # Smart links with prefetch + transitions
+│   │   ├── SyncStatusIndicator.jsx     # Offline queue status
 │   │   ├── Layout.js            # Main layout wrapper
 │   │   ├── DesktopSidebar.js    # Desktop navigation
 │   │   ├── MobileBottomNav.js   # Mobile navigation
 │   │   └── ...
+│   ├── hooks/                   # Custom React hooks
+│   │   ├── useActivityStream.js # SSE real-time activity feed
+│   │   ├── useViewTransition.js # View Transitions API wrapper
+│   │   ├── usePrefetch.js       # TanStack Query prefetching
+│   │   ├── useOfflineSync.js    # Offline-first mutations
+│   │   └── useDebounce.js       # Input debouncing
+│   ├── lib/                     # Utilities
+│   │   ├── offlineQueue.js      # IndexedDB sync queue
+│   │   ├── api.js               # Axios instance with auth
+│   │   └── dateUtils.js         # Date formatting helpers
 │   ├── context/
-│   │   └── AuthContext.js       # Authentication state
+│   │   └── AuthContext.jsx      # Authentication state + token
 │   ├── locales/
 │   │   ├── en.json              # English translations
 │   │   └── id.json              # Indonesian translations
@@ -490,7 +581,7 @@ frontend/
 │   └── i18n.js                  # i18next configuration
 ├── package.json                 # Uses yarn
 ├── tailwind.config.js           # Tailwind CSS config
-└── craco.config.js              # Create React App overrides
+└── vite.config.js               # Vite build configuration
 ```
 
 ### Mobile (Expo/React Native)
