@@ -38,7 +38,17 @@
   "completed": "Completed",
   "submit": "Submit",
   "close": "Close",
-  
+
+  "_comment_bulk": "Bulk Operations",
+  "bulk": {
+    "selected": "{{count}} selected",
+    "select_mode": "Select",
+    "exit_select": "Exit Select",
+    "complete_all": "Complete",
+    "ignore_all": "Ignore",
+    "delete_all": "Delete"
+  },
+
   "_comment_fields": "Form Fields",
   "member_name": "Member Name",
   "phone_number": "Phone Number/WhatsApp",

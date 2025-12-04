@@ -9323,18 +9323,20 @@ async def activity_event_generator(campus_id: str, user_id: str):
         await unsubscribe_from_activities(campus_id, queue)
 
 @get("/stream/activity")
-async def stream_activity(request: Request) -> Stream:
+async def stream_activity(request: Request, token: Optional[str] = None) -> Stream:
     """
     Server-Sent Events endpoint for real-time activity updates.
 
     Streams activity events (task completions, new events, etc.) to connected clients.
     Events are scoped by campus_id for multi-tenant isolation.
 
+    Supports authentication via:
+    - Authorization header (Bearer token)
+    - Query parameter (?token=xxx) - for EventSource which doesn't support headers
+
     Usage (JavaScript):
     ```js
-    const eventSource = new EventSource('/api/stream/activity', {
-      headers: { 'Authorization': 'Bearer <token>' }
-    });
+    const eventSource = new EventSource('/api/stream/activity?token=' + authToken);
 
     eventSource.addEventListener('activity', (e) => {
       const activity = JSON.parse(e.data);
@@ -9343,7 +9345,30 @@ async def stream_activity(request: Request) -> Stream:
     ```
     """
     try:
-        current_user = await get_current_user(request)
+        # Try to get user from header first, then from query param
+        current_user = None
+        try:
+            current_user = await get_current_user(request)
+        except:
+            pass
+
+        # If no user from header, try query param token
+        if not current_user and token:
+            try:
+                payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+                user_id = payload.get("sub")
+                if user_id:
+                    user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+                    if user_doc:
+                        current_user = user_doc
+            except jwt.ExpiredSignatureError:
+                raise HTTPException(status_code=401, detail="Token expired")
+            except jwt.InvalidTokenError:
+                raise HTTPException(status_code=401, detail="Invalid token")
+
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Authentication required")
+
         campus_id = current_user.get("campus_id") or "global"
         user_id = current_user.get("id", "")
 
@@ -9357,6 +9382,8 @@ async def stream_activity(request: Request) -> Stream:
             }
         )
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error starting activity stream: {str(e)}")
         raise HTTPException(status_code=500, detail=safe_error_detail(e))

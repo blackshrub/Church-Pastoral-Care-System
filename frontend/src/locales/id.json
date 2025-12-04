@@ -38,7 +38,17 @@
   "completed": "Selesai",
   "submit": "Kirim",
   "close": "Tutup",
-  
+
+  "_comment_bulk": "Bulk Operations",
+  "bulk": {
+    "selected": "{{count}} dipilih",
+    "select_mode": "Pilih",
+    "exit_select": "Batal Pilih",
+    "complete_all": "Selesai",
+    "ignore_all": "Abaikan",
+    "delete_all": "Hapus"
+  },
+
   "_comment_fields": "Form Fields",
   "member_name": "Nama Jemaat",
   "phone_number": "Nomor Telepon/WhatsApp",

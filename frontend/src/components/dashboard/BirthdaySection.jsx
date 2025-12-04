@@ -44,7 +44,11 @@ export const BirthdaySection = ({
   birthdays = [],
   title = 'Birthdays Today',
   icon = '🎂',
-  borderClass = 'card-border-left-amber'
+  borderClass = 'card-border-left-amber',
+  // Bulk selection props
+  selectable = false,
+  isSelected,
+  onSelectionChange,
 }) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -77,6 +81,9 @@ export const BirthdaySection = ({
               completedLabel={t('completed')}
               contactLabel={t('contact_whatsapp')}
               triggerHaptic={triggerHaptic}
+              selectable={selectable}
+              selected={isSelected ? isSelected(event.id) : false}
+              onSelectionChange={onSelectionChange}
             >
               {event.completed
                 ? "✅ Birthday contact completed"

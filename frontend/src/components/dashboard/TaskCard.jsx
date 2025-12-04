@@ -7,6 +7,7 @@ import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { MemberAvatar } from '@/components/MemberAvatar';
 import { Check } from 'lucide-react';
 
@@ -35,18 +36,34 @@ export const TaskCard = memo(({
   actionLabel = 'Mark Complete',
   completedLabel = 'Completed',
   contactLabel = 'Contact WhatsApp',
-  triggerHaptic = () => {}
+  triggerHaptic = () => {},
+  // Bulk selection props
+  selectable = false,
+  selected = false,
+  onSelectionChange,
 }) => {
   return (
     <article
-      className={`p-4 ${config.bgClass} rounded-lg border ${config.borderClass} relative hover:shadow-lg transition-all`}
+      className={`p-4 ${config.bgClass} rounded-lg border ${selected ? 'border-teal-500 ring-2 ring-teal-200' : config.borderClass} relative hover:shadow-lg transition-all`}
       aria-label={`Task for ${event.member_name}${event.days_overdue > 0 ? `, ${event.days_overdue} days overdue` : ''}`}
     >
       {/* Overdue Badge - Top Right */}
       {event.days_overdue > 0 && (
-        <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10" aria-hidden="true">
+        <span className={`absolute top-3 ${selectable ? 'right-10' : 'right-3'} px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10`} aria-hidden="true">
           {event.days_overdue}d overdue
         </span>
+      )}
+
+      {/* Selection Checkbox - Top Right */}
+      {selectable && (
+        <div className="absolute top-3 right-3 z-10">
+          <Checkbox
+            checked={selected}
+            onCheckedChange={() => onSelectionChange && onSelectionChange(event.id)}
+            className="h-5 w-5 border-2 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+            aria-label={`Select task for ${event.member_name}`}
+          />
+        </div>
       )}
 
       <div className="flex items-start gap-3 mb-3">
@@ -151,7 +168,11 @@ TaskCard.propTypes = {
   actionLabel: PropTypes.string,
   completedLabel: PropTypes.string,
   contactLabel: PropTypes.string,
-  triggerHaptic: PropTypes.func
+  triggerHaptic: PropTypes.func,
+  // Bulk selection
+  selectable: PropTypes.bool,
+  selected: PropTypes.bool,
+  onSelectionChange: PropTypes.func,
 };
 
 export default TaskCard;

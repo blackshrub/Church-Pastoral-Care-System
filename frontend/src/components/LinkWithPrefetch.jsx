@@ -87,9 +87,19 @@ export function LinkWithPrefetch({
     // Prevent default link behavior
     e.preventDefault();
 
-    // Start view transition, then navigate
-    document.startViewTransition(() => {
+    // Start view transition with proper async handling
+    // The transition captures the current state, then we navigate
+    const transition = document.startViewTransition(async () => {
+      // Navigate and wait for it to complete
       navigate(to);
+      // Give React time to update the DOM
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    // Handle transition errors gracefully
+    transition.finished.catch(() => {
+      // If transition fails, ensure navigation still happens
+      console.debug('[ViewTransition] Transition interrupted');
     });
   }, [to, useViewTransition, navigate]);
 

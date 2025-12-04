@@ -34,8 +34,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { Heart, Users, Hospital, Calendar, AlertTriangle, DollarSign, Bell, Plus, Check, MoreVertical, Phone, Cake, CalendarIcon } from 'lucide-react';
-import { DashboardStats, BirthdaySection } from '@/components/dashboard';
+import { Heart, Users, Hospital, Calendar, AlertTriangle, DollarSign, Bell, Plus, Check, MoreVertical, Phone, Cake, CalendarIcon, CheckSquare, Square } from 'lucide-react';
+import { DashboardStats, BirthdaySection, LiveActivityFeed, BulkActionBar } from '@/components/dashboard';
+import { useBulkMutation, useBulkSelection } from '@/hooks/useBulkMutation';
 import { DashboardSkeleton } from '@/components/skeletons';
 import { ErrorState } from '@/components/ErrorState';
 import { EmptyTasks } from '@/components/EmptyState';
@@ -273,7 +274,52 @@ export const Dashboard = () => {
     atRiskDays: 60,
     inactiveDays: 90
   });
-  
+
+  // Bulk selection mode state
+  const [selectionMode, setSelectionMode] = useState(false);
+
+  // Combine all selectable care events for bulk operations
+  const allSelectableEvents = useMemo(() => {
+    const events = [];
+    // Birthdays
+    birthdaysToday.forEach(e => events.push({ id: e.id, type: 'birthday' }));
+    overdueBirthdays.forEach(e => events.push({ id: e.id, type: 'birthday' }));
+    // Today tasks (grief, accident)
+    todayTasks.forEach(task => {
+      if (task.type === 'grief_support' || task.type === 'accident_followup') {
+        events.push({ id: task.data.id, type: task.type });
+      }
+    });
+    // Grief due and overdue
+    griefDue.forEach(g => events.push({ id: g.id, type: 'grief_support' }));
+    return events;
+  }, [birthdaysToday, overdueBirthdays, todayTasks, griefDue]);
+
+  // Bulk selection hook
+  const bulkSelection = useBulkSelection(allSelectableEvents);
+
+  // Bulk mutation hook for complete/ignore/delete
+  const { bulkComplete, bulkIgnore, bulkDelete, isLoading: isBulkLoading } = useBulkMutation();
+
+  // Handle bulk actions
+  const handleBulkComplete = async () => {
+    await bulkComplete(bulkSelection.selectedIds);
+    bulkSelection.clearSelection();
+    setSelectionMode(false);
+  };
+
+  const handleBulkIgnore = async () => {
+    await bulkIgnore(bulkSelection.selectedIds);
+    bulkSelection.clearSelection();
+    setSelectionMode(false);
+  };
+
+  const handleBulkDelete = async () => {
+    await bulkDelete(bulkSelection.selectedIds);
+    bulkSelection.clearSelection();
+    setSelectionMode(false);
+  };
+
   useEffect(() => {
     // Load engagement settings from localStorage (set in Settings page)
     const savedSettings = localStorage.getItem('engagement_settings');
@@ -879,11 +925,37 @@ export const Dashboard = () => {
       </div>
       
       {/* Task Management */}
-      <div>
-        <h2 className="text-2xl font-playfair font-bold mb-4">{t('todays_tasks_reminders')}</h2>
-        <p className="text-muted-foreground mb-4">
-          {totalIncompleteTasks} {t('tasks_need_attention')}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-playfair font-bold mb-2">{t('todays_tasks_reminders')}</h2>
+          <p className="text-muted-foreground mb-4">
+            {totalIncompleteTasks} {t('tasks_need_attention')}
+          </p>
+        </div>
+        {/* Bulk Selection Toggle */}
+        <Button
+          variant={selectionMode ? "default" : "outline"}
+          size="sm"
+          onClick={() => {
+            if (selectionMode) {
+              bulkSelection.clearSelection();
+            }
+            setSelectionMode(!selectionMode);
+          }}
+          className={selectionMode ? "bg-teal-600 hover:bg-teal-700" : ""}
+        >
+          {selectionMode ? (
+            <>
+              <CheckSquare className="w-4 h-4 mr-2" />
+              {t('bulk.exit_select', 'Exit Select')}
+            </>
+          ) : (
+            <>
+              <Square className="w-4 h-4 mr-2" />
+              {t('bulk.select_mode', 'Select')}
+            </>
+          )}
+        </Button>
       </div>
       
       <Tabs defaultValue="today" className="w-full">
@@ -918,6 +990,9 @@ export const Dashboard = () => {
                 title={t('birthdays_today')}
                 icon="🎂"
                 borderClass="card-border-left-amber"
+                selectable={selectionMode}
+                isSelected={bulkSelection.isSelected}
+                onSelectionChange={bulkSelection.toggleSelection}
               />
               
               {/* All Other Tasks Due Today */}
@@ -936,15 +1011,29 @@ export const Dashboard = () => {
                         };
                         const config = typeConfig[task.type] || { icon: '📋', color: 'gray', bgClass: 'bg-gray-50', borderClass: 'border-gray-200', btnClass: 'bg-gray-500 hover:bg-gray-600', label: 'Task' };
                         
+                        const taskId = task.data?.id;
+                        const isSelectableTask = task.type === 'grief_support' || task.type === 'accident_followup';
+                        const isTaskSelected = taskId && isSelectableTask && bulkSelection.isSelected(taskId);
+
                         return (
-                          <div key={index} className={`p-4 ${config.bgClass} rounded-lg border ${config.borderClass} relative hover:shadow-lg transition-all`}>
+                          <div key={index} className={`p-4 ${config.bgClass} rounded-lg border ${isTaskSelected ? 'border-teal-500 ring-2 ring-teal-200' : config.borderClass} relative hover:shadow-lg transition-all`}>
                             {/* Overdue Badge - Top Right */}
                             {task.days_overdue > 0 && (
-                              <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                              <span className={`absolute top-3 ${selectionMode && isSelectableTask ? 'right-10' : 'right-3'} px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10`}>
                                 {task.days_overdue}d overdue
                               </span>
                             )}
-                            
+                            {/* Selection Checkbox for grief/accident tasks */}
+                            {selectionMode && isSelectableTask && taskId && (
+                              <div className="absolute top-3 right-3 z-10">
+                                <Checkbox
+                                  checked={isTaskSelected}
+                                  onCheckedChange={() => bulkSelection.toggleSelection(taskId)}
+                                  className="h-5 w-5 border-2 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                                />
+                              </div>
+                            )}
+
                             <div className="flex items-start gap-3 mb-3">
                               {/* Avatar with colored ring - Simplified */}
                               <div className={`flex-shrink-0 rounded-full ring-2 ${
@@ -1162,11 +1251,21 @@ export const Dashboard = () => {
                   <CardContent>
                     <div className="space-y-4">
                       {sortedOverdueBirthdays.map(event => (
-                        <div key={event.id} className="p-4 bg-amber-50 rounded-lg border border-amber-200 relative hover:shadow-lg transition-all">
+                        <div key={event.id} className={`p-4 bg-amber-50 rounded-lg border ${bulkSelection.isSelected(event.id) ? 'border-teal-500 ring-2 ring-teal-200' : 'border-amber-200'} relative hover:shadow-lg transition-all`}>
                           {event.days_overdue > 0 && (
-                            <span className="absolute top-3 right-3 px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10">
+                            <span className={`absolute top-3 ${selectionMode ? 'right-10' : 'right-3'} px-2 py-1 bg-red-500 text-white text-xs font-semibold rounded shadow-sm z-10`}>
                               {event.days_overdue}d overdue
                             </span>
+                          )}
+                          {/* Selection Checkbox */}
+                          {selectionMode && (
+                            <div className="absolute top-3 right-3 z-10">
+                              <Checkbox
+                                checked={bulkSelection.isSelected(event.id)}
+                                onCheckedChange={() => bulkSelection.toggleSelection(event.id)}
+                                className="h-5 w-5 border-2 data-[state=checked]:bg-teal-600 data-[state=checked]:border-teal-600"
+                              />
+                            </div>
                           )}
                           <div className="flex items-start gap-3 mb-3">
                             <div className="flex-shrink-0 rounded-full ring-2 ring-amber-400">
@@ -1916,13 +2015,31 @@ export const Dashboard = () => {
           )}
         </TabsContent>
       </Tabs>
-      
+
+      {/* Live Activity Feed - Shows real-time team activity */}
+      <div className="mt-6">
+        <LiveActivityFeed maxItems={15} />
+      </div>
+
       <ConfirmDialog
         open={confirmDialog.open}
         onOpenChange={(open) => !open && closeConfirm()}
         title={confirmDialog.title}
         description={confirmDialog.description}
         onConfirm={confirmDialog.onConfirm}
+      />
+
+      {/* Bulk Action Bar - Floating bar when items are selected */}
+      <BulkActionBar
+        selectedCount={bulkSelection.selectedCount}
+        onComplete={handleBulkComplete}
+        onIgnore={handleBulkIgnore}
+        onDelete={handleBulkDelete}
+        onClear={() => {
+          bulkSelection.clearSelection();
+          setSelectionMode(false);
+        }}
+        isLoading={isBulkLoading}
       />
     </div>
   );
