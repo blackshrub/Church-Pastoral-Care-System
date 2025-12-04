@@ -9274,7 +9274,7 @@ app = Litestar(
     on_shutdown=[on_shutdown],
     middleware=[
         DefineMiddleware(SecurityHeadersMiddleware),  # Security headers (XSS, clickjacking protection)
-        DefineMiddleware(CompressionMiddleware, minimum_size=500),  # Gzip/Brotli compression (60-80% size reduction)
+        # Note: Compression handled by Traefik at edge (Brotli/gzip)
         DefineMiddleware(RequestSizeLimitMiddleware),  # Limit request body size
         rate_limit_config.middleware,  # Rate limiting
     ],
