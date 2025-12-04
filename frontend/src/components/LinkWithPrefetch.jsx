@@ -30,7 +30,7 @@ const supportsViewTransitions = typeof document !== 'undefined' && 'startViewTra
  * @param {string} to - Route path
  * @param {string} prefetchType - Type of data to prefetch: 'member' | 'dashboard' | 'membersList'
  * @param {string} prefetchId - ID to pass to prefetch function (for member)
- * @param {boolean} useViewTransition - Enable View Transitions API (default: false - causes data fetch issues)
+ * @param {boolean} useViewTransition - Enable View Transitions API (default: true)
  * @param {React.ReactNode} children - Link content
  * @param {object} props - Additional props passed to Link
  */
@@ -38,7 +38,7 @@ export function LinkWithPrefetch({
   to,
   prefetchType,
   prefetchId,
-  useViewTransition = false, // Disabled by default - causes "member not found" issues
+  useViewTransition = true, // Smooth page transitions on supported browsers
   children,
   className,
   ...props
