@@ -493,12 +493,78 @@ When creating a grief/loss event, the system automatically generates 6 follow-up
 5. 100-day check-in
 6. 1-year memorial
 
+**Reports & Analytics System:**
+Comprehensive reporting for data-driven ministry decisions:
+
+*Analytics Dashboard (`/analytics`):*
+- **Demographics Tab:** Age distribution (bar), gender (pie), membership status (pie), categories (bar)
+- **Trends Tab:** Population analysis, AI-powered insights with strategic recommendations
+- **Engagement Tab:** Active/at-risk/inactive pie chart, care events by month (area)
+- **Financial Tab:** Aid by type (bar), distribution summary, average calculations
+- **Care Events Tab:** Event distribution by type with completion rates
+- **Predictive Tab:** Member priority scoring, aid effectiveness analysis
+
+*Reports Page (`/reports`):*
+- **Monthly Management Report:** Executive summary, KPIs (care completion, engagement, reach, birthdays), ministry highlights, weekly trends, strategic insights, month comparison
+- **Staff Performance Report:** Team overview, workload recommendations, top performers (gold/silver/bronze), individual metrics (tasks, contacts, active days)
+- **Yearly Summary:** Annual totals, monthly trend charts, care events by type
+
+*Backend Endpoints:*
+- `GET /api/analytics/dashboard` - Comprehensive dashboard data
+- `GET /api/analytics/engagement-trends` - 30-day engagement trends
+- `GET /api/analytics/demographic-trends` - Population analysis with insights
+- `GET /api/reports/monthly?year=YYYY&month=MM` - Monthly report JSON
+- `GET /api/reports/monthly/pdf` - Downloadable PDF report
+- `GET /api/reports/staff-performance` - Staff metrics
+- `GET /api/reports/yearly-summary` - Annual report
+- `GET /api/export/members/csv` - Members CSV export
+- `GET /api/export/care-events/csv` - Care events CSV export
+
 **API Sync with FaithFlow Enterprise:**
-Two sync methods:
-- Polling: Pull data every 1-24 hours (configurable)
-- Webhooks: Real-time updates with HMAC-SHA256 security
-- Dynamic filter system (include/exclude by gender, age, status)
-- Daily reconciliation at 3 AM Asia/Jakarta time
+Full integration with external church management systems:
+
+*Sync Methods:*
+- **Polling Mode:** Pull data every 1-24 hours (configurable interval)
+- **Webhook Mode:** Real-time push updates from core system
+- **Daily Reconciliation:** 3 AM Asia/Jakarta automatic full sync (catches missed webhooks)
+
+*Configuration (`SyncConfig` model):*
+```python
+{
+  "sync_method": "polling" | "webhook",
+  "api_base_url": "https://faithflow.example.com",
+  "api_path_prefix": "/api",
+  "api_login_endpoint": "/auth/login",
+  "api_members_endpoint": "/members/",
+  "api_email": "user@example.com",
+  "api_password": "encrypted...",  # Fernet encrypted
+  "polling_interval_hours": 6,      # 1, 3, 6, 12, or 24
+  "is_enabled": true,
+  "webhook_secret": "auto-generated-256-bit",
+  "reconciliation_enabled": true,
+  "reconciliation_time": "03:00"
+}
+```
+
+*Dynamic Filter System:*
+- **Filter Modes:** `include` (whitelist) or `exclude` (blacklist)
+- **Operators:** `equals`, `not_equals`, `contains`, `in`, `not_in`, `greater_than`, `less_than`, `between`, `is_true`, `is_false`
+- **Field Discovery:** `/sync/discover-fields` endpoint analyzes external API for available fields
+- **Example:** Sync only females aged 18-35: `[{field: "gender", operator: "equals", value: "Female"}, {field: "age", operator: "between", value: [18, 35]}]`
+
+*Security:*
+- **Fernet Encryption:** API credentials encrypted before storage
+- **HMAC-SHA256:** Webhook signature verification
+- **Distributed Locks:** MongoDB-based locks prevent duplicate sync in multi-worker environments
+
+*Sync Endpoints:*
+- `POST /sync/config` - Save configuration
+- `GET /sync/config` - Get current config
+- `POST /sync/test-connection` - Test API connectivity
+- `POST /sync/discover-fields` - Discover available fields
+- `POST /sync/members/pull` - Manual sync trigger
+- `POST /sync/webhook` - Receive webhook from core
+- `GET /sync/logs` - Sync history with pagination
 
 **Activity Logging:**
 Every action is logged with WHO did WHAT on WHICH member:

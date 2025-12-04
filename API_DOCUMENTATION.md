@@ -14,6 +14,10 @@
 - [Members](#members)
 - [Care Events](#care-events)
 - [Dashboard](#dashboard)
+- [Analytics](#analytics)
+- [Reports](#reports)
+- [Data Export](#data-export)
+- [API Sync](#api-sync)
 - [Real-Time Activity Stream (SSE)](#real-time-activity-stream-sse)
 - [Activity Logs](#activity-logs)
 - [Campuses](#campuses)
@@ -379,6 +383,426 @@ Authorization: Bearer {token}
   "upcoming_tasks": [],
   "total_tasks": 5,
   "total_members": 150
+}
+```
+
+---
+
+## Analytics
+
+### Get Analytics Dashboard
+```http
+GET /api/analytics/dashboard
+Authorization: Bearer {token}
+```
+
+**Response** (200 OK):
+```json
+{
+  "members": {
+    "total": 500,
+    "with_photos": 350,
+    "active": 400,
+    "at_risk": 75,
+    "disconnected": 25
+  },
+  "demographics": {
+    "age_distribution": [
+      {"range": "0-17", "count": 50},
+      {"range": "18-35", "count": 150},
+      {"range": "36-50", "count": 180},
+      {"range": "51-65", "count": 80},
+      {"range": "65+", "count": 40}
+    ],
+    "gender_distribution": {"male": 240, "female": 260},
+    "membership_status": {"active": 400, "inactive": 50, "new": 50}
+  },
+  "financial_aid": {
+    "total_distributed": 50000000,
+    "active_schedules": 15,
+    "by_type": [
+      {"type": "medical", "amount": 20000000},
+      {"type": "educational", "amount": 15000000}
+    ]
+  },
+  "grief_support": {
+    "total_stages": 120,
+    "completed_stages": 95,
+    "completion_rate": 79.2
+  },
+  "average_age": 38.5
+}
+```
+
+### Get Engagement Trends
+```http
+GET /api/analytics/engagement-trends
+Authorization: Bearer {token}
+```
+
+**Response** (200 OK):
+```json
+{
+  "trends": [
+    {"date": "2024-01-01", "care_events": 15},
+    {"date": "2024-01-02", "care_events": 22}
+  ]
+}
+```
+
+### Get Demographic Trends
+```http
+GET /api/analytics/demographic-trends
+Authorization: Bearer {token}
+```
+
+**Response** (200 OK):
+```json
+{
+  "age_groups": [
+    {"range": "18-35", "count": 150, "percentage": 30}
+  ],
+  "membership_trends": {...},
+  "care_needs_by_age": {...},
+  "insights": {
+    "population": ["Largest age group is 36-50 (36%)"],
+    "care_adaptations": ["Focus on family-oriented care programs"],
+    "strategic_recommendations": {
+      "high_priority": ["Develop youth engagement programs"],
+      "medium_term": ["Expand elderly care services"],
+      "long_term": ["Plan for demographic shifts"]
+    }
+  }
+}
+```
+
+---
+
+## Reports
+
+### Get Monthly Report
+```http
+GET /api/reports/monthly?year=2024&month=12
+Authorization: Bearer {token}
+```
+
+**Query Parameters**:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| year | int | current | Report year |
+| month | int | current | Report month (1-12) |
+
+**Response** (200 OK):
+```json
+{
+  "period": {"year": 2024, "month": 12},
+  "executive_summary": {
+    "total_members": 500,
+    "active_members": 400,
+    "at_risk_members": 75,
+    "inactive_members": 25
+  },
+  "kpis": {
+    "care_completion_rate": 85.5,
+    "engagement_rate": 80.0,
+    "member_reach_rate": 65.0,
+    "birthday_completion": {"celebrated": 45, "ignored": 5, "total": 50}
+  },
+  "ministry_highlights": {
+    "grief_support": {"families": 8, "touchpoints": 24},
+    "hospital_visits": {"patients": 12, "total_visits": 36},
+    "birthdays": {"celebrated": 45, "skipped": 5},
+    "financial_aid": {"total": 15000000, "recipients": 10}
+  },
+  "weekly_trends": [...],
+  "insights": ["Engagement increased 5% from last month"],
+  "recommendations": ["Focus on re-engaging at-risk members"]
+}
+```
+
+### Download Monthly Report PDF
+```http
+GET /api/reports/monthly/pdf?year=2024&month=12
+Authorization: Bearer {token}
+```
+
+**Response**: PDF file download
+- Content-Type: `application/pdf`
+- Filename: `Pastoral_Care_Report_December_2024.pdf`
+
+### Get Staff Performance Report
+```http
+GET /api/reports/staff-performance?year=2024&month=12
+Authorization: Bearer {token}
+```
+
+**Response** (200 OK):
+```json
+{
+  "team_overview": {
+    "total_staff": 10,
+    "balanced": 6,
+    "overworked": 2,
+    "underworked": 2
+  },
+  "metrics": {
+    "total_tasks_completed": 450,
+    "avg_tasks_per_staff": 45,
+    "max_min_difference": 30
+  },
+  "top_performers": [
+    {"name": "Pastor John", "tasks": 75, "photo_url": "/api/uploads/users/john.jpg"},
+    {"name": "Pastor Sarah", "tasks": 68, "photo_url": null}
+  ],
+  "individual_performance": [
+    {
+      "user_id": "user-001",
+      "name": "Pastor John",
+      "role": "pastor",
+      "tasks_completed": 75,
+      "members_contacted": 45,
+      "active_days": 22,
+      "workload_status": "balanced"
+    }
+  ],
+  "recommendations": [
+    {"priority": "high", "action": "Redistribute tasks from overworked staff"}
+  ]
+}
+```
+
+### Get Yearly Summary
+```http
+GET /api/reports/yearly-summary?year=2024
+Authorization: Bearer {token}
+```
+
+**Response** (200 OK):
+```json
+{
+  "year": 2024,
+  "totals": {
+    "members": 500,
+    "care_events": 2400,
+    "completion_rate": 82.5,
+    "financial_aid": 180000000
+  },
+  "monthly_breakdown": [
+    {"month": 1, "care_events": 180, "completed": 150}
+  ],
+  "care_by_type": [
+    {"type": "birthday", "total": 600, "completed": 580}
+  ]
+}
+```
+
+---
+
+## Data Export
+
+### Export Members to CSV
+```http
+GET /api/export/members/csv
+Authorization: Bearer {token}
+```
+
+**Response**: CSV file download
+- Content-Type: `text/csv`
+- Fields: id, name, phone, external_member_id, last_contact_date, engagement_status, days_since_last_contact, notes
+
+### Export Care Events to CSV
+```http
+GET /api/export/care-events/csv
+Authorization: Bearer {token}
+```
+
+**Response**: CSV file download
+- Content-Type: `text/csv`
+- Fields: id, member_id, event_type, event_date, title, description, completed, aid_type, aid_amount, hospital_name
+
+---
+
+## API Sync
+
+Integration with FaithFlow Enterprise or external church management systems.
+
+### Save Sync Configuration
+```http
+POST /api/sync/config
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body**:
+```json
+{
+  "sync_method": "polling",
+  "api_base_url": "https://faithflow.example.com",
+  "api_path_prefix": "/api",
+  "api_login_endpoint": "/auth/login",
+  "api_members_endpoint": "/members/",
+  "api_email": "sync@church.org",
+  "api_password": "your-password",
+  "polling_interval_hours": 6,
+  "is_enabled": true,
+  "filter_mode": "include",
+  "filter_rules": [
+    {"field": "gender", "operator": "equals", "value": "Female"},
+    {"field": "age", "operator": "between", "value": [18, 35]}
+  ],
+  "reconciliation_enabled": true,
+  "reconciliation_time": "03:00"
+}
+```
+
+**Filter Operators**:
+| Operator | Description | Example Value |
+|----------|-------------|---------------|
+| `equals` | Exact match | `"active"` |
+| `not_equals` | Not equal | `"inactive"` |
+| `contains` | Substring match | `"Smith"` |
+| `in` | Value in list | `["active", "new"]` |
+| `not_in` | Value not in list | `["deleted"]` |
+| `greater_than` | Numeric > | `18` |
+| `less_than` | Numeric < | `65` |
+| `between` | Numeric range | `[18, 35]` |
+| `is_true` | Boolean true | `null` |
+| `is_false` | Boolean false | `null` |
+
+### Get Sync Configuration
+```http
+GET /api/sync/config
+Authorization: Bearer {token}
+```
+
+### Test Connection
+```http
+POST /api/sync/test-connection
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+**Request Body**:
+```json
+{
+  "api_base_url": "https://faithflow.example.com",
+  "api_path_prefix": "/api",
+  "api_login_endpoint": "/auth/login",
+  "api_email": "sync@church.org",
+  "api_password": "your-password"
+}
+```
+
+**Response** (200 OK):
+```json
+{
+  "success": true,
+  "message": "Connection successful"
+}
+```
+
+### Discover Fields
+```http
+POST /api/sync/discover-fields
+Authorization: Bearer {token}
+```
+
+Analyzes the external API to discover available fields for filtering.
+
+**Response** (200 OK):
+```json
+{
+  "fields": [
+    {"name": "gender", "type": "string", "values": ["male", "female"]},
+    {"name": "age", "type": "number", "min": 0, "max": 100},
+    {"name": "membership_status", "type": "string", "values": ["active", "inactive"]}
+  ]
+}
+```
+
+### Trigger Manual Sync
+```http
+POST /api/sync/members/pull
+Authorization: Bearer {token}
+```
+
+**Response** (200 OK):
+```json
+{
+  "status": "success",
+  "members_fetched": 500,
+  "members_created": 10,
+  "members_updated": 45,
+  "members_archived": 2,
+  "duration_seconds": 12.5
+}
+```
+
+### Receive Webhook
+```http
+POST /api/sync/webhook
+X-Signature: {hmac-sha256-signature}
+Content-Type: application/json
+```
+
+**Request Body**:
+```json
+{
+  "event": "member.updated",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "data": {
+    "id": "ext-member-001",
+    "name": "John Doe",
+    "phone": "+6281234567890"
+  }
+}
+```
+
+**Event Types**:
+- `member.created` - New member added
+- `member.updated` - Member data changed
+- `member.deleted` - Member removed
+- `ping` - Test webhook connectivity
+
+### Regenerate Webhook Secret
+```http
+POST /api/sync/regenerate-secret
+Authorization: Bearer {token}
+```
+
+**Response** (200 OK):
+```json
+{
+  "webhook_secret": "new-256-bit-secret"
+}
+```
+
+### Get Sync Logs
+```http
+GET /api/sync/logs?page=1&limit=20
+Authorization: Bearer {token}
+```
+
+**Response** (200 OK):
+```json
+{
+  "logs": [
+    {
+      "id": "log-001",
+      "sync_type": "scheduled",
+      "status": "success",
+      "members_fetched": 500,
+      "members_created": 5,
+      "members_updated": 20,
+      "members_archived": 1,
+      "started_at": "2024-01-15T03:00:00+07:00",
+      "completed_at": "2024-01-15T03:00:15+07:00",
+      "duration_seconds": 15.2
+    }
+  ],
+  "total": 100,
+  "page": 1,
+  "limit": 20
 }
 ```
 

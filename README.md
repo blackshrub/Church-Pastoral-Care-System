@@ -96,6 +96,87 @@ Member photos load fast with optimized sizes for every context.
 | **Campus Switching** | Full admins can view any campus |
 | **Shared Analytics** | Organization-wide statistics for admins |
 
+### Reports & Analytics
+
+FaithTracker provides comprehensive reporting and analytics for data-driven ministry decisions.
+
+#### Analytics Dashboard (`/analytics`)
+
+| Tab | Visualizations |
+|-----|----------------|
+| **Demographics** | Age distribution, gender breakdown, membership status, member categories |
+| **Trends** | Population analysis, AI-powered insights, strategic recommendations |
+| **Engagement** | Active/at-risk/inactive pie chart, care events by month |
+| **Financial** | Aid by type, distribution summary, average aid calculations |
+| **Care Events** | Event distribution by type with completion rates |
+| **Predictive** | High/medium/low priority members, aid effectiveness |
+
+#### Monthly Management Report (`/reports`)
+
+- **Executive Summary**: Total members, active/at-risk/inactive counts
+- **KPI Cards**: Care completion rate, engagement rate, member reach, birthday completion
+- **Ministry Highlights**: Grief support families, hospital visits, birthdays celebrated, financial aid distributed
+- **Weekly Trends**: Activity trend line charts
+- **Strategic Insights**: Auto-generated action recommendations
+- **Month Comparison**: Current vs previous month metrics
+
+#### Staff Performance Report
+
+- **Team Overview**: Total staff, balanced/overworked/underworked indicators
+- **Workload Recommendations**: Priority-coded action items
+- **Top Performers**: Gold/silver/bronze recognition with task counts
+- **Individual Metrics**: Tasks completed, members contacted, active days
+
+#### Export Options
+
+| Format | Contents |
+|--------|----------|
+| **PDF** | Monthly management report with professional formatting |
+| **CSV (Members)** | ID, name, phone, engagement status, last contact |
+| **CSV (Care Events)** | Event details, completion status, financial aid info |
+
+### API Sync with External Systems
+
+Integrate with FaithFlow Enterprise or other church management systems for automatic member data synchronization.
+
+#### Sync Methods
+
+| Method | Description |
+|--------|-------------|
+| **Polling** | Pull data every 1-24 hours (configurable interval) |
+| **Webhooks** | Real-time push updates with HMAC-SHA256 security |
+
+#### Dynamic Filter System
+
+Filter which members to sync using powerful rules:
+
+| Operator | Example |
+|----------|---------|
+| `equals` | Gender equals "Female" |
+| `between` | Age between 18-35 |
+| `in` / `not_in` | Status in ["active", "new"] |
+| `contains` | Name contains "Smith" |
+| `greater_than` / `less_than` | Age > 60 |
+
+**Filter Modes:**
+- **Include**: Only sync members matching ALL rules
+- **Exclude**: Sync all EXCEPT members matching rules
+
+#### Security Features
+
+- **Fernet Encryption**: API credentials encrypted at rest
+- **HMAC-SHA256**: Webhook signature verification
+- **Distributed Locks**: Prevents duplicate sync in multi-worker environments
+- **Daily Reconciliation**: Automatic 3 AM sync ensures data integrity
+
+#### Field Mapping
+
+Automatically maps common field variations:
+- `name` ← name, full_name
+- `phone` ← phone, phone_whatsapp
+- `birth_date` ← birth_date, date_of_birth, birthDate
+- `membership_status` ← membership_status, member_type, status
+
 ---
 
 ## Quick Start
