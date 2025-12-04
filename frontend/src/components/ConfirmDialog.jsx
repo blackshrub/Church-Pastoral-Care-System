@@ -15,11 +15,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-export const ConfirmDialog = ({ 
-  open, 
-  onOpenChange, 
-  title, 
-  description, 
+export const ConfirmDialog = ({
+  open,
+  onOpenChange,
+  title,
+  description,
   onConfirm,
   confirmText = "Confirm",
   cancelText = "Cancel",
@@ -30,7 +30,10 @@ export const ConfirmDialog = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          {/* Always render description - use visually hidden text if empty for accessibility */}
+          <AlertDialogDescription>
+            {description || <span className="sr-only">Confirmation dialog</span>}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>

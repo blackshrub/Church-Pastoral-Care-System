@@ -366,7 +366,9 @@
     "member_not_found": "Member not found",
     "failed_to_save": "Failed to save data",
     "failed_to_send": "Failed to send message",
-    "incorrect_credentials": "Incorrect email or password"
+    "incorrect_credentials": "Incorrect email or password",
+    "aid_type_required": "Aid type is required",
+    "aid_amount_required": "Aid amount must be a valid non-negative number"
   },
   
   "empty_states": {

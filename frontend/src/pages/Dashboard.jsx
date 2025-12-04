@@ -333,7 +333,21 @@ export const Dashboard = () => {
       toast.error(t('select_at_least_one_member'));
       return;
     }
-    
+
+    // Validate financial aid fields before proceeding
+    let aidAmount = null;
+    if (quickEvent.event_type === 'financial_aid') {
+      if (!quickEvent.aid_type) {
+        toast.error(t('error_messages.aid_type_required'));
+        return;
+      }
+      aidAmount = parseFloat(quickEvent.aid_amount);
+      if (isNaN(aidAmount) || aidAmount < 0) {
+        toast.error(t('error_messages.aid_amount_required'));
+        return;
+      }
+    }
+
     // Auto-generate title based on event type (except financial aid)
     const eventTypeNames = {
       birthday: 'Birthday Celebration',
@@ -344,14 +358,14 @@ export const Dashboard = () => {
       regular_contact: 'Regular Contact',
       financial_aid: quickEvent.title // Use custom title for financial aid
     };
-    
+
     const autoTitle = eventTypeNames[quickEvent.event_type] || quickEvent.title;
-    
+
     try {
       let success = 0;
       for (const memberId of selectedMemberIds) {
         const member = allMembers.find(m => m.id === memberId);
-        
+
         if (quickEvent.event_type === 'financial_aid') {
           if (quickEvent.schedule_frequency === 'one_time') {
             // One-time aid: Create care event
@@ -363,7 +377,7 @@ export const Dashboard = () => {
               title: autoTitle,
               description: quickEvent.description,
               aid_type: quickEvent.aid_type,
-              aid_amount: parseFloat(quickEvent.aid_amount)
+              aid_amount: aidAmount
             });
           } else {
             // Scheduled aid: Create schedule
@@ -392,7 +406,7 @@ export const Dashboard = () => {
               campus_id: member.campus_id,
               title: autoTitle,
               aid_type: quickEvent.aid_type,
-              aid_amount: parseFloat(quickEvent.aid_amount),
+              aid_amount: aidAmount,
               frequency: quickEvent.schedule_frequency,
               start_date: startDate,
               end_date: endDate,

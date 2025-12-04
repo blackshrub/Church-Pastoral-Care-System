@@ -364,7 +364,9 @@
     "member_not_found": "Jemaat tidak ditemukan",
     "failed_to_save": "Gagal menyimpan data",
     "failed_to_send": "Gagal mengirim pesan",
-    "incorrect_credentials": "Email atau kata sandi salah"
+    "incorrect_credentials": "Email atau kata sandi salah",
+    "aid_type_required": "Jenis bantuan harus diisi",
+    "aid_amount_required": "Jumlah bantuan harus angka yang valid dan tidak negatif"
   },
   
   "empty_states": {

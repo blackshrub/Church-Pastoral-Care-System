@@ -198,6 +198,19 @@ export const MemberDetail = () => {
     setSaving(true);
     try {
       if (newEvent.event_type === 'financial_aid') {
+        // Validate financial aid fields
+        if (!newEvent.aid_type) {
+          toast.error(t('error_messages.aid_type_required'));
+          setSaving(false);
+          return;
+        }
+        const aidAmount = parseFloat(newEvent.aid_amount);
+        if (isNaN(aidAmount) || aidAmount < 0) {
+          toast.error(t('error_messages.aid_amount_required'));
+          setSaving(false);
+          return;
+        }
+
         if (newEvent.schedule_frequency === 'one_time') {
           // One-time aid: Create care event (aid has been given)
           const eventData = {
@@ -208,14 +221,14 @@ export const MemberDetail = () => {
             title: newEvent.title,
             description: newEvent.description,
             aid_type: newEvent.aid_type,
-            aid_amount: parseFloat(newEvent.aid_amount)
+            aid_amount: aidAmount
           };
           await api.post(`/care-events`, eventData);
           toast.success(t('toasts.financial_aid_recorded'));
         } else {
           // Scheduled aid: Create schedule (future payments)
           let startDate, endDate;
-          
+
           if (newEvent.schedule_frequency === 'weekly') {
             startDate = getTodayLocal();  // Use today for weekly
             endDate = newEvent.schedule_end_date || null;
@@ -224,7 +237,7 @@ export const MemberDetail = () => {
             const startMonth = newEvent.start_month || new Date().getMonth() + 1;
             const startYear = newEvent.start_year || new Date().getFullYear();
             startDate = `${startYear}-${String(startMonth).padStart(2, '0')}-01`;
-            
+
             // Construct end_date from end_month and end_year if provided
             if (newEvent.end_month && newEvent.end_year) {
               endDate = `${newEvent.end_year}-${String(newEvent.end_month).padStart(2, '0')}-01`;
@@ -236,13 +249,13 @@ export const MemberDetail = () => {
             startDate = newEvent.schedule_start_date;
             endDate = newEvent.schedule_end_date || null;
           }
-          
+
           const scheduleData = {
             member_id: id,
             campus_id: member.campus_id,
             title: newEvent.title,
             aid_type: newEvent.aid_type,
-            aid_amount: parseFloat(newEvent.aid_amount),
+            aid_amount: aidAmount,
             frequency: newEvent.schedule_frequency,
             start_date: startDate,
             end_date: endDate,
