@@ -12,9 +12,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { Heart, LogIn } from 'lucide-react';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
 export const LoginPage = () => {
   const { t } = useTranslation();
   const { login } = useAuth();

@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, CheckCircle2, XCircle, MessageSquare, Mail } from 'lucide-react';
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
 
 export const IntegrationTest = () => {
   const [whatsappPhone, setWhatsappPhone] = useState('6281290080025');
@@ -22,13 +19,13 @@ export const IntegrationTest = () => {
   const testWhatsApp = async () => {
     setWhatsappLoading(true);
     setWhatsappResult(null);
-    
+
     try {
-      const response = await axios.post(`${API}/integrations/ping/whatsapp`, {
+      const response = await api.post('/integrations/ping/whatsapp', {
         phone: whatsappPhone,
         message: whatsappMessage
       });
-      
+
       setWhatsappResult(response.data);
     } catch (error) {
       setWhatsappResult({
@@ -44,9 +41,9 @@ export const IntegrationTest = () => {
   const testEmail = async () => {
     setEmailLoading(true);
     setEmailResult(null);
-    
+
     try {
-      const response = await axios.get(`${API}/integrations/ping/email`);
+      const response = await api.get('/integrations/ping/email');
       setEmailResult(response.data);
     } catch (error) {
       setEmailResult({
