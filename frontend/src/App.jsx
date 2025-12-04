@@ -126,9 +126,57 @@ const RootLayout = () => {
 };
 
 // Error element for route errors
+// Handles chunk load failures (common after deployments) by auto-reloading
 const RouteError = () => {
   const error = useRouteError();
   console.error('Route error:', error);
+
+  // Detect chunk load failures (after new deployments)
+  const isChunkLoadError =
+    error?.message?.includes('Failed to fetch dynamically imported module') ||
+    error?.message?.includes('Loading chunk') ||
+    error?.message?.includes('Loading CSS chunk') ||
+    error?.name === 'ChunkLoadError';
+
+  useEffect(() => {
+    if (isChunkLoadError) {
+      // Clear service worker cache and reload once
+      const hasReloaded = sessionStorage.getItem('chunk_reload_attempted');
+      if (!hasReloaded) {
+        sessionStorage.setItem('chunk_reload_attempted', 'true');
+        // Unregister service worker to clear stale cache
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            registrations.forEach((registration) => registration.unregister());
+          });
+        }
+        // Clear caches and reload
+        if ('caches' in window) {
+          caches.keys().then((names) => {
+            names.forEach((name) => caches.delete(name));
+          });
+        }
+        // Hard reload to bypass browser cache
+        window.location.reload(true);
+      }
+    } else {
+      // Clear reload flag for non-chunk errors
+      sessionStorage.removeItem('chunk_reload_attempted');
+    }
+  }, [isChunkLoadError]);
+
+  if (isChunkLoadError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500 mx-auto mb-4"></div>
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Updating App...</h1>
+          <p className="text-gray-600">A new version is available. Reloading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center p-8">
