@@ -334,6 +334,24 @@ def global_exception_handler(request: Request, exc: Exception) -> LitestarRespon
     This catches any unhandled exceptions not caught by endpoint-level handlers.
     """
     import json
+    from litestar.exceptions import ValidationException
+
+    # Log request details for validation errors (to debug 400 errors)
+    if isinstance(exc, ValidationException):
+        # Log the validation error details
+        detail_str = str(exc.detail) if hasattr(exc, 'detail') else str(exc)
+        logger.warning(f"[VALIDATION] {request.method} {request.url.path} failed: {detail_str}")
+
+        # Try to get additional info from the exception
+        if hasattr(exc, 'extra') and exc.extra:
+            logger.warning(f"[VALIDATION] Extra info: {exc.extra}")
+
+        content = json.dumps({"detail": f"Validation failed for {request.method} {request.url.path}"})
+        return LitestarResponse(
+            content=content,
+            status_code=HTTP_400_BAD_REQUEST,
+            media_type="application/json"
+        )
 
     # Handle HTTP exceptions properly - return their status code and message
     if isinstance(exc, HTTPException):

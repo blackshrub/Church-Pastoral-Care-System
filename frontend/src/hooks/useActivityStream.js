@@ -196,19 +196,19 @@ export function formatActivityMessage(activity) {
   const { user_name, action_type, member_name, event_type } = activity;
 
   const actionMessages = {
-    complete: `completed a task for ${member_name}`,
-    ignore: `skipped a task for ${member_name}`,
-    create_event: `created a ${event_type || 'care'} event for ${member_name}`,
-    update_event: `updated an event for ${member_name}`,
-    delete_event: `deleted an event for ${member_name}`,
+    // Correct action types matching backend ActivityActionType enum
+    complete_task: `completed a task for ${member_name}`,
+    ignore_task: `skipped a task for ${member_name}`,
+    unignore_task: `restored a task for ${member_name}`,
+    send_reminder: `sent a reminder for ${member_name}`,
+    stop_schedule: `stopped a schedule for ${member_name}`,
+    clear_ignored: `cleared ignored tasks for ${member_name}`,
     create_member: `added new member ${member_name}`,
     update_member: `updated ${member_name}'s profile`,
     delete_member: `deleted ${member_name}`,
-    complete_stage: `completed a grief stage for ${member_name}`,
-    ignore_stage: `skipped a grief stage for ${member_name}`,
-    undo_stage: `undid a grief stage for ${member_name}`,
-    send_reminder: `sent a reminder for ${member_name}`,
-    distribute_aid: `distributed financial aid to ${member_name}`,
+    create_care_event: `created a ${event_type || 'care'} event for ${member_name}`,
+    update_care_event: `updated an event for ${member_name}`,
+    delete_care_event: `deleted an event for ${member_name}`,
   };
 
   const message = actionMessages[action_type] || `performed an action on ${member_name}`;

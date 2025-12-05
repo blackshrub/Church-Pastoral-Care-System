@@ -196,22 +196,36 @@ const ActivityLog = () => {
     const icons = {
       complete_task: '✓',
       ignore_task: '⊘',
+      unignore_task: '↩',
       send_reminder: '📧',
       stop_schedule: '⏹',
-      clear_ignored: '🔄'
+      clear_ignored: '🔄',
+      create_member: '+',
+      update_member: '✎',
+      delete_member: '✗',
+      create_care_event: '+',
+      update_care_event: '✎',
+      delete_care_event: '✗'
     };
     return icons[actionType] || '•';
   };
 
   const getActionColor = (actionType) => {
     const colors = {
-      complete_task: 'text-green-600 bg-green-50',
-      ignore_task: 'text-yellow-600 bg-yellow-50',
-      send_reminder: 'text-blue-600 bg-blue-50',
-      stop_schedule: 'text-red-600 bg-red-50',
-      clear_ignored: 'text-purple-600 bg-purple-50'
+      complete_task: 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/30',
+      ignore_task: 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-900/30',
+      unignore_task: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30',
+      send_reminder: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30',
+      stop_schedule: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30',
+      clear_ignored: 'text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-900/30',
+      create_member: 'text-teal-600 bg-teal-50 dark:text-teal-400 dark:bg-teal-900/30',
+      update_member: 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30',
+      delete_member: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30',
+      create_care_event: 'text-teal-600 bg-teal-50 dark:text-teal-400 dark:bg-teal-900/30',
+      update_care_event: 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30',
+      delete_care_event: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30'
     };
-    return colors[actionType] || 'text-gray-600 bg-gray-50';
+    return colors[actionType] || 'text-gray-600 bg-gray-50 dark:text-gray-400 dark:bg-gray-700';
   };
 
   return (

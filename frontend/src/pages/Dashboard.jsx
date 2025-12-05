@@ -227,7 +227,7 @@ export const Dashboard = () => {
   const { data: allMembers = [] } = useQuery({
     queryKey: ['members', 'all', 'basic'],
     queryFn: async () => {
-      const response = await api.get(`/members?limit=500&fields=id,name,phone,photo_url`);
+      const response = await api.get(`/members?limit=500&fields=id,name,phone,photo_url,campus_id`);
       return response.data;
     },
     staleTime: 1000 * 60 * 10, // 10 minutes - member list changes infrequently
