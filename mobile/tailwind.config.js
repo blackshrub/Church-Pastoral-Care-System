@@ -5,6 +5,8 @@ module.exports = {
     './app/**/*.{js,jsx,ts,tsx}',
     './components/**/*.{js,jsx,ts,tsx}',
   ],
+  // Enable class-based dark mode (controlled by ThemeProvider)
+  darkMode: 'class',
   presets: [require('nativewind/preset')],
   theme: {
     extend: {

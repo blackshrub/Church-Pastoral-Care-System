@@ -34,6 +34,9 @@ import {
   Fingerprint,
   ScanFace,
   FileText,
+  Moon,
+  Sun,
+  Smartphone,
 } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 
@@ -42,6 +45,7 @@ import { changeLanguage, getCurrentLanguage } from '@/lib/i18n';
 import { haptics } from '@/constants/interaction';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useBiometrics } from '@/hooks/useBiometrics';
+import { useTheme, type ThemeMode } from '@/context/ThemeContext';
 
 // ============================================================================
 // COMPONENTS
@@ -64,25 +68,25 @@ const SettingsRow = memo(function SettingsRow({
 }: SettingsRowProps) {
   return (
     <Pressable
-      className={`flex-row items-center px-4 py-4 ${onPress ? 'active:bg-gray-50' : ''}`}
+      className={`flex-row items-center px-4 py-4 ${onPress ? 'active:bg-gray-50 dark:active:bg-slate-700' : ''}`}
       onPress={onPress}
       disabled={!onPress}
     >
       <View
         className={`w-9 h-9 rounded-lg items-center justify-center mr-4 ${
-          destructive ? 'bg-error-50' : 'bg-primary-50'
+          destructive ? 'bg-error-50 dark:bg-error-900/30' : 'bg-primary-50 dark:bg-primary-900/30'
         }`}
       >
         <Icon size={20} color={destructive ? '#ef4444' : '#0d9488'} />
       </View>
       <Text
         className={`flex-1 text-base ${
-          destructive ? 'text-error-500' : 'text-gray-900'
+          destructive ? 'text-error-500' : 'text-gray-900 dark:text-white'
         }`}
       >
         {label}
       </Text>
-      {value && <Text className="text-sm text-gray-500 mr-2">{value}</Text>}
+      {value && <Text className="text-sm text-gray-500 dark:text-gray-400 mr-2">{value}</Text>}
       {onPress && <ChevronRight size={20} color="#9ca3af" />}
     </Pressable>
   );
@@ -98,6 +102,7 @@ function ProfileScreen() {
   const { user, logout, saveCredentialsForBiometric, clearBiometricCredentials } = useAuthStore();
   const { isEnabled: notificationsEnabled, isLoading: notificationsLoading, requestPermissions } = useNotifications();
   const { status, isEnabled: biometricEnabled, enable: enableBiometric, disable: disableBiometric, isLoading: biometricLoading } = useBiometrics();
+  const { mode: themeMode, setMode: setThemeMode, isDark } = useTheme();
 
   // Modal state for biometric setup
   const [showBiometricSetup, setShowBiometricSetup] = useState(false);
@@ -124,6 +129,28 @@ function ProfileScreen() {
     await changeLanguage(newLang);
     haptics.success();
   }, []);
+
+  // Handle theme mode change (cycles: system -> light -> dark -> system)
+  const handleThemeModeChange = useCallback(() => {
+    haptics.tap();
+    const modes: ThemeMode[] = ['system', 'light', 'dark'];
+    const currentIndex = modes.indexOf(themeMode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    setThemeMode(modes[nextIndex]);
+  }, [themeMode, setThemeMode]);
+
+  // Get theme mode display info
+  const getThemeModeInfo = () => {
+    switch (themeMode) {
+      case 'light':
+        return { icon: Sun, label: t('profile.lightMode', 'Light'), value: t('profile.lightMode', 'Light') };
+      case 'dark':
+        return { icon: Moon, label: t('profile.darkMode', 'Dark'), value: t('profile.darkMode', 'Dark') };
+      default:
+        return { icon: Smartphone, label: t('profile.systemMode', 'System'), value: t('profile.systemMode', 'System') };
+    }
+  };
+  const themeModeInfo = getThemeModeInfo();
 
   // Handle biometric toggle
   const handleBiometricToggle = useCallback(async () => {
@@ -260,7 +287,7 @@ function ProfileScreen() {
   }, [t, logout]);
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-50 dark:bg-slate-900">
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingTop: insets.top + 24 }}
@@ -268,7 +295,7 @@ function ProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Header */}
-        <View className="bg-white rounded-2xl p-6 items-center shadow-sm">
+        <View className="bg-white dark:bg-slate-800 rounded-2xl p-6 items-center shadow-sm">
           <View className="mb-4">
             {user?.photo_url ? (
               <Image
@@ -281,10 +308,10 @@ function ProfileScreen() {
               </View>
             )}
           </View>
-          <Text className="text-[22px] font-bold text-gray-900 mb-1">
+          <Text className="text-[22px] font-bold text-gray-900 dark:text-white mb-1">
             {user?.name || 'User'}
           </Text>
-          <Text className="text-sm text-gray-500 mb-4">{user?.email}</Text>
+          <Text className="text-sm text-gray-500 dark:text-gray-400 mb-4">{user?.email}</Text>
 
           <View className="flex-row gap-2">
             <View className="flex-row items-center px-3 py-1.5 rounded-full bg-primary-50 gap-1">
@@ -302,18 +329,25 @@ function ProfileScreen() {
 
         {/* Settings Section */}
         <View className="mt-6">
-          <Text className="text-sm font-semibold text-gray-500 mb-2 ml-1 uppercase tracking-wide">
+          <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2 ml-1 uppercase tracking-wide">
             {t('profile.settings')}
           </Text>
 
-          <View className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <View className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm overflow-hidden">
             <SettingsRow
               icon={Globe}
               label={t('profile.language')}
               value={i18n.language === 'en' ? 'English' : 'Bahasa Indonesia'}
               onPress={handleLanguageChange}
             />
-            <View className="h-px bg-gray-100 ml-16" />
+            <View className="h-px bg-gray-100 dark:bg-slate-700 ml-16" />
+            <SettingsRow
+              icon={themeModeInfo.icon}
+              label={t('profile.theme', 'Theme')}
+              value={themeModeInfo.value}
+              onPress={handleThemeModeChange}
+            />
+            <View className="h-px bg-gray-100 dark:bg-slate-700 ml-16" />
             <Pressable
               className="flex-row items-center px-4 py-4 active:bg-gray-50"
               onPress={handleNotificationToggle}
@@ -364,11 +398,11 @@ function ProfileScreen() {
 
         {/* Tools Section */}
         <View className="mt-6">
-          <Text className="text-sm font-semibold text-gray-500 mb-2 ml-1 uppercase tracking-wide">
+          <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2 ml-1 uppercase tracking-wide">
             {t('profile.tools', 'Tools')}
           </Text>
 
-          <View className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <View className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm overflow-hidden">
             <SettingsRow
               icon={FileText}
               label={t('reports.title', 'Reports')}
@@ -382,11 +416,11 @@ function ProfileScreen() {
 
         {/* About Section */}
         <View className="mt-6">
-          <Text className="text-sm font-semibold text-gray-500 mb-2 ml-1 uppercase tracking-wide">
+          <Text className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2 ml-1 uppercase tracking-wide">
             {t('profile.about')}
           </Text>
 
-          <View className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <View className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm overflow-hidden">
             <SettingsRow
               icon={Info}
               label={t('profile.version')}
@@ -397,7 +431,7 @@ function ProfileScreen() {
 
         {/* Logout */}
         <View className="mt-6">
-          <View className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <View className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm overflow-hidden">
             <SettingsRow
               icon={LogOut}
               label={t('auth.logout')}
@@ -409,8 +443,8 @@ function ProfileScreen() {
 
         {/* Footer */}
         <View className="items-center mt-12 py-6">
-          <Text className="text-base font-semibold text-gray-400">FaithTracker</Text>
-          <Text className="text-xs text-gray-300 mt-1">GKBJ Pastoral Care System</Text>
+          <Text className="text-base font-semibold text-gray-400 dark:text-gray-500">FaithTracker</Text>
+          <Text className="text-xs text-gray-300 dark:text-gray-600 mt-1">GKBJ Pastoral Care System</Text>
         </View>
 
         <View className="h-24" />

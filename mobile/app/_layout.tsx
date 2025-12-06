@@ -14,6 +14,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
 import { queryClient } from '@/lib/queryClient';
 import { UnifiedOverlayHost } from '@/components/overlay';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
 
 // Log immediately to detect import issues
 console.log('[Layout] Module loading...');
@@ -61,14 +62,28 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SafeAreaProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <StatusBar style="auto" />
-          <Slot />
-          <UnifiedOverlayHost />
-          <Toast />
-        </GestureHandlerRootView>
-      </SafeAreaProvider>
+      <ThemeProvider>
+        <SafeAreaProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <ThemedStatusBar />
+            <Slot />
+            <UnifiedOverlayHost />
+            <Toast />
+          </GestureHandlerRootView>
+        </SafeAreaProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
+}
+
+// Inner component that uses theme context for status bar
+function ThemedStatusBar() {
+  // Safe to call here since we're inside ThemeProvider
+  try {
+    const { isDark } = useTheme();
+    return <StatusBar style={isDark ? 'light' : 'dark'} />;
+  } catch {
+    // Fallback if ThemeProvider not ready yet
+    return <StatusBar style="auto" />;
+  }
 }

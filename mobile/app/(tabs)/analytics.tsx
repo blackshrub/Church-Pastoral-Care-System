@@ -241,19 +241,19 @@ export default function AnalyticsScreen() {
   })) || [];
 
   return (
-    <View className="flex-1 bg-gray-50" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-gray-50 dark:bg-slate-900" style={{ paddingTop: insets.top }}>
       {/* Header */}
-      <View className="px-4 py-4 bg-white border-b border-gray-100">
+      <View className="px-4 py-4 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700">
         <View className="flex-row items-center gap-2">
           <BarChart3 size={24} color={colors.primary.teal} strokeWidth={2} />
-          <Text className="text-xl font-bold text-gray-900">
+          <Text className="text-xl font-bold text-gray-900 dark:text-white">
             {t('analytics.title', 'Analytics')}
           </Text>
         </View>
       </View>
 
       {/* Time Range Selector */}
-      <View className="py-3 bg-white">
+      <View className="py-3 bg-white dark:bg-slate-800">
         <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
       </View>
 

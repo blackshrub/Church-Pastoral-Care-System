@@ -274,14 +274,14 @@ function TodayScreen() {
 
   if (isLoading) {
     return (
-      <View className="flex-1 justify-center items-center bg-gray-50">
+      <View className="flex-1 justify-center items-center bg-gray-50 dark:bg-slate-900">
         <ActivityIndicator size="large" color="#14b8a6" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1 bg-gray-50 dark:bg-slate-900">
       {/* Fixed Header */}
       <LinearGradient
         colors={[gradients.header.start, gradients.header.mid, gradients.header.end]}
@@ -334,7 +334,7 @@ function TodayScreen() {
           className="mb-6"
         >
           <View className="flex-row justify-between items-center mb-3">
-            <Text className="text-lg font-bold text-gray-900">
+            <Text className="text-lg font-bold text-gray-900 dark:text-white">
               {t('dashboard.sections.quickActions')}
             </Text>
             <Pressable

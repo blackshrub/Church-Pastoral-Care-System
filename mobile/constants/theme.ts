@@ -126,6 +126,84 @@ export const colors = {
   },
 };
 
+// Dark mode semantic colors
+export const darkColors = {
+  // Backgrounds
+  background: '#0f172a',       // slate-900
+  surface: '#1e293b',          // slate-800
+  surfaceElevated: '#334155',  // slate-700
+  surfacePressed: '#475569',   // slate-600
+
+  // Text
+  text: {
+    primary: '#f1f5f9',        // slate-100
+    secondary: '#94a3b8',      // slate-400
+    tertiary: '#64748b',       // slate-500
+    inverse: '#0f172a',        // slate-900
+  },
+
+  // Borders
+  border: {
+    default: '#334155',        // slate-700
+    light: '#1e293b',          // slate-800
+    subtle: '#475569',         // slate-600
+  },
+
+  // Icon colors
+  icon: {
+    default: '#f1f5f9',        // slate-100
+    muted: '#64748b',          // slate-500
+    subtle: '#475569',         // slate-600
+  },
+
+  // Status (slightly adjusted for dark mode visibility)
+  status: {
+    success: '#22c55e',        // green-500
+    warning: '#f59e0b',        // amber-500
+    error: '#ef4444',          // red-500
+    info: '#3b82f6',           // blue-500
+  },
+};
+
+// Light mode semantic colors
+export const lightColors = {
+  // Backgrounds
+  background: '#f9fafb',       // gray-50
+  surface: '#ffffff',          // white
+  surfaceElevated: '#ffffff',  // white
+  surfacePressed: '#f3f4f6',   // gray-100
+
+  // Text
+  text: {
+    primary: '#111827',        // gray-900
+    secondary: '#6b7280',      // gray-500
+    tertiary: '#9ca3af',       // gray-400
+    inverse: '#ffffff',        // white
+  },
+
+  // Borders
+  border: {
+    default: '#e5e7eb',        // gray-200
+    light: '#f3f4f6',          // gray-100
+    subtle: '#d1d5db',         // gray-300
+  },
+
+  // Icon colors
+  icon: {
+    default: '#374151',        // gray-700
+    muted: '#9ca3af',          // gray-400
+    subtle: '#d1d5db',         // gray-300
+  },
+
+  // Status
+  status: {
+    success: '#22c55e',        // green-500
+    warning: '#f59e0b',        // amber-500
+    error: '#ef4444',          // red-500
+    info: '#3b82f6',           // blue-500
+  },
+};
+
 // Premium gradient for headers (dark teal theme)
 export const gradients = {
   header: {
