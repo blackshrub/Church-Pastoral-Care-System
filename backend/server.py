@@ -2096,11 +2096,11 @@ class PasswordChange(Struct):
     new_password: str
 
 @put("/auth/profile")
-async def update_own_profile(update: ProfileUpdate, request: Request) -> dict:
+async def update_own_profile(data: ProfileUpdate, request: Request) -> dict:
     """Update own profile (all users can update their own name, email, phone)"""
     current_user = await get_current_user(request)
     try:
-        update_data = {k: v for k, v in to_mongo_doc(update).items() if v is not None}
+        update_data = {k: v for k, v in to_mongo_doc(data).items() if v is not None}
 
         if not update_data:
             raise HTTPException(status_code=400, detail="No fields to update")
