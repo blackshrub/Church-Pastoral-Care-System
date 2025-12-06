@@ -236,7 +236,8 @@ from PIL import Image
 import io
 import csv
 import json as json_lib
-from jose import JWTError, jwt
+import jwt
+from jwt.exceptions import InvalidTokenError as JWTError  # PyJWT (no ecdsa vulnerability)
 from passlib.context import CryptContext
 from scheduler import start_scheduler, stop_scheduler, daily_reminder_job
 

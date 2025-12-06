@@ -11,9 +11,9 @@ charset-normalizer==3.4.4
 click==8.3.0
 cryptography==46.0.3
 dnspython==2.8.0
-ecdsa==0.19.1
+# ecdsa removed - CVE-2024-23342, python-jose uses it but we can use PyJWT directly
 email-validator==2.3.0
-litestar[standard]==2.14.0
+litestar[standard]==2.17.0  # Fixed GHSA-674p-xv2x-rf3g
 flake8==7.3.0
 h11==0.16.0
 httpcore==1.0.9
@@ -26,7 +26,7 @@ jq==1.10.0
 markdown-it-py==4.0.0
 mccabe==0.7.0
 mdurl==0.1.2
-motor==3.3.1
+motor==3.6.0  # Updated for pymongo 4.10.x compatibility
 mypy==1.18.2
 mypy_extensions==1.1.0
 numpy==2.3.4
@@ -45,14 +45,14 @@ pycparser==2.23
 pyflakes==3.4.0
 Pygments==2.19.2
 PyJWT==2.10.1
-pymongo==4.5.0
+pymongo==4.10.1  # Fixed CVE-2024-5629 (was 4.5.0)
 pytest==8.4.2
 pytest-asyncio==0.24.0
 pytest-cov==6.0.0
 Faker==37.4.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.1
-python-jose==3.5.0
+# python-jose removed - using PyJWT instead (ecdsa vulnerability CVE-2024-23342)
 python-multipart==0.0.20
 pytokens==0.3.0
 pytz==2025.2
@@ -72,7 +72,7 @@ typing-inspection==0.4.2
 typing_extensions==4.15.0
 tzdata==2025.2
 tzlocal==5.3.1
-urllib3==2.5.0
+urllib3==2.6.0  # Fixed CVE-2025-66418, CVE-2025-66471
 uvicorn==0.25.0
 granian==1.7.6
 msgspec==0.19.0
