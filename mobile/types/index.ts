@@ -323,3 +323,128 @@ export interface CareEventFilters {
   page?: number;
   limit?: number;
 }
+
+// ============================================================================
+// ACTIVITY STREAM
+// ============================================================================
+
+export type ActivityActionType =
+  | 'complete_task'
+  | 'ignore_task'
+  | 'unignore_task'
+  | 'send_reminder'
+  | 'stop_schedule'
+  | 'clear_ignored'
+  | 'create_member'
+  | 'update_member'
+  | 'delete_member'
+  | 'create_care_event'
+  | 'update_care_event'
+  | 'delete_care_event';
+
+export interface ActivityEvent {
+  id: string;
+  campus_id: string;
+  user_id: string;
+  user_name: string;
+  user_photo_url?: string;
+  action_type: ActivityActionType;
+  member_id?: string;
+  member_name?: string;
+  care_event_id?: string;
+  event_type?: EventType;
+  notes?: string;
+  timestamp: string;
+}
+
+// ============================================================================
+// ANALYTICS
+// ============================================================================
+
+export interface AnalyticsDashboard {
+  member_stats: {
+    total: number;
+    active: number;
+    at_risk: number;
+    disconnected: number;
+    new_this_month: number;
+  };
+  demographics: {
+    age_distribution: { range: string; count: number }[];
+    gender_distribution: { gender: string; count: number }[];
+    category_distribution: { category: string; count: number }[];
+    membership_distribution: { status: string; count: number }[];
+  };
+  events_by_type: { type: EventType; count: number; completed: number }[];
+  events_by_month: { month: string; count: number }[];
+  financial: {
+    total_distributed: number;
+    total_pending: number;
+    by_type: { type: AidType; amount: number; count: number }[];
+  };
+  engagement_trends: {
+    date: string;
+    active: number;
+    at_risk: number;
+    disconnected: number;
+  }[];
+}
+
+// ============================================================================
+// REPORTS
+// ============================================================================
+
+export interface MonthlyReport {
+  report_period: {
+    year: number;
+    month: number;
+    month_name: string;
+  };
+  executive_summary: {
+    total_members: number;
+    active_members: number;
+    tasks_completed: number;
+    completion_rate: number;
+  };
+  kpis: {
+    care_completion_rate: number;
+    engagement_rate: number;
+    reach_rate: number;
+    birthday_completion_rate: number;
+  };
+  ministry_highlights: {
+    new_members: number;
+    grief_support_active: number;
+    financial_aid_distributed: number;
+    hospital_visits: number;
+  };
+  care_breakdown: {
+    type: EventType;
+    total: number;
+    completed: number;
+    rate: number;
+  }[];
+  insights: string[];
+  recommendations: string[];
+}
+
+export interface StaffPerformanceReport {
+  period: {
+    year: number;
+    month: number;
+  };
+  team_overview: {
+    total_staff: number;
+    total_tasks_completed: number;
+    average_per_staff: number;
+  };
+  staff_metrics: {
+    user_id: string;
+    user_name: string;
+    user_photo_url?: string;
+    tasks_completed: number;
+    members_contacted: number;
+    active_days: number;
+    rank: number;
+  }[];
+}

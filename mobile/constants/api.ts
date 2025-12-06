@@ -94,6 +94,27 @@ export const API_ENDPOINTS = {
     AID_TYPES: '/config/aid-types',
     EVENT_TYPES: '/config/event-types',
   },
+
+  // Activity Stream
+  ACTIVITY: {
+    STREAM: '/stream/activity',
+    LOGS: '/activity-logs',
+  },
+
+  // Analytics
+  ANALYTICS: {
+    DASHBOARD: '/analytics/dashboard',
+    ENGAGEMENT_TRENDS: '/analytics/engagement-trends',
+    DEMOGRAPHIC_TRENDS: '/analytics/demographic-trends',
+  },
+
+  // Reports
+  REPORTS: {
+    MONTHLY: '/reports/monthly',
+    MONTHLY_PDF: '/reports/monthly/pdf',
+    STAFF_PERFORMANCE: '/reports/staff-performance',
+    YEARLY_SUMMARY: '/reports/yearly-summary',
+  },
 } as const;
 
 // Event types
