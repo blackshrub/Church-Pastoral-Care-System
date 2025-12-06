@@ -4744,7 +4744,7 @@ async def create_aid_schedule(data: FinancialAidScheduleCreate, request: Request
         
         aid_schedule = FinancialAidSchedule(
             member_id=schedule['member_id'],
-            campus_id=current_user['church_id'],
+            campus_id=current_user['campus_id'],
             title=schedule['title'],
             aid_type=schedule['aid_type'],
             aid_amount=schedule['aid_amount'],
@@ -4765,7 +4765,7 @@ async def create_aid_schedule(data: FinancialAidScheduleCreate, request: Request
         await db.financial_aid_schedules.insert_one(schedule_dict)
         
         # Invalidate dashboard cache
-        await invalidate_dashboard_cache(current_user['church_id'])
+        await invalidate_dashboard_cache(current_user['campus_id'])
         
         return aid_schedule
     except Exception as e:
