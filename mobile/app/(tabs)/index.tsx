@@ -409,7 +409,7 @@ const TaskCard = memo(function TaskCard({ task, onComplete, onMarkContact, onPre
               )}
               {aidType && (
                 <Text className="text-xs text-gray-500">
-                  {t(`careEvents.aidTypes.${aidType}`, aidType)}
+                  {String(t(`careEvents.aidTypes.${aidType}`, aidType))}
                 </Text>
               )}
             </View>

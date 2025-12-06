@@ -575,6 +575,17 @@ export const mockDashboardReminders: DashboardReminders = {
       scheduled_date: daysFromNow(0),
     },
   ],
+  overdue_birthdays: [
+    {
+      type: 'birthday',
+      member_id: 'member_003',
+      member_name: 'Dewi Kartika',
+      member_phone: '+6281234567893',
+      member_age: 42,
+      event_id: 'event_overdue_001',
+      scheduled_date: daysFromNow(-3),
+    },
+  ],
   upcoming_birthdays: [
     {
       type: 'birthday',
@@ -583,6 +594,48 @@ export const mockDashboardReminders: DashboardReminders = {
       member_phone: '+6281234567895',
       member_age: 25,
       scheduled_date: daysFromNow(19), // Dec 25
+    },
+  ],
+  upcoming_tasks: [
+    {
+      type: 'birthday',
+      member_id: 'member_005',
+      member_name: 'Linda Permata',
+      member_phone: '+6281234567895',
+      member_age: 25,
+      scheduled_date: daysFromNow(19),
+    },
+    {
+      type: 'financial_aid',
+      member_id: 'member_004',
+      member_name: 'Hendri Susanto',
+      member_phone: '+6281234567894',
+      aid_amount: 500000,
+      aid_type: 'food',
+      title: 'Weekly Food Assistance',
+      scheduled_date: daysFromNow(2),
+    },
+  ],
+  today_tasks: [
+    {
+      type: 'grief_support',
+      member_id: 'member_002',
+      member_name: 'Agus Wijaya',
+      member_phone: '+6281234567892',
+      stage_id: 'grief_stage_003',
+      stage: 'Day 14 - Two Weeks',
+      scheduled_date: daysFromNow(0),
+      title: 'Grief Support Follow-up',
+    },
+    {
+      type: 'accident_followup',
+      member_id: 'member_005',
+      member_name: 'Linda Permata',
+      member_phone: '+6281234567895',
+      stage_id: 'accident_001',
+      stage: 'First Follow-up',
+      scheduled_date: daysFromNow(0),
+      title: 'Hospital Recovery Check',
     },
   ],
   grief_today: [

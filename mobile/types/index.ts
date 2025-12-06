@@ -433,7 +433,8 @@ export interface MonthlyReport {
     new_members: number;
     grief_support_active: number;
     financial_aid_distributed: number;
-    hospital_visits: number;
+    hospital_visits: number | { patients_visited?: number };
+    grief_support?: { families_supported?: number };
   };
   care_breakdown: {
     type: EventType;

@@ -2624,9 +2624,49 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                     "data": followup
                 })
         
-        # At-risk and disconnected members
-        at_risk = [m for m in members if m.get("engagement_status") == "at_risk"]
-        disconnected = [m for m in members if m.get("engagement_status") == "disconnected"]
+        # At-risk and disconnected members - include both formats for webapp/mobile compatibility
+        # Webapp uses: id, name, phone, photo_url, age
+        # Mobile uses: member_id, member_name, member_phone, member_photo_url, member_age
+        at_risk = [
+            {
+                "type": "at_risk",
+                # Webapp format
+                "id": m.get("id"),
+                "name": m.get("name"),
+                "phone": m.get("phone"),
+                "photo_url": m.get("photo_url"),
+                "age": m.get("age"),
+                # Mobile format
+                "member_id": m.get("id"),
+                "member_name": m.get("name"),
+                "member_phone": m.get("phone"),
+                "member_photo_url": m.get("photo_url"),
+                "member_age": m.get("age"),
+                # Common
+                "days_since_last_contact": m.get("days_since_last_contact", 0),
+            }
+            for m in members if m.get("engagement_status") == "at_risk"
+        ]
+        disconnected = [
+            {
+                "type": "disconnected",
+                # Webapp format
+                "id": m.get("id"),
+                "name": m.get("name"),
+                "phone": m.get("phone"),
+                "photo_url": m.get("photo_url"),
+                "age": m.get("age"),
+                # Mobile format
+                "member_id": m.get("id"),
+                "member_name": m.get("name"),
+                "member_phone": m.get("phone"),
+                "member_photo_url": m.get("photo_url"),
+                "member_age": m.get("age"),
+                # Common
+                "days_since_last_contact": m.get("days_since_last_contact", 0),
+            }
+            for m in members if m.get("engagement_status") == "disconnected"
+        ]
 
         # Process financial aid schedules (already fetched in parallel above)
         logger.info(f"Found {len(aid_schedules)} active financial aid schedules for campus")

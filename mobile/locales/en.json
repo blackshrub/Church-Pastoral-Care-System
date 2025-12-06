@@ -312,6 +312,13 @@
       "secondFollowup": "Second Follow-up",
       "finalFollowup": "Final Follow-up"
     },
+    "subtabs": {
+      "birthday": "Birthday",
+      "followups": "Followup",
+      "aid": "Aid",
+      "atRisk": "At Risk",
+      "disconnected": "Inactive"
+    },
     "emptyState": {
       "noTasks": "No tasks",
       "noTasksDesc": "You have no tasks in this category"

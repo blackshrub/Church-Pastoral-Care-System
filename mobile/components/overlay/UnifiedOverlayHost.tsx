@@ -1,6 +1,12 @@
 // components/overlay/UnifiedOverlayHost.tsx
 import React from 'react';
-import { StyleSheet, Pressable, View } from 'react-native';
+import {
+  StyleSheet,
+  Pressable,
+  View,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -39,19 +45,25 @@ export const UnifiedOverlayHost = () => {
       )}
 
       {type === 'bottom-sheet' && (
-        <Animated.View
-          entering={SlideInDown.duration(300)}
-          exiting={SlideOutDown.duration(200)}
-          style={styles.bottomSheetWrapper}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoidingView}
+          keyboardVerticalOffset={0}
         >
-          <BaseBottomSheet
-            visible
-            onClose={close}
-            {...config.props}
+          <Animated.View
+            entering={SlideInDown.duration(300)}
+            exiting={SlideOutDown.duration(200)}
+            style={styles.bottomSheetWrapper}
           >
-            <Component payload={config.props} onClose={close} />
-          </BaseBottomSheet>
-        </Animated.View>
+            <BaseBottomSheet
+              visible
+              onClose={close}
+              {...config.props}
+            >
+              <Component payload={config.props} onClose={close} />
+            </BaseBottomSheet>
+          </Animated.View>
+        </KeyboardAvoidingView>
       )}
     </View>
   );
@@ -66,6 +78,9 @@ const styles = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  keyboardAvoidingView: {
+    width: '100%',
   },
   bottomSheetWrapper: {
     width: '100%',

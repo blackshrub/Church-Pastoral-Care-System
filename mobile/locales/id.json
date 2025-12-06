@@ -312,6 +312,13 @@
       "secondFollowup": "Kunjungan Kedua",
       "finalFollowup": "Kunjungan Terakhir"
     },
+    "subtabs": {
+      "birthday": "Ulang Tahun",
+      "followups": "Tindak Lanjut",
+      "aid": "Bantuan",
+      "atRisk": "Berisiko",
+      "disconnected": "Tidak Aktif"
+    },
     "emptyState": {
       "noTasks": "Tidak ada tugas",
       "noTasksDesc": "Tidak ada tugas dalam kategori ini"

@@ -14,6 +14,7 @@ import {
   RefreshControl,
   Image,
   Linking,
+  ScrollView,
 } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -28,6 +29,7 @@ import {
   Clock,
   AlertTriangle,
   User,
+  Users,
   MessageCircle,
   Phone,
   UserCheck,
@@ -146,6 +148,7 @@ function getTaskType(task: DashboardTask): string {
 }
 
 type TabKey = 'today' | 'upcoming' | 'overdue';
+type OverdueSubTab = 'birthdays' | 'followups' | 'aid' | 'atrisk' | 'disconnected';
 
 // ============================================================================
 // COMPONENTS
@@ -359,7 +362,7 @@ const TaskCard = memo(function TaskCard({ task, onComplete, onMarkContact, onPre
               )}
               {aidType && (
                 <Text className="text-xs text-gray-500">
-                  {t(`careEvents.aidTypes.${aidType}`, aidType)}
+                  {String(t(`careEvents.aidTypes.${aidType}`, aidType))}
                 </Text>
               )}
             </View>
@@ -435,6 +438,7 @@ function TasksScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabKey>('today');
+  const [activeOverdueSubTab, setActiveOverdueSubTab] = useState<OverdueSubTab>('birthdays');
 
   const {
     data: reminders,
@@ -472,16 +476,76 @@ function TasksScreen() {
     return reminders.upcoming_tasks || reminders.upcoming_birthdays || [];
   }, [reminders]);
 
-  const overdueTasks = useMemo(() => {
-    if (!reminders) return [];
-    return [
-      ...(reminders.overdue_birthdays || []),  // Past birthdays not yet completed
-      ...(reminders.at_risk_members || []),
-      ...(reminders.disconnected_members || []),
-    ];
-  }, [reminders]);
+  // Overdue sub-tab data
+  const overdueBirthdays = useMemo(() =>
+    reminders?.overdue_birthdays || [], [reminders]);
 
-  // Current tasks based on tab
+  const overdueFollowups = useMemo(() => [
+    ...(reminders?.grief_today || []).filter((g: any) => (g.days_overdue || 0) > 0),
+    ...(reminders?.accident_followup || []).filter((a: any) => (a.days_overdue || 0) > 0),
+  ], [reminders]);
+
+  const overdueAid = useMemo(() =>
+    (reminders?.financial_aid_due || []).filter((a: any) => (a.days_overdue || 0) > 0), [reminders]);
+
+  const atRiskMembers = useMemo(() =>
+    reminders?.at_risk_members || [], [reminders]);
+
+  const disconnectedMembers = useMemo(() =>
+    reminders?.disconnected_members || [], [reminders]);
+
+  // Total overdue count for main tab
+  const totalOverdueCount = overdueBirthdays.length +
+    overdueFollowups.length +
+    overdueAid.length +
+    atRiskMembers.length +
+    disconnectedMembers.length;
+
+  // Sub-tabs configuration
+  const overdueSubTabs = useMemo(() => [
+    {
+      key: 'birthdays' as OverdueSubTab,
+      label: t('tasks.subtabs.birthday', 'Birthday'),
+      icon: Cake,
+      count: overdueBirthdays.length,
+      activeClass: 'bg-amber-500',
+      iconColor: { active: '#ffffff', inactive: '#f59e0b' },
+    },
+    {
+      key: 'followups' as OverdueSubTab,
+      label: t('tasks.subtabs.followups', 'Followup'),
+      icon: Hospital,
+      count: overdueFollowups.length,
+      activeClass: 'bg-purple-500',
+      iconColor: { active: '#ffffff', inactive: '#8b5cf6' },
+    },
+    {
+      key: 'aid' as OverdueSubTab,
+      label: t('tasks.subtabs.aid', 'Aid'),
+      icon: DollarSign,
+      count: overdueAid.length,
+      activeClass: 'bg-violet-500',
+      iconColor: { active: '#ffffff', inactive: '#8b5cf6' },
+    },
+    {
+      key: 'atrisk' as OverdueSubTab,
+      label: t('tasks.subtabs.atRisk', 'At Risk'),
+      icon: AlertTriangle,
+      count: atRiskMembers.length,
+      activeClass: 'bg-amber-500',
+      iconColor: { active: '#ffffff', inactive: '#f59e0b' },
+    },
+    {
+      key: 'disconnected' as OverdueSubTab,
+      label: t('tasks.subtabs.disconnected', 'Inactive'),
+      icon: Users,
+      count: disconnectedMembers.length,
+      activeClass: 'bg-red-500',
+      iconColor: { active: '#ffffff', inactive: '#ef4444' },
+    },
+  ], [t, overdueBirthdays.length, overdueFollowups.length, overdueAid.length, atRiskMembers.length, disconnectedMembers.length]);
+
+  // Current tasks based on tab and sub-tab
   const currentTasks = useMemo(() => {
     switch (activeTab) {
       case 'today':
@@ -489,11 +553,25 @@ function TasksScreen() {
       case 'upcoming':
         return upcomingTasks;
       case 'overdue':
-        return overdueTasks;
+        // Return based on active sub-tab
+        switch (activeOverdueSubTab) {
+          case 'birthdays':
+            return overdueBirthdays;
+          case 'followups':
+            return overdueFollowups;
+          case 'aid':
+            return overdueAid;
+          case 'atrisk':
+            return atRiskMembers;
+          case 'disconnected':
+            return disconnectedMembers;
+          default:
+            return [];
+        }
       default:
         return [];
     }
-  }, [activeTab, todayTasks, upcomingTasks, overdueTasks]);
+  }, [activeTab, activeOverdueSubTab, todayTasks, upcomingTasks, overdueBirthdays, overdueFollowups, overdueAid, atRiskMembers, disconnectedMembers]);
 
   // Handle task completion
   const handleComplete = useCallback(
@@ -521,7 +599,7 @@ function TasksScreen() {
   const tabs: { key: TabKey; label: string; count: number }[] = [
     { key: 'today', label: t('tasks.tabs.today'), count: todayTasks.length },
     { key: 'upcoming', label: t('tasks.tabs.upcoming'), count: upcomingTasks.length },
-    { key: 'overdue', label: t('tasks.tabs.overdue'), count: overdueTasks.length },
+    { key: 'overdue', label: t('tasks.tabs.overdue'), count: totalOverdueCount },
   ];
 
   return (
@@ -535,7 +613,7 @@ function TasksScreen() {
           {t('tasks.title')}
         </Text>
 
-        {/* Tabs */}
+        {/* Main Tabs */}
         <View className="flex-row gap-2">
           {tabs.map((tab) => {
             const isActive = tab.key === activeTab;
@@ -585,6 +663,46 @@ function TasksScreen() {
             );
           })}
         </View>
+
+        {/* Overdue Sub-Tabs */}
+        {activeTab === 'overdue' && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="mt-3 -mx-6 px-6"
+          >
+            <View className="flex-row gap-2">
+              {overdueSubTabs.map((subTab) => {
+                const isActive = activeOverdueSubTab === subTab.key;
+                const SubIcon = subTab.icon;
+                return (
+                  <Pressable
+                    key={subTab.key}
+                    className={`flex-row items-center px-3 py-1.5 rounded-full gap-1.5 ${
+                      isActive ? subTab.activeClass : 'bg-gray-100'
+                    }`}
+                    onPress={() => {
+                      haptics.tap();
+                      setActiveOverdueSubTab(subTab.key);
+                    }}
+                  >
+                    <SubIcon
+                      size={14}
+                      color={isActive ? subTab.iconColor.active : subTab.iconColor.inactive}
+                    />
+                    <Text
+                      className={`text-xs font-medium ${
+                        isActive ? 'text-white' : 'text-gray-600'
+                      }`}
+                    >
+                      {subTab.count}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </ScrollView>
+        )}
       </View>
 
       {/* Content */}

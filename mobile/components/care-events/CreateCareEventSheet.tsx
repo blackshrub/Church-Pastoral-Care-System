@@ -17,9 +17,7 @@ import {
   ScrollView,
   TextInput,
   Platform,
-  KeyboardAvoidingView,
   ActivityIndicator,
-  Keyboard,
   Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -1034,25 +1032,19 @@ export function CreateCareEventSheet({
   const maxSheetHeight = screenHeight * 0.85;
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="w-full"
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+    <View
+      className="bg-white rounded-t-3xl shadow-2xl w-full"
+      style={{ maxHeight: maxSheetHeight }}
     >
-      <View
-        className="bg-white rounded-t-3xl shadow-2xl"
-        style={{ maxHeight: maxSheetHeight }}
-      >
-        {/* Handle bar */}
-        <View className="items-center pt-3 pb-2">
-          <View className="w-10 h-1 bg-gray-300 rounded-full" />
-        </View>
-
-        {step === 'member' && renderMemberSelector()}
-        {step === 'type' && renderTypeSelector()}
-        {step === 'form' && renderForm()}
+      {/* Handle bar */}
+      <View className="items-center pt-3 pb-2">
+        <View className="w-10 h-1 bg-gray-300 rounded-full" />
       </View>
-    </KeyboardAvoidingView>
+
+      {step === 'member' && renderMemberSelector()}
+      {step === 'type' && renderTypeSelector()}
+      {step === 'form' && renderForm()}
+    </View>
   );
 }
 
