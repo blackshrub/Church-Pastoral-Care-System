@@ -174,9 +174,11 @@ export interface GriefStage {
   member_photo_url?: string;
   campus_id: string;
   stage: string;
+  stage_type?: string;
   scheduled_date: string;
   completed: boolean;
   completed_at?: string;
+  completed_by_user_name?: string;
   ignored: boolean;
   ignored_at?: string;
   ignored_by?: string;
@@ -190,6 +192,8 @@ export interface GriefStage {
 // ACCIDENT FOLLOWUP
 // ============================================================================
 
+export type AccidentFollowupStage = 'first_followup' | 'second_followup' | 'final_followup';
+
 export interface AccidentFollowup {
   id: string;
   care_event_id: string;
@@ -198,10 +202,13 @@ export interface AccidentFollowup {
   member_phone?: string;
   member_photo_url?: string;
   campus_id: string;
-  stage: 'first_followup' | 'second_followup' | 'final_followup';
+  stage: AccidentFollowupStage;
+  stage_type?: AccidentFollowupStage;
   scheduled_date: string;
+  hospital_name?: string;
   completed: boolean;
   completed_at?: string;
+  completed_by_user_name?: string;
   ignored: boolean;
   ignored_at?: string;
   ignored_by?: string;
@@ -224,16 +231,23 @@ export interface FinancialAidSchedule {
   title: string;
   aid_type: AidType;
   aid_amount: number;
+  amount?: number;
   frequency: 'one_time' | 'weekly' | 'monthly' | 'annually';
   start_date: string;
+  scheduled_date?: string;
+  payment_date?: string;
   end_date?: string;
   day_of_week?: string;
   day_of_month?: number;
   month_of_year?: number;
   is_active: boolean;
+  ignored: boolean;
   ignored_occurrences: string[];
   next_occurrence?: string;
   occurrences_completed: number;
+  distributed?: boolean;
+  distributed_at?: string;
+  distributed_by_user_name?: string;
   created_by: string;
   notes?: string;
   created_at: string;
@@ -246,7 +260,10 @@ export interface FinancialAidSchedule {
 
 export interface DashboardReminders {
   birthdays_today: DashboardTask[];
+  overdue_birthdays: DashboardTask[];  // Past birthdays not yet completed
   upcoming_birthdays: DashboardTask[];
+  upcoming_tasks: DashboardTask[];  // All upcoming tasks (birthdays, accidents, financial aid, etc.)
+  today_tasks: DashboardTask[];  // All tasks due today (birthdays, grief, accidents, financial aid)
   grief_today: DashboardTask[];
   accident_followup: DashboardTask[];
   at_risk_members: DashboardTask[];
@@ -255,7 +272,7 @@ export interface DashboardReminders {
   ai_suggestions: any[];
   total_tasks: number;
   total_members: number;
-  cache_version: string;
+  cache_version?: string;
 }
 
 export interface DashboardTask {

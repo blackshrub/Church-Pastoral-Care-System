@@ -321,19 +321,23 @@ const MonthlyReportTab = memo(function MonthlyReportTab({ year, month }: Monthly
               <View className="flex-row items-center justify-between py-2 border-b border-gray-100">
                 <View className="flex-row items-center gap-2">
                   <Heart size={16} color="#6366f1" />
-                  <Text className="text-sm text-gray-600">Active Grief Support</Text>
+                  <Text className="text-sm text-gray-600">Grief Families Supported</Text>
                 </View>
                 <Text className="text-sm font-semibold text-gray-900">
-                  {data.ministry_highlights.grief_support_active || 0}
+                  {typeof data.ministry_highlights.grief_support === 'object'
+                    ? data.ministry_highlights.grief_support?.families_supported || 0
+                    : data.ministry_highlights.grief_support_active || 0}
                 </Text>
               </View>
               <View className="flex-row items-center justify-between py-2 border-b border-gray-100">
                 <View className="flex-row items-center gap-2">
                   <Hospital size={16} color="#ef4444" />
-                  <Text className="text-sm text-gray-600">Hospital Visits</Text>
+                  <Text className="text-sm text-gray-600">Patients Visited</Text>
                 </View>
                 <Text className="text-sm font-semibold text-gray-900">
-                  {data.ministry_highlights.hospital_visits || 0}
+                  {typeof data.ministry_highlights.hospital_visits === 'object'
+                    ? data.ministry_highlights.hospital_visits?.patients_visited || 0
+                    : data.ministry_highlights.hospital_visits || 0}
                 </Text>
               </View>
               <View className="flex-row items-center justify-between py-2">

@@ -42,6 +42,7 @@ import { useAuthStore } from '@/stores/auth';
 import { useDashboardReminders, useCompleteTask } from '@/hooks/useDashboard';
 import { useOverlayStore } from '@/stores/overlayStore';
 import { CreateCareEventSheet } from '@/components/care-events/CreateCareEventSheet';
+import { MemberAvatar } from '@/components/ui/CachedImage';
 import { gradients, eventTypeColors, colors } from '@/constants/theme';
 import { haptics } from '@/constants/interaction';
 import type { DashboardTask, EventType } from '@/types';
@@ -107,6 +108,9 @@ function getTaskIcon(type: string) {
       return Home;
     case 'regular_contact':
       return Phone;
+    case 'at_risk':
+    case 'disconnected':
+      return Users;
     default:
       return CheckSquare;
   }
@@ -129,21 +133,84 @@ interface TaskCardProps {
 
 const TaskCard = memo(function TaskCard({ task, onComplete, onPress }: TaskCardProps) {
   const { t } = useTranslation();
-  const Icon = getTaskIcon(task.type);
-  const color = getTaskColor(task.type);
+  // Backend uses different fields depending on task source:
+  // - upcoming_tasks/today_tasks: has "type" field
+  // - birthdays_today/overdue_birthdays: has "event_type" field (from care_events)
+  // - grief_today: has "stage" field (from grief_support collection)
+  // - accident_followup: has "stage" field (from accident_followups collection)
+  // - financial_aid_due: has "aid_type" field (from financial_aid_schedules collection)
+  const getTaskType = () => {
+    if (task.type) return task.type;
+    if ((task as any).event_type) return (task as any).event_type;
+    // For grief/accident stages without explicit type, detect from stage or collection fields
+    if ((task as any).stage) {
+      // Check if it's an accident followup (has specific stage names)
+      const stageValue = (task as any).stage;
+      if (typeof stageValue === 'string' &&
+          (stageValue.includes('followup') || stageValue === 'first_followup' ||
+           stageValue === 'second_followup' || stageValue === 'final_followup')) {
+        return 'accident_followup';
+      }
+      // Otherwise it's grief support
+      return 'grief_stage';
+    }
+    // For financial aid schedules
+    if ((task as any).aid_type || (task as any).aid_amount !== undefined) {
+      return 'financial_aid';
+    }
+    return '';
+  };
+  const taskType = getTaskType();
+  const Icon = getTaskIcon(taskType);
+  const color = getTaskColor(taskType);
+
+  // Determine the type label based on task type
+  const getTypeLabel = () => {
+    switch (taskType) {
+      case 'birthday':
+        return t('tasks.types.birthday', 'Birthday');
+      case 'grief_stage':
+      case 'grief_loss':
+        return t('tasks.types.grief', 'Grief Support');
+      case 'accident_followup':
+      case 'accident_illness':
+        return t('tasks.types.accident', 'Accident/Illness');
+      case 'financial_aid':
+        return t('tasks.types.financial_aid', 'Financial Aid');
+      case 'at_risk':
+        return t('tasks.types.at_risk', 'At Risk');
+      case 'disconnected':
+        return t('tasks.types.disconnected', 'Disconnected');
+      case 'childbirth':
+        return t('tasks.types.childbirth', 'Childbirth');
+      case 'new_house':
+        return t('tasks.types.new_house', 'New House');
+      case 'regular_contact':
+        return t('tasks.types.regular_contact', 'Regular Contact');
+      default:
+        return taskType || t('tasks.types.task', 'Task');
+    }
+  };
+  const typeLabel = getTypeLabel();
 
   return (
     <Pressable
       className="flex-row items-center bg-white rounded-xl p-4 shadow-sm active:opacity-90 active:scale-[0.98]"
       onPress={onPress}
     >
-      {/* Icon */}
-      <View
-        className="w-10 h-10 rounded-lg items-center justify-center"
-        style={{ backgroundColor: `${color}15` }}
-      >
-        <Icon size={20} color={color} />
-      </View>
+      {/* Profile Photo or Icon */}
+      {task.member_photo_url ? (
+        <Image
+          source={{ uri: task.member_photo_url }}
+          className="w-10 h-10 rounded-full"
+        />
+      ) : (
+        <View
+          className="w-10 h-10 rounded-full items-center justify-center bg-gray-100"
+        >
+          <User size={20} color="#9ca3af" />
+        </View>
+      )}
 
       {/* Content */}
       <View className="flex-1 ml-3">
@@ -151,7 +218,7 @@ const TaskCard = memo(function TaskCard({ task, onComplete, onPress }: TaskCardP
           {task.member_name}
         </Text>
         <Text className="text-sm text-gray-500 mt-0.5">
-          {t(`careEvents.types.${task.type}`, task.type)}
+          {typeLabel}
           {task.stage && ` - ${t(`careEvents.griefStages.${task.stage}`, task.stage)}`}
         </Text>
       </View>
