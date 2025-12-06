@@ -70,6 +70,8 @@ import { haptics } from '@/constants/interaction';
 import { useOverlayStore } from '@/stores/overlayStore';
 import { CreateCareEventSheet } from '@/components/care-events';
 import type { CareEvent, GriefStage, AccidentFollowup, FinancialAidSchedule } from '@/types';
+import { formatDateToLocalTimezone, formatAge } from '@/lib/dateUtils';
+import { formatCurrency } from '@/lib/formatting';
 
 // ============================================================================
 // TYPES
@@ -108,34 +110,9 @@ function getEventColor(type: string) {
   return eventTypeColors[type as keyof typeof eventTypeColors] || colors.primary[500];
 }
 
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-function formatAge(birthDate: string): string {
-  const birth = new Date(birthDate);
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-    age--;
-  }
-  return `${age} years`;
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+// Use centralized date formatting with Indonesian locale
+const formatDate = (dateString: string | null | undefined) =>
+  formatDateToLocalTimezone(dateString, 'medium');
 
 // ============================================================================
 // TAB BUTTON COMPONENT

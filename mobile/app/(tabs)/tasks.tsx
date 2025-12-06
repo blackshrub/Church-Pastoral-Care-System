@@ -30,6 +30,7 @@ import {
 import { useDashboardReminders, useCompleteTask } from '@/hooks/useDashboard';
 import { eventTypeColors, colors } from '@/constants/theme';
 import { haptics } from '@/constants/interaction';
+import { formatDateToLocalTimezone } from '@/lib/dateUtils';
 import type { DashboardTask } from '@/types';
 
 // ============================================================================
@@ -109,7 +110,7 @@ const TaskCard = memo(function TaskCard({ task, onComplete, onPress }: TaskCardP
         </Text>
         {task.scheduled_date && (
           <Text className="text-xs text-gray-400 mt-0.5">
-            {new Date(task.scheduled_date).toLocaleDateString()}
+            {formatDateToLocalTimezone(task.scheduled_date, 'short')}
           </Text>
         )}
       </View>

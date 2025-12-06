@@ -278,7 +278,7 @@ export function formatCountLabel(count: number, singular: string, plural?: strin
  */
 export function formatDateLabel(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date;
-  return d.toLocaleDateString(undefined, {
+  return d.toLocaleDateString('id-ID', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',

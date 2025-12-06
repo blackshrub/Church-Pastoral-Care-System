@@ -731,7 +731,7 @@ export function CreateCareEventSheet({
               >
                 <Calendar size={18} color="#9ca3af" />
                 <Text className="text-gray-900 ml-2">
-                  {eventDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {eventDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </Text>
               </Pressable>
               {showDatePicker && (
@@ -864,7 +864,7 @@ export function CreateCareEventSheet({
                     >
                       <Calendar size={18} color="#9ca3af" />
                       <Text className="text-gray-900 ml-2">
-                        {paymentDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        {paymentDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </Text>
                     </Pressable>
                     <Text className="text-xs text-gray-500 mt-1">Date when aid was given</Text>
@@ -899,7 +899,7 @@ export function CreateCareEventSheet({
                         <Calendar size={18} color="#9ca3af" />
                         <Text className="text-gray-900 ml-2">
                           {scheduleEndDate
-                            ? scheduleEndDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+                            ? scheduleEndDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
                             : 'No end date'}
                         </Text>
                       </Pressable>
