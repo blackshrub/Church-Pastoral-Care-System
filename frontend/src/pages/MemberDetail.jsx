@@ -844,7 +844,7 @@ export const MemberDetail = () => {
             )}
             {(careEvents.filter(e => e.event_type === 'financial_aid').length > 0 || aidSchedules.length > 0) && (
               <TabsTrigger value="aid" data-testid="tab-aid" className="flex-shrink-0">
-                <DollarSign className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Aid</span> ({careEvents.filter(e => e.event_type === 'financial_aid').length + aidSchedules.length})
+                <DollarSign className="w-4 h-4 sm:mr-2" /><span className="hidden sm:inline">Aid</span> ({careEvents.filter(e => e.event_type === 'financial_aid' && !(e.aid_notes && e.aid_notes.includes('schedule'))).length + aidSchedules.length})
               </TabsTrigger>
             )}
           </TabsList>
