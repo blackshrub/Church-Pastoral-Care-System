@@ -5172,6 +5172,7 @@ async def mark_aid_distributed(schedule_id: str, request: Request) -> dict:
 @post("/financial-aid-schedules/{schedule_id:str}/ignore")
 async def ignore_financial_aid_schedule(schedule_id: str, request: Request) -> dict:
     """Mark a specific financial aid occurrence as ignored (not the entire schedule)"""
+    current_user = await get_current_user(request)
     try:
         schedule = await db.financial_aid_schedules.find_one({"id": schedule_id}, {"_id": 0})
         if not schedule:
@@ -5242,14 +5243,14 @@ async def ignore_financial_aid_schedule(schedule_id: str, request: Request) -> d
         # Log activity
         await log_activity(
             campus_id=schedule["campus_id"],
-            user_id=user["id"],
-            user_name=user["name"],
+            user_id=current_user["id"],
+            user_name=current_user["name"],
             action_type=ActivityActionType.IGNORE_TASK,
             member_id=schedule["member_id"],
             member_name=member_name,
             event_type=EventType.FINANCIAL_AID,
             notes=f"Ignored {schedule.get('aid_type', 'financial aid')} payment on {current_occurrence}",
-            user_photo_url=user.get("photo_url")
+            user_photo_url=current_user.get("photo_url")
         )
         
         # Invalidate dashboard cache
