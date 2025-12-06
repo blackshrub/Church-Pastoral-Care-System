@@ -6170,7 +6170,7 @@ async def import_members_csv(request: Request, data: UploadFile) -> Response:
         raise HTTPException(status_code=500, detail=safe_error_detail(e))
 
 @post("/import/members/json")
-async def import_members_json(members: List[Dict[str, Any]], request: Request) -> dict:
+async def import_members_json(data: List[Dict[str, Any]] = Body(), request: Request = None) -> dict:
     """Import members from JSON array"""
     current_user = await get_current_user(request)
     try:
@@ -6182,7 +6182,7 @@ async def import_members_json(members: List[Dict[str, Any]], request: Request) -
         imported_count = 0
         errors = []
 
-        for member_data in members:
+        for member_data in data:
             try:
                 member = Member(
                     name=member_data.get('name', ''),
@@ -7956,7 +7956,7 @@ async def get_grief_stages() -> dict:
         raise HTTPException(status_code=500, detail=safe_error_detail(e))
 
 @put("/settings/grief-stages")
-async def update_grief_stages(stages: list, request: Request) -> dict:
+async def update_grief_stages(data: list = Body(), request: Request = None) -> dict:
     """Update grief support stage configuration"""
     current_admin = await get_current_admin(request)
     try:
@@ -7964,7 +7964,7 @@ async def update_grief_stages(stages: list, request: Request) -> dict:
             {"type": "grief_stages"},
             {"$set": {
                 "type": "grief_stages",
-                "data": stages,
+                "data": data,
                 "updated_at": datetime.now(timezone.utc),
                 "updated_by": current_admin["id"]
             }},
@@ -7993,7 +7993,7 @@ async def get_accident_followup() -> dict:
         raise HTTPException(status_code=500, detail=safe_error_detail(e))
 
 @put("/settings/accident-followup")
-async def update_accident_followup(config: list, request: Request) -> dict:
+async def update_accident_followup(data: list = Body(), request: Request = None) -> dict:
     """Update accident follow-up configuration"""
     current_admin = await get_current_admin(request)
     try:
@@ -8001,7 +8001,7 @@ async def update_accident_followup(config: list, request: Request) -> dict:
             {"type": "accident_followup"},
             {"$set": {
                 "type": "accident_followup",
-                "data": config,
+                "data": data,
                 "updated_at": datetime.now(timezone.utc),
                 "updated_by": current_admin["id"]
             }},
