@@ -3175,9 +3175,10 @@ async def delete_care_event(event_id: str, request: Request) -> dict:
         result = await db.care_events.delete_one({"id": event_id})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Care event not found")
-        
+
         # Delete activity logs related to this care event
-        await db.activity_logs.delete_many({"care_event_id": event_id})
+        activity_delete_result = await db.activity_logs.delete_many({"care_event_id": event_id})
+        logger.info(f"[DELETE EVENT] Deleted {activity_delete_result.deleted_count} activity logs for care_event_id={event_id}")
 
         # Delete notification logs related to this care event
         await db.notification_logs.delete_many({"care_event_id": event_id})
