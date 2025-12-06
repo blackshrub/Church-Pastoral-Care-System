@@ -26,6 +26,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     console.log('[Layout] useEffect running...');
+    let notificationCleanup: (() => void) | undefined;
+
     const init = async () => {
       console.log('[Init] Starting...');
       try {
@@ -37,6 +39,13 @@ export default function RootLayout() {
         const { useAuthStore } = await import('@/stores/auth');
         await useAuthStore.getState().initialize();
         console.log('[Init] auth done');
+
+        // Initialize push notifications
+        const notifications = await import('@/services/notifications');
+        notificationCleanup = notifications.setupNotificationListeners();
+        const user = useAuthStore.getState().user;
+        await notifications.initializePushNotifications(user?.id);
+        console.log('[Init] notifications done');
       } catch (e: any) {
         console.error('[Init] Error:', e);
         setError(e.message || 'Unknown error');
@@ -46,6 +55,11 @@ export default function RootLayout() {
       }
     };
     init();
+
+    // Cleanup notification listeners on unmount
+    return () => {
+      notificationCleanup?.();
+    };
   }, []);
 
   // Show loading only while initializing

@@ -11,6 +11,7 @@ import { Platform } from 'react-native';
 import { router } from 'expo-router';
 
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import api from '@/services/api';
 
 // ============================================================================
 // CONFIGURATION
@@ -427,6 +428,92 @@ export async function setupAndroidChannels(): Promise<void> {
   });
 }
 
+// ============================================================================
+// BACKEND TOKEN REGISTRATION
+// ============================================================================
+
+/**
+ * Register push token with backend for server-sent notifications
+ * Call this after successful login and when token changes
+ */
+export async function registerPushToken(userId: string): Promise<boolean> {
+  try {
+    const token = await getPushToken();
+    if (!token) {
+      console.warn('No push token available to register');
+      return false;
+    }
+
+    // Store token locally
+    storage.set(STORAGE_KEYS.PUSH_TOKEN, token);
+
+    // Send to backend
+    await api.post('/users/push-token', {
+      user_id: userId,
+      token,
+      platform: Platform.OS,
+      device_id: Device.osInternalBuildId || Device.deviceName,
+    });
+
+    console.log('Push token registered successfully');
+    return true;
+  } catch (error) {
+    console.error('Failed to register push token:', error);
+    return false;
+  }
+}
+
+/**
+ * Unregister push token from backend (on logout)
+ */
+export async function unregisterPushToken(): Promise<void> {
+  try {
+    const token = storage.getString(STORAGE_KEYS.PUSH_TOKEN);
+    if (token) {
+      await api.delete('/users/push-token', {
+        data: { token },
+      });
+      storage.delete(STORAGE_KEYS.PUSH_TOKEN);
+    }
+  } catch (error) {
+    console.error('Failed to unregister push token:', error);
+  }
+}
+
+/**
+ * Initialize push notifications
+ * Call this in root layout on mount
+ */
+export async function initializePushNotifications(userId?: string): Promise<void> {
+  // Setup Android channels
+  await setupAndroidChannels();
+
+  // Request permissions if not granted
+  const enabled = await areNotificationsEnabled();
+  if (!enabled) {
+    // Don't automatically request - let user opt-in via settings
+    console.log('Push notifications not enabled');
+    return;
+  }
+
+  // Register token with backend if user is logged in
+  if (userId) {
+    await registerPushToken(userId);
+  }
+
+  // Schedule daily digest if enabled
+  const digestEnabled = storage.getBoolean('daily_digest_enabled');
+  if (digestEnabled) {
+    const notifications = await getScheduledNotifications();
+    const hasDigest = notifications.some(
+      (n) => (n.content.data as any)?.type === 'general'
+    );
+    if (!hasDigest) {
+      await scheduleDailyDigest(8, 0); // 8 AM
+    }
+  }
+}
+
 export default {
   requestNotificationPermissions,
   areNotificationsEnabled,
@@ -446,4 +533,7 @@ export default {
   clearBadge,
   getBadgeCount,
   setupAndroidChannels,
+  registerPushToken,
+  unregisterPushToken,
+  initializePushNotifications,
 };
