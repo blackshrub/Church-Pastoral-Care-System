@@ -240,7 +240,36 @@
       "aidType": "Jenis Bantuan",
       "aidAmount": "Jumlah",
       "aidNotes": "Catatan",
-      "aidNotesPlaceholder": "Catatan tambahan..."
+      "aidNotesPlaceholder": "Catatan tambahan...",
+      "paymentType": "Jenis Pembayaran",
+      "griefTimelineNote": "Timeline dukungan kedukaan 6 tahap akan dibuat otomatis",
+      "financialAidDetails": "Detail Bantuan Dana",
+      "aidTitle": "Nama/Judul Bantuan",
+      "aidTitleRequired": "Nama/Judul Bantuan *",
+      "aidTypeLabel": "Jenis Bantuan *",
+      "amountLabel": "Jumlah (Rp) *",
+      "paymentTypeLabel": "Jenis Pembayaran",
+      "frequency": "Frekuensi",
+      "paymentDate": "Tanggal Pembayaran",
+      "paymentDateHint": "Tanggal bantuan diberikan",
+      "dayOfWeek": "Hari dalam Minggu",
+      "dayOfMonth": "Tanggal dalam Bulan",
+      "endDateOptional": "Tanggal Akhir (opsional)",
+      "startMonth": "Bulan Mulai",
+      "startYear": "Tahun Mulai",
+      "endMonth": "Bulan Akhir",
+      "endYear": "Tahun Akhir",
+      "monthOfYear": "Bulan dalam Tahun",
+      "noEndDate": "Tanpa tanggal akhir",
+      "save": "Simpan Pelayanan",
+      "saving": "Menyimpan...",
+      "selectRelationship": "Pilih hubungan"
+    },
+    "scheduleFrequency": {
+      "one_time": "Pembayaran Satu Kali (sudah diberikan)",
+      "weekly": "Jadwal Mingguan (pembayaran mendatang)",
+      "monthly": "Jadwal Bulanan (pembayaran mendatang)",
+      "annually": "Jadwal Tahunan (pembayaran mendatang)"
     },
     "griefStages": {
       "mourning": "Ibadah Penghiburan",
@@ -379,5 +408,25 @@
     "offlineDesc": "Periksa koneksi internet untuk memuat data terbaru.",
     "error": "Terjadi kesalahan",
     "errorDesc": "Tidak dapat memuat data. Silakan coba lagi atau hubungi dukungan."
+  },
+  "validation": {
+    "titleRequired": "Judul Diperlukan",
+    "aidTitleRequired": "Silakan masukkan nama/judul bantuan",
+    "amountRequired": "Jumlah Diperlukan",
+    "validAmountRequired": "Silakan masukkan jumlah yang valid",
+    "required": "Bidang ini wajib diisi",
+    "invalidAmount": "Silakan masukkan jumlah yang valid"
+  },
+  "errors": {
+    "somethingWentWrong": "Terjadi Kesalahan",
+    "genericErrorMessage": "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
+    "networkError": "Tidak Ada Koneksi",
+    "networkErrorMessage": "Periksa koneksi internet Anda dan coba lagi.",
+    "serverError": "Kesalahan Server",
+    "serverErrorMessage": "Server kami sedang bermasalah. Silakan coba lagi nanti.",
+    "notFound": "Tidak Ditemukan",
+    "notFoundMessage": "Sumber daya yang diminta tidak dapat ditemukan.",
+    "loadFailed": "Gagal memuat data",
+    "tryAgain": "Coba Lagi"
   }
 }

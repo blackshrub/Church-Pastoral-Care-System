@@ -38,114 +38,18 @@ import {
 } from 'lucide-react-native';
 
 import { useDashboardReminders, useCompleteTask, useMarkMemberContacted } from '@/hooks/useDashboard';
-import { eventTypeColors, colors } from '@/constants/theme';
 import { haptics } from '@/constants/interaction';
+import {
+  getTaskIcon,
+  getTaskStyles,
+  getTaskColor,
+  getTaskType,
+  getDaysUntil,
+  isContactType,
+} from '@/constants/taskTypes';
 import { formatDateToLocalTimezone } from '@/lib/dateUtils';
 import { formatPhoneForWhatsApp, formatPhoneNumber, formatCurrency } from '@/lib/formatting';
 import type { DashboardTask } from '@/types';
-
-// ============================================================================
-// HELPERS
-// ============================================================================
-
-function getTaskIcon(type: string) {
-  switch (type) {
-    case 'birthday':
-      return Cake;
-    case 'grief_stage':
-    case 'grief_loss':
-      return Heart;
-    case 'accident_followup':
-    case 'accident_illness':
-      return Hospital;
-    case 'financial_aid':
-      return DollarSign;
-    case 'at_risk':
-      return Clock;
-    case 'disconnected':
-      return AlertTriangle;
-    case 'childbirth':
-      return Baby;
-    case 'new_house':
-      return Home;
-    default:
-      return CheckSquare;
-  }
-}
-
-// Task type styling configuration
-const TASK_TYPE_STYLES: Record<string, { ring: string; bg: string; text: string }> = {
-  birthday: { ring: 'border-amber-400', bg: 'bg-amber-50', text: 'text-amber-600' },
-  grief_stage: { ring: 'border-purple-400', bg: 'bg-purple-50', text: 'text-purple-600' },
-  grief_loss: { ring: 'border-purple-400', bg: 'bg-purple-50', text: 'text-purple-600' },
-  accident_followup: { ring: 'border-teal-400', bg: 'bg-teal-50', text: 'text-teal-600' },
-  accident_illness: { ring: 'border-teal-400', bg: 'bg-teal-50', text: 'text-teal-600' },
-  financial_aid: { ring: 'border-violet-400', bg: 'bg-violet-50', text: 'text-violet-600' },
-  at_risk: { ring: 'border-amber-400', bg: 'bg-amber-50', text: 'text-amber-600' },
-  disconnected: { ring: 'border-red-400', bg: 'bg-red-50', text: 'text-red-600' },
-  childbirth: { ring: 'border-pink-400', bg: 'bg-pink-50', text: 'text-pink-600' },
-  new_house: { ring: 'border-emerald-400', bg: 'bg-emerald-50', text: 'text-emerald-600' },
-  regular_contact: { ring: 'border-blue-400', bg: 'bg-blue-50', text: 'text-blue-600' },
-};
-
-function getTaskStyles(type: string) {
-  return TASK_TYPE_STYLES[type] || { ring: 'border-gray-300', bg: 'bg-gray-50', text: 'text-gray-600' };
-}
-
-function getTaskColor(type: string) {
-  switch (type) {
-    case 'birthday':
-      return eventTypeColors.birthday;
-    case 'grief_stage':
-    case 'grief_loss':
-      return eventTypeColors.grief_loss;
-    case 'accident_followup':
-    case 'accident_illness':
-      return eventTypeColors.accident_illness;
-    case 'financial_aid':
-      return eventTypeColors.financial_aid;
-    case 'at_risk':
-      return colors.status.warning;
-    case 'disconnected':
-      return colors.status.error;
-    case 'childbirth':
-      return '#ec4899'; // pink-500
-    case 'new_house':
-      return '#10b981'; // emerald-500
-    default:
-      return colors.primary[500];
-  }
-}
-
-// Calculate days until a date (positive = future, negative = past)
-function getDaysUntil(dateStr: string | undefined): number | null {
-  if (!dateStr) return null;
-  const date = new Date(dateStr);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  date.setHours(0, 0, 0, 0);
-  const diffTime = date.getTime() - today.getTime();
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-}
-
-// Get the task type from various backend fields
-function getTaskType(task: DashboardTask): string {
-  if (task.type) return task.type;
-  if ((task as any).event_type) return (task as any).event_type;
-  if ((task as any).stage) {
-    const stageValue = (task as any).stage;
-    if (typeof stageValue === 'string' &&
-        (stageValue.includes('followup') || stageValue === 'first_followup' ||
-         stageValue === 'second_followup' || stageValue === 'final_followup')) {
-      return 'accident_followup';
-    }
-    return 'grief_stage';
-  }
-  if ((task as any).aid_type || (task as any).aid_amount !== undefined) {
-    return 'financial_aid';
-  }
-  return '';
-}
 
 type TabKey = 'today' | 'upcoming' | 'overdue';
 type OverdueSubTab = 'birthdays' | 'followups' | 'aid' | 'atrisk' | 'disconnected';
@@ -169,20 +73,20 @@ const TaskCard = memo(function TaskCard({ task, onComplete, onMarkContact, onPre
   const color = getTaskColor(taskType);
   const styles = getTaskStyles(taskType);
 
-  // Get phone info
-  const phone = task.member_phone || (task as any).phone;
+  // Get phone info - DashboardTask now includes all phone fields
+  const phone = task.member_phone || task.phone;
   const whatsappUrl = formatPhoneForWhatsApp(phone);
 
-  // Calculate days info
-  const scheduledDate = task.scheduled_date || (task as any).date || (task as any).next_distribution_date;
+  // Calculate days info - DashboardTask now includes all date fields
+  const scheduledDate = task.scheduled_date || task.date || task.next_distribution_date;
   const daysUntil = getDaysUntil(scheduledDate);
 
-  // Get type-specific data
-  const aidAmount = (task as any).aid_amount;
-  const aidType = (task as any).aid_type;
-  const stage = task.stage || (task as any).stage;
-  const memberAge = task.member_age || (task as any).age;
-  const daysSinceContact = task.days_since_last_contact || (task as any).days_since_last_contact;
+  // Get type-specific data - DashboardTask now includes these fields
+  const aidAmount = task.aid_amount;
+  const aidType = task.aid_type;
+  const stage = task.stage;
+  const memberAge = task.member_age || task.age;
+  const daysSinceContact = task.days_since_last_contact;
 
   // Determine the type label
   const getTypeLabel = () => {
@@ -239,12 +143,12 @@ const TaskCard = memo(function TaskCard({ task, onComplete, onMarkContact, onPre
     }
   }, [whatsappUrl]);
 
-  // Determine if this is an at-risk/disconnected member
-  const isContactType = taskType === 'at_risk' || taskType === 'disconnected';
+  // Determine if this is an at-risk/disconnected member (using shared helper)
+  const isContact = isContactType(taskType);
 
   // Determine action button text and handler
   const getActionButton = () => {
-    if (isContactType && onMarkContact) {
+    if (isContact && onMarkContact) {
       return {
         label: t('tasks.actions.markContact', 'Mark Contact'),
         onPress: onMarkContact,
@@ -369,7 +273,7 @@ const TaskCard = memo(function TaskCard({ task, onComplete, onMarkContact, onPre
           )}
 
           {/* At-Risk/Disconnected: Days since contact + Age */}
-          {isContactType && (
+          {isContact && (
             <View className="mt-0.5">
               {daysSinceContact !== undefined && daysSinceContact > 0 && (
                 <Text className="text-xs text-red-500 font-medium">
@@ -385,7 +289,7 @@ const TaskCard = memo(function TaskCard({ task, onComplete, onMarkContact, onPre
           )}
 
           {/* Scheduled Date */}
-          {scheduledDate && !isContactType && (
+          {scheduledDate && !isContact && (
             <Text className="text-xs text-gray-400 mt-0.5">
               {formatDateToLocalTimezone(scheduledDate, 'short')}
             </Text>
@@ -577,7 +481,7 @@ function TasksScreen() {
   const handleComplete = useCallback(
     (task: DashboardTask) => {
       const taskType = getTaskType(task);
-      const eventId = task.event_id || (task as any).stage_id || (task as any).schedule_id || task.member_id;
+      const eventId = task.event_id || task.stage_id || task.schedule_id || task.member_id;
       completeTask.mutate({ eventId, type: taskType });
     },
     [completeTask]

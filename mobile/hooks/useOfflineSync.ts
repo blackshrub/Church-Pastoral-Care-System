@@ -95,7 +95,8 @@ export function useOfflineSync(): UseOfflineSyncReturn {
     if (isOnline && pendingCount > 0 && !isSyncing) {
       sync();
     }
-  }, [isOnline, pendingCount]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOnline, pendingCount, isSyncing]);
 
   /**
    * Queue an operation for offline sync
@@ -305,7 +306,7 @@ export function useOfflineMutation({
           type,
           endpoint: endpointUrl,
           method,
-          payload: typeof endpoint === 'function' ? undefined : (payload as Record<string, unknown>),
+          payload: payload as Record<string, unknown> | undefined,
         });
 
         if (result.success && !result.queued) {

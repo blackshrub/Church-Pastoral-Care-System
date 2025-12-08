@@ -291,6 +291,19 @@ export interface DashboardTask {
   aid_type?: AidType;
   title?: string;
   days_since_last_contact?: number;
+  // Additional fields from backend
+  event_type?: EventType;           // Backend returns this for care events
+  date?: string;                    // Alternative date field
+  next_distribution_date?: string;  // Financial aid next distribution
+  schedule_id?: string;             // Financial aid schedule identifier
+  phone?: string;                   // Alternative phone field (at-risk/disconnected)
+  age?: number;                     // Alternative age field (at-risk/disconnected)
+  id?: string;                      // At-risk/disconnected members use id
+  name?: string;                    // At-risk/disconnected format uses name
+  photo_url?: string;               // At-risk/disconnected format uses photo_url
+  days_overdue?: number;            // Overdue tasks
+  hospital_name?: string;           // Accident/illness events
+  grief_relationship?: GriefRelationship; // Grief events
 }
 
 export interface DashboardStats {

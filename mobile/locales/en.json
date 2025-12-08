@@ -240,7 +240,36 @@
       "aidType": "Aid Type",
       "aidAmount": "Amount",
       "aidNotes": "Notes",
-      "aidNotesPlaceholder": "Additional notes..."
+      "aidNotesPlaceholder": "Additional notes...",
+      "paymentType": "Payment Type",
+      "griefTimelineNote": "A 6-stage grief support timeline will be auto-generated",
+      "financialAidDetails": "Financial Aid Details",
+      "aidTitle": "Aid Name/Title",
+      "aidTitleRequired": "Aid Name/Title *",
+      "aidTypeLabel": "Aid Type *",
+      "amountLabel": "Amount (Rp) *",
+      "paymentTypeLabel": "Payment Type",
+      "frequency": "Frequency",
+      "paymentDate": "Payment Date",
+      "paymentDateHint": "Date when aid was given",
+      "dayOfWeek": "Day of Week",
+      "dayOfMonth": "Day of Month",
+      "endDateOptional": "End Date (optional)",
+      "startMonth": "Start Month",
+      "startYear": "Start Year",
+      "endMonth": "End Month",
+      "endYear": "End Year",
+      "monthOfYear": "Month of Year",
+      "noEndDate": "No end date",
+      "save": "Save Care Event",
+      "saving": "Saving...",
+      "selectRelationship": "Select relationship"
+    },
+    "scheduleFrequency": {
+      "one_time": "One-time Payment (already given)",
+      "weekly": "Weekly Schedule (future payments)",
+      "monthly": "Monthly Schedule (future payments)",
+      "annually": "Annual Schedule (future payments)"
     },
     "griefStages": {
       "mourning": "Mourning Service",
@@ -379,5 +408,25 @@
     "offlineDesc": "Please check your internet connection to load the latest data.",
     "error": "Something went wrong",
     "errorDesc": "We couldn't load the data. Please try again or contact support if the problem persists."
+  },
+  "validation": {
+    "titleRequired": "Title Required",
+    "aidTitleRequired": "Please enter an aid name/title",
+    "amountRequired": "Amount Required",
+    "validAmountRequired": "Please enter a valid amount",
+    "required": "This field is required",
+    "invalidAmount": "Please enter a valid amount"
+  },
+  "errors": {
+    "somethingWentWrong": "Something Went Wrong",
+    "genericErrorMessage": "An unexpected error occurred. Please try again.",
+    "networkError": "No Connection",
+    "networkErrorMessage": "Please check your internet connection and try again.",
+    "serverError": "Server Error",
+    "serverErrorMessage": "Our servers are having issues. Please try again later.",
+    "notFound": "Not Found",
+    "notFoundMessage": "The requested resource could not be found.",
+    "loadFailed": "Failed to load data",
+    "tryAgain": "Try Again"
   }
 }

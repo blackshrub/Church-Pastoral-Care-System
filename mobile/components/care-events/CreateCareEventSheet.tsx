@@ -83,12 +83,8 @@ const FORM_EVENT_TYPES: EventType[] = [
 
 type ScheduleFrequency = 'one_time' | 'weekly' | 'monthly' | 'annually';
 
-const SCHEDULE_FREQUENCIES: { value: ScheduleFrequency; label: string }[] = [
-  { value: 'one_time', label: 'One-time Payment (already given)' },
-  { value: 'weekly', label: 'Weekly Schedule (future payments)' },
-  { value: 'monthly', label: 'Monthly Schedule (future payments)' },
-  { value: 'annually', label: 'Annual Schedule (future payments)' },
-];
+// Schedule frequency keys for translation
+const SCHEDULE_FREQUENCY_KEYS: ScheduleFrequency[] = ['one_time', 'weekly', 'monthly', 'annually'];
 
 const DAYS_OF_WEEK = [
   { value: 'monday', label: 'Monday' },
@@ -245,6 +241,9 @@ export function CreateCareEventSheet({
   const [aidType, setAidType] = useState<AidType>('education');
   const [aidAmount, setAidAmount] = useState('');
   const [scheduleFrequency, setScheduleFrequency] = useState<ScheduleFrequency>('one_time');
+
+  // Form validation errors (for visual feedback)
+  const [errors, setErrors] = useState<Record<string, boolean>>({});
   const [paymentDate, setPaymentDate] = useState(new Date());
   const [showPaymentDatePicker, setShowPaymentDatePicker] = useState(false);
   const [dayOfWeek, setDayOfWeek] = useState('monday');
@@ -330,26 +329,36 @@ export function CreateCareEventSheet({
   const handleSubmit = useCallback(async () => {
     if (!eventType || !selectedMember?.id || !payload?.campusId) return;
 
-    // Validate financial aid
+    // Validate financial aid with visual feedback
     if (eventType === 'financial_aid') {
+      const newErrors: Record<string, boolean> = {};
+      let hasErrors = false;
+
       if (!aidTitle.trim()) {
-        Toast.show({
-          type: 'error',
-          text1: 'Title Required',
-          text2: 'Please enter an aid name/title',
-        });
-        return;
+        newErrors.aidTitle = true;
+        hasErrors = true;
       }
       if (!aidAmount || parseFloat(aidAmount) <= 0) {
+        newErrors.aidAmount = true;
+        hasErrors = true;
+      }
+
+      if (hasErrors) {
+        setErrors(newErrors);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
         Toast.show({
           type: 'error',
-          text1: 'Amount Required',
-          text2: 'Please enter a valid amount',
+          text1: t('validation.required'),
+          text2: newErrors.aidTitle
+            ? t('validation.aidTitleRequired')
+            : t('validation.validAmountRequired'),
         });
         return;
       }
     }
 
+    // Clear any previous errors
+    setErrors({});
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     const request: CreateCareEventRequest = {
@@ -611,46 +620,49 @@ export function CreateCareEventSheet({
           title = t('careEvents.form.aidType');
           break;
         case 'scheduleFrequency':
-          options = SCHEDULE_FREQUENCIES.map(f => ({ value: f.value, label: f.label }));
+          options = SCHEDULE_FREQUENCY_KEYS.map(key => ({
+            value: key,
+            label: t(`careEvents.scheduleFrequency.${key}`),
+          }));
           selectedValue = scheduleFrequency;
           onSelect = setScheduleFrequency;
-          title = 'Payment Type';
+          title = t('careEvents.form.paymentType');
           break;
         case 'dayOfWeek':
           options = DAYS_OF_WEEK;
           selectedValue = dayOfWeek;
           onSelect = setDayOfWeek;
-          title = 'Day of Week';
+          title = t('careEvents.form.dayOfWeek');
           break;
         case 'startMonth':
           options = MONTHS;
           selectedValue = startMonth;
           onSelect = setStartMonth;
-          title = 'Start Month';
+          title = t('careEvents.form.startMonth');
           break;
         case 'startYear':
           options = yearOptions;
           selectedValue = startYear;
           onSelect = setStartYear;
-          title = 'Start Year';
+          title = t('careEvents.form.startYear');
           break;
         case 'endMonth':
-          options = [{ value: 0, label: 'No end date' }, ...MONTHS];
+          options = [{ value: 0, label: t('careEvents.form.noEndDate') }, ...MONTHS];
           selectedValue = endMonth || 0;
           onSelect = (v) => setEndMonth(v === 0 ? null : v);
-          title = 'End Month';
+          title = t('careEvents.form.endMonth');
           break;
         case 'endYear':
-          options = [{ value: 0, label: 'No end date' }, ...yearOptions];
+          options = [{ value: 0, label: t('careEvents.form.noEndDate') }, ...yearOptions];
           selectedValue = endYear || 0;
           onSelect = (v) => setEndYear(v === 0 ? null : v);
-          title = 'End Year';
+          title = t('careEvents.form.endYear');
           break;
         case 'monthOfYear':
           options = MONTHS;
           selectedValue = monthOfYear;
           onSelect = setMonthOfYear;
-          title = 'Month of Year';
+          title = t('careEvents.form.monthOfYear');
           break;
         case 'griefRelationship':
           options = GRIEF_RELATIONSHIPS.map(rel => ({
@@ -753,7 +765,7 @@ export function CreateCareEventSheet({
             <TextInput
               value={description}
               onChangeText={setDescription}
-              placeholder="Additional details..."
+              placeholder={t('careEvents.form.descriptionPlaceholder')}
               placeholderTextColor="#9ca3af"
               className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-900 min-h-[80px]"
               multiline
@@ -768,13 +780,13 @@ export function CreateCareEventSheet({
           {eventType === 'grief_loss' && (
             <View className="mb-5 p-4 bg-purple-50 rounded-xl border border-purple-200">
               <Text className="text-sm font-medium text-purple-900 mb-3">
-                A 6-stage grief support timeline will be auto-generated
+                {t('careEvents.form.griefTimelineNote')}
               </Text>
               <Text className="text-gray-700 font-semibold mb-2">
                 {t('careEvents.form.relationship')}
               </Text>
               <Picker
-                label="Select relationship"
+                label={t('careEvents.form.selectRelationship')}
                 value={t(`careEvents.relationships.${griefRelationship}`, griefRelationship)}
                 onPress={() => setShowOptionSelector('griefRelationship')}
               />
@@ -804,25 +816,37 @@ export function CreateCareEventSheet({
           {/* ================================================================ */}
           {eventType === 'financial_aid' && (
             <View className="p-4 bg-green-50 rounded-xl border border-green-200 mb-5">
-              <Text className="font-bold text-green-900 mb-4">Financial Aid Details</Text>
+              <Text className="font-bold text-green-900 mb-4">{t('careEvents.form.financialAidDetails')}</Text>
 
               {/* Aid Title */}
               <View className="mb-4">
-                <Text className="text-gray-700 font-semibold mb-2">Aid Name/Title *</Text>
+                <Text className={`font-semibold mb-2 ${errors.aidTitle ? 'text-red-600' : 'text-gray-700'}`}>
+                  {t('careEvents.form.aidTitleRequired')}
+                </Text>
                 <TextInput
                   value={aidTitle}
-                  onChangeText={setAidTitle}
+                  onChangeText={(text) => {
+                    setAidTitle(text);
+                    if (errors.aidTitle && text.trim()) {
+                      setErrors((prev) => ({ ...prev, aidTitle: false }));
+                    }
+                  }}
                   placeholder="e.g., Monthly Education Support"
                   placeholderTextColor="#9ca3af"
-                  className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-900"
+                  className={`bg-white rounded-xl px-4 py-3 text-base text-gray-900 border ${
+                    errors.aidTitle ? 'border-red-500 border-2' : 'border-gray-200'
+                  }`}
                 />
+                {errors.aidTitle && (
+                  <Text className="text-red-500 text-xs mt-1">{t('validation.aidTitleRequired')}</Text>
+                )}
               </View>
 
               {/* Aid Type */}
               <View className="mb-4">
-                <Text className="text-gray-700 font-semibold mb-2">Aid Type *</Text>
+                <Text className="text-gray-700 font-semibold mb-2">{t('careEvents.form.aidTypeLabel')}</Text>
                 <Picker
-                  label="Select aid type"
+                  label={t('careEvents.form.aidType')}
                   value={t(`careEvents.aidTypes.${aidType}`, aidType)}
                   onPress={() => setShowOptionSelector('aidType')}
                 />
@@ -830,26 +854,38 @@ export function CreateCareEventSheet({
 
               {/* Amount */}
               <View className="mb-4">
-                <Text className="text-gray-700 font-semibold mb-2">Amount (Rp) *</Text>
+                <Text className={`font-semibold mb-2 ${errors.aidAmount ? 'text-red-600' : 'text-gray-700'}`}>
+                  {t('careEvents.form.amountLabel')}
+                </Text>
                 <TextInput
                   value={aidAmount}
-                  onChangeText={setAidAmount}
+                  onChangeText={(text) => {
+                    setAidAmount(text);
+                    if (errors.aidAmount && text && parseFloat(text) > 0) {
+                      setErrors((prev) => ({ ...prev, aidAmount: false }));
+                    }
+                  }}
                   placeholder="1500000"
                   placeholderTextColor="#9ca3af"
-                  className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-900"
+                  className={`bg-white rounded-xl px-4 py-3 text-base text-gray-900 border ${
+                    errors.aidAmount ? 'border-red-500 border-2' : 'border-gray-200'
+                  }`}
                   keyboardType="numeric"
                 />
+                {errors.aidAmount && (
+                  <Text className="text-red-500 text-xs mt-1">{t('validation.validAmountRequired')}</Text>
+                )}
               </View>
 
               {/* Payment Type / Schedule */}
               <View className="border-t border-green-200 pt-4 mt-2">
-                <Text className="font-bold text-green-800 mb-3">Payment Type</Text>
+                <Text className="font-bold text-green-800 mb-3">{t('careEvents.form.paymentTypeLabel')}</Text>
 
                 <View className="mb-4">
-                  <Text className="text-gray-700 font-semibold mb-2">Frequency</Text>
+                  <Text className="text-gray-700 font-semibold mb-2">{t('careEvents.form.frequency')}</Text>
                   <Picker
-                    label="Select frequency"
-                    value={SCHEDULE_FREQUENCIES.find(f => f.value === scheduleFrequency)?.label || ''}
+                    label={t('careEvents.form.frequency')}
+                    value={t(`careEvents.scheduleFrequency.${scheduleFrequency}`)}
                     onPress={() => setShowOptionSelector('scheduleFrequency')}
                   />
                 </View>
@@ -857,7 +893,7 @@ export function CreateCareEventSheet({
                 {/* One-time Payment Fields */}
                 {scheduleFrequency === 'one_time' && (
                   <View className="mb-4">
-                    <Text className="text-gray-700 font-semibold mb-2">Payment Date</Text>
+                    <Text className="text-gray-700 font-semibold mb-2">{t('careEvents.form.paymentDate')}</Text>
                     <Pressable
                       onPress={() => setShowPaymentDatePicker(true)}
                       className="flex-row items-center bg-white border border-gray-200 rounded-xl px-4 py-3.5"
@@ -867,7 +903,7 @@ export function CreateCareEventSheet({
                         {paymentDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </Text>
                     </Pressable>
-                    <Text className="text-xs text-gray-500 mt-1">Date when aid was given</Text>
+                    <Text className="text-xs text-gray-500 mt-1">{t('careEvents.form.paymentDateHint')}</Text>
                     {showPaymentDatePicker && (
                       <DateTimePicker
                         value={paymentDate}
@@ -883,15 +919,15 @@ export function CreateCareEventSheet({
                 {scheduleFrequency === 'weekly' && (
                   <View className="p-3 bg-blue-50 rounded-xl">
                     <View className="mb-4">
-                      <Text className="text-gray-700 font-semibold mb-2 text-sm">Day of Week</Text>
+                      <Text className="text-gray-700 font-semibold mb-2 text-sm">{t('careEvents.form.dayOfWeek')}</Text>
                       <Picker
-                        label="Select day"
+                        label={t('careEvents.form.dayOfWeek')}
                         value={DAYS_OF_WEEK.find(d => d.value === dayOfWeek)?.label || ''}
                         onPress={() => setShowOptionSelector('dayOfWeek')}
                       />
                     </View>
                     <View>
-                      <Text className="text-gray-700 font-semibold mb-2 text-sm">End Date (optional)</Text>
+                      <Text className="text-gray-700 font-semibold mb-2 text-sm">{t('careEvents.form.endDateOptional')}</Text>
                       <Pressable
                         onPress={() => setShowEndDatePicker(true)}
                         className="flex-row items-center bg-white border border-gray-200 rounded-xl px-4 py-3.5"
@@ -900,7 +936,7 @@ export function CreateCareEventSheet({
                         <Text className="text-gray-900 ml-2">
                           {scheduleEndDate
                             ? scheduleEndDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-                            : 'No end date'}
+                            : t('careEvents.form.noEndDate')}
                         </Text>
                       </Pressable>
                       {showEndDatePicker && (
@@ -920,24 +956,24 @@ export function CreateCareEventSheet({
                   <View className="p-3 bg-purple-50 rounded-xl">
                     <View className="flex-row gap-3 mb-4">
                       <View className="flex-1">
-                        <Text className="text-gray-700 font-semibold mb-2 text-sm">Start Month</Text>
+                        <Text className="text-gray-700 font-semibold mb-2 text-sm">{t('careEvents.form.startMonth')}</Text>
                         <Picker
-                          label="Month"
+                          label={t('careEvents.form.startMonth')}
                           value={MONTHS.find(m => m.value === startMonth)?.label || ''}
                           onPress={() => setShowOptionSelector('startMonth')}
                         />
                       </View>
                       <View className="flex-1">
-                        <Text className="text-gray-700 font-semibold mb-2 text-sm">Start Year</Text>
+                        <Text className="text-gray-700 font-semibold mb-2 text-sm">{t('careEvents.form.startYear')}</Text>
                         <Picker
-                          label="Year"
+                          label={t('careEvents.form.startYear')}
                           value={startYear.toString()}
                           onPress={() => setShowOptionSelector('startYear')}
                         />
                       </View>
                     </View>
                     <View className="mb-4">
-                      <Text className="text-gray-700 font-semibold mb-2 text-sm">Day of Month</Text>
+                      <Text className="text-gray-700 font-semibold mb-2 text-sm">{t('careEvents.form.dayOfMonth')}</Text>
                       <TextInput
                         value={dayOfMonth}
                         onChangeText={setDayOfMonth}
@@ -950,18 +986,18 @@ export function CreateCareEventSheet({
                     </View>
                     <View className="flex-row gap-3">
                       <View className="flex-1">
-                        <Text className="text-gray-700 font-semibold mb-2 text-sm">End Month</Text>
+                        <Text className="text-gray-700 font-semibold mb-2 text-sm">{t('careEvents.form.endMonth')}</Text>
                         <Picker
-                          label="No end"
-                          value={endMonth ? MONTHS.find(m => m.value === endMonth)?.label || '' : 'No end date'}
+                          label={t('careEvents.form.noEndDate')}
+                          value={endMonth ? MONTHS.find(m => m.value === endMonth)?.label || '' : t('careEvents.form.noEndDate')}
                           onPress={() => setShowOptionSelector('endMonth')}
                         />
                       </View>
                       <View className="flex-1">
-                        <Text className="text-gray-700 font-semibold mb-2 text-sm">End Year</Text>
+                        <Text className="text-gray-700 font-semibold mb-2 text-sm">{t('careEvents.form.endYear')}</Text>
                         <Picker
-                          label="No end"
-                          value={endYear ? endYear.toString() : 'No end date'}
+                          label={t('careEvents.form.noEndDate')}
+                          value={endYear ? endYear.toString() : t('careEvents.form.noEndDate')}
                           onPress={() => setShowOptionSelector('endYear')}
                         />
                       </View>
@@ -974,18 +1010,18 @@ export function CreateCareEventSheet({
                   <View className="p-3 bg-orange-50 rounded-xl">
                     <View className="flex-row gap-3">
                       <View className="flex-1">
-                        <Text className="text-gray-700 font-semibold mb-2 text-sm">Month of Year *</Text>
+                        <Text className="text-gray-700 font-semibold mb-2 text-sm">{t('careEvents.form.monthOfYear')} *</Text>
                         <Picker
-                          label="Month"
+                          label={t('careEvents.form.monthOfYear')}
                           value={MONTHS.find(m => m.value === monthOfYear)?.label || ''}
                           onPress={() => setShowOptionSelector('monthOfYear')}
                         />
                       </View>
                       <View className="flex-1">
-                        <Text className="text-gray-700 font-semibold mb-2 text-sm">End Year</Text>
+                        <Text className="text-gray-700 font-semibold mb-2 text-sm">{t('careEvents.form.endYear')}</Text>
                         <Picker
-                          label="No end"
-                          value={endYear ? endYear.toString() : 'No end date'}
+                          label={t('careEvents.form.noEndDate')}
+                          value={endYear ? endYear.toString() : t('careEvents.form.noEndDate')}
                           onPress={() => setShowOptionSelector('endYear')}
                         />
                       </View>
@@ -1011,13 +1047,13 @@ export function CreateCareEventSheet({
           >
             {createMutation.isPending ? (
               <Text className="text-white font-semibold text-base">
-                {t('common.loading')}
+                {t('careEvents.form.saving')}
               </Text>
             ) : (
               <>
                 <Check size={18} color="#ffffff" />
                 <Text className="text-white font-semibold text-base ml-2">
-                  Save Care Event
+                  {t('careEvents.form.save')}
                 </Text>
               </>
             )}
