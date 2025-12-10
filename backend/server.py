@@ -2584,9 +2584,12 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         accident_writeoff = writeoff_settings.get("accident_illness", 14)
         
         for followup in accident_followups:
-            sched_date = datetime.strptime(followup["scheduled_date"], '%Y-%m-%d').date()
+            try:
+                sched_date = datetime.strptime(followup["scheduled_date"], '%Y-%m-%d').date()
+            except (ValueError, TypeError):
+                continue
             days_overdue = (today - sched_date).days
-            
+
             if sched_date == today:
                 # Due TODAY - add to today_tasks
                 today_tasks.append({
@@ -2745,8 +2748,12 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
             if not member.get("birth_date"):
                 continue
 
-            birth_date = datetime.strptime(member["birth_date"], '%Y-%m-%d').date()
-            this_year_birthday = birth_date.replace(year=today.year)
+            try:
+                birth_date = datetime.strptime(member["birth_date"], '%Y-%m-%d').date()
+                this_year_birthday = birth_date.replace(year=today.year)
+            except (ValueError, TypeError):
+                # Skip members with invalid birth_date format
+                continue
 
             # Lookup birthday event from pre-fetched map (O(1) instead of DB call)
             event = birthday_events_map.get(member["id"])
@@ -2804,9 +2811,12 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
         # Today's grief stages (not overdue, exactly today)
         grief_today = []
         for stage in grief_stages:
-            sched_date = datetime.strptime(stage["scheduled_date"], '%Y-%m-%d').date()
+            try:
+                sched_date = datetime.strptime(stage["scheduled_date"], '%Y-%m-%d').date()
+            except (ValueError, TypeError):
+                continue
             days_overdue = (today - sched_date).days
-            
+
             # Apply writeoff threshold
             grief_writeoff = writeoff_settings.get("grief_support", 14)
             

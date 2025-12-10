@@ -59,7 +59,7 @@ async def send_whatsapp(phone: str, message: str, log_context: dict):
                 "message": message,
                 "status": status,
                 "response_data": result,
-                "created_at": datetime.now(timezone.utc).isoformat()
+                "created_at": datetime.now(timezone.utc)  # Store as datetime for proper sorting
             })
             
             return {"success": status == "sent", "result": result}
