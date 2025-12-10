@@ -4,9 +4,9 @@
  * Tests critical user flows in the FaithTracker application
  */
 
-const { defineConfig, devices } = require('@playwright/test');
+import { defineConfig, devices } from '@playwright/test';
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './e2e',
 
   // Maximum time one test can run
@@ -26,8 +26,8 @@ module.exports = defineConfig({
 
   // Shared settings for all projects
   use: {
-    // Base URL for tests
-    baseURL: process.env.REACT_APP_BACKEND_URL?.replace('/api', '') || 'http://localhost:3000',
+    // Base URL for tests - use environment variable or default to production
+    baseURL: process.env.BASE_URL || 'https://pastoral.gkbj.org',
 
     // Collect trace when retrying failed test
     trace: 'on-first-retry',
@@ -64,11 +64,12 @@ module.exports = defineConfig({
     },
   ],
 
-  // Run local dev server before starting tests
-  webServer: {
-    command: 'yarn start',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  // Note: webServer is disabled - tests run against existing deployment
+  // Uncomment below for local development with yarn start
+  // webServer: {
+  //   command: 'yarn start',
+  //   url: 'http://localhost:3000',
+  //   reuseExistingServer: !process.env.CI,
+  //   timeout: 120 * 1000,
+  // },
 });

@@ -4,20 +4,32 @@
  * Tests creating, viewing, editing, and deleting members
  */
 
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
 
-// Helper function to login before each test
+// Helper function to login with Shadcn/UI Select
 async function login(page) {
   await page.goto('/');
-  const email = process.env.TEST_USER_EMAIL || 'admin@test.com';
-  const password = process.env.TEST_USER_PASSWORD || 'testpass123';
+  await page.waitForLoadState('networkidle');
 
-  await page.fill('input[type="email"]', email);
-  await page.fill('input[type="password"]', password);
-  await page.click('button[type="submit"]');
+  // Wait for campus select to be available and click it
+  const campusSelect = page.locator('[data-testid="campus-select"]');
+  await campusSelect.waitFor({ state: 'visible', timeout: 10000 });
+  await campusSelect.click();
 
-  // Wait for dashboard to load
-  await expect(page).toHaveURL(/\/(dashboard|home)/, { timeout: 10000 });
+  // Select first campus option
+  const campusOption = page.locator('[role="option"]').first();
+  await campusOption.waitFor({ state: 'visible', timeout: 5000 });
+  await campusOption.click();
+
+  // Fill credentials
+  const email = process.env.TEST_USER_EMAIL || 'admin@gkbj.church';
+  const password = process.env.TEST_USER_PASSWORD || 'admin123';
+
+  await page.locator('[data-testid="login-email-input"], input[type="email"]').first().fill(email);
+  await page.locator('[data-testid="login-password-input"], input[type="password"]').first().fill(password);
+  await page.locator('[data-testid="login-button"], button[type="submit"]').first().click();
+
+  await page.waitForURL(/\/(dashboard|home|members)/, { timeout: 15000 });
 }
 
 test.describe('Member CRUD Operations', () => {

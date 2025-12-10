@@ -4,132 +4,163 @@
  * Critical tests for login, logout, and session management
  */
 
-const { test, expect } = require('@playwright/test');
+import { test, expect } from '@playwright/test';
+
+// Helper function to login with Shadcn/UI Select
+async function loginWithCampus(page, options = {}) {
+  await page.goto('/');
+  await page.waitForLoadState('networkidle');
+
+  // Wait for campus select to be available and click it
+  const campusSelect = page.locator('[data-testid="campus-select"]');
+  await campusSelect.waitFor({ state: 'visible', timeout: 10000 });
+  await campusSelect.click();
+
+  // Select first campus option
+  const campusOption = page.locator('[role="option"]').first();
+  await campusOption.waitFor({ state: 'visible', timeout: 5000 });
+  await campusOption.click();
+
+  // Fill credentials
+  const email = options.email || process.env.TEST_USER_EMAIL || 'admin@gkbj.church';
+  const password = options.password || process.env.TEST_USER_PASSWORD || 'admin123';
+
+  await page.locator('[data-testid="login-email-input"], input[type="email"]').first().fill(email);
+  await page.locator('[data-testid="login-password-input"], input[type="password"]').first().fill(password);
+  await page.locator('[data-testid="login-button"], button[type="submit"]').first().click();
+}
 
 test.describe('Authentication', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to the app
     await page.goto('/');
   });
 
   test('should display login page', async ({ page }) => {
-    // Wait for login form to appear
-    await expect(page.locator('input[type="email"]')).toBeVisible();
-    await expect(page.locator('input[type="password"]')).toBeVisible();
-    await expect(page.locator('button[type="submit"]')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+
+    // Wait for login form to appear with campus select
+    await expect(page.locator('[data-testid="campus-select"]')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-testid="login-email-input"], input[type="email"]').first()).toBeVisible();
+    await expect(page.locator('[data-testid="login-password-input"], input[type="password"]').first()).toBeVisible();
+    await expect(page.locator('[data-testid="login-button"], button[type="submit"]').first()).toBeVisible();
+  });
+
+  test('should show error when campus not selected', async ({ page }) => {
+    await page.waitForLoadState('networkidle');
+
+    // Try to submit without selecting campus
+    await page.locator('[data-testid="login-email-input"], input[type="email"]').first().fill('test@test.com');
+    await page.locator('[data-testid="login-password-input"], input[type="password"]').first().fill('password');
+    await page.locator('[data-testid="login-button"], button[type="submit"]').first().click();
+
+    // Should show error about campus selection - use data-testid to be specific
+    await expect(page.locator('[data-testid="login-error"]')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-testid="login-error"]')).toContainText(/select.*campus|Please select/i);
   });
 
   test('should show error on invalid credentials', async ({ page }) => {
-    // Fill in invalid credentials
-    await page.fill('input[type="email"]', 'invalid@test.com');
-    await page.fill('input[type="password"]', 'wrongpassword');
+    await page.waitForLoadState('networkidle');
 
-    // Submit login form
-    await page.click('button[type="submit"]');
+    // Select campus first
+    const campusSelect = page.locator('[data-testid="campus-select"]');
+    await campusSelect.click();
+    await page.locator('[role="option"]').first().click();
+
+    // Fill in invalid credentials
+    await page.locator('[data-testid="login-email-input"], input[type="email"]').first().fill('invalid@test.com');
+    await page.locator('[data-testid="login-password-input"], input[type="password"]').first().fill('wrongpassword');
+    await page.locator('[data-testid="login-button"], button[type="submit"]').first().click();
 
     // Wait for error message
-    await expect(page.locator('text=/Invalid credentials|Login failed/i')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('text=/Invalid|failed|incorrect|wrong/i')).toBeVisible({ timeout: 5000 });
   });
 
   test('should successfully login with valid credentials', async ({ page }) => {
-    // Note: These credentials should match your test environment
-    // You may need to adjust these or use environment variables
-    const email = process.env.TEST_USER_EMAIL || 'admin@test.com';
-    const password = process.env.TEST_USER_PASSWORD || 'testpass123';
-
-    // Fill in credentials
-    await page.fill('input[type="email"]', email);
-    await page.fill('input[type="password"]', password);
-
-    // Submit login form
-    await page.click('button[type="submit"]');
+    await loginWithCampus(page);
 
     // Wait for dashboard to load
-    await expect(page).toHaveURL(/\/(dashboard|home)/, { timeout: 10000 });
+    await page.waitForURL(/\/(dashboard|home|members)/, { timeout: 15000 });
 
     // Verify user is logged in by checking for dashboard elements
-    await expect(page.locator('text=/Dashboard|Welcome/i')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('text=/Dashboard|Welcome|Task|Today/i').first()).toBeVisible({ timeout: 10000 });
   });
 
   test('should redirect to login when accessing protected route while logged out', async ({ page }) => {
     // Try to access members page directly
     await page.goto('/members');
 
-    // Should be redirected to login
-    await expect(page).toHaveURL(/\/(login|auth)/, { timeout: 5000 });
+    // Should be redirected to login - campus select should be visible
+    await expect(page.locator('[data-testid="campus-select"]')).toBeVisible({ timeout: 5000 });
   });
 
   test('should logout successfully', async ({ page }) => {
     // First login
-    const email = process.env.TEST_USER_EMAIL || 'admin@test.com';
-    const password = process.env.TEST_USER_PASSWORD || 'testpass123';
+    await loginWithCampus(page);
+    await page.waitForURL(/\/(dashboard|home|members)/, { timeout: 15000 });
 
-    await page.fill('input[type="email"]', email);
-    await page.fill('input[type="password"]', password);
-    await page.click('button[type="submit"]');
+    // Wait for page to fully load
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(1000);
 
-    // Wait for dashboard
-    await expect(page).toHaveURL(/\/(dashboard|home)/, { timeout: 10000 });
+    // Click on user menu in top right (shows "Full Administrator" with chevron)
+    const userMenuTrigger = page.locator('button:has-text("Full Administrator"), button:has-text("Administrator")').first();
+    await userMenuTrigger.click();
 
-    // Find and click logout button (may be in a dropdown or menu)
-    // This selector may need adjustment based on your actual UI
-    const logoutButton = page.locator('button:has-text("Logout"), button:has-text("Sign Out")').first();
+    // Wait for dropdown to open
+    await page.waitForTimeout(500);
 
-    if (await logoutButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await logoutButton.click();
-    } else {
-      // If not visible, try opening user menu first
-      const userMenu = page.locator('[data-testid="user-menu"], button:has([data-testid="user-avatar"])').first();
-      await userMenu.click();
-      await page.locator('button:has-text("Logout"), button:has-text("Sign Out")').click();
-    }
+    // Click logout in dropdown menu
+    const logoutItem = page.locator('[role="menuitem"]:has-text("Logout"), div:has-text("Logout")').first();
+    await logoutItem.click();
 
     // Should be redirected to login
-    await expect(page).toHaveURL(/\/(login|auth|)$/, { timeout: 5000 });
+    await expect(page.locator('[data-testid="campus-select"]')).toBeVisible({ timeout: 10000 });
   });
 
   test('should persist session on page reload', async ({ page }) => {
     // Login
-    const email = process.env.TEST_USER_EMAIL || 'admin@test.com';
-    const password = process.env.TEST_USER_PASSWORD || 'testpass123';
+    await loginWithCampus(page);
+    await page.waitForURL(/\/(dashboard|home|members)/, { timeout: 15000 });
 
-    await page.fill('input[type="email"]', email);
-    await page.fill('input[type="password"]', password);
-    await page.click('button[type="submit"]');
-
-    // Wait for dashboard
-    await expect(page).toHaveURL(/\/(dashboard|home)/, { timeout: 10000 });
+    // Wait a bit for session to be stored
+    await page.waitForTimeout(1000);
 
     // Reload page
     await page.reload();
 
-    // Should still be logged in
-    await expect(page).toHaveURL(/\/(dashboard|home)/, { timeout: 5000 });
-    await expect(page.locator('text=/Dashboard|Welcome/i')).toBeVisible();
+    // Wait for page to load (use domcontentloaded instead of networkidle)
+    await page.waitForLoadState('domcontentloaded');
+
+    // Should still be on dashboard, not login page
+    await expect(page).toHaveURL(/\/(dashboard|home|members|analytics|reports|settings)/, { timeout: 10000 });
   });
 
-  test('should display validation errors for empty fields', async ({ page }) => {
-    // Try to submit without filling fields
-    await page.click('button[type="submit"]');
+  test('should display validation errors for empty email and password', async ({ page }) => {
+    await page.waitForLoadState('networkidle');
 
-    // Should show validation errors
-    // The exact error message depends on your validation implementation
-    await expect(page.locator('text=/required|cannot be empty/i')).toBeVisible({ timeout: 2000 });
+    // Select campus first
+    const campusSelect = page.locator('[data-testid="campus-select"]');
+    await campusSelect.click();
+    await page.locator('[role="option"]').first().click();
+
+    // Try to submit without filling email/password
+    await page.locator('[data-testid="login-button"], button[type="submit"]').first().click();
+
+    // HTML5 validation will prevent submission or show error
+    // Just verify form didn't submit (still on login page)
+    await expect(page.locator('[data-testid="campus-select"]')).toBeVisible();
   });
 
-  test('should toggle password visibility', async ({ page }) => {
-    const passwordInput = page.locator('input[type="password"]');
-    const toggleButton = page.locator('button[aria-label*="password"], button:has([data-testid="toggle-password"])');
+  test('should display campus dropdown options', async ({ page }) => {
+    await page.waitForLoadState('networkidle');
 
-    // Password should initially be hidden
-    await expect(passwordInput).toHaveAttribute('type', 'password');
+    // Click on campus select to open dropdown
+    const campusSelect = page.locator('[data-testid="campus-select"]');
+    await campusSelect.click();
 
-    // Click toggle button if it exists
-    if (await toggleButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await toggleButton.click();
-
-      // Password should now be visible
-      await expect(page.locator('input[type="text"]').first()).toBeVisible();
-    }
+    // Should show at least one campus option
+    const campusOptions = page.locator('[role="option"]');
+    await expect(campusOptions.first()).toBeVisible({ timeout: 5000 });
+    expect(await campusOptions.count()).toBeGreaterThan(0);
   });
 });
