@@ -358,6 +358,147 @@ async def update_care_event(event_id: str, data: CareEventUpdate, request: Reque
         raise HTTPException(status_code=500, detail=safe_error_detail(e))
 
 
+@post("/care-events/birthday/member/{member_id:str}/complete")
+async def complete_birthday_by_member(member_id: str, request: Request) -> dict:
+    """
+    Complete birthday for a member by member_id.
+    Creates the birthday care_event if it doesn't exist.
+    This is more robust than completing by event_id since some members
+    may have birth_dates but no pre-existing birthday care_events.
+    """
+    current_user = await get_current_user(request)
+    db = get_db()
+    try:
+        # Get the member with campus filter
+        campus_filter = get_campus_filter(current_user)
+        member_query = {"id": member_id}
+        if campus_filter:
+            member_query.update(campus_filter)
+
+        member = await db.members.find_one(member_query, {"_id": 0})
+        if not member:
+            raise HTTPException(status_code=404, detail="Member not found")
+
+        if not member.get("birth_date"):
+            raise HTTPException(status_code=400, detail="Member has no birth date")
+
+        campus_id = member.get("campus_id") or current_user.get("campus_id")
+        now = datetime.now(timezone.utc)
+
+        # Get campus timezone for correct date
+        campus_tz = "Asia/Jakarta"
+        if _get_campus_timezone:
+            campus_tz = await _get_campus_timezone(campus_id)
+        today_date = _get_date_in_timezone(campus_tz) if _get_date_in_timezone else date.today().isoformat()
+
+        # Check for existing incomplete birthday event this year
+        year_start = f"{datetime.now().year}-01-01"
+        existing_event = await db.care_events.find_one({
+            "member_id": member_id,
+            "event_type": "birthday",
+            "event_date": {"$gte": year_start},
+            "completed": {"$ne": True}
+        }, {"_id": 0})
+
+        if existing_event:
+            # Idempotency: if somehow already completed, return success
+            if existing_event.get("completed"):
+                return {"success": True, "message": "Birthday already completed"}
+
+            event_id = existing_event["id"]
+            # Complete existing event
+            await db.care_events.update_one(
+                {"id": event_id},
+                {"$set": {
+                    "completed": True,
+                    "completed_at": now,
+                    "completed_by_user_id": current_user["id"],
+                    "completed_by_user_name": current_user["name"],
+                    "updated_at": now
+                }}
+            )
+        else:
+            # Create new birthday event and mark as completed
+            event_id = generate_uuid()
+            birthday_event = {
+                "id": event_id,
+                "member_id": member_id,
+                "campus_id": campus_id,
+                "event_type": "birthday",
+                "event_date": today_date,
+                "title": f"Birthday - {member['name']}",
+                "description": f"Birthday contact for {member['name']}",
+                "completed": True,
+                "completed_at": now,
+                "completed_by_user_id": current_user["id"],
+                "completed_by_user_name": current_user["name"],
+                "reminder_sent": False,
+                "created_by_user_id": current_user["id"],
+                "created_by_user_name": current_user["name"],
+                "created_at": now,
+                "updated_at": now
+            }
+            await db.care_events.insert_one(birthday_event)
+
+        # Log activity
+        if _log_activity:
+            await _log_activity(
+                campus_id=campus_id,
+                user_id=current_user["id"],
+                user_name=current_user["name"],
+                action_type=ActivityActionType.COMPLETE_TASK,
+                member_id=member_id,
+                member_name=member["name"],
+                care_event_id=event_id,
+                event_type=EventType.BIRTHDAY,
+                notes="Completed birthday task",
+                user_photo_url=current_user.get("photo_url")
+            )
+
+        # Update member engagement status
+        await db.members.update_one(
+            {"id": member_id},
+            {"$set": {
+                "last_contact_date": now,
+                "days_since_last_contact": 0,
+                "engagement_status": "active",
+                "updated_at": now
+            }}
+        )
+
+        # Create "Birthday Contact" regular_contact event for timeline
+        if _get_campus_timezone and _get_date_in_timezone:
+            contact_event = {
+                "id": generate_uuid(),
+                "member_id": member_id,
+                "campus_id": campus_id,
+                "event_type": "regular_contact",
+                "event_date": today_date,
+                "title": "Birthday Contact",
+                "description": f"Contacted {member['name']} for their birthday celebration",
+                "completed": True,
+                "completed_at": now,
+                "completed_by_user_id": current_user["id"],
+                "completed_by_user_name": current_user["name"],
+                "reminder_sent": False,
+                "created_at": now,
+                "updated_at": now
+            }
+            await db.care_events.insert_one(contact_event)
+
+        # Invalidate dashboard cache
+        if _invalidate_dashboard_cache:
+            await _invalidate_dashboard_cache(campus_id)
+
+        return {"success": True, "message": "Birthday completed successfully"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error completing birthday by member: {str(e)}")
+        raise HTTPException(status_code=500, detail=safe_error_detail(e))
+
+
 @post("/care-events/{event_id:str}/complete")
 async def complete_care_event(event_id: str, request: Request) -> dict:
     """Mark care event as completed and update member engagement"""
@@ -914,6 +1055,7 @@ route_handlers = [
     list_care_events,
     get_care_event,
     update_care_event,
+    complete_birthday_by_member,  # Must come before complete_care_event for route priority
     complete_care_event,
     log_additional_visit,
     send_care_event_reminder,

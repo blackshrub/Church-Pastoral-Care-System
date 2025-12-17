@@ -29,15 +29,15 @@ export const BirthdaySection = ({
 }) => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  // Track which event IDs are currently being processed to prevent double-clicks
+  // Track which member IDs are currently being processed to prevent double-clicks
   const [loadingIds, setLoadingIds] = useState(new Set());
 
-  const handleComplete = useCallback(async (eventId) => {
+  const handleComplete = useCallback(async (memberId) => {
     // Prevent double-click: if already loading, do nothing
-    if (loadingIds.has(eventId)) return;
+    if (loadingIds.has(memberId)) return;
 
     // Mark as loading
-    setLoadingIds(prev => new Set(prev).add(eventId));
+    setLoadingIds(prev => new Set(prev).add(memberId));
 
     try {
       // Optimistic update - remove from UI immediately
@@ -45,12 +45,13 @@ export const BirthdaySection = ({
         if (!old) return old;
         return {
           ...old,
-          birthdays_today: old.birthdays_today?.filter(e => e.id !== eventId),
-          overdue_birthdays: old.overdue_birthdays?.filter(e => e.id !== eventId)
+          birthdays_today: old.birthdays_today?.filter(e => e.member_id !== memberId),
+          overdue_birthdays: old.overdue_birthdays?.filter(e => e.member_id !== memberId)
         };
       });
 
-      await api.post(`/care-events/${eventId}/complete`);
+      // Use the new member-based endpoint that creates event if needed
+      await api.post(`/care-events/birthday/member/${memberId}/complete`);
       toast.success(t('toasts.birthday_completed'));
       // Refetch to get accurate data
       await queryClient.invalidateQueries(['dashboard']);
@@ -62,7 +63,7 @@ export const BirthdaySection = ({
       // Remove from loading state
       setLoadingIds(prev => {
         const next = new Set(prev);
-        next.delete(eventId);
+        next.delete(memberId);
         return next;
       });
     }
@@ -88,17 +89,17 @@ export const BirthdaySection = ({
         <div className="space-y-4">
           {birthdays.map(event => (
             <TaskCard
-              key={event.id}
+              key={event.member_id}
               event={event}
               config={config}
-              onComplete={handleComplete}
-              isLoading={loadingIds.has(event.id)}
+              onComplete={() => handleComplete(event.member_id)}
+              isLoading={loadingIds.has(event.member_id)}
               actionLabel={t('mark_complete')}
               completedLabel={t('completed')}
               contactLabel={t('contact_whatsapp')}
               triggerHaptic={triggerHaptic}
               selectable={selectable}
-              selected={isSelected ? isSelected(event.id) : false}
+              selected={isSelected ? isSelected(event.member_id) : false}
               onSelectionChange={onSelectionChange}
             >
               {event.completed
