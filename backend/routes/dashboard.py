@@ -297,8 +297,16 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                     birthdays_today.append({**base_data, "date": today_date})
                 elif this_year_birthday < today:
                     days_overdue = (today - this_year_birthday).days
-                    # For completed/ignored, always show (no writeoff); for incomplete, apply writeoff
-                    if is_completed or is_ignored or birthday_writeoff == 0 or days_overdue <= birthday_writeoff:
+                    # For completed/ignored, show only for 2 days after birthday (not forever)
+                    # For incomplete, apply normal writeoff
+                    completed_grace_period = 2  # Days to show completed birthdays
+                    if is_completed or is_ignored:
+                        if days_overdue <= completed_grace_period:
+                            overdue_birthdays.append({
+                                **base_data, "date": this_year_birthday.isoformat(),
+                                "days_overdue": days_overdue
+                            })
+                    elif birthday_writeoff == 0 or days_overdue <= birthday_writeoff:
                         overdue_birthdays.append({
                             **base_data, "date": this_year_birthday.isoformat(),
                             "days_overdue": days_overdue
@@ -348,7 +356,22 @@ async def calculate_dashboard_reminders(campus_id: str, campus_tz, today_date: s
                     "member_photo_url": member_map.get(stage["member_id"], {}).get("photo_url"),
                     "details": f"{stage['stage'].replace('_', ' ')} stage", "data": stage
                 })
-        
+
+        # Add upcoming birthdays to upcoming_tasks so they appear in Upcoming tab
+        for birthday in upcoming_birthdays:
+            upcoming_tasks.append({
+                "type": "birthday",
+                "date": birthday["date"],
+                "member_id": birthday["member_id"],
+                "member_name": birthday["member_name"],
+                "member_phone": birthday["member_phone"],
+                "member_photo_url": birthday["member_photo_url"],
+                "member_age": birthday.get("member_age"),
+                "details": birthday.get("details", "Birthday"),
+                "days_until": birthday.get("days_until"),
+                "data": birthday
+            })
+
         upcoming_tasks.sort(key=lambda x: x["date"])
         
         return {
