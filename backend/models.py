@@ -432,6 +432,19 @@ class TokenResponse(Struct):
     user: UserResponse
 
 
+class ProfileUpdate(Struct):
+    """Model for self-profile update (excludes role and campus)"""
+    name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+
+
+class PasswordChange(Struct):
+    """Model for password change"""
+    current_password: str
+    new_password: str
+
+
 # ==================== ACTIVITY LOG MODELS ====================
 
 class ActivityLog(Struct):

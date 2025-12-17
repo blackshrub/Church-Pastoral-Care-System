@@ -12,7 +12,8 @@ from enums import EngagementStatus
 from constants import (
     ENGAGEMENT_AT_RISK_DAYS_DEFAULT,
     ENGAGEMENT_DISCONNECTED_DAYS_DEFAULT,
-    ENGAGEMENT_NO_CONTACT_DAYS
+    ENGAGEMENT_NO_CONTACT_DAYS,
+    IMAGE_MAGIC_BYTES
 )
 
 # ==================== REGEX PATTERNS ====================
@@ -228,3 +229,26 @@ def invalidate_cache(pattern: Optional[str] = None) -> None:
         for key in keys_to_delete:
             del _cache[key]
             del _cache_timestamps[key]
+
+
+# ==================== IMAGE VALIDATION ====================
+
+def validate_image_magic_bytes(content: bytes) -> tuple[bool, str]:
+    """
+    Validate image file by checking magic bytes (file signature).
+    
+    Returns:
+        (is_valid, detected_mime_type or error_message)
+    """
+    if len(content) < 8:
+        return False, "File too small to be a valid image"
+
+    for magic, mime_type in IMAGE_MAGIC_BYTES.items():
+        if content.startswith(magic):
+            return True, mime_type
+
+    # Special check for WebP (RIFF....WEBP)
+    if content[:4] == b'RIFF' and content[8:12] == b'WEBP':
+        return True, 'image/webp'
+
+    return False, "Invalid image format. Allowed: JPEG, PNG, GIF, WebP"
