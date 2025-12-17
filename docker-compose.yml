@@ -77,8 +77,15 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL:-}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
       - ADMIN_PHONE=${ADMIN_PHONE:-}
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-}
+      - ALERT_EMAIL=${ALERT_EMAIL:-}
     volumes:
       - ./data/uploads:/app/uploads
+      - ./data/logs:/app/logs
     networks:
       - faithtracker-network
     depends_on:

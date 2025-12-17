@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Plus, CheckCircle2, Calendar, Heart, Hospital, DollarSign, MoreVertical, Trash2, Check, CalendarIcon } from 'lucide-react';
+import { Plus, CheckCircle2, Calendar, Heart, Hospital, DollarSign, MoreVertical, Trash2, Check, CalendarIcon, FileText, Lock, ChevronDown, ChevronUp } from 'lucide-react';
 import { format as formatDateFns } from 'date-fns';
 
 import api from '@/lib/api';
@@ -25,6 +25,8 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MemberProfileHeader, TimelineEventCard } from '@/components/member';
 import { formatDate, getTodayLocal } from '@/lib/dateUtils';
@@ -49,17 +51,69 @@ export const MemberDetail = () => {
   const { id } = useParams();
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  // Pastoral Notes handlers
+  const handleSaveNote = async () => {
+    if (!noteForm.title || !noteForm.content) return;
+
+    setSaving(true);
+    try {
+      if (editingNote) {
+        await api.put(`/pastoral-notes/${editingNote.id}`, {
+          ...noteForm,
+          category: noteForm.category || null
+        });
+        toast.success('Note updated successfully');
+      } else {
+        await api.post('/pastoral-notes', {
+          member_id: id,
+          ...noteForm,
+          category: noteForm.category || null
+        });
+        toast.success('Note created successfully');
+      }
+      setNoteModalOpen(false);
+      queryClient.invalidateQueries(['member', id]);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to save note');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    try {
+      await api.delete(`/pastoral-notes/${noteId}`);
+      toast.success('Note deleted');
+      setNoteToDelete(null);
+      queryClient.invalidateQueries(['member', id]);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to delete note');
+    }
+  };
+
+  const handleCompleteNoteFollowup = async (noteId) => {
+    try {
+      await api.post(`/pastoral-notes/${noteId}/complete-followup`);
+      toast.success('Follow-up marked as completed');
+      queryClient.invalidateQueries(['member', id]);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to complete follow-up');
+    }
+  };
+
+
   
   // React Query for member data with caching
   const { data: memberData, isLoading } = useQuery({
     queryKey: ['member', id],
     queryFn: async () => {
-      const [memberRes, eventsRes, griefRes, accidentRes, aidSchedulesRes] = await Promise.all([
+      const [memberRes, eventsRes, griefRes, accidentRes, aidSchedulesRes, notesRes] = await Promise.all([
         api.get(`/members/${id}`),
         api.get(`/care-events?member_id=${id}`),
         api.get(`/grief-support/member/${id}`),
         api.get(`/accident-followup/member/${id}`),
-        api.get(`/financial-aid-schedules/member/${id}`)
+        api.get(`/financial-aid-schedules/member/${id}`),
+        api.get(`/pastoral-notes/member/${id}`)
       ]);
 
       const sortedEvents = (eventsRes.data || []).sort((a, b) => {
@@ -73,7 +127,8 @@ export const MemberDetail = () => {
         careEvents: sortedEvents,
         griefTimeline: griefRes.data,
         accidentTimeline: accidentRes.data,
-        aidSchedules: aidSchedulesRes.data || []
+        aidSchedules: aidSchedulesRes.data || [],
+        pastoralNotes: notesRes.data || []
       };
     },
     enabled: !!id,
@@ -87,6 +142,7 @@ export const MemberDetail = () => {
   const griefTimeline = memberData?.griefTimeline || [];
   const accidentTimeline = memberData?.accidentTimeline || [];
   const aidSchedules = memberData?.aidSchedules || [];
+  const pastoralNotes = memberData?.pastoralNotes || [];
   
   // UI state
   const [_editModalOpen, _setEditModalOpen] = useState(false);
@@ -98,6 +154,21 @@ export const MemberDetail = () => {
   const [saving, setSaving] = useState(false);
   const [eventDateOpen, setEventDateOpen] = useState(false);
   const [paymentDateOpen, setPaymentDateOpen] = useState(false);
+
+  // Pastoral notes state
+  const [noteModalOpen, setNoteModalOpen] = useState(false);
+  const [editingNote, setEditingNote] = useState(null);
+  const [noteForm, setNoteForm] = useState({
+    title: '',
+    content: '',
+    category: '',
+    is_private: false,
+    follow_up_date: '',
+    follow_up_notes: ''
+  });
+  const [followUpDateOpen, setFollowUpDateOpen] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState(null);
+  const [notesExpanded, setNotesExpanded] = useState(true);
   const [endDateOpen, setEndDateOpen] = useState(false);
   const [_editingEvent, _setEditingEvent] = useState(null);
   
@@ -825,6 +896,167 @@ export const MemberDetail = () => {
         </CardContent>
       </Card>
       
+
+      {/* Pastoral Notes Section - Visible in Header */}
+      <Card className="mb-4">
+        <CardContent className="p-4">
+          <div
+            className="flex justify-between items-center cursor-pointer"
+            onClick={() => setNotesExpanded(!notesExpanded)}
+          >
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-muted-foreground" />
+              <h3 className="font-semibold">Pastoral Notes</h3>
+              {pastoralNotes.length > 0 && (
+                <Badge variant="secondary">{pastoralNotes.length}</Badge>
+              )}
+              {pastoralNotes.some(n => n.follow_up_date && !n.follow_up_completed && new Date(n.follow_up_date) <= new Date()) && (
+                <Badge variant="destructive" className="text-xs">Action Needed</Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingNote(null);
+                  setNoteForm({
+                    title: '',
+                    content: '',
+                    category: '',
+                    is_private: false,
+                    follow_up_date: '',
+                    follow_up_notes: ''
+                  });
+                  setNoteModalOpen(true);
+                }}
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Note
+              </Button>
+              {notesExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </div>
+          </div>
+
+          {notesExpanded && (
+            <div className="mt-4">
+              {pastoralNotes.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  No pastoral notes yet. Add notes about special needs, health conditions, spiritual concerns, etc.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {pastoralNotes.map((note) => {
+                    const categoryLabels = {
+                      special_needs: 'Special Needs',
+                      health: 'Health',
+                      financial: 'Financial',
+                      spiritual: 'Spiritual',
+                      family: 'Family',
+                      work: 'Work',
+                      other: 'Other'
+                    };
+                    const categoryColors = {
+                      special_needs: 'bg-purple-100 text-purple-800 border-purple-200',
+                      health: 'bg-red-100 text-red-800 border-red-200',
+                      financial: 'bg-green-100 text-green-800 border-green-200',
+                      spiritual: 'bg-blue-100 text-blue-800 border-blue-200',
+                      family: 'bg-amber-100 text-amber-800 border-amber-200',
+                      work: 'bg-gray-100 text-gray-800 border-gray-200',
+                      other: 'bg-slate-100 text-slate-800 border-slate-200'
+                    };
+                    const isOverdue = note.follow_up_date && !note.follow_up_completed && new Date(note.follow_up_date) < new Date();
+                    const isDueToday = note.follow_up_date && !note.follow_up_completed &&
+                      new Date(note.follow_up_date).toDateString() === new Date().toDateString();
+
+                    return (
+                      <div
+                        key={note.id}
+                        className={`p-3 rounded-lg border ${isOverdue ? 'border-red-300 bg-red-50/50' : isDueToday ? 'border-amber-300 bg-amber-50/50' : 'border-gray-200 bg-gray-50/30'}`}
+                      >
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap mb-1">
+                              <span className="font-medium">{note.title}</span>
+                              {note.is_private && (
+                                <span className="inline-flex items-center gap-1 text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded">
+                                  <Lock className="w-3 h-3" />
+                                </span>
+                              )}
+                              {note.category && (
+                                <span className={`text-xs px-2 py-0.5 rounded border ${categoryColors[note.category] || 'bg-gray-100'}`}>
+                                  {categoryLabels[note.category] || note.category}
+                                </span>
+                              )}
+                              {isOverdue && (
+                                <Badge variant="destructive" className="text-xs">Overdue</Badge>
+                              )}
+                              {isDueToday && (
+                                <Badge className="text-xs bg-amber-500">Due Today</Badge>
+                              )}
+                              {note.follow_up_completed && (
+                                <Badge variant="secondary" className="text-xs">✓ Done</Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">{note.content}</p>
+                            {note.follow_up_date && (
+                              <p className="text-xs text-muted-foreground mt-1">
+                                📅 {formatDate(note.follow_up_date, 'dd MMM yyyy')}
+                                {note.follow_up_notes && ` • ${note.follow_up_notes}`}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground mt-1 opacity-60">
+                              {note.created_by_name} • {formatDate(note.created_at, 'dd MMM yyyy')}
+                            </p>
+                          </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => {
+                                setEditingNote(note);
+                                setNoteForm({
+                                  title: note.title,
+                                  content: note.content,
+                                  category: note.category || '',
+                                  is_private: note.is_private || false,
+                                  follow_up_date: note.follow_up_date || '',
+                                  follow_up_notes: note.follow_up_notes || ''
+                                });
+                                setNoteModalOpen(true);
+                              }}>
+                                Edit
+                              </DropdownMenuItem>
+                              {note.follow_up_date && !note.follow_up_completed && (
+                                <DropdownMenuItem onClick={() => handleCompleteNoteFollowup(note.id)}>
+                                  <Check className="w-4 h-4 mr-2" />
+                                  Complete Follow-up
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onClick={() => setNoteToDelete(note)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Tabbed Content - Dynamic tabs based on data */}
       <Tabs defaultValue="timeline" className="w-full">
         <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -1774,6 +2006,127 @@ export const MemberDetail = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+
+      {/* Pastoral Note Modal */}
+      <Dialog open={noteModalOpen} onOpenChange={setNoteModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>{editingNote ? 'Edit Pastoral Note' : 'Add Pastoral Note'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="noteTitle">Title *</Label>
+              <Input
+                id="noteTitle"
+                value={noteForm.title}
+                onChange={(e) => setNoteForm({...noteForm, title: e.target.value})}
+                placeholder="Brief title for this note"
+              />
+            </div>
+            <div>
+              <Label htmlFor="noteContent">Content *</Label>
+              <Textarea
+                id="noteContent"
+                value={noteForm.content}
+                onChange={(e) => setNoteForm({...noteForm, content: e.target.value})}
+                placeholder="Detailed notes about this person..."
+                rows={4}
+              />
+            </div>
+            <div>
+              <Label htmlFor="noteCategory">Category</Label>
+              <Select value={noteForm.category} onValueChange={(v) => setNoteForm({...noteForm, category: v})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="special_needs">Special Needs</SelectItem>
+                  <SelectItem value="health">Health</SelectItem>
+                  <SelectItem value="financial">Financial</SelectItem>
+                  <SelectItem value="spiritual">Spiritual</SelectItem>
+                  <SelectItem value="family">Family</SelectItem>
+                  <SelectItem value="work">Work</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <Label htmlFor="notePrivate">Private Note</Label>
+                <p className="text-xs text-muted-foreground">Only you can see this note</p>
+              </div>
+              <Switch
+                id="notePrivate"
+                checked={noteForm.is_private}
+                onCheckedChange={(checked) => setNoteForm({...noteForm, is_private: checked})}
+              />
+            </div>
+            <div>
+              <Label>Follow-up Date (Optional)</Label>
+              <Popover open={followUpDateOpen} onOpenChange={setFollowUpDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {noteForm.follow_up_date ? formatDate(noteForm.follow_up_date, 'dd MMM yyyy') : 'Select date'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent
+                    mode="single"
+                    selected={noteForm.follow_up_date ? new Date(noteForm.follow_up_date) : undefined}
+                    onSelect={(date) => {
+                      if (date) {
+                        setNoteForm({...noteForm, follow_up_date: date.toISOString().split('T')[0]});
+                      }
+                      setFollowUpDateOpen(false);
+                    }}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              {noteForm.follow_up_date && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-1 text-xs"
+                  onClick={() => setNoteForm({...noteForm, follow_up_date: '', follow_up_notes: ''})}
+                >
+                  Clear date
+                </Button>
+              )}
+            </div>
+            {noteForm.follow_up_date && (
+              <div>
+                <Label htmlFor="followUpNotes">Follow-up Notes</Label>
+                <Input
+                  id="followUpNotes"
+                  value={noteForm.follow_up_notes}
+                  onChange={(e) => setNoteForm({...noteForm, follow_up_notes: e.target.value})}
+                  placeholder="What to do during follow-up"
+                />
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setNoteModalOpen(false)}>Cancel</Button>
+            <Button onClick={handleSaveNote} disabled={saving || !noteForm.title || !noteForm.content}>
+              {saving ? 'Saving...' : editingNote ? 'Update' : 'Create'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Note Confirmation */}
+      <ConfirmDialog
+        open={!!noteToDelete}
+        onOpenChange={(open) => !open && setNoteToDelete(null)}
+        title="Delete Pastoral Note"
+        description={`Are you sure you want to delete "${noteToDelete?.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="destructive"
+        onConfirm={() => handleDeleteNote(noteToDelete?.id)}
+      />
 
       {/* Confirmation Dialog */}
       <ConfirmDialog
