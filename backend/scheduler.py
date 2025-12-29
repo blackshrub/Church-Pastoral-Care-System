@@ -831,8 +831,35 @@ async def member_reconciliation_job():
 
         logger.info(f"Daily reconciliation complete: {total_synced} members synced, {total_errors} errors")
 
+        if total_errors > 0:
+            await send_email_alert(
+                subject=f"[FaithTracker] Member Sync Errors - {total_errors} campus(es) failed",
+                body=f"""Daily member reconciliation completed with errors.
+
+Errors: {total_errors} campus sync(s) failed
+Members synced: {total_synced}
+
+Please check the logs for details and verify the sync configuration for affected campuses.
+
+---
+FaithTracker Pastoral Care System
+"""
+            )
+
     except Exception as e:
         logger.error(f"Error in reconciliation job: {str(e)}")
+        await send_email_alert(
+            subject="[FaithTracker] Member Reconciliation Job Failed",
+            body=f"""The daily member reconciliation job failed unexpectedly.
+
+Error: {str(e)}
+
+Please check the scheduler logs for more details.
+
+---
+FaithTracker Pastoral Care System
+"""
+        )
     finally:
         await release_job_lock("member_reconciliation")
 
@@ -845,7 +872,13 @@ async def refresh_all_dashboard_caches():
         return
 
     try:
-        from server import db, calculate_dashboard_reminders, get_campus_timezone, get_date_in_timezone
+        from server import db, get_campus_timezone, get_date_in_timezone, get_writeoff_settings, SECRET_KEY
+        from routes.dashboard import calculate_dashboard_reminders, init_dashboard_routes
+        from dependencies import init_dependencies
+
+        # Initialize dependencies for dashboard module
+        init_dependencies(db, SECRET_KEY)
+        init_dashboard_routes(get_campus_timezone, get_date_in_timezone, get_writeoff_settings)
 
         # Get all active campuses
         campuses = await db.campuses.find({"is_active": True}, {"_id": 0, "id": 1, "campus_name": 1, "timezone": 1}).to_list(None)
@@ -993,6 +1026,7 @@ def schedule_daily_digest(hour: int, minute: int):
             pass
 
         # Add job with new time
+        # misfire_grace_time allows digest to run if container restarts after scheduled time
         scheduler.add_job(
             daily_reminder_job,
             'cron',
@@ -1001,7 +1035,9 @@ def schedule_daily_digest(hour: int, minute: int):
             timezone='Asia/Jakarta',
             id='daily_reminders',
             name='Daily Pastoral Care Digest',
-            replace_existing=True
+            replace_existing=True,
+            misfire_grace_time=7200,  # 2 hours in seconds
+            coalesce=True
         )
         logger.info(f"Daily digest scheduled for {hour:02d}:{minute:02d} Asia/Jakarta")
     except Exception as e:
@@ -1022,10 +1058,64 @@ async def init_daily_digest_schedule():
     await asyncio.sleep(2)  # Wait for DB connection to be ready
     await reschedule_daily_digest()
 
+
+async def check_missed_reconciliation():
+    """
+    Check if daily reconciliation was missed and run it if needed.
+    This handles cases where the container restarts after 3 AM but misfire_grace_time has expired.
+    """
+    await asyncio.sleep(5)  # Wait for DB connection to be ready
+    
+    try:
+        logger.info("Checking for missed reconciliation syncs...")
+        
+        # Get campuses with reconciliation enabled
+        sync_configs = await db.sync_configs.find({
+            "is_enabled": True,
+            "reconciliation_enabled": True
+        }).to_list(None)
+        
+        if not sync_configs:
+            logger.info("No campuses configured for reconciliation")
+            return
+        
+        for config in sync_configs:
+            campus_id = config.get("campus_id")
+            last_sync_at = config.get("last_sync_at")
+            
+            # Check if last sync was more than 24 hours ago
+            if last_sync_at:
+                if isinstance(last_sync_at, str):
+                    last_sync_at = datetime.fromisoformat(last_sync_at.replace("Z", "+00:00"))
+                elif isinstance(last_sync_at, datetime) and last_sync_at.tzinfo is None:
+                    # MongoDB returns naive datetime - assume UTC
+                    last_sync_at = last_sync_at.replace(tzinfo=timezone.utc)
+                
+                hours_since_sync = (datetime.now(timezone.utc) - last_sync_at).total_seconds() / 3600
+                
+                if hours_since_sync > 24:
+                    logger.warning(
+                        f"Campus {campus_id}: Last sync was {hours_since_sync:.1f} hours ago. "
+                        "Running catch-up reconciliation..."
+                    )
+                    # Trigger reconciliation
+                    await member_reconciliation_job()
+                    return  # Job handles all campuses, so we only need to trigger once
+                else:
+                    logger.info(f"Campus {campus_id}: Last sync was {hours_since_sync:.1f} hours ago (OK)")
+            else:
+                logger.warning(f"Campus {campus_id}: No previous sync found. Running initial reconciliation...")
+                await member_reconciliation_job()
+                return
+                
+    except Exception as e:
+        logger.error(f"Error checking missed reconciliation: {str(e)}")
+
 def start_scheduler():
     """Start the scheduler with jobs configured from database"""
     try:
         # Midnight job - Refresh dashboard cache when date changes
+        # misfire_grace_time allows job to run if container restarts after midnight
         scheduler.add_job(
             refresh_all_dashboard_caches,
             'cron',
@@ -1034,10 +1124,14 @@ def start_scheduler():
             timezone='Asia/Jakarta',
             id='midnight_cache_refresh',
             name='Midnight Dashboard Cache Refresh',
-            replace_existing=True
+            replace_existing=True,
+            misfire_grace_time=3600,  # 1 hour grace time
+            coalesce=True
         )
 
         # Run daily reconciliation at 3 AM Jakarta time
+        # misfire_grace_time: Allow job to run if missed within 6 hours (e.g., container restart)
+        # coalesce: If multiple misfires, run only once
         scheduler.add_job(
             member_reconciliation_job,
             'cron',
@@ -1046,10 +1140,13 @@ def start_scheduler():
             timezone='Asia/Jakarta',
             id='member_reconciliation',
             name='Daily Member Reconciliation',
-            replace_existing=True
+            replace_existing=True,
+            misfire_grace_time=21600,  # 6 hours in seconds
+            coalesce=True
         )
 
         # Default daily digest at 8 AM (will be updated from DB shortly after startup)
+        # misfire_grace_time allows digest to run if container restarts after scheduled time
         scheduler.add_job(
             daily_reminder_job,
             'cron',
@@ -1058,7 +1155,9 @@ def start_scheduler():
             timezone='Asia/Jakarta',
             id='daily_reminders',
             name='Daily Pastoral Care Digest',
-            replace_existing=True
+            replace_existing=True,
+            misfire_grace_time=7200,  # 2 hours in seconds
+            coalesce=True
         )
 
         scheduler.start()
@@ -1071,11 +1170,22 @@ def start_scheduler():
             name='Initialize Digest Schedule from DB',
             replace_existing=True
         )
+        
+        # Check for missed reconciliation on startup
+        # This catches cases where container was down during scheduled reconciliation time
+        scheduler.add_job(
+            check_missed_reconciliation,
+            'date',  # Run once on startup
+            id='check_missed_reconciliation',
+            name='Check Missed Reconciliation on Startup',
+            replace_existing=True
+        )
 
         logger.info("Scheduler started successfully")
-        logger.info("  - Midnight cache refresh: 00:00 Asia/Jakarta")
+        logger.info("  - Midnight cache refresh: 00:00 Asia/Jakarta (misfire: 1h)")
         logger.info("  - Daily digest: 08:00 Asia/Jakarta (loading from DB...)")
-        logger.info("  - Member reconciliation: 03:00 Asia/Jakarta")
+        logger.info("  - Member reconciliation: 03:00 Asia/Jakarta (misfire: 6h)")
+        logger.info("  - Startup reconciliation check: enabled")
     except Exception as e:
         logger.error(f"Error starting scheduler: {str(e)}")
 

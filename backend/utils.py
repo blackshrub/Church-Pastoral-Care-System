@@ -13,7 +13,8 @@ from constants import (
     ENGAGEMENT_AT_RISK_DAYS_DEFAULT,
     ENGAGEMENT_DISCONNECTED_DAYS_DEFAULT,
     ENGAGEMENT_NO_CONTACT_DAYS,
-    IMAGE_MAGIC_BYTES
+    IMAGE_MAGIC_BYTES,
+    MAX_CACHE_SIZE
 )
 
 # ==================== REGEX PATTERNS ====================
@@ -203,11 +204,16 @@ def get_from_cache(key: str, ttl_seconds: int = 300) -> Optional[Any]:
 def set_in_cache(key: str, value: Any) -> None:
     """
     Store value in cache with current timestamp.
+    Enforces MAX_CACHE_SIZE limit using simple LRU eviction.
 
     Args:
         key: Cache key
         value: Value to cache
     """
+    if key not in _cache and len(_cache) >= MAX_CACHE_SIZE:
+        oldest_key = min(_cache_timestamps, key=_cache_timestamps.get)
+        del _cache[oldest_key]
+        del _cache_timestamps[oldest_key]
     _cache[key] = value
     _cache_timestamps[key] = datetime.now(timezone.utc)
 

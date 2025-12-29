@@ -62,3 +62,13 @@ IMAGE_MAGIC_BYTES = {
     b'GIF89a': 'image/gif',                   # GIF89a
     b'RIFF': 'image/webp',                    # WebP (partial check)
 }
+
+# ==================== CACHE SETTINGS ====================
+# In-memory cache configuration (prevents unbounded memory growth)
+MAX_CACHE_SIZE = 1000  # Maximum number of cached items
+
+# ==================== API RETRY SETTINGS ====================
+# Retry configuration for external API calls (FaithFlow sync, etc.)
+API_MAX_RETRIES = 3
+API_RETRY_DELAYS = [1, 3, 5]  # Seconds to wait before each retry (exponential backoff)
+API_RETRY_TIMEOUT = 30.0  # Request timeout in seconds

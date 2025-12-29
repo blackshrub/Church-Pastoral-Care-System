@@ -59,7 +59,8 @@ from constants import (
     DEFAULT_REMINDER_DAYS_ACCIDENT_ILLNESS, DEFAULT_REMINDER_DAYS_GRIEF_SUPPORT,
     JWT_TOKEN_EXPIRE_HOURS, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE, MAX_PAGE_NUMBER,
     MAX_LIMIT, DEFAULT_ANALYTICS_DAYS, DEFAULT_UPCOMING_DAYS, MAX_IMAGE_SIZE,
-    MAX_CSV_SIZE, MAX_REQUEST_BODY_SIZE, IMAGE_MAGIC_BYTES
+    MAX_CSV_SIZE, MAX_REQUEST_BODY_SIZE, IMAGE_MAGIC_BYTES,
+    API_MAX_RETRIES, API_RETRY_DELAYS, API_RETRY_TIMEOUT
 )
 from models import (
     # UUID utilities
@@ -301,6 +302,36 @@ def get_jakarta_date_str():
     """Get current date in Jakarta as YYYY-MM-DD string"""
     return now_jakarta().strftime('%Y-%m-%d')
 import httpx
+
+async def http_request_with_retry(
+    method: str,
+    url: str,
+    max_retries: int = API_MAX_RETRIES,
+    retry_delays: list = API_RETRY_DELAYS,
+    timeout: float = API_RETRY_TIMEOUT,
+    **kwargs
+) -> httpx.Response:
+    """
+    Make an HTTP request with automatic retry on transient failures.
+    Uses exponential backoff for network errors and timeouts.
+    """
+    last_error = None
+    for attempt in range(max_retries):
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                response = await client.request(method, url, **kwargs)
+                return response
+        except (httpx.ConnectError, httpx.TimeoutException) as e:
+            last_error = e
+            if attempt < max_retries - 1:
+                delay = retry_delays[min(attempt, len(retry_delays) - 1)]
+                logger.warning(f"HTTP {method} {url} failed (attempt {attempt + 1}/{max_retries}): {e}. Retrying in {delay}s...")
+                await asyncio.sleep(delay)
+            else:
+                logger.error(f"HTTP {method} {url} failed after {max_retries} attempts: {e}")
+                raise
+    raise last_error
+
 from PIL import Image
 import io
 import csv
@@ -3953,26 +3984,49 @@ async def perform_member_sync_for_campus(campus_id: str, sync_type: str = "manua
             raise Exception("Failed to decrypt API password")
 
         async with httpx.AsyncClient(timeout=60.0) as client:
-            login_response = await client.post(
-                f"{base_url}{api_path_prefix}/auth/login",
-                json={"email": config["api_email"], "password": decrypted_pwd}
-            )
+            # Login with retry logic
+            login_url = f"{base_url}{api_path_prefix}/auth/login"
+            login_payload = {"email": config["api_email"], "password": decrypted_pwd}
+            login_response = None
+            for attempt in range(API_MAX_RETRIES):
+                try:
+                    login_response = await client.post(login_url, json=login_payload)
+                    break
+                except (httpx.ConnectError, httpx.TimeoutException) as e:
+                    if attempt < API_MAX_RETRIES - 1:
+                        delay = API_RETRY_DELAYS[min(attempt, len(API_RETRY_DELAYS) - 1)]
+                        logger.warning(f"Sync login failed (attempt {attempt + 1}/{API_MAX_RETRIES}): {e}. Retrying in {delay}s...")
+                        await asyncio.sleep(delay)
+                    else:
+                        raise Exception(f"Sync login failed after {API_MAX_RETRIES} attempts: {e}")
 
             if login_response.status_code != 200:
                 raise Exception(f"Login failed: {login_response.text}")
 
             token = login_response.json().get("access_token")
 
-            # Fetch ALL members using pagination
+            # Fetch ALL members using pagination with retry logic
             all_members = []
             page_size = 100
             offset = 0
 
             while True:
-                members_response = await client.get(
-                    f"{base_url}{api_path_prefix}/members/?limit={page_size}&skip={offset}",
-                    headers={"Authorization": f"Bearer {token}"}
-                )
+                members_url = f"{base_url}{api_path_prefix}/members/?limit={page_size}&skip={offset}"
+                members_response = None
+                for attempt in range(API_MAX_RETRIES):
+                    try:
+                        members_response = await client.get(
+                            members_url,
+                            headers={"Authorization": f"Bearer {token}"}
+                        )
+                        break
+                    except (httpx.ConnectError, httpx.TimeoutException) as e:
+                        if attempt < API_MAX_RETRIES - 1:
+                            delay = API_RETRY_DELAYS[min(attempt, len(API_RETRY_DELAYS) - 1)]
+                            logger.warning(f"Sync fetch failed (attempt {attempt + 1}/{API_MAX_RETRIES}): {e}. Retrying in {delay}s...")
+                            await asyncio.sleep(delay)
+                        else:
+                            raise Exception(f"Sync fetch failed after {API_MAX_RETRIES} attempts: {e}")
 
                 if members_response.status_code != 200:
                     if members_response.status_code == 500:
@@ -4985,11 +5039,10 @@ async def broadcast_activity(campus_id: str, activity: dict):
                 try:
                     queue.put_nowait(activity)
                 except asyncio.QueueFull:
-                    # Drop oldest message if queue is full
                     try:
                         queue.get_nowait()
                         queue.put_nowait(activity)
-                    except:
+                    except (asyncio.QueueEmpty, asyncio.QueueFull):
                         pass
 
 async def subscribe_to_activities(campus_id: str) -> Queue:
