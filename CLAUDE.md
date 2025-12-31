@@ -7,7 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **FaithTracker** is a multi-tenant pastoral care management system for GKBJ church. It's a monorepo with FastAPI backend and React frontend designed for managing pastoral care across multiple campuses with complete accountability tracking.
 
 **Tech Stack:**
-- Backend: FastAPI (Python 3.11), MongoDB 7.0 (Motor async driver), APScheduler
+- Backend: Litestar (Python 3.11), MongoDB 8.0 (Motor async driver), APScheduler
+- Cache: DragonflyDB (Redis-compatible, 25x faster)
 - ASGI Server: Granian (Rust-based, faster than Uvicorn)
 - JSON: msgspec (faster than orjson, lower memory)
 - Frontend: React 19 + React Compiler, Vite, TanStack React Query, Shadcn/UI, Tailwind CSS
@@ -288,14 +289,16 @@ REACT_APP_BACKEND_URL=http://localhost:8001/api
 - All queries auto-scope by `church_id` for multi-tenancy
 
 **Caching Patterns:**
-- **In-memory cache** for static data (campuses, settings) with TTL
+- **DragonflyDB (Redis-compatible)** for distributed caching across workers
+  - 25x faster than Redis with better memory efficiency
+  - `CacheService` in `backend/services/cache.py`
+  - Dashboard stats: 10-minute TTL
+  - Settings: 1-hour TTL
+  - Graceful fallback to in-memory if unavailable
+- **In-memory cache** for static data (campuses, settings) with TTL (legacy fallback)
   - `get_from_cache(key, ttl_seconds)` - Retrieve cached value if not expired
   - `set_in_cache(key, value)` - Store value with timestamp
   - `invalidate_cache(pattern)` - Clear cache on updates (pattern-based or full clear)
-- **Cached endpoints** (10-minute TTL):
-  - `/api/campuses` - Campus list (invalidated on campus create/update)
-  - Engagement settings (invalidated on settings update)
-  - Writeoff settings (invalidated on settings update)
 - **Performance impact:** 50-90% reduction in database queries for static data
 
 **MongoDB Connection Pooling:**
@@ -597,16 +600,30 @@ All components must be responsive. Design for mobile first, then enhance for lar
 ```
 data/                            # All persistent data (bind mounts for easy migration)
 ├── mongo/                       # MongoDB database files
+├── dragonfly/                   # DragonflyDB cache persistence
 └── uploads/                     # User-uploaded files (member photos)
+
+secrets/                         # Docker secrets (sensitive credentials)
+├── mongo_password               # MongoDB root password
+├── jwt_secret                   # JWT signing key
+└── encryption_key               # Fernet encryption key
 ```
 
-**Migration:** Copy entire project folder (including `data/`) to new server. Run `make setup`.
+**Migration:** Copy entire project folder (including `data/` and `secrets/`) to new server. Run `make setup`.
 
 ### Backend
 ```
 backend/
-├── server.py                    # MONOLITHIC - entire API (~6500 lines)
+├── server.py                    # Main API (~6500 lines) - routes, middleware, startup
 ├── scheduler.py                 # APScheduler background jobs
+├── secrets.py                   # Docker secrets reader utility
+├── services/                    # Service layer (business logic)
+│   ├── cache.py                 # DragonflyDB distributed cache
+│   ├── member_service.py        # Member CRUD, engagement tracking
+│   ├── care_event_service.py    # Care events, grief/accident timelines
+│   ├── notification_service.py  # Async WhatsApp notifications
+│   └── image_service.py         # Background image processing
+├── routes/                      # Route handlers (extracted from server.py)
 ├── requirements.txt             # Python dependencies
 ├── test_api.sh                  # Comprehensive API test suite
 ├── TESTING_GUIDE.md            # Testing documentation

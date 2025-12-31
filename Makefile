@@ -38,7 +38,7 @@
 .PHONY: help up down restart logs build rebuild status health clean \
         restart-backend restart-frontend rebuild-backend rebuild-frontend \
         logs-backend logs-frontend logs-mongo \
-        backup shell-db shell-backend ps \
+        backup shell-db shell-backend ps init-secrets \
         angie-install angie-status angie-reload angie-test angie-logs \
         ssl-setup ssl-renew ssl-status
 
@@ -355,6 +355,14 @@ clear-cache: ## Clear dashboard cache in MongoDB
 	@echo "$(GREEN)Dashboard cache cleared.$(NC)"
 
 #===============================================================================
+# SECRETS MANAGEMENT
+#===============================================================================
+
+init-secrets: ## Initialize Docker secrets from .env
+	@echo "$(GREEN)Initializing Docker secrets...$(NC)"
+	@./scripts/init-secrets.sh
+
+#===============================================================================
 # FIRST-TIME SETUP
 #===============================================================================
 
@@ -367,13 +375,16 @@ setup: ## First-time setup: install Angie, get SSL, start services
 	@echo "Step 2: Setting up SSL certificates..."
 	$(MAKE) ssl-setup
 	@echo ""
-	@echo "Step 3: Building Docker images..."
+	@echo "Step 3: Initializing secrets..."
+	$(MAKE) init-secrets
+	@echo ""
+	@echo "Step 4: Building Docker images..."
 	$(MAKE) build
 	@echo ""
-	@echo "Step 4: Starting services..."
+	@echo "Step 5: Starting services..."
 	$(MAKE) up
 	@echo ""
-	@echo "Step 5: Checking health..."
+	@echo "Step 6: Checking health..."
 	@sleep 10
 	$(MAKE) health
 	@echo ""

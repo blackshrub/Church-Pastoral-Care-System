@@ -10,12 +10,54 @@
 # Setup:
 #   1. Install Angie: sudo ./angie/install.sh
 #   2. Setup SSL: sudo ./angie/setup-ssl.sh
-#   3. Start services: docker compose up -d
+#   3. Initialize secrets: make init-secrets
+#   4. Start services: docker compose up -d
 #
 # Migration:
-#   Copy entire project folder (including ./data/) to new server
+#   Copy entire project folder (including ./data/ and ./secrets/) to new server
 
 services:
+  # ===================
+  # DragonflyDB Cache (Redis-compatible, 25x faster)
+  # ===================
+  dragonfly:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    container_name: faithtracker-dragonfly
+    restart: unless-stopped
+    # Use Unix socket for better performance within Docker network
+    command: >
+      --logtostderr
+      --cache_mode=true
+      --maxmemory=512mb
+      --hz=100
+      --tcp_keepalive=300
+      --dbfilename=dump
+      --dir=/data
+      --snapshot_cron=0 */6 * * *
+    volumes:
+      - ./data/dragonfly:/data
+    networks:
+      - faithtracker-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 768M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
   # ===================
   # MongoDB Database
   # ===================
@@ -62,7 +104,6 @@ services:
       dockerfile: Dockerfile
     container_name: faithtracker-backend
     restart: unless-stopped
-    # Expose to localhost only (Angie will proxy)
     ports:
       - "127.0.0.1:8001:8001"
     environment:
@@ -71,6 +112,7 @@ services:
       - DB_NAME=faithtracker
       - JWT_SECRET_KEY=${JWT_SECRET}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - DRAGONFLY_URL=redis://dragonfly:6379/0
       - FRONTEND_URL=https://${DOMAIN}
       - ALLOWED_ORIGINS=https://${DOMAIN},https://api.${DOMAIN}
       - WHATSAPP_GATEWAY_URL=${WHATSAPP_GATEWAY_URL:-}
@@ -83,6 +125,11 @@ services:
       - SMTP_PASS=${SMTP_PASS:-}
       - SMTP_FROM=${SMTP_FROM:-}
       - ALERT_EMAIL=${ALERT_EMAIL:-}
+      - SECRETS_DIR=/run/secrets
+    secrets:
+      - mongo_password
+      - jwt_secret
+      - encryption_key
     volumes:
       - ./data/uploads:/app/uploads
       - ./data/logs:/app/logs
@@ -90,6 +137,8 @@ services:
       - faithtracker-network
     depends_on:
       mongo:
+        condition: service_healthy
+      dragonfly:
         condition: service_healthy
     # Resource limits to prevent runaway memory/CPU usage
     deploy:
@@ -160,11 +209,24 @@ networks:
     driver: bridge
 
 # ===================
+# Docker Secrets (Production)
+# ===================
+secrets:
+  mongo_password:
+    file: ./secrets/mongo_password
+  jwt_secret:
+    file: ./secrets/jwt_secret
+  encryption_key:
+    file: ./secrets/encryption_key
+
+# ===================
 # Data Directories (Bind Mounts)
 # ===================
 # Data is stored in ./data/ directory for easy backup and migration:
-#   - ./data/mongo    - MongoDB database files
-#   - ./data/uploads  - User-uploaded files (member photos)
+#   - ./data/mongo      - MongoDB database files
+#   - ./data/dragonfly  - DragonflyDB cache persistence
+#   - ./data/uploads    - User-uploaded files (member photos)
+#   - ./secrets/        - Docker secrets (sensitive credentials)
 #
 # To migrate to a new server, simply copy the entire project folder
-# including the ./data/ directory.
+# including the ./data/ and ./secrets/ directories.

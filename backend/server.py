@@ -5268,8 +5268,15 @@ cors_config = CORSConfig(
 
 # Lifecycle functions
 async def on_startup() -> None:
-    """Initialize dependencies and create default admin if needed"""
-    # Initialize shared dependencies for route modules
+    """Initialize dependencies, cache, and create default admin if needed"""
+    from services.cache import init_cache
+    
+    try:
+        await init_cache()
+        logger.info("DragonflyDB cache initialized")
+    except Exception as e:
+        logger.warning(f"Cache initialization failed (continuing without cache): {e}")
+    
     init_dependencies(db, SECRET_KEY)
     init_member_routes(invalidate_dashboard_cache, log_activity, msgspec_enc_hook, ROOT_DIR)
     init_care_event_routes(
@@ -5332,7 +5339,15 @@ async def on_startup() -> None:
 
 async def on_shutdown() -> None:
     """Cleanup on shutdown"""
+    from services.cache import close_cache
+    
     stop_scheduler()
+    
+    try:
+        await close_cache()
+    except Exception as e:
+        logger.warning(f"Error closing cache: {e}")
+    
     client.close()
 
 
