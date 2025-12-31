@@ -15,6 +15,7 @@ from enums import EventType
 from dependencies import (
     get_db, get_current_user, get_campus_filter, safe_error_detail
 )
+from services.cache import get_cache, CacheService
 
 logger = logging.getLogger(__name__)
 
@@ -403,17 +404,21 @@ async def get_dashboard_reminders(request: Request) -> dict:
         
         campus_tz = await _get_campus_timezone(campus_id)
         today_date = _get_date_in_timezone(campus_tz)
-        cache_key = f"dashboard_reminders_{campus_id}_{today_date}"
-        cached = await db.dashboard_cache.find_one({"cache_key": cache_key})
-        if cached and cached.get("data"):
-            return cached["data"]
-
+        cache_key = f"reminders:{today_date}"
+        
+        cache = get_cache()
+        if cache:
+            cached = await cache.get(cache_key, church_id=campus_id)
+            if cached:
+                cached["cache_source"] = "dragonfly"
+                return cached
+        
         data = await calculate_dashboard_reminders(campus_id, campus_tz, today_date)
-        cache_data = {"cache_key": cache_key, "data": data,
-                      "calculated_at": datetime.now(timezone.utc),
-                      "expires_at": datetime.now(timezone.utc) + timedelta(hours=1)}
-        await db.dashboard_cache.update_one({"cache_key": cache_key}, {"$set": cache_data}, upsert=True)
-        data["cache_version"] = cache_data["calculated_at"].isoformat()
+        
+        if cache:
+            await cache.set(cache_key, data, ttl=CacheService.DASHBOARD_TTL, church_id=campus_id)
+        
+        data["cache_version"] = datetime.now(timezone.utc).isoformat()
         return data
     except Exception as e:
         logger.error(f"Error getting dashboard reminders: {str(e)}")
@@ -421,10 +426,23 @@ async def get_dashboard_reminders(request: Request) -> dict:
 
 
 @get("/dashboard/stats")
-async def get_dashboard_stats() -> dict:
-    """Get overall dashboard statistics"""
+async def get_dashboard_stats(request: Request) -> dict:
+    """Get overall dashboard statistics with DragonflyDB caching"""
+    current_user = await get_current_user(request)
     db = get_db()
     try:
+        campus_id = current_user.get("campus_id", "global")
+        cache_key = "dashboard:stats"
+        
+        # Try cache first
+        cache = get_cache()
+        if cache:
+            cached = await cache.get(cache_key, church_id=campus_id)
+            if cached:
+                cached["cache_source"] = "dragonfly"
+                return cached
+        
+        # Calculate fresh stats
         member_stats_pipeline = [{"$facet": {
             "total_count": [{"$count": "count"}],
             "at_risk_count": [{"$match": {"engagement_status": {"$in": ["at_risk", "disconnected"]}}}, {"$count": "count"}]
@@ -442,8 +460,15 @@ async def get_dashboard_stats() -> dict:
         ]
         financial_aid_result = await db.care_events.aggregate(financial_aid_pipeline).to_list(1)
         total_aid = financial_aid_result[0]["total_aid"] if financial_aid_result else 0
-        return {"total_members": total_members, "active_grief_support": active_grief,
+        
+        data = {"total_members": total_members, "active_grief_support": active_grief,
                 "members_at_risk": at_risk_count, "month_financial_aid": total_aid}
+        
+        # Cache the result
+        if cache:
+            await cache.set(cache_key, data, ttl=CacheService.DASHBOARD_TTL, church_id=campus_id)
+        
+        return data
     except Exception as e:
         logger.error(f"Error getting dashboard stats: {str(e)}")
         raise HTTPException(status_code=500, detail=safe_error_detail(e))

@@ -31,9 +31,6 @@ services:
       --maxmemory=512mb
       --hz=100
       --tcp_keepalive=300
-      --dbfilename=dump
-      --dir=/data
-      --snapshot_cron=0 */6 * * *
     volumes:
       - ./data/dragonfly:/data
     networks:
