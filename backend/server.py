@@ -4177,7 +4177,7 @@ async def perform_member_sync_for_campus(campus_id: str, sync_type: str = "manua
                     stats["matched_by_id"] += 1
                 else:
                     core_name = core_member.get("full_name") or core_member.get("name")
-                    core_phone = core_member.get("phone_whatsapp") or core_member.get("phone")
+                    core_phone = core_member.get("phone") or core_member.get("phone_whatsapp")
                     norm_core_name = normalize_name(core_name) if core_name else ""
                     norm_core_phone = normalize_phone_number(core_phone) if core_phone else ""
 
@@ -4216,7 +4216,7 @@ async def perform_member_sync_for_campus(campus_id: str, sync_type: str = "manua
                 member_data = {
                     "external_member_id": core_id,
                     "name": core_member.get("full_name") or core_member.get("name"),
-                    "phone": normalize_phone_number(core_member.get("phone_whatsapp", "")) if core_member.get("phone_whatsapp") else (normalize_phone_number(core_member.get("phone", "")) if core_member.get("phone") else None),
+                    "phone": normalize_phone_number(core_member.get("phone", "")) if core_member.get("phone") else (normalize_phone_number(core_member.get("phone_whatsapp", "")) if core_member.get("phone_whatsapp") else None),
                     "birth_date": core_member.get("date_of_birth") or core_member.get("birthDate") or core_member.get("birth_date"),
                     "gender": core_member.get("gender"),
                     "membership_status": membership_status,
@@ -4539,6 +4539,49 @@ async def check_setup_status() -> dict:
         raise HTTPException(status_code=500, detail=safe_error_detail(e))
 
 
+# Token cache for core API authentication (avoids rate limiting)
+# Format: {campus_id: {"token": str, "expires_at": datetime}}
+_core_api_token_cache: dict = {}
+
+async def get_cached_core_token(campus_id: str, config: dict) -> str:
+    """Get or refresh cached token for core API authentication"""
+    import httpx
+
+    # Check if we have a valid cached token
+    cached = _core_api_token_cache.get(campus_id)
+    if cached:
+        # Token valid if expires_at is more than 5 minutes from now
+        if cached["expires_at"] > datetime.now(timezone.utc) + timedelta(minutes=5):
+            return cached["token"]
+
+    # Need to login and get a new token
+    api_path_prefix = config.get('api_path_prefix', '/api')
+    base_url = config['api_base_url'].rstrip('/')
+    decrypted_pwd = decrypt_password(config["api_password"])
+
+    if not decrypted_pwd:
+        raise Exception("Failed to decrypt API password")
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        login_response = await client.post(
+            f"{base_url}{api_path_prefix}/auth/login",
+            json={"email": config["api_email"], "password": decrypted_pwd}
+        )
+
+        if login_response.status_code != 200:
+            raise Exception(f"Login failed: {login_response.status_code}")
+
+        token = login_response.json().get("access_token")
+
+        # Cache token for 50 minutes (JWT usually expires in 60)
+        _core_api_token_cache[campus_id] = {
+            "token": token,
+            "expires_at": datetime.now(timezone.utc) + timedelta(minutes=50)
+        }
+
+        return token
+
+
 @post("/sync/webhook")
 async def receive_sync_webhook(request: Request) -> dict:
     """
@@ -4623,31 +4666,18 @@ async def receive_sync_webhook(request: Request) -> dict:
                 }
             
             logger.info(f"Webhook {event_type} received for member {member_id}, syncing...")
-            
+
             try:
                 import httpx
-                from io import BytesIO
-                import base64
 
                 # Get api_path_prefix with fallback for existing configs
                 api_path_prefix = config.get('api_path_prefix', '/api')
                 base_url = config['api_base_url'].rstrip('/')
 
-                # Login to core API
-                decrypted_pwd = decrypt_password(config["api_password"])
-                if not decrypted_pwd:
-                    raise Exception("Failed to decrypt API password")
+                # Get cached token (avoids rate limiting)
+                token = await get_cached_core_token(campus_id, config)
+
                 async with httpx.AsyncClient(timeout=30.0) as client:
-                    login_response = await client.post(
-                        f"{base_url}{api_path_prefix}/auth/login",
-                        json={"email": config["api_email"], "password": decrypted_pwd}
-                    )
-
-                    if login_response.status_code != 200:
-                        raise Exception("Login failed")
-
-                    token = login_response.json().get("access_token")
-
                     if event_type == "member.deleted":
                         # Archive the member
                         await db.members.update_one(
@@ -4677,12 +4707,15 @@ async def receive_sync_webhook(request: Request) -> dict:
                             }
                         
                         core_member = member_response.json()
-                        
+
                         # Prepare member data
+                        # Support both 'phone' and 'phone_whatsapp' fields from core system
+                        # Note: FaithFlow now uses 'phone' only, so prioritize it
+                        phone_raw = core_member.get("phone") or core_member.get("phone_whatsapp") or ""
                         member_data = {
                             "external_member_id": member_id,
                             "name": core_member.get("full_name"),
-                            "phone": normalize_phone_number(core_member.get("phone_whatsapp", "")) if core_member.get("phone_whatsapp") else None,
+                            "phone": normalize_phone_number(phone_raw) if phone_raw else None,
                             "birth_date": core_member.get("date_of_birth"),
                             "gender": core_member.get("gender"),
                             "category": core_member.get("member_status"),
@@ -4699,29 +4732,13 @@ async def receive_sync_webhook(request: Request) -> dict:
                             except (ValueError, TypeError):
                                 member_data["age"] = None
 
-                        # Handle photo if exists
-                        photo_base64 = core_member.get("photo_base64")
-                        if photo_base64 and photo_base64.startswith("data:image"):
-                            try:
-                                image_data = photo_base64.split(",")[1] if "," in photo_base64 else photo_base64
-                                image_bytes = base64.b64decode(image_data)
-                                
-                                upload_dir = Path(ROOT_DIR) / "uploads"
-                                upload_dir.mkdir(exist_ok=True)
-                                
-                                ext = "jpg"
-                                if "png" in photo_base64: ext = "png"
-                                filename = f"JEMAAT-{member_id[:5]}.{ext}"
-                                filepath = upload_dir / filename
-                                
-                                img = Image.open(BytesIO(image_bytes))
-                                img = img.convert('RGB')
-                                img.thumbnail((800, 800), Image.Resampling.LANCZOS)
-                                img.save(filepath, 'JPEG', quality=85)
-                                
-                                member_data["photo_url"] = f"/uploads/{filename}"
-                            except Exception as e:
-                                logger.error(f"Error processing photo: {str(e)}")
+                        # Handle photo - use SeaweedFS URL directly (no need to download)
+                        photo_url = core_member.get("photo_url") or core_member.get("photo_thumbnail_url")
+
+                        if photo_url and photo_url.startswith("http"):
+                            # Use SeaweedFS URL directly - no need to download
+                            member_data["photo_url"] = photo_url
+                            logger.info(f"Using SeaweedFS photo URL for {core_member.get('full_name')}: {photo_url}")
                         
                         # Check if member exists
                         existing = await db.members.find_one({"external_member_id": member_id}, {"_id": 0})
@@ -4832,7 +4849,7 @@ async def get_uploaded_file(filename: str) -> dict:
 
     if not filepath.exists():
         raise HTTPException(status_code=404, detail="File not found")
-    return FileResponse(filepath)
+    return LitestarFile(path=filepath)
 
 @get("/user-photos/{filename:str}")
 async def get_user_photo(filename: str) -> dict:
@@ -4850,7 +4867,7 @@ async def get_user_photo(filename: str) -> dict:
 
     if not filepath.exists():
         raise HTTPException(status_code=404, detail="Photo not found")
-    return FileResponse(filepath)
+    return LitestarFile(path=filepath)
 
 # ==================== SEARCH ENDPOINT ====================
 
